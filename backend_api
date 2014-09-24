@@ -1,0 +1,11 @@
+Description: This file describes the relationship between frontend and backend, and the current state of each
+	property. This is not a complete specification, but rather, it details for those working at the front-
+	end of the application how to communicate with current the backend software at a glance. 
+
+	This document is under rapid development and will change without notice.
+
+Last Modified: 24 September 2014 by birdsongj
+
+URL TEST_WRITTEN IMPLEMENTED REQUEST_TYPE JSON_ARGUMENTS REPLY_CODES JSON_RESPONSE
+
+
