@@ -1,11 +1,24 @@
-Description: This file describes the relationship between frontend and backend, and the current state of each
-	property. This is not a complete specification, but rather, it details for those working at the front-
-	end of the application how to communicate with the current backend software at a glance. 
+Description: This file describes the relationship between frontend and backend, and the current 
+	state of each property. This is not a complete specification, but rather, it details for those 
+	working at the front-end of the application how to communicate with the current backend software
+	at a glance.
 
 	This document is under rapid development and will change without notice.
 
-Last Modified: 24 September 2014 by birdsongj
+Last Modified: 25 September 2014 by birdsongj
 
-URL TEST_WRITTEN IMPLEMENTED REQUEST_TYPE JSON_ARGUMENTS REPLY_CODES JSON_RESPONSE
+Errors:
+	All server errors return with status 500 and {"error":"My error message"}
 
-testing git branch
+URL AUTH TEST_WRITTEN IMPLEMENTED REQUEST_TYPE JSON_ARGUMENTS REPLY_CODES JSON_RESPONSE
+
+/listusers No No No GET Undefined 200 {"firstNames": ["John",...], "lastNames": ["Doe",...]}
+/getrole No No No GET {"usernames":["Usario",...]} 200 {"roles":["admin/recruiter/attendee",...]}
+/login No No No POST {"username":"Usario","password":"pieinthesky"} 200 {"auth":true/false}
+/logout No No No POST {} 200 {}
+/getattends Yes No No GET {"username":"Usario"} 200,500 {"eventID":true/false,...}
+/recruiterstats Yes No No {"Recruiters":["Bob",...]} 200,500 {"Bob":{"Invited":N,"Almost":M,"Accepted":P,"Rank":Q},...}
+/canlogin No No No {"username":"Usario"} 200 {"canlogin":true/false}
+/gettemplates Yes No No {"username":"Usario"} 200,500 {"templateName":"Hi...",...}
+/getevents No No No {} 200 {"eventID":N,"name":"MyCoolEvent","start":"MMDDYYYYHHMM","end":"MMDDYYYYHHMM","location":"SomewhereVill","Schedule":"Text...","Description":"AnEvent"}
+/getattendees Yes No No [STOPPED WRITING HERE FOR THE MOMENT]
