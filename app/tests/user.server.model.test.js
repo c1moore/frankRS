@@ -5,6 +5,7 @@
  */
 var should = require('should'),
 	mongoose = require('mongoose'),
+	assert = require('assert'),
 	User = mongoose.model('User');
 
 /**
@@ -18,8 +19,8 @@ var user, user2;
 describe('User Model Unit Tests:', function() {
 	before(function(done) {
 		user = new User({
-			firstName: 'Full',
-			lastName: 'Name',
+			fName: 'Full',
+			lName: 'Name',
 			displayName: 'Full Name',
 			email: 'test@test.com',
 			username: 'username',
@@ -27,8 +28,8 @@ describe('User Model Unit Tests:', function() {
 			provider: 'local'
 		});
 		user2 = new User({
-			firstName: 'Full',
-			lastName: 'Name',
+			fName: 'Full',
+			lName: 'Name',
 			displayName: 'Full Name',
 			email: 'test@test.com',
 			username: 'username',
@@ -59,8 +60,64 @@ describe('User Model Unit Tests:', function() {
 			});
 		});
 
+		it('should allow getting the first name', function(done) {
+			var fname = user.get('fName');
+			assert.equal(fname,user.fName);
+			assert.notEqual(fname,undefined);
+			done();
+			return;
+		});
+
+		it('should allow getting the last name', function(done) {
+			var lname = user.get('lName');
+			assert.equal(lname,user.lName);
+			assert.notEqual(lname,undefined);
+			done();
+			return;
+		});
+
+		it('should allow getting the email', function(done) {
+			var email = user.get('email');
+			assert.equal(email,user.email);
+			assert.notEqual(email,undefined);
+			done();
+			return;
+		});
+
+		it('should allow getting the password', function(done) {
+			var password = user.get('password');
+			assert.equal(password,user.password);
+			assert.notEqual(password,undefined);
+			done();
+			return;
+		});
+
+		it('should allow getting the role', function(done) {
+			var role = user.get('role');
+			assert.equal(role,user.role);
+			assert.notEqual(role,undefined);
+			done();
+			return;
+		});
+
+		it('should allow getting the status', function(done) {
+			var status = user.get('status');
+			assert.equal(status,user.status);
+			assert.notEqual(status,undefined);
+			done();
+			return;
+		});
+
+		it('should allow getting the status', function(done) {
+			var status = user.get('status');
+			assert.equal(status,user.status);
+			assert.notEqual(status,undefined);
+			done();
+			return;
+		});
+
 		it('should be able to show an error when try to save without first name', function(done) {
-			user.firstName = '';
+			user.fName = '';
 			return user.save(function(err) {
 				should.exist(err);
 				done();
