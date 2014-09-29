@@ -142,26 +142,26 @@ describe('User Model Unit Tests:', function() {
 			return;
 		});
 
-		it('should allow getting the attendee list', function(done) {
-			var attendees = user.get('attendees');
-			assert.equal(attendees,user.attendees);
-			assert.notEqual(attendees,undefined);
+		it('should allow getting the attendee_list', function(done) {
+			var attendee_list = user.get('attendee_list');
+			assert.equal(attendee_list,user.attendee_list);
+			assert.notEqual(attendee_list,undefined);
 			done();
 			return;
 		});
 
-		it('should allow getting the invitees list', function(done) {
-			var invitees = user.get('invitees');
-			assert.equal(invitees,user.invitees);
-			assert.notEqual(invitees,undefined);
+		it('should allow getting the invitee_list', function(done) {
+			var invitee_list = user.get('invitee_list');
+			assert.equal(invitee_list,user.invitee_list);
+			assert.notEqual(invitee_list,undefined);
 			done();
 			return;
 		});
 
-		it('should allow getting the almosts list', function(done) {
-			var almosts = user.get('almosts');
-			assert.equal(almosts,user.almosts);
-			assert.notEqual(almosts,undefined);
+		it('should allow getting the almost_list', function(done) {
+			var almost_list = user.get('almost_list');
+			assert.equal(almost_list,user.almost_list);
+			assert.notEqual(almost_list,undefined);
 			done();
 			return;
 		});
@@ -251,6 +251,36 @@ describe('User Model Unit Tests:', function() {
 			user.login_enable = undefined;
 			return user.save(function(err) {
 				user.login_enable = login_enable_old;
+				should.exist(err);
+				done();
+			});
+		});
+
+		it('should be able to show an error when try to save without an invitee_list', function(done) {
+			var invitee_list_old = user.invitee_list;
+			user.invitee_list = undefined;
+			return user.save(function(err) {
+				user.invitee_list = invitee_list_old;
+				should.exist(err);
+				done();
+			});
+		});
+
+		it('should be able to show an error when try to save without an attendee_list', function(done) {
+			var attendee_list_old = user.attendee_list;
+			user.attendee_list = undefined;
+			return user.save(function(err) {
+				user.attendee_list = attendee_list_old;
+				should.exist(err);
+				done();
+			});
+		});
+
+		it('should be able to show an error when try to save without an almost_list', function(done) {
+			var almost_list_old = user.almost_list;
+			user.almost_list = undefined;
+			return user.save(function(err) {
+				user.almost_list = almost_list_old;
 				should.exist(err);
 				done();
 			});
