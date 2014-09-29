@@ -142,6 +142,30 @@ describe('User Model Unit Tests:', function() {
 			return;
 		});
 
+		it('should allow getting the attendee list', function(done) {
+			var attendees = user.get('attendees');
+			assert.equal(attendees,user.attendees);
+			assert.notEqual(attendees,undefined);
+			done();
+			return;
+		});
+
+		it('should allow getting the invitees list', function(done) {
+			var invitees = user.get('invitees');
+			assert.equal(invitees,user.invitees);
+			assert.notEqual(invitees,undefined);
+			done();
+			return;
+		});
+
+		it('should allow getting the almosts list', function(done) {
+			var almosts = user.get('almosts');
+			assert.equal(almosts,user.almosts);
+			assert.notEqual(almosts,undefined);
+			done();
+			return;
+		});
+
 		it('should be able to show an error when try to save without first name', function(done) {
 			var fName_old = user.fName;
 			user.fName = '';
