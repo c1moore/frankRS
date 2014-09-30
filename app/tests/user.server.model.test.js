@@ -118,6 +118,14 @@ describe('User Model Unit Tests:', function() {
 			return;
 		});
 
+		it('should allow getting the almost_count', function(done) {
+			var almost_count = user.get('almost_count');
+			assert.equal(almost_count,user.almost_count);
+			assert.notEqual(almost_count,undefined);
+			done();
+			return;
+		});
+
 		it('should allow getting the rank', function(done) {
 			var rank = user.get('rank');
 			assert.equal(rank,user.rank);
@@ -281,6 +289,76 @@ describe('User Model Unit Tests:', function() {
 			user.almost_list = undefined;
 			return user.save(function(err) {
 				user.almost_list = almost_list_old;
+				should.exist(err);
+				done();
+			});
+		});
+
+		it('should be able to show an error when try to save with a clearly invalid email', function(done) {
+			var email_old = user.email;
+			user.email = "This is clearly not an email address";
+			return user.save(function(err) {
+				user.email = email_old;
+				should.exist(err);
+				done();
+			});
+		});
+
+		it('should be able to show an error when try to save with a not-so-clearly invalid email', function(done) {
+			var email_old = user.email;
+			user.email = "invalid@";
+			return user.save(function(err) {
+				user.email = email_old;
+				should.exist(err);
+				done();
+			});
+		});
+
+		it('should be able to show an error when try to save with an invalid role', function(done) {
+			var role_old = user.role;
+			user.role = "Giant sabertooth tiger";
+			return user.save(function(err) {
+				user.role = role_old;
+				should.exist(err);
+				done();
+			});
+		});
+
+		it('should be able to show an error when try to save with a negative invitee_count', function(done) {
+			var invitee_count_old = user.invitee_count;
+			user.invitee_count = -1;
+			return user.save(function(err) {
+				user.invitee_count = invitee_count_old;
+				should.exist(err);
+				done();
+			});
+		});
+
+		it('should be able to show an error when try to save with a negative attendee_count', function(done) {
+			var attendee_count_old = user.attendee_count;
+			user.attendee_count = -1;
+			return user.save(function(err) {
+				user.attendee_count = attendee_count_old;
+				should.exist(err);
+				done();
+			});
+		});
+
+		it('should be able to show an error when try to save with a negative almost_count', function(done) {
+			var almost_count_old = user.almost_count;
+			user.almost_count = -1;
+			return user.save(function(err) {
+				user.almost_count = almost_count_old;
+				should.exist(err);
+				done();
+			});
+		});
+
+		it('should be able to show an error when try to save with a non-boolean login_enable', function(done) {
+			var login_enable_old = user.login_enable;
+			user.login_enable = "true";
+			return user.save(function(err) {
+				user.login_enable = login_enable_old;
 				should.exist(err);
 				done();
 			});
