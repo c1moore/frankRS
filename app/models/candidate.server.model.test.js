@@ -40,7 +40,6 @@ var CandidateSchema = new Schema({
 		type: String,
 		enum: ['volunteer','invited','accepted'],
 		default: 'volunteer'
-		trim: true
 	},
 	events: {
 		type: [{
