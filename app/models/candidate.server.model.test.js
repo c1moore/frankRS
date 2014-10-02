@@ -43,7 +43,7 @@ var CandidateSchema = new Schema({
 	},
 	events: {
 		type: [{
-			eventsID: {type: Objectid}
+			eventsID: {type: Objectid},
 			accepted: {type: Boolean, default: 'false'}
 		}]
 
