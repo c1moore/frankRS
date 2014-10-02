@@ -23,15 +23,13 @@ describe('Candidate Model Unit Tests:', function() {
 				fName : 'Full',
 				lName : 'Name',
 				email : 'test@test.com',
-				status : 'volunteer',
-				accept : 'false'
+				status : 'volunteer'
 			});
 			duplicate = new candidate({
 				fName : 'Full',
 				lName : 'Name',
 				email : 'test@test.com',
-				status : 'volunteer',
-				accept : 'false'
+				status : 'volunteer'
 			});
 
 			done();
