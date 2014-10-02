@@ -9,9 +9,9 @@ var mongoose = require('mongoose'),
 	/**
  * A Validation function for local strategy properties
  */
-var validateLocalStrategyProperty = function(property) {
-	return ((this.provider !== 'local' && !this.updated) || property.length>0);
-};
+//var validateLocalStrategyProperty = function(property) {
+//	return ((this.provider !== 'local' && !this.updated) || property.length>0);
+//};
 
 
 
@@ -19,21 +19,21 @@ var CandidateSchema = new Schema({
 	fName: {
 		type: String,
 		trim: true,
-		default: '',
-		validate: [validateLocalStrategyProperty, 'Please fill in your first name']
+		//validate: [validateLocalStrategyProperty, 'Please fill in your first name']
+		require: 'First name required.'
 	},
 	lName: {
 		type: String,
 		trim: true,
-		default: '',
-		validate: [validateLocalStrategyProperty, 'Please fill in your last name']
+		//validate: [validateLocalStrategyProperty, 'Please fill in your last name']
+		require: "Last name required."
 	},
 	email: {
 		type: String,
 		unique: 'Email is already associated with a candidate',
 		trim: true,
 		default: '',
-		validate: [validateLocalStrategyProperty, 'Please fill in your email'],
+		require: "Email address required.",
 		match: [/.+\@.+\..+/, 'Please fill a valid email address']
 	},
 	status: {
@@ -43,17 +43,17 @@ var CandidateSchema = new Schema({
 	},
 	events: {
 		type: [{
-			eventsID: {type: Objectid},
+			eventsID: {type: mongoose.Schema.Types.ObjectId},
 			accepted: {type: Boolean, default: 'false'}
 		}]
 
 	},
 	accept_key: {
-		type: string,
+		type: String,
 		default: 'false'
 	},
 	note: {
-		type: string,
+		type: String,
 		default: ''
 	}
 
@@ -61,8 +61,7 @@ var CandidateSchema = new Schema({
 });
 
 CandidateSchema.CreateAcceptKey = function() {
-	        var chars = 
-"01@2345$6789-ABCDEF+GHIJK=LMNO*PQRSTU#VWXT+Zabcdefghiklmnopqrstuvwxyz"; 
+	    var chars = "01@2345$6789-ABCDEF+GHIJK=LMNO*PQRSTU#VWXT+Zabcdefghiklmnopqrstuvwxyz"; 
         var randomstring = ''; 
         var string_length = 100;
         for (var i=0; i<string_length; i++) { 

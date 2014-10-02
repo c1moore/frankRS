@@ -92,26 +92,26 @@ var UserSchema = new Schema({
   	},
   	status: {
   		type: [{
-  			event_id: {type: Objectid},
+  			event_id: {type: mongoose.Schema.Types.ObjectId},
   			status: {type: Boolean}
   		}]
-  	}
+  	},
   	inviteeList: {
   		type: [{
-  			user_id: {type: Objectid},
-  			event_id: {type: Objectid}
+  			user_id: {type: mongoose.Schema.Types.ObjectId},
+  			event_id: {type: mongoose.Schema.Types.ObjectId}
   		}]
   	},
   	attendeeList: {
   		type: [{
-  			user_id: {type: Objectid},
-  			event_id: {type: Objectid}
+  			user_id: {type: mongoose.Schema.Types.ObjectId},
+  			event_id: {type: mongoose.Schema.Types.ObjectId}
   		}]
   	},
   	almostList: {
   		type: [{
-  			user_id: {type: Objectid},
-  			event_id: {type: Objectid}
+  			user_id: {type: mongoose.Schema.Types.ObjectId},
+  			event_id: {type: mongoose.Schema.Types.ObjectId}
   		}]
   	},
   	rank: {
