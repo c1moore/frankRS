@@ -40,11 +40,10 @@ var CandidateSchema = new Schema({
 		type: String,
 		enum: ['volunteer','invited','accepted'],
 		default: 'volunteer'
-		trim: true
 	},
 	events: {
 		type: [{
-			eventsID: {type: Objectid}
+			eventsID: {type: Objectid},
 			accepted: {type: Boolean, default: 'false'}
 		}]
 
