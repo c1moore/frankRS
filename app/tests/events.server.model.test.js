@@ -5,7 +5,7 @@
  */
 var should = require('should'),
 	mongoose = require('mongoose'),
-	events = mongoose.model('Events');
+	events = mongoose.model('Event');
 
 /**
 * Global Variabls used for testing
