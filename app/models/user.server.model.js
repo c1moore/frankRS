@@ -70,7 +70,7 @@ var UserSchema = new Schema({
 	additionalProvidersData: {},
 	roles: {
 		type: [{
-			type: String,
+			type: [String],
 			enum: ['admin', 'recruiter', 'attendee']
 		}],
 		//default: ['user']
