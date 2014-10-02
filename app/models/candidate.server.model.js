@@ -60,7 +60,7 @@ var CandidateSchema = new Schema({
 
 });
 
-CandidateSchema.CreateAcceptKey = function() {
+CandidateSchema.methods.CreateAcceptKey = function() {
 	    var chars = "01@2345$6789-ABCDEF+GHIJK=LMNO*PQRSTU#VWXT+Zabcdefghiklmnopqrstuvwxyz"; 
         var randomstring = ''; 
         var string_length = 100;
@@ -68,9 +68,7 @@ CandidateSchema.CreateAcceptKey = function() {
                 var rnum = Math.floor(Math.random() * chars.length); 
                 randomstring += chars.substring(rnum,rnum+1); 
         }
-        return randomstring; 
-
-
+        return randomstring;
 };
 
 

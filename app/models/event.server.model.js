@@ -8,11 +8,11 @@ var mongoose = require('mongoose'),
 
 //Validation functions
 var dateMustBeAtLeastToday = function(start_date) {
-	return (start_date >= Date.now);
+	return (start_date >= Date.getTime())
 };
 
 var dateMustBeBeforeStart = function(end_date) {
-	return (this.start_date > end_Date);
+	return (this.start_date > end_date);
 };
 
 /**
