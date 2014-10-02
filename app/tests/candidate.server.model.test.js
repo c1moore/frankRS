@@ -10,38 +10,32 @@ var should = require('should'),
 /**
  * Globals
  */
-var candidate1, candidate2, candidate3;
+var candidate1, duplicate;
 
 /**
  * Unit tests
  */
 describe('Candidate Model Unit Tests:', function() {
-	before(function(done) {
-		candidate1 = new candidate({
-			fName : 'Full',
-			lName : 'Name',
-			email : 'test@test.com',
-			status : 'volunteer',
-			accept : 'false'
-		});
-		duplicate = new candidate({
-			fName : 'Full',
-			lName : 'Name',
-			email : 'test@test.com',
-			status : 'volunteer',
-			accept : 'false'
-		});
-
-		done();
-	});
 
 	describe('Method Save', function() {
-		//it('should begin with no users', function(done) {
-		//	User.find({}, function(err, users) {
-		//		users.should.have.length(0);
-		//		done();
-		//	});
-		//});
+		beforeEach(function(done) {
+			candidate1 = new candidate({
+				fName : 'Full',
+				lName : 'Name',
+				email : 'test@test.com',
+				status : 'volunteer',
+				accept : 'false'
+			});
+			duplicate = new candidate({
+				fName : 'Full',
+				lName : 'Name',
+				email : 'test@test.com',
+				status : 'volunteer',
+				accept : 'false'
+			});
+
+			done();
+		});
 
 		it('should be able to save without problems', function(done) {
 			candidate1.save(done);
@@ -78,12 +72,11 @@ describe('Candidate Model Unit Tests:', function() {
 				done();
 			});
 		});
-	});
 
-	after(function(done) {
-		candidate1.remove().exec();
-		candidate2.remove().exec();
-		candidate3.remove().exec();
-		done();
+		afterEach(function(done) {
+			candidate1.remove().exec();
+			duplicate.remove().exec();
+			done();
+		});
 	});
 });
