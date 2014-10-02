@@ -48,12 +48,12 @@ var UserSchema = new Schema({
 		validate: [validateLocalStrategyProperty, 'Please fill in your email'],
 		match: [/.+\@.+\..+/, 'Please fill a valid email address']
 	},
-	username: {
-		type: String,
-		unique: 'testing error message',
-		required: 'Please fill in a username',
-		trim: true
-	},
+	//username: {
+	//	type: String,
+	//	unique: 'testing error message',
+	//	required: 'Please fill in a username',
+	//	trim: true
+	//},
 	password: {
 		type: String,
 		default: '',
@@ -70,10 +70,11 @@ var UserSchema = new Schema({
 	additionalProvidersData: {},
 	roles: {
 		type: [{
-			type: String,
-			enum: ['user', 'admin']
+			type: [String],
+			enum: ['admin', 'recruiter', 'attendee']
 		}],
-		default: ['user']
+		//default: ['user']
+		required: 'User role is requred'
 	},
 	updated: {
 		type: Date
@@ -88,6 +89,44 @@ var UserSchema = new Schema({
 	},
   	resetPasswordExpires: {
   		type: Date
+  	},
+  	status: {
+  		type: [{
+  			event_id: {type: Objectid},
+  			status: {type: Boolean}
+  		}]
+  	}
+  	inviteeList: {
+  		type: [{
+  			user_id: {type: Objectid},
+  			event_id: {type: Objectid}
+  		}]
+  	},
+  	attendeeList: {
+  		type: [{
+  			user_id: {type: Objectid},
+  			event_id: {type: Objectid}
+  		}]
+  	},
+  	almostList: {
+  		type: [{
+  			user_id: {type: Objectid},
+  			event_id: {type: Objectid}
+  		}]
+  	},
+  	rank: {
+  		type: Number,
+  		min: [1, 'Rank must be at least 1']
+  	},
+  	login_enabled: {
+  		type: Boolean,
+  		required: 'login_enabled required'
+  	},
+  	templates: {
+  		type: [{
+  			name: {type: String},
+  			template: {type: String}
+  		}]
   	}
 });
 
