@@ -159,7 +159,7 @@ describe('User Model Unit Tests:', function() {
 		});
 
 		it('should be able to show an error when try to save without a role', function(done) {
-			user.role = '';
+			user.role = {};
 			return user.save(function(err) {
 				should.exist(err);
 				done();
@@ -199,7 +199,7 @@ describe('User Model Unit Tests:', function() {
 		});
 
 		it('should be able to show an error when try to save with an invalid role', function(done) {
-			user.role = "Giant sabertooth tiger";
+			user.role = {"Giant sabertooth tiger","Attendee"};
 			return user.save(function(err) {
 				should.exist(err);
 				done();

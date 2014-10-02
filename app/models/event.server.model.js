@@ -19,25 +19,31 @@ var dateMustBeBeforeStart = function(end_date) {
  * Event Schema
  */
 var EventSchema = new Schema({
-	name: {
-		type: String,
-		trim: true,
-		required: "A name is required"
-	},
-	start_date: {
-		type: Date,
-		required: "A start date is required",
-		validate: [dateMustBeAtLeastToday, 'Date must be at least today if not later']
-	},
-	end_date: {
-		type: Date,
-		required: "An end date is required",
-		validate: [dateMustBeBeforeStart, 'End date must not exceed the start date']
-	},
-	location: {
-		type: String,
-		trim: true,
-		required: "The event must have a location"
+	contents: {
+		type: [{
+			name: {
+				type: String,
+				trim: true,
+				unique: "Events must have a unique name",
+				required: "A name is required"
+			},
+			start_date: {
+				type: Date,
+				required: "A start date is required",
+				validate: [dateMustBeAtLeastToday, 'Date must be at least today if not later']
+			},
+			end_date: {
+				type: Date,
+				required: "An end date is required",
+				validate: [dateMustBeBeforeStart, 'End date must not exceed the start date']
+			},
+			location: {
+				type: String,
+				trim: true,
+				required: "The event must have a location"
+			}
+		}],
+		unique: true
 	},
 	schedule: {
 		type: String,
