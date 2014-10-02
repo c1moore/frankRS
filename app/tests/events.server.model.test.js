@@ -17,7 +17,7 @@ var event1, event2, event3;
 */
 
 describe('Event Model Unit Tests',function() {
-	before(function(done){
+	beforeeach(function(done){
 		event1 = new events({
 		name:  "testing123",
 		sdate: "10.30.2014",
