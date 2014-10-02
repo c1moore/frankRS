@@ -126,30 +126,6 @@ describe('User Model Unit Tests:', function() {
 			return;
 		});
 
-		it('should allow getting the attendee_list', function(done) {
-			var attendee_list = user.get('attendee_list');
-			assert.equal(attendee_list,user.attendee_list);
-			assert.notEqual(attendee_list,undefined);
-			done();
-			return;
-		});
-
-		it('should allow getting the invitee_list', function(done) {
-			var invitee_list = user.get('invitee_list');
-			assert.equal(invitee_list,user.invitee_list);
-			assert.notEqual(invitee_list,undefined);
-			done();
-			return;
-		});
-
-		it('should allow getting the almost_list', function(done) {
-			var almost_list = user.get('almost_list');
-			assert.equal(almost_list,user.almost_list);
-			assert.notEqual(almost_list,undefined);
-			done();
-			return;
-		});
-
 		it('should be able to show an error when try to save without first name', function(done) {
 			user.fName = '';
 			return user.save(function(err) {
@@ -198,22 +174,6 @@ describe('User Model Unit Tests:', function() {
 			});
 		});
 
-		it('should be able to show an error when try to save without an invite_count', function(done) {
-			user.invite_count = undefined;
-			return user.save(function(err) {
-				should.exist(err);
-				done();
-			});
-		});
-
-		it('should be able to show an error when try to save without an attendee_count', function(done) {
-			user.attendee_count = undefined;
-			return user.save(function(err) {
-				should.exist(err);
-				done();
-			});
-		});
-
 		it('should be able to show an error when try to save without a login_enable', function(done) {
 			user.login_enable = undefined;
 			return user.save(function(err) {
@@ -222,101 +182,57 @@ describe('User Model Unit Tests:', function() {
 			});
 		});
 
-		it('should be able to show an error when try to save without an invitee_list', function(done) {
-			var invitee_list_old = user.invitee_list;
-			user.invitee_list = undefined;
-			return user.save(function(err) {
-				user.invitee_list = invitee_list_old;
-				should.exist(err);
-				done();
-			});
-		});
-
-		it('should be able to show an error when try to save without an attendee_list', function(done) {
-			var attendee_list_old = user.attendee_list;
-			user.attendee_list = undefined;
-			return user.save(function(err) {
-				user.attendee_list = attendee_list_old;
-				should.exist(err);
-				done();
-			});
-		});
-
-		it('should be able to show an error when try to save without an almost_list', function(done) {
-			var almost_list_old = user.almost_list;
-			user.almost_list = undefined;
-			return user.save(function(err) {
-				user.almost_list = almost_list_old;
-				should.exist(err);
-				done();
-			});
-		});
-
 		it('should be able to show an error when try to save with a clearly invalid email', function(done) {
-			var email_old = user.email;
 			user.email = "This is clearly not an email address";
 			return user.save(function(err) {
-				user.email = email_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save with a not-so-clearly invalid email', function(done) {
-			var email_old = user.email;
 			user.email = "invalid@";
 			return user.save(function(err) {
-				user.email = email_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save with an invalid role', function(done) {
-			var role_old = user.role;
 			user.role = "Giant sabertooth tiger";
 			return user.save(function(err) {
-				user.role = role_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save with a negative invitee_count', function(done) {
-			var invitee_count_old = user.invitee_count;
 			user.invitee_count = -1;
 			return user.save(function(err) {
-				user.invitee_count = invitee_count_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save with a negative attendee_count', function(done) {
-			var attendee_count_old = user.attendee_count;
 			user.attendee_count = -1;
 			return user.save(function(err) {
-				user.attendee_count = attendee_count_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save with a negative almost_count', function(done) {
-			var almost_count_old = user.almost_count;
 			user.almost_count = -1;
 			return user.save(function(err) {
-				user.almost_count = almost_count_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save with a non-boolean login_enable', function(done) {
-			var login_enable_old = user.login_enable;
 			user.login_enable = "true";
 			return user.save(function(err) {
-				user.login_enable = login_enable_old;
 				should.exist(err);
 				done();
 			});
