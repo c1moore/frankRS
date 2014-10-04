@@ -55,75 +55,75 @@ describe('User Model Unit Tests:', function() {
 		});
 
 		it('should allow getting the first name', function(done) {
-			var fname = user.get('fName');
+			var fname = user.fName;
 			assert.equal(fname,user.fName);
 			assert.notEqual(fname,undefined);
 			done();
-			return;
+			//return;
 		});
 
 		it('should allow getting the last name', function(done) {
-			var lname = user.get('lName');
+			var lname = user.lName;
 			assert.equal(lname,user.lName);
 			assert.notEqual(lname,undefined);
 			done();
-			return;
+			//return;
 		});
 
 		it('should allow getting the email', function(done) {
-			var email = user.get('email');
+			var email = user.email;
 			assert.equal(email,user.email);
 			assert.notEqual(email,undefined);
 			done();
-			return;
+			//return;
 		});
 
 		it('should allow getting the password', function(done) {
-			var password = user.get('password');
+			var password = user.password;
 			assert.equal(password,user.password);
 			assert.notEqual(password,undefined);
 			done();
-			return;
+			//return;
 		});
 
 		it('should allow getting the role', function(done) {
-			var role = user.get('role');
+			var role = user.role;
 			assert.equal(role,user.role);
 			assert.notEqual(role,undefined);
 			done();
-			return;
+			//return;
 		});
 
 		it('should allow getting the status', function(done) {
-			var status = user.get('status');
+			var status = user.status;
 			assert.equal(status,user.status);
 			assert.notEqual(status,undefined);
 			done();
-			return;
+			//return;
 		});
 
 		it('should allow getting the rank', function(done) {
-			var rank = user.get('rank');
+			var rank = user.rank;
 			assert.equal(rank,user.rank);
 			assert.notEqual(rank,undefined);
 			done();
-			return;
+			//return;
 		});
 		
 		it('should allow getting the login_enable', function(done) {
-			var login_enable = user.get('login_enable');
+			var login_enable = user.login_enable;
 			assert.equal(login_enable,user.login_enable);
 			assert.notEqual(login_enable,undefined);
 			done();
-			return;
+			//return;
 		});
 
 		it('should allow getting the templates', function(done) {
-			var templates = user.get('templates');
+			var templates = user.templates;
 			assert.equal(templates,user.templates);
 			assert.notEqual(templates,undefined);
 			done();
-			return;
+			//return;
 		});
 
 		it('should be able to show an error when try to save without first name', function(done) {
@@ -199,7 +199,7 @@ describe('User Model Unit Tests:', function() {
 		});
 
 		it('should be able to show an error when try to save with an invalid role', function(done) {
-			user.role = {"Giant sabertooth tiger","Attendee"};
+			user.role = ["Giant sabertooth tiger","Attendee"];
 			return user.save(function(err) {
 				should.exist(err);
 				done();

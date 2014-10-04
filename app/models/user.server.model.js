@@ -70,7 +70,7 @@ var UserSchema = new Schema({
 	additionalProvidersData: {},
 	roles: {
 		type: [{
-			type: [String],
+			type: String,
 			enum: ['admin', 'recruiter', 'attendee']
 		}],
 		//default: ['user']
@@ -116,7 +116,7 @@ var UserSchema = new Schema({
   	},
   	rank: {
   		type: Number,
-  		min: [1, 'Rank must be at least 1']
+  		min: 1//[1, 'Rank must be at least 1']
   	},
   	login_enabled: {
   		type: Boolean,
