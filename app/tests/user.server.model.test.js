@@ -62,71 +62,71 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the first name', function(done) {
 			var fname = user.fName;
-			assert.equal(fname,user.fName);
-			assert.notEqual(fname,undefined);
+			(fname).should.be.equal(user.fName);
+			(fname).should.not.be(undefined);
 			done();
 		});
 
 		it('should allow getting the last name', function(done) {
 			var lname = user.lName;
-			assert.equal(lname,user.lName);
-			assert.notEqual(lname,undefined);
+			(lname).should.be.equal(user.lName);
+			(lname).should.be.equal(undefined);
 			done();
 		});
 
 		it('should allow getting the email', function(done) {
 			var email = user.email;
-			assert.equal(email,user.email);
-			assert.notEqual(email,undefined);
+			(email).should.be.equal(user.email);
+			(email).should.not.be.equal(undefined);
 			done();
 		});
 
 		it('should allow getting the password', function(done) {
 			var password = user.password;
-			assert.equal(password,user.password);
-			assert.notEqual(password,undefined);
+			(password).should.be.equal(user.password);
+			(password).should.not.be.equal(undefined);
 			done();
 		});
 
 		it('should allow getting the password salt', function(done) {
 			var salt = user.salt;
-			assert.equal(salt,user.salt);
-			assert.notEqual(salt,undefined);
+			(salt).should.be.equal(user.salt);
+			(salt).should.not.be.equal(undefined);
 			done();
 		});
 
 		it('should allow getting the roles', function(done) {
 			var roles = user.roles;
-			assert.equal(role,user.role);
-			assert.notEqual(role,undefined);
+			(roles).should.be.equal(user.roles);
+			(roles).should.not.be.equal(undefined);
 			done();
 		});
 
 		it('should allow getting the status', function(done) {
 			var status = user.status;
-			assert.equal(status,user.status);
-			assert.notEqual(status,undefined);
+			(status).should.be.equal(user.status);
+			(status).should.not.be.equal(undefined);
 			done();
 		});
 
 		it('should allow getting the rank', function(done) {
 			var rank = user.rank;
-			assert.equal(rank,user.rank);
-			assert.notEqual(rank,undefined);
+			(rank).should.be.equal(user.rank);
+			(rank).should.not.be.equal(undefined);
 			done();
 		});
 		
-		it('should allow getting the login_enable', function(done) {
-			var login_enable = user.login_enable;
-			assert.equal(login_enable,user.login_enable);
-			assert.notEqual(login_enable,undefined);
+		it('should allow getting the login_enabled', function(done) {
+			var login_enabled = user.login_enabled;
+			(login_enabled).should.be.equal(user.login_enabled);
+			(login_enabled).should.not.be.equal(undefined);
 			done();
 		});
 
 		it('should allow getting the templates', function(done) {
 			var templates = user.templates;
-			assert.equal(templates,user.templates);
-			assert.notEqual(templates,undefined);
+			(templates).should.be.equal(user.templates);
+			(templates).should.not.be.equal(undefined);
 			done();
 		});
 
