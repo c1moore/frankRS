@@ -186,7 +186,7 @@ describe('Event Model Unit Tests',function() {
 		afterEach(function(done){
 			event1.remove();
 			event2.remove();
-			event3.remove();
+			//event3.remove();
 			done();
 		});
 	});
