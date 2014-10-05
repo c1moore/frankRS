@@ -95,8 +95,8 @@ describe('User Model Unit Tests:', function() {
 			done();
 		});
 
-		it('should allow getting the role', function(done) {
-			var role = user.role;
+		it('should allow getting the roles', function(done) {
+			var roles = user.roles;
 			assert.equal(role,user.role);
 			assert.notEqual(role,undefined);
 			done();
