@@ -18,7 +18,7 @@ var candidate1, duplicate;
 describe('Candidate Model Unit Tests:', function() {
 
 	describe('Method Save', function() {
-		beforeEach(function(done) {
+		before(function(done) {
 			candidate1 = new candidate({
 				fName : 'Full',
 				lName : 'Name',
@@ -49,7 +49,7 @@ describe('Candidate Model Unit Tests:', function() {
 
 		it('should show an error when trying to save without first name', function(done) {
 			candidate1.fName = '';
-			return user.save(function(err) {
+			return candidate1.save(function(err) {
 				should.exist(err);
 				done();
 			});
@@ -57,7 +57,7 @@ describe('Candidate Model Unit Tests:', function() {
 
 		it('should show an error when trying to save without last name', function(done) {
 			candidate1.lName = '';
-			return user.save(function(err) {
+			return candidate1.save(function(err) {
 				should.exist(err);
 				done();
 			});
@@ -65,7 +65,7 @@ describe('Candidate Model Unit Tests:', function() {
 
 		it('should show an error when trying to save without email', function(done) {
 			candidate1.email = '';
-			return user.save(function(err) {
+			return candidate1.save(function(err) {
 				should.exist(err);
 				done();
 			});
