@@ -15,6 +15,15 @@ var dateMustBeBeforeStart = function(end_date) {
 	return (this.start_date > end_date);
 };
 
+var contentsValidate = function(contents) {
+	if (!contents) return false;
+	if (!name) return false;
+	if (!start_date) return false;
+	if (!end_date) return false;
+	if (!location) return false;
+	return true;
+};
+
 /**
  * Event Schema
  */
@@ -43,7 +52,8 @@ var EventSchema = new Schema({
 				required: "The event must have a location"
 			}
 		},
-		unique: true
+		unique: true,
+		validate: [contentsValidate, "The event contains empty fields"]
 	},
 	schedule: {
 		type: String,
