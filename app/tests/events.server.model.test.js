@@ -21,19 +21,21 @@ describe('Event Model Unit Tests',function() {
 	describe('Method Save',function(){
 		beforeEach(function(done){
 			event1 = new events({
+				contents: {
 				name:  "testing123",
-				sdate: "10.30.2014",
-				edate: "10.31.2014",
-				loc: "UF",
-				sched: "www.google.com"
-			});
+				start_date: "10.30.2014",
+				end_date: "10.31.2014",
+				location: "UF",
+				schedule: "www.google.com"
+			}});
 			event2 = new events({
+				contents: {
 				name:  "testing123",
-				sdate: "10.30.2014",
-				edate: "10.31.2014",
-				loc: "UF",
-				sched: "www.google.com"
-			});
+				start_date: "10.30.2014",
+				end_date: "10.31.2014",
+				location: "UF",
+				schedule: "www.google.com"
+			}});
 
 			done();
 		});
@@ -51,50 +53,50 @@ describe('Event Model Unit Tests',function() {
 		});
 
 		it('should allow an event to share everything but the name',function(done){
-			event2.name = 'Off campus';
+			event2.contents.name = 'Off campus';
 			event2.save();
 			done();
 		});
 
 		it('should allow getting the event name',function(done){
-			var ename = event1.name;
-			assert.equal(ename,event1.name);
+			var ename = event1.contents.name;
+			assert.equal(ename,event1.contents.name);
 			assert.notequal(ename,undefined);
 			done();
 		});
 
 		it('should allow getting the event start date',function(done){
-			var esdate = event1.sdate;
-			assert.equal(esdate,event1.sdate);
+			var esdate = event1.contents.start_date;
+			assert.equal(esdate,event1.contents.start_date);
 			assert.notequal(esdate,undefined);
 			done();
 		});
 
 		it('should allow getting the event end date',function(done){
-			var eedate = event1.edate;
-			assert.equal(eedate,event1.edate);
+			var eedate = event1.contents.end_date;
+			assert.equal(eedate,event1.contents.end_date);
 			assert.notequal(eedate,undefined);
 			done();
 		});
 
 		it('should allow getting the event location',function(done){
-			var eloc = event1.loc;
-			assert.equal(eloc,event1.loc);
+			var eloc = event1.contents.location;
+			assert.equal(eloc,event1.contents.location);
 			assert.notequal(eloc,undefined);
 			done();
 		});
 
 		it('should allow getting the event schedule',function(done){
-			var esched = event1.sched;
-			assert.equal(esched,event1.sched);
+			var esched = event1.contents.schedule;
+			assert.equal(esched,event1.contents.schedule);
 			assert.notequal(esched,undefined);
 			done();
 		});
 
 
 		it('should be able to show an error when try to save without a name', function(done) {
-			var ename_old = event1.name;
-			event1.name= '';
+			var ename_old = event1.contents.name;
+			event1.contents.name= '';
 			return event1.save(function(err) {
 				event1.name = ename_old;
 				should.exist(err);
@@ -104,80 +106,70 @@ describe('Event Model Unit Tests',function() {
 
 
 		it('should be able to show an error when try to save without a start date', function(done) {
-			var esdate_old = event1.sdate;
-			event1.sdate= '';
+			var esdate_old = event1.contents.start_date;
+			event1.contents.start_date= '';
 			return event1.save(function(err) {
-				event1.sdate = esdate_old;
+				event1.contents.start_date = esdate_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save without a end date', function(done) {
-			var eedate_old = event1.edate;
-			event1.edate= '';
+			var eedate_old = event1.contents.end_date;
+			event1.contents.end_date= '';
 			return event1.save(function(err) {
-				event1.edate = eedate_old;
+				event1.contents.end_date = eedate_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save without a location', function(done) {
-			var eloc_old = event1.loc;
-			event1.loc= '';
+			var eloc_old = event1.contents.location;
+			event1.contents.location= '';
 			return event1.save(function(err) {
-				event1.loc = eloc_old;
+				event1.contents.location = eloc_old;
 				should.exist(err);
 				done();
 			});
 		});
 
-		it('should be able to show an error when try to save with a past start date', function(done) {
-			var esdate_old = event1.sdate;
-			event1.sdate= '10.31.2000';
+		it('should be able to show an error when try to save with a passed start date', function(done) {
+			var esdate_old = event1.contents.start_date;
+			event1.contents.start_date= '10.31.2000';
 			return event1.save(function(err) {
-				event1.sdate = esdate_old;
+				event1.contents.start_date = esdate_old;
 				should.exist(err);
 				done();
 			});
 		});
 
-		it('should be able to show an error when try to save without a valid start date', function(done) {
-			var esdate_old = event1.sdate;
-			event1.sdate= 'not a date';
+		it('should be able to show an error when try to save with a passed end date', function(done) {
+			var eedate_old = event1.contents.end_date;
+			event1.contents.end_date= '10.31.2000';
 			return event1.save(function(err) {
-				event1.sdate = esdate_old;
-				should.exist(err);
-				done();
-			});
-		});
-
-		it('should be able to show an error when try to save with a past end date', function(done) {
-			var eedate_old = event1.edate;
-			event1.edate= '10.31.2000';
-			return event1.save(function(err) {
-				event1.edate = eedate_old;
+				event1.contents.end_date = eedate_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save without a valid end date', function(done) {
-			var eedate_old = event1.edate;
-			event1.edate= 'this is not a date';
+			var eedate_old = event1.contents.end_date;
+			event1.contents.end_date= 'this is not a date';
 			return event1.save(function(err) {
-				event1.edate = eedate_old;
+				event1.contents.end_date = eedate_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save with an end date before the start date', function(done) {
-			var eedate_old = event1.edate;
-			event1.edate= '10.29.2014';
+			var eedate_old = event1.contents.end_date;
+			event1.contents.end_date= '10.29.2014';
 			return event1.save(function(err) {
-				event1.edate = eedate_old;
+				event1.contents.end_date = eedate_old;
 				should.exist(err);
 				done();
 			});
@@ -186,7 +178,7 @@ describe('Event Model Unit Tests',function() {
 		afterEach(function(done){
 			event1.remove();
 			event2.remove();
-			event3.remove();
+			//event3.remove();
 			done();
 		});
 	});
