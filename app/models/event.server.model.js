@@ -20,7 +20,7 @@ var dateMustBeBeforeStart = function(end_date) {
  */
 var EventSchema = new Schema({
 	contents: {
-		type: [{
+		type: {
 			name: {
 				type: String,
 				trim: true,
@@ -42,7 +42,7 @@ var EventSchema = new Schema({
 				trim: true,
 				required: "The event must have a location"
 			}
-		}],
+		},
 		unique: true
 	},
 	schedule: {

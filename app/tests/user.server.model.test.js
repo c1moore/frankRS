@@ -27,7 +27,9 @@ describe('User Model Unit Tests:', function() {
 				email: 'test@test.com',
 				username: 'username',
 				password: 'password',
-				provider: 'local'
+				salt: 'abc123',
+				provider: 'local',
+				login_enabled: false
 			});
 			user2 = new User({
 				fName: 'Full',
@@ -36,7 +38,9 @@ describe('User Model Unit Tests:', function() {
 				email: 'test@test.com',
 				username: 'username',
 				password: 'password',
-				provider: 'local'
+				salt: 'abc123',
+				provider: 'local',
+				login_enabled: false
 			});
 
 			done();
@@ -79,6 +83,13 @@ describe('User Model Unit Tests:', function() {
 			var password = user.password;
 			assert.equal(password,user.password);
 			assert.notEqual(password,undefined);
+			done();
+		});
+
+		it('should allow getting the password salt', function(done) {
+			var salt = user.salt;
+			assert.equal(salt,user.salt);
+			assert.notEqual(salt,undefined);
 			done();
 		});
 
@@ -165,8 +176,8 @@ describe('User Model Unit Tests:', function() {
 			});
 		});
 
-		it('should be able to show an error when try to save without a login_enable', function(done) {
-			user.login_enable = undefined;
+		it('should be able to show an error when try to save without a login_enabled', function(done) {
+			user.login_enabled = undefined;
 			return user.save(function(err) {
 				should.exist(err);
 				done();
@@ -197,8 +208,8 @@ describe('User Model Unit Tests:', function() {
 			});
 		});
 
-		it('should be able to show an error when try to save with a non-boolean login_enable', function(done) {
-			user.login_enable = "true";
+		it('should be able to show an error when try to save with a non-boolean login_enabled', function(done) {
+			user.login_enabled = "true";
 			return user.save(function(err) {
 				should.exist(err);
 				done();
