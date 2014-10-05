@@ -20,20 +20,20 @@ var CandidateSchema = new Schema({
 		type: String,
 		trim: true,
 		//validate: [validateLocalStrategyProperty, 'Please fill in your first name']
-		require: 'First name required.'
+		required: 'First name required'
 	},
 	lName: {
 		type: String,
 		trim: true,
 		//validate: [validateLocalStrategyProperty, 'Please fill in your last name']
-		require: "Last name required."
+		required: 'Last name required'
 	},
 	email: {
 		type: String,
 		unique: 'Email is already associated with a candidate',
 		trim: true,
 		default: '',
-		require: "Email address required.",
+		required: 'Email address required',
 		match: [/.+\@.+\..+/, 'Please fill a valid email address']
 	},
 	status: {
