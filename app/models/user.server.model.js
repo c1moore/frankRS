@@ -21,6 +21,10 @@ var validateLocalStrategyPassword = function(password) {
 	return (this.provider !== 'local' || (password && password.length > 6));
 };
 
+var validateRequired = function(property) {
+	return (property && property.length)
+};
+
 /**
  * User Schema
  */
@@ -46,14 +50,9 @@ var UserSchema = new Schema({
 		trim: true,
 		default: '',
 		validate: [validateLocalStrategyProperty, 'Please fill in your email'],
-		match: [/.+\@.+\..+/, 'Please fill a valid email address']
+		match: [/.+\@.+\..+/, 'Please fill a valid email address'],
+		unique: "This email address is already being used."
 	},
-	//username: {
-	//	type: String,
-	//	unique: 'testing error message',
-	//	required: 'Please fill in a username',
-	//	trim: true
-	//},
 	password: {
 		type: String,
 		default: '',
@@ -64,7 +63,8 @@ var UserSchema = new Schema({
 	},
 	provider: {
 		type: String,
-		required: 'Provider is required'
+		//required: 'Provider is required'
+		validate: [validateRequired, 'Provider required.']
 	},
 	providerData: {},
 	additionalProvidersData: {},
@@ -74,7 +74,8 @@ var UserSchema = new Schema({
 			enum: ['admin', 'recruiter', 'attendee']
 		}],
 		//default: ['user']
-		required: 'User role is requred'
+		//required: 'User role is requred'
+		validate: [validateRequired, 'At least one role is required.']
 	},
 	updated: {
 		type: Date
@@ -120,7 +121,8 @@ var UserSchema = new Schema({
   	},
   	login_enabled: {
   		type: Boolean,
-  		required: 'login_enabled required'
+  		//required: 'login_enabled required'
+  		validate: [validateRequired, 'login_enabled is required.']
   	},
   	templates: {
   		type: [{
