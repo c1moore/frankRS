@@ -23,6 +23,7 @@ describe('User Model Unit Tests:', function() {
 			user = new User({
 				fName: 'Full',
 				lName: 'Name',
+				roles: ["Attendee"],
 				displayName: 'Full Name',
 				email: 'test@test.com',
 				username: 'username',
@@ -34,6 +35,7 @@ describe('User Model Unit Tests:', function() {
 			user2 = new User({
 				fName: 'Full',
 				lName: 'Name',
+				roles: ["Attendee"],
 				displayName: 'Full Name',
 				email: 'test@test.com',
 				username: 'username',
