@@ -33,7 +33,6 @@ var EventSchema = new Schema({
 			name: {
 				type: String,
 				trim: true,
-				unique: "Events must have a unique name",
 				required: "A name is required"
 			},
 			start_date: {
