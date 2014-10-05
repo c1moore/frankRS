@@ -72,8 +72,8 @@ describe('Candidate Model Unit Tests:', function() {
 		});
 
 		afterEach(function(done) {
-			candidate1.remove().exec();
-			duplicate.remove().exec();
+			candidate1.remove();
+			duplicate.remove();
 			done();
 		});
 	});
