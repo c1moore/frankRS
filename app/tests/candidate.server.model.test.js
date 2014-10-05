@@ -39,7 +39,7 @@ describe('Candidate Model Unit Tests:', function() {
 			candidate1.save(done);
 		});
 
-		it('should fail to save an existing user again', function(done) {
+		it('should fail to save an existing candidate again', function(done) {
 			candidate1.save();
 			return duplicate.save(function(err) {
 				should.exist(err);
@@ -49,7 +49,7 @@ describe('Candidate Model Unit Tests:', function() {
 
 		it('should show an error when trying to save without first name', function(done) {
 			candidate1.fName = '';
-			return user.save(function(err) {
+			return candidate1.save(function(err) {
 				should.exist(err);
 				done();
 			});
@@ -57,7 +57,7 @@ describe('Candidate Model Unit Tests:', function() {
 
 		it('should show an error when trying to save without last name', function(done) {
 			candidate1.lName = '';
-			return user.save(function(err) {
+			return candidate1.save(function(err) {
 				should.exist(err);
 				done();
 			});
@@ -65,15 +65,15 @@ describe('Candidate Model Unit Tests:', function() {
 
 		it('should show an error when trying to save without email', function(done) {
 			candidate1.email = '';
-			return user.save(function(err) {
+			return candidate1.save(function(err) {
 				should.exist(err);
 				done();
 			});
 		});
 
 		afterEach(function(done) {
-			candidate1.remove().exec();
-			duplicate.remove().exec();
+			candidate1.remove();
+			duplicate.remove();
 			done();
 		});
 	});
