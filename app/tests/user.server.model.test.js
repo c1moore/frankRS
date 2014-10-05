@@ -68,64 +68,64 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the last name', function(done) {
 			var lname = user.lName;
+			(lname === undefined).should.be.false;
 			(lname).should.be.equal(user.lName);
-			(lname).should.be.equal(undefined);
 			done();
 		});
 
 		it('should allow getting the email', function(done) {
 			var email = user.email;
+			(email === undefined).should.be.false;
 			(email).should.be.equal(user.email);
-			(email).should.not.be.equal(undefined);
 			done();
 		});
 
 		it('should allow getting the password', function(done) {
 			var password = user.password;
+			(password === undefined).should.be.false;
 			(password).should.be.equal(user.password);
-			(password).should.not.be.equal(undefined);
 			done();
 		});
 
 		it('should allow getting the password salt', function(done) {
 			var salt = user.salt;
+			(salt === undefined).should.be.false;
 			(salt).should.be.equal(user.salt);
-			(salt).should.not.be.equal(undefined);
 			done();
 		});
 
 		it('should allow getting the roles', function(done) {
 			var roles = user.roles;
+			(roles === undefined).should.be.false;
 			(roles).should.be.equal(user.roles);
-			(roles).should.not.be.equal(undefined);
 			done();
 		});
 
 		it('should allow getting the status', function(done) {
 			var status = user.status;
+			(status === undefined).should.be.false;
 			(status).should.be.equal(user.status);
-			(status).should.not.be.equal(undefined);
 			done();
 		});
 
 		it('should allow getting the rank', function(done) {
 			var rank = user.rank;
+			(rank === undefined).should.be.false;
 			(rank).should.be.equal(user.rank);
-			(rank).should.not.be.equal(undefined);
 			done();
 		});
 		
 		it('should allow getting the login_enabled', function(done) {
 			var login_enabled = user.login_enabled;
+			(login_enabled === undefined).should.be.false;
 			(login_enabled).should.be.equal(user.login_enabled);
-			(login_enabled).should.not.be.equal(undefined);
 			done();
 		});
 
 		it('should allow getting the templates', function(done) {
 			var templates = user.templates;
+			(templates === undefined).should.be.false;
 			(templates).should.be.equal(user.templates);
-			(templates).should.not.be.equal(undefined);
 			done();
 		});
 
