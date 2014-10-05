@@ -5,6 +5,7 @@
  */
 var should = require('should'),
 	mongoose = require('mongoose'),
+	assert = require('assert'),
 	events = mongoose.model('Event');
 
 /**
@@ -179,7 +180,6 @@ describe('Event Model Unit Tests',function() {
 		afterEach(function(done){
 			event1.remove();
 			event2.remove();
-			//event3.remove();
 			done();
 		});
 	});
