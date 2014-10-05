@@ -184,9 +184,9 @@ describe('Event Model Unit Tests',function() {
 		});
 	
 		afterEach(function(done){
-			event1.remove().exec();
-			event2.remove().exec();
-			event3.remove().exec();
+			event1.remove();
+			event2.remove();
+			event3.remove();
 			done();
 		});
 	});
