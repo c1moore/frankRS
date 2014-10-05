@@ -9,9 +9,10 @@ var mongoose = require('mongoose'),
 	/**
  * A Validation function for local strategy properties
  */
-//var validateLocalStrategyProperty = function(property) {
-//	return ((this.provider !== 'local' && !this.updated) || property.length>0);
-//};
+
+var validateLocalStrategyProperty = function(property) {
+	return ((this.provider !== 'local' && !this.updated) || property.length);
+};
 
 
 
@@ -19,22 +20,24 @@ var CandidateSchema = new Schema({
 	fName: {
 		type: String,
 		trim: true,
-		//validate: [validateLocalStrategyProperty, 'Please fill in your first name']
-		required: 'First name required'
+		default: '',
+		validate: [validateLocalStrategyProperty, 'Please fill in your first name']
+		//required: 'First name required'
 	},
 	lName: {
 		type: String,
 		trim: true,
-		//validate: [validateLocalStrategyProperty, 'Please fill in your last name']
-		required: 'Last name required'
+		default: '',
+		validate: [validateLocalStrategyProperty, 'Please fill in your last name']
+		//required: 'Last name required'
 	},
 	email: {
 		type: String,
-		unique: 'Email is already associated with a candidate',
 		trim: true,
 		default: '',
-		required: 'Email address required',
-		match: [/.+\@.+\..+/, 'Please fill a valid email address']
+		validate: [validateLocalStrategyProperty, 'Please fill in your email'],
+		match: [/.+\@.+\..+/, 'Please fill a valid email address'],
+				unique: 'email is already registered'
 	},
 	status: {
 		type: String,
