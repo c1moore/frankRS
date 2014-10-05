@@ -61,8 +61,8 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the first name', function(done) {
 			var fname = user.fName;
+			(fname === undefined).should.be.false;
 			(fname).should.be.equal(user.fName);
-			(fname).should.not.be(undefined);
 			done();
 		});
 
