@@ -17,7 +17,7 @@ var user, user2;
  */
 describe('User Model Unit Tests:', function() {
 
-	describe('Method Save', function() {
+	describe('Method', function() {
 		beforeEach(function(done) {
 			user = new User({
 				fName: 'Full',
