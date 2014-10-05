@@ -5,7 +5,6 @@
  */
 var should = require('should'),
 	mongoose = require('mongoose'),
-	assert = require('assert'),
 	User = mongoose.model('User');
 
 /**
