@@ -25,7 +25,7 @@ describe('Event Model Unit Tests',function() {
 					name:  "testing123",
 					start_date: "10.30.2014",
 					end_date: "10.31.2014",
-					location: "UF",
+					location: "UF"
 				},
 				schedule: "www.google.com"
 			});
@@ -34,7 +34,7 @@ describe('Event Model Unit Tests',function() {
 					name:  "testing123",
 					start_date: "10.30.2014",
 					end_date: "10.31.2014",
-					location: "UF",
+					location: "UF"
 				},
 			schedule: "www.google.com"
 			});
