@@ -8,7 +8,7 @@ var mongoose = require('mongoose'),
 
 //Validation functions
 var dateMustBeAtLeastToday = function(start_date) {
-	return (start_date >= Date.getTime())
+	return (start_date >= Date.getTime());
 };
 
 var dateMustBeBeforeStart = function(end_date) {
@@ -55,7 +55,7 @@ var EventSchema = new Schema({
 	schedule: {
 		type: String,
 		trim: true,
-		default: "No schedule specified"
+		default: 'No schedule specified'
 	}
 });
 
