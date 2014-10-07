@@ -61,46 +61,49 @@ describe('Event Model Unit Tests',function() {
 		});
 
 		it('should allow getting the event name',function(done){
+			event1.save();	
 			var ename = event1.contents.name;
-			assert.equal(ename,event1.contents.name);
-			assert.notequal(ename,undefined);
+			(ename === undefined).should.be.false;
+			(ename).should.be.equal(event1.contents.name);
 			done();
 		});
 
 		it('should allow getting the event start date',function(done){
+			event1.save();	
 			var esdate = event1.contents.start_date;
-			assert.equal(esdate,event1.contents.start_date);
-			assert.notequal(esdate,undefined);
+			(esdate === undefined).should.be.false;
+			(esdate).should.be.equal(event1.contents.start_date);
 			done();
 		});
 
 		it('should allow getting the event end date',function(done){
+			event1.save();	
 			var eedate = event1.contents.end_date;
-			assert.equal(eedate,event1.contents.end_date);
-			assert.notequal(eedate,undefined);
+			(eedate === undefined).should.be.false;
+			(eedate).should.be.equal(event1.contents.end_date);
 			done();
 		});
 
 		it('should allow getting the event location',function(done){
+			event1.save();	
 			var eloc = event1.contents.location;
-			assert.equal(eloc,event1.contents.location);
-			assert.notequal(eloc,undefined);
+			(eloc === undefined).should.be.false;
+			(eloc).should.be.equal(event1.contents.location);
 			done();
 		});
 
 		it('should allow getting the event schedule',function(done){
-			var esched = event1.contents.schedule;
-			assert.equal(esched,event1.contents.schedule);
-			assert.notequal(esched,undefined);
+			event1.save();	
+			var esched = event1.schedule;
+			(esched === undefined).should.be.false;
+			(esched).should.be.equal(event1.schedule);
 			done();
 		});
 
 
 		it('should be able to show an error when try to save without a name', function(done) {
-			var ename_old = event1.contents.name;
-			event1.contents.name= '';
+			event1.contents.name = '';
 			return event1.save(function(err) {
-				event1.contents.name = ename_old;
 				should.exist(err);
 				done();
 			});

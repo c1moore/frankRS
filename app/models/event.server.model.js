@@ -15,14 +15,14 @@ var dateMustBeBeforeStart = function(end_date) {
 	return (this.start_date > end_date);
 };
 
-var contentsValidate = function(contents) {
-	// if (!contents) return false;
+var contentsValidate = function(property) {
+	// if (!property) return false;
 	// if (!this.name) return false;
 	// if (!this.start_date) return false;
 	// if (!this.end_date) return false;
 	// if (!this.location) return false;
 	// return true;
-	return (contents && contents.length);
+	return (property && property.length);
 };
 
 /**
