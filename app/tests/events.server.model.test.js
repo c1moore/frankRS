@@ -47,7 +47,7 @@ describe('Event Model Unit Tests',function() {
 		});
 
 		it('should fail to save an existing event again',function(done){
-			event2.save();
+			event1.save();
 			return event2.save(function(err){
 				should.exist(err);
 				done();
