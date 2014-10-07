@@ -8,7 +8,7 @@ var mongoose = require('mongoose'),
 
 //Validation functions
 var dateMustBeAtLeastToday = function(start_date) {
-	return (start_date >= Date.getTime())
+	return (start_date >= Date.getTime());
 };
 
 var dateMustBeBeforeStart = function(end_date) {
@@ -16,12 +16,13 @@ var dateMustBeBeforeStart = function(end_date) {
 };
 
 var contentsValidate = function(contents) {
-	if (!contents) return false;
-	if (!name) return false;
-	if (!start_date) return false;
-	if (!end_date) return false;
-	if (!location) return false;
-	return true;
+	// if (!contents) return false;
+	// if (!this.name) return false;
+	// if (!this.start_date) return false;
+	// if (!this.end_date) return false;
+	// if (!this.location) return false;
+	// return true;
+	return (contents && contents.length);
 };
 
 /**
@@ -33,31 +34,28 @@ var EventSchema = new Schema({
 			name: {
 				type: String,
 				trim: true,
-				required: "A name is required"
+				validate: [contentsValidate, 'A name is required.']
 			},
 			start_date: {
 				type: Date,
-				required: "A start date is required",
-				validate: [dateMustBeAtLeastToday, 'Date must be at least today if not later']
+				validate: [dateMustBeAtLeastToday, 'Date must be at least today if not later', contentsValidate, 'Start date is required.']
 			},
 			end_date: {
 				type: Date,
-				required: "An end date is required",
-				validate: [dateMustBeBeforeStart, 'End date must not exceed the start date']
+				validate: [dateMustBeBeforeStart, 'End date must not exceed the start date', contentsValidate, 'End date is required.']
 			},
 			location: {
 				type: String,
 				trim: true,
-				required: "The event must have a location"
+				validate: [contentsValidate, 'A location is required.']
 			}
 		},
-		unique: true,
-		validate: [contentsValidate, "The event contains empty fields"]
+		unique: true
 	},
 	schedule: {
 		type: String,
 		trim: true,
-		default: "No schedule specified"
+		default: 'No schedule specified'
 	}
 });
 

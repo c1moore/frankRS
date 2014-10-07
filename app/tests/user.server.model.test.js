@@ -22,10 +22,9 @@ describe('User Model Unit Tests:', function() {
 			user = new User({
 				fName: 'Full',
 				lName: 'Name',
-				roles: ["Attendee"],
+				roles: ["attendee"],
 				displayName: 'Full Name',
 				email: 'test@test.com',
-				username: 'username',
 				password: 'password',
 				salt: 'abc123',
 				provider: 'local',
@@ -34,10 +33,9 @@ describe('User Model Unit Tests:', function() {
 			user2 = new User({
 				fName: 'Full',
 				lName: 'Name',
-				roles: ["Attendee"],
+				roles: ["attendee"],
 				displayName: 'Full Name',
 				email: 'test@test.com',
-				username: 'username',
 				password: 'password',
 				salt: 'abc123',
 				provider: 'local',

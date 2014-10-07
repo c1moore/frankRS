@@ -22,7 +22,11 @@ var validateLocalStrategyPassword = function(password) {
 };
 
 var validateRequired = function(property) {
-	return (property && property.length)
+	return (property && property.length);
+};
+
+var validateLogin = function(enabled) {
+	return (typeof enabled === 'boolean');
 };
 
 /**
@@ -122,7 +126,7 @@ var UserSchema = new Schema({
   	login_enabled: {
   		type: Boolean,
   		//required: 'login_enabled required'
-  		validate: [validateRequired, 'login_enabled is required.']
+  		validate: [validateLogin, 'login_enabled is required.']
   	},
   	templates: {
   		type: [{
