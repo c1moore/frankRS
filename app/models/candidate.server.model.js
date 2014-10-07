@@ -11,7 +11,7 @@ var mongoose = require('mongoose'),
  */
 
 var validateLocalStrategyProperty = function(property) {
-	return ((this.provider !== 'local' && !this.updated) || property.length);
+	return (property && property.length);
 };
 
 
@@ -20,24 +20,21 @@ var CandidateSchema = new Schema({
 	fName: {
 		type: String,
 		trim: true,
-		default: '',
 		validate: [validateLocalStrategyProperty, 'Please fill in your first name']
 		//required: 'First name required'
 	},
 	lName: {
 		type: String,
 		trim: true,
-		default: '',
 		validate: [validateLocalStrategyProperty, 'Please fill in your last name']
 		//required: 'Last name required'
 	},
 	email: {
 		type: String,
 		trim: true,
-		default: '',
 		validate: [validateLocalStrategyProperty, 'Please fill in your email'],
 		match: [/.+\@.+\..+/, 'Please fill a valid email address'],
-				unique: 'email is already registered'
+		unique: 'email is already registered'
 	},
 	status: {
 		type: String,

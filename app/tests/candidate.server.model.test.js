@@ -18,7 +18,7 @@ var candidate1, duplicate;
 describe('Candidate Model Unit Tests:', function() {
 
 	describe('Method Save', function() {
-		before(function(done) {
+		beforeEach(function(done) {
 			candidate1 = new candidate({
 				fName : 'Full',
 				lName : 'Name',
