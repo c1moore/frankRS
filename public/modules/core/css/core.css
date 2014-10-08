@@ -1,6 +1,9 @@
 body {
 	font-family: "Helvetica", sans-serif;
 }
+.container {
+	width: initial;
+}
 .content {
 	margin-top: 50px;
 }
@@ -20,4 +23,8 @@ body {
 	position: fixed;
 	width: 100%;
 	bottom: 0px;
+}
+
+#buttoncontainer {
+	width:50%;
 }
