@@ -62,10 +62,13 @@ describe('Event Model Unit Tests',function() {
 
 		it('should allow getting the event name',function(done){
 			event1.save();	
-			var ename = event1.contents.name;
-			(ename === undefined).should.be.false;
-			(ename).should.be.equal(event1.contents.name);
-			done();
+			var query = events.find({name: event1.contents.name});
+			var ename = query.exec();
+			ename.addBack(function (err,docs){
+				(docs.contents.name === undefined).should.be.false;
+				(docs.contents.name).should.be.equal(event1.contents.name);
+				done();
+			});
 		});
 
 		it('should allow getting the event start date',function(done){
