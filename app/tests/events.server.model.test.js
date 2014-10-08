@@ -55,24 +55,24 @@ describe('Event Model Unit Tests',function() {
 		});
 
 		it('should allow an event to share everything but the name',function(done){
+			event1.save();
 			event2.contents.name = 'Off campus';
-			event2.save();
-			done();
+			event2.save(done);
 		});
 
 		it('should allow getting the event name',function(done){
-			event1.save();	
-			var query = events.find({name: event1.contents.name});
-			var ename = query.exec();
-			ename.addBack(function (err,docs){
-				(docs.contents.name === undefined).should.be.false;
-				(docs.contents.name).should.be.equal(event1.contents.name);
-				done();
+			event1.save(function() {
+				var query = events.findOne({'contents.name': event1.contents.name});
+				query.exec(function (err, result) {
+					(result.contents.name === undefined).should.be.false;
+					(result.contents.name).should.be.equal(event1.contents.name);
+					done();
+				});
 			});
 		});
 
 		it('should allow getting the event start date',function(done){
-			event1.save();	
+			event1.save();
 			var esdate = event1.contents.start_date;
 			(esdate === undefined).should.be.false;
 			(esdate).should.be.equal(event1.contents.start_date);
