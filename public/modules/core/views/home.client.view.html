@@ -10,7 +10,7 @@
 	<div class="container-fluid">
 		<div class="row">
 			<!-- app launcher area -->
-			<div class="col-md-10">
+			<div ng-class="buttonsGrid">
 				<div class="row">
 					<!-- these divs col values will generatgoogle mapse dynamicaly through angular -->
 					<div ng-repeat="button in data.buttons" class="col-md-3">
@@ -23,11 +23,11 @@
 
 			</div>
 
-			<div class="panel panel-primary col-md-2">
+			<div ng-show='displayComments' class="panel panel-primary col-md-2">
 				
 				<div class="panel-heading">
     				User Comments
-    				<button type="button" class="btn btn-defualt btn-xs pull-right">
+    				<button type="button" ng-click="hideComments()" class="btn btn-defualt btn-xs pull-right">
     					 <span class="glyphicon glyphicon-remove"></span>
     				</button>
   				</div>
