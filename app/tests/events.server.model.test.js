@@ -26,8 +26,8 @@ describe('Event Model Unit Tests',function() {
 			event1 = new events({
 			contents: {
 					name:  'testing123',
-					start_date: '10.30.2014',
-					end_date: '10.31.2014',
+					start_date: new Date(2014,11,30,10,0,0), //year, month, day, hour, minute, millisec
+					end_date:  new Date(2015,11,30,10,0,0),  //month is zero based.  11 = dec
 					location: 'UF'
 				},
 			schedule: 'www.google.com'
@@ -35,8 +35,8 @@ describe('Event Model Unit Tests',function() {
 			event2 = new events({
 				contents: {
 					name:  'testing123',
-					start_date: '10.30.2014',
-					end_date: '10.31.2014',
+					start_date: new Date(2014,11,30,10,0,0), //year, month, day, hour, minute, millisec
+					end_date:  new Date(2015,11,30,10,0,0),  //month is zero based.  11 = dec
 					location: 'UF'
 				},
 			schedule: 'www.google.com'
@@ -49,17 +49,20 @@ describe('Event Model Unit Tests',function() {
 		});
 
 		it('should fail to save an existing event again',function(done){
-			event1.save();
-			return event2.save(function(err){
-				should.exist(err);
-				done();
+			event1.save(function(err1,obj,num){
+				return event2.save(function(err){
+					should.exist(err);
+					done();
+				});
 			});
+			
 		});
 
 		it('should allow an event to share everything but the name',function(done){
-			event1.save();
-			event2.contents.name = 'Off campus';
-			event2.save(done);
+			event1.save(function(err1,obj,num){
+				event2.contents.name = 'Off campus';
+				event2.save(done);
+			});
 		});
 
 		it('should allow getting the event name',function(done){
@@ -126,7 +129,7 @@ describe('Event Model Unit Tests',function() {
 			});
 		});
 
-		it('should be able to show an error when try to save without a start date', function(done) {
+		it('should be able to show an error when trying to save without a start date', function(done) {
 			event1.contents.start_date= '';
 			return event1.save(function(err) {
 				should.exist(err);
@@ -134,39 +137,46 @@ describe('Event Model Unit Tests',function() {
 			});
 		});
 
-		it('should be able to show an error when try to save without a end date', function(done) {
+		it('should be able to show an error when trying to save without a end date', function(done) {
 			event1.contents.end_date= '';
-			return event1.save(function(err) {
+			return event1.save(function(err, obj) {
+			//	console.log(obj);
+			//	console.log(obj.contents.end_date == true);
 				should.exist(err);
 				done();
 			});
 		});
 
-		it('should be able to show an error when try to save without a location', function(done) {
+		it('should be able to show an error when trying to save without a location', function(done) {
 			event1.contents.location= '';
+			return event1.save(function(err, obj) {
+			//	console.log(obj);
+			//	console.log(obj.contents.location==true);
+				should.exist(err);
+				done();
+			});
+		});
+
+		it('should be able to show an error when trying to save with a past start date', function(done) {
+			event1.contents.start_date= new Date(2013,10,20,10,0,0);
 			return event1.save(function(err) {
 				should.exist(err);
 				done();
 			});
 		});
 
-		it('should be able to show an error when try to save with a passed start date', function(done) {
-			event1.contents.start_date= '10.31.2000';
+		it('should be able to show an error when trying to save with a past end date', function(done) {
+			event1.contents.end_date= new Date(2013,10,20,10,0,0);
+				console.log(Date.parse(event1.contents.end_date)>=new Date().getTime());
+				console.log(Date.parse(event1.contents.end_date));
+				console.log(Date.getTime());
 			return event1.save(function(err) {
 				should.exist(err);
 				done();
 			});
 		});
 
-		it('should be able to show an error when try to save with a passed end date', function(done) {
-			event1.contents.end_date= '10.31.2000';
-			return event1.save(function(err) {
-				should.exist(err);
-				done();
-			});
-		});
-
-		it('should be able to show an error when try to save without a valid end date', function(done) {
+		it('should be able to show an error when trying to save without a valid end date', function(done) {
 			event1.contents.end_date= 'this is not a date';
 			return event1.save(function(err) {
 				should.exist(err);
@@ -174,8 +184,8 @@ describe('Event Model Unit Tests',function() {
 			});
 		});
 
-		it('should be able to show an error when try to save with an end date before the start date', function(done) {
-			event1.contents.end_date= '10.29.2014';
+		it('should be able to show an error when trying to save with an end date before the start date', function(done) {
+			event1.contents.end_date=  new Date(2014,11,20,10,0,0);
 			return event1.save(function(err) {
 				should.exist(err);
 				done();
