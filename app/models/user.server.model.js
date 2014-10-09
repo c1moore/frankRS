@@ -21,17 +21,25 @@ var validateLocalStrategyPassword = function(password) {
 	return (this.provider !== 'local' || (password && password.length > 6));
 };
 
+var validateRequired = function(property) {
+	return (property && property.length);
+};
+
+var validateLogin = function(enabled) {
+	return (typeof enabled === 'boolean');
+};
+
 /**
  * User Schema
  */
 var UserSchema = new Schema({
-	firstName: {
+	fName: {
 		type: String,
 		trim: true,
 		default: '',
 		validate: [validateLocalStrategyProperty, 'Please fill in your first name']
 	},
-	lastName: {
+	lName: {
 		type: String,
 		trim: true,
 		default: '',
@@ -46,13 +54,8 @@ var UserSchema = new Schema({
 		trim: true,
 		default: '',
 		validate: [validateLocalStrategyProperty, 'Please fill in your email'],
-		match: [/.+\@.+\..+/, 'Please fill a valid email address']
-	},
-	username: {
-		type: String,
-		unique: 'testing error message',
-		required: 'Please fill in a username',
-		trim: true
+		match: [/.+\@.+\..+/, 'Please fill a valid email address'],
+		unique: "This email address is already being used."
 	},
 	password: {
 		type: String,
@@ -64,16 +67,19 @@ var UserSchema = new Schema({
 	},
 	provider: {
 		type: String,
-		required: 'Provider is required'
+		//required: 'Provider is required'
+		validate: [validateRequired, 'Provider required.']
 	},
 	providerData: {},
 	additionalProvidersData: {},
 	roles: {
 		type: [{
 			type: String,
-			enum: ['user', 'admin']
+			enum: ['admin', 'recruiter', 'attendee']
 		}],
-		default: ['user']
+		//default: ['user']
+		//required: 'User role is requred'
+		validate: [validateRequired, 'At least one role is required.']
 	},
 	updated: {
 		type: Date
@@ -88,6 +94,45 @@ var UserSchema = new Schema({
 	},
   	resetPasswordExpires: {
   		type: Date
+  	},
+  	status: {
+  		type: [{
+  			event_id: {type: mongoose.Schema.Types.ObjectId},
+  			status: {type: Boolean}
+  		}]
+  	},
+  	inviteeList: {
+  		type: [{
+  			user_id: {type: mongoose.Schema.Types.ObjectId},
+  			event_id: {type: mongoose.Schema.Types.ObjectId}
+  		}]
+  	},
+  	attendeeList: {
+  		type: [{
+  			user_id: {type: mongoose.Schema.Types.ObjectId},
+  			event_id: {type: mongoose.Schema.Types.ObjectId}
+  		}]
+  	},
+  	almostList: {
+  		type: [{
+  			user_id: {type: mongoose.Schema.Types.ObjectId},
+  			event_id: {type: mongoose.Schema.Types.ObjectId}
+  		}]
+  	},
+  	rank: {
+  		type: Number,
+  		min: 1//[1, 'Rank must be at least 1']
+  	},
+  	login_enabled: {
+  		type: Boolean,
+  		//required: 'login_enabled required'
+  		validate: [validateLogin, 'login_enabled is required.']
+  	},
+  	templates: {
+  		type: [{
+  			name: {type: String},
+  			template: {type: String}
+  		}]
   	}
 });
 
@@ -124,7 +169,7 @@ UserSchema.methods.authenticate = function(password) {
 /**
  * Find possible not used username
  */
-UserSchema.statics.findUniqueUsername = function(username, suffix, callback) {
+/**UserSchema.statics.findUniqueUsername = function(username, suffix, callback) {
 	var _this = this;
 	var possibleUsername = username + (suffix || '');
 
@@ -141,6 +186,6 @@ UserSchema.statics.findUniqueUsername = function(username, suffix, callback) {
 			callback(null);
 		}
 	});
-};
+};**/
 
 mongoose.model('User', UserSchema);
