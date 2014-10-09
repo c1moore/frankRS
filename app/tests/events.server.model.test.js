@@ -22,22 +22,22 @@ describe('Event Model Unit Tests',function() {
 	describe('Method Save',function(){
 		beforeEach(function(done){
 			event1 = new events({
-				contents: {
-					name:  "testing123",
-					start_date: "10.30.2014",
-					end_date: "10.31.2014",
-					location: "UF"
+			contents: {
+					name:  'testing123',
+					start_date: '10.30.2014',
+					end_date: '10.31.2014',
+					location: 'UF'
 				},
-				schedule: "www.google.com"
+			schedule: 'www.google.com'
 			});
 			event2 = new events({
 				contents: {
-					name:  "testing123",
-					start_date: "10.30.2014",
-					end_date: "10.31.2014",
-					location: "UF"
+					name:  'testing123',
+					start_date: '10.30.2014',
+					end_date: '10.31.2014',
+					location: 'UF'
 				},
-			schedule: "www.google.com"
+			schedule: 'www.google.com'
 			});
 			done();
 		});
