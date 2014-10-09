@@ -15,5 +15,18 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 				{name:"Button 4", description:"Description 4"}
 			]
 		};
+
+		$scope.displayComments = true;
+		$scope.buttonsGrid = "col-md-10"
+
+		$scope.toggleComments = function(){
+			$scope.displayComments = !$scope.displayComments;
+			if ($scope.displayComments) {
+				$scope.buttonsGrid = "col-md-10";
+			}
+			else if (!$scope.displayComments) {
+				$scope.buttonsGrid = "col-md-12";
+			}
+		}
 	}
 ]);
