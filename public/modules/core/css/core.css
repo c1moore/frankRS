@@ -16,15 +16,14 @@ body {
 .ng-valid.ng-dirty{
     border-color:#78FA89;
 }
-<<<<<<< HEAD
 
-.commentBar {
-	border: solid black 1px;
-}
-=======
 .musicdiv{
 	position: fixed;
 	width: 100%;
 	bottom: 0px;
 }
->>>>>>> e64c9cb328d9657d6b7af2b48a423b1e7a28883b
+
+.jumbotron {
+	padding:20px;
+	margin-bottom: 20px;
+}
