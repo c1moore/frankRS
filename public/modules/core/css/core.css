@@ -19,12 +19,22 @@ body {
 .ng-valid.ng-dirty{
     border-color:#78FA89;
 }
+
+.commentBar {
+	border: solid black 1px;
+}
+
+.jumbotron {
+	padding:20px;
+	bottom-margin:20px;
+}
+
 .musicdiv{
 	position: fixed;
 	width: 100%;
 	bottom: 0px;
 }
 
-#buttoncontainer {
-	width:50%;
+.appButton{
+
 }

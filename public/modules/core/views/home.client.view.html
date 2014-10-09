@@ -7,22 +7,37 @@
 		</div>
 	</div>
 
-	<div id="buttoncontainer" class="container">
-		<!-- app launcher area -->
-		<div ng-controller="ButtonController">
-			<!-- these divs col values will generate dynamicaly through angular -->
-			<a href="#" class="btn" role="button"><img src="/modules/core/img/temp/242.svg" alt="Placeholder"></a>
-						
-			<a href="#" class="btn" role="button"><img src="/modules/core/img/temp/242.svg" alt="Placeholder"></a>
-						
-			<a href="#" class="btn" role="button"><img src="/modules/core/img/temp/242.svg" alt="Placeholder"></a>
-			
-			<a href="#" class="btn" role="button"><img src="/modules/core/img/temp/242.svg" alt="Placeholder"></a>
+	<div class="container-fluid">
+		<div class="row">
+			<!-- app launcher area -->
+			<div class="col-md-10">
+				<div class="row">
+					<!-- these divs col values will generatgoogle mapse dynamicaly through angular -->
+					<div ng-repeat="button in data.buttons" class="col-md-3">
+						<a href="#"><img src="/modules/core/img/temp/242.svg" alt="Place holder"></a>
+						<div class="caption text-center">
+							<h3>{{button.name}}</h3>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			<div class"col-md-2 panel panel-heading">
+				<div class="panel-heading">
+    				<h3 class="panel-title text-center">User Comments</h3>
+  				</div>
+  				<div class="panel-body">
+    				Panel content
+  				</div>
+			</div>
+
 		</div>
 	</div>
 
 	<!--sound cloud player will go here -->
+
 	<div class="musicdiv well">
-		sound cloud will go here
+		<iframe width="100%" height="20" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/34019569&color=0066cc"></iframe>
 	</div>
 </section>
