@@ -159,7 +159,7 @@ describe('User Model Unit Tests:', function() {
 			user.save(function(err) {
 				var query = Mode.findOne({'login_enabled':user.login_enabled});
 				query.exec(function(err,result) {
-					(result.login_enabled===undefined).should.be.false);
+					(result.login_enabled===undefined).should.be.false;
 					(result.login_enabled).should.be.equal(user.login_enabled);
 					done();
 				});
