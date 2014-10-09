@@ -37,6 +37,7 @@ describe('User Model Unit Tests:', function() {
 				email: 'test@test.com',
 				password: 'password',
 				salt: 'abc123',
+				rank: 1,
 				provider: 'local',
 				login_enabled: false
 			});
@@ -48,6 +49,7 @@ describe('User Model Unit Tests:', function() {
 				email: 'test@test.com',
 				password: 'password',
 				salt: 'abc123',
+				rank: 2,
 				provider: 'local',
 				login_enabled: false
 			});
@@ -129,7 +131,7 @@ describe('User Model Unit Tests:', function() {
 				var query = User.findOne({'roles':user.roles});
 				query.exec(function(err,result) {
 					(result.roles===undefined).should.be.false;
-					(result.roles).should.be.equal(user.roles);
+					(arraysEqual(result.roles,user.roles)).should.be.equal(true);
 					done();
 				});
 			});
@@ -140,7 +142,7 @@ describe('User Model Unit Tests:', function() {
 				var query = User.findOne({'status':user.status});
 				query.exec(function(err,result) {
 					(result.status===undefined).should.be.false;
-					(result.status).should.be.equal(user.status);
+					(arraysEqual(result.status,user.status)).should.be.equal(true);
 					done();
 				});
 			});
@@ -211,8 +213,8 @@ describe('User Model Unit Tests:', function() {
 			});
 		});
 
-		it('should be able to show an error when try to save without a role', function(done) {
-			user.role = {};
+		it('should be able to show an error when try to save without any roles', function(done) {
+			user.roles = [];
 			return user.save(function(err) {
 				should.exist(err);
 				done();
@@ -251,8 +253,8 @@ describe('User Model Unit Tests:', function() {
 			});
 		});
 
-		it('should be able to show an error when try to save with an invalid role', function(done) {
-			user.role = ['Giant sabertooth tiger','attendee'];
+		it('should be able to show an error when try to save with invalid roles', function(done) {
+			user.roles = ['giant sabertooth tiger','attendee'];
 			return user.save(function(err) {
 				should.exist(err);
 				done();
