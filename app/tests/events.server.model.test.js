@@ -106,7 +106,7 @@ describe('Event Model Unit Tests',function() {
 
 		it('should be able to show an error when try to save without a name', function(done) {
 			event1.contents.name = '';
-			return event1.save(function(err) {
+			return event1.save(function(err, obj, num) {
 				should.exist(err);
 				done();
 			});
@@ -114,70 +114,56 @@ describe('Event Model Unit Tests',function() {
 
 
 		it('should be able to show an error when try to save without a start date', function(done) {
-			var esdate_old = event1.contents.start_date;
 			event1.contents.start_date= '';
 			return event1.save(function(err) {
-				event1.contents.start_date = esdate_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save without a end date', function(done) {
-			var eedate_old = event1.contents.end_date;
 			event1.contents.end_date= '';
 			return event1.save(function(err) {
-				event1.contents.end_date = eedate_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save without a location', function(done) {
-			var eloc_old = event1.contents.location;
 			event1.contents.location= '';
 			return event1.save(function(err) {
-				event1.contents.location = eloc_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save with a passed start date', function(done) {
-			var esdate_old = event1.contents.start_date;
 			event1.contents.start_date= '10.31.2000';
 			return event1.save(function(err) {
-				event1.contents.start_date = esdate_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save with a passed end date', function(done) {
-			var eedate_old = event1.contents.end_date;
 			event1.contents.end_date= '10.31.2000';
 			return event1.save(function(err) {
-				event1.contents.end_date = eedate_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save without a valid end date', function(done) {
-			var eedate_old = event1.contents.end_date;
 			event1.contents.end_date= 'this is not a date';
 			return event1.save(function(err) {
-				event1.contents.end_date = eedate_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save with an end date before the start date', function(done) {
-			var eedate_old = event1.contents.end_date;
 			event1.contents.end_date= '10.29.2014';
 			return event1.save(function(err) {
-				event1.contents.end_date = eedate_old;
 				should.exist(err);
 				done();
 			});
