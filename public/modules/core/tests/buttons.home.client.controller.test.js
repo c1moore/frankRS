@@ -1,3 +1,5 @@
+'use strict';
+
 (function() {
 	describe('ButtonController', function() {
 		//Initialize global variables
