@@ -68,7 +68,7 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the first name', function(done) {
 			user.save(function(err) {
-				var query = Model.findOne({'fName' : user.fName});
+				var query = User.findOne({'fName' : user.fName});
 				query.exec(function(err, result) {
 					(result.fName === undefined).should.be.false;
 					result.fName.should.equal(user.fName);
@@ -79,7 +79,7 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the last name', function(done) {
 			user.save(function(err) {
-				var query = Model.findOne({'lName' : user.lName});
+				var query = User.findOne({'lName' : user.lName});
 				query.exec(function(err, result) {
 					(result.lName === undefined).should.be.false;
 					(result.lName).should.be.equal(user.lName);
@@ -91,7 +91,7 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the email', function(done) {
 			user.save(function(err) {
-				var query = Model.findOne({'email':user.email});
+				var query = User.findOne({'email':user.email});
 				query.exec(function(err,result) {
 					(result.email === undefined).should.be.false;
 					(result.email).should.be.equal(user.email)
@@ -102,7 +102,7 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the password', function(done) {
 			user.save(function(err) {
-				var query = Model.findOne({'password':user.password});
+				var query = User.findOne({'password':user.password});
 				query.exec(function(err,result) {
 					(result.password === undefined).should.be.false;
 					(result.password).should.be.equal(user.password);
@@ -113,7 +113,7 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the password salt', function(done) {
 			user.save(function(err) {
-				var query = Model.findOne({'salt':user.salt});
+				var query = User.findOne({'salt':user.salt});
 				query.exec(function(err,result) {
 					(result.salt===undefined).should.be.false;
 					(result.salt).should.be.equal(user.salt);
@@ -124,7 +124,7 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the roles', function(done) {
 			user.save(function(err) {
-				var query = Model.findOne({'roles':user.roles});
+				var query = User.findOne({'roles':user.roles});
 				query.exec(function(err,result) {
 					(result.roles===undefined).should.be.false;
 					(result.roles).should.be.equal(user.roles);
@@ -135,7 +135,7 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the status', function(done) {
 			user.save(function(err) {
-				var query = Model.findOne({'status':user.status});
+				var query = User.findOne({'status':user.status});
 				query.exec(function(err,result) {
 					(result.status===undefined).should.be.false;
 					(result.status).should.be.equal(user.status);
@@ -146,7 +146,7 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the rank', function(done) {
 			user.save(function(err) {
-				var query = Model.findOne({'rank':user.rank});
+				var query = User.findOne({'rank':user.rank});
 				query.exec(function(err,result) {
 					(result.rank===undefined).should.be.false;
 					(result.rank).should.be.equal(user.rank);
