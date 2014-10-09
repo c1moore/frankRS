@@ -18,7 +18,7 @@ function arraysEqual(array0,array1) {
         if (array0[i] !== array1[i]) return false;
     }
     return true;
-};
+}
 
 /**
  * Unit tests
@@ -30,7 +30,7 @@ describe('User Model Unit Tests:', function() {
 			user = new User({
 				fName: 'Full',
 				lName: 'Name',
-				roles: ["attendee"],
+				roles: ['attendee'],
 				displayName: 'Full Name',
 				email: 'test@test.com',
 				password: 'password',
@@ -41,7 +41,7 @@ describe('User Model Unit Tests:', function() {
 			user2 = new User({
 				fName: 'Full',
 				lName: 'Name',
-				roles: ["attendee"],
+				roles: ['attendee'],
 				displayName: 'Full Name',
 				email: 'test@test.com',
 				password: 'password',
@@ -157,7 +157,7 @@ describe('User Model Unit Tests:', function() {
 		
 		it('should allow getting the login_enabled', function(done) {
 			user.save(function(err) {
-				var query = Mode.findOne({'login_enabled':user.login_enabled});
+				var query = User.findOne({'login_enabled':user.login_enabled});
 				query.exec(function(err,result) {
 					(result.login_enabled===undefined).should.be.false;
 					(result.login_enabled).should.be.equal(user.login_enabled);
@@ -168,7 +168,7 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the templates', function(done) {
 			user.save(function(err) {
-				var query = Mode.findOne({'templates':user.templates});
+				var query = User.findOne({'templates':user.templates});
 				query.exec(function(err,result) {
 					(result.templates===undefined).should.be.false;
 					(arraysEqual(result.templates,user.templates)).should.be.equal(true);
@@ -234,7 +234,7 @@ describe('User Model Unit Tests:', function() {
 		});
 
 		it('should be able to show an error when try to save with a clearly invalid email', function(done) {
-			user.email = "This is clearly not an email address";
+			user.email = 'This is clearly not an email address';
 			return user.save(function(err) {
 				should.exist(err);
 				done();
@@ -242,7 +242,7 @@ describe('User Model Unit Tests:', function() {
 		});
 
 		it('should be able to show an error when try to save with a not-so-clearly invalid email', function(done) {
-			user.email = "invalid@";
+			user.email = 'invalid@';
 			return user.save(function(err) {
 				should.exist(err);
 				done();
@@ -250,7 +250,7 @@ describe('User Model Unit Tests:', function() {
 		});
 
 		it('should be able to show an error when try to save with an invalid role', function(done) {
-			user.role = ["Giant sabertooth tiger","attendee"];
+			user.role = ['Giant sabertooth tiger','attendee'];
 			return user.save(function(err) {
 				should.exist(err);
 				done();
@@ -258,7 +258,7 @@ describe('User Model Unit Tests:', function() {
 		});
 
 		it('should be able to show an error when try to save with a non-boolean login_enabled', function(done) {
-			user.login_enabled = "true";
+			user.login_enabled = 'true';
 			return user.save(function(err) {
 				should.exist(err);
 				done();
