@@ -13,7 +13,7 @@ var should = require('should'),
 var user, user2;
 
 function arraysEqual(array0,array1) {
-    if (array0.length != array1.length) return false;
+    if (array0.length !== array1.length) return false;
     for (var i = 0; i<array0.length; i++) {
         if (array0[i] !== array1[i]) return false;
     }
@@ -94,7 +94,7 @@ describe('User Model Unit Tests:', function() {
 				var query = User.findOne({'email':user.email});
 				query.exec(function(err,result) {
 					(result.email === undefined).should.be.false;
-					(result.email).should.be.equal(user.email)
+					(result.email).should.be.equal(user.email);
 					done();
 				});
 			});
