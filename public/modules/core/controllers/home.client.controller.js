@@ -19,9 +19,14 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 		$scope.displayComments = true;
 		$scope.buttonsGrid = "col-md-10"
 
-		$scope.hideComments = function(){
-			$scope.displayComments = false;
-			$scope.buttonsGrid = "col-md-12";
+		$scope.toggleComments = function(){
+			$scope.displayComments = !$scope.displayComments;
+			if ($scope.displayComments) {
+				$scope.buttonsGrid = "col-md-10";
+			}
+			else if (!$scope.displayComments) {
+				$scope.buttonsGrid = "col-md-12";
+			}
 		}
 	}
 ]);
