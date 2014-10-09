@@ -16,13 +16,9 @@ var dateMustBeBeforeStart = function(end_date) {
 };
 
 var contentsValidate = function(property) {
-	// if (!property) return false;
-	// if (!this.name) return false;
-	// if (!this.start_date) return false;
-	// if (!this.end_date) return false;
-	// if (!this.location) return false;
-	// return true;
-	return (property && property.length);
+	return ((property.name && property.name.length) && (property.start_date && property.start_date.length) && (property.end_date && property.end_date.length) && (property.location && property.location.length));
+	//return (property && property.length);
+
 };
 
 /**
@@ -33,24 +29,25 @@ var EventSchema = new Schema({
 		type: {
 			name: {
 				type: String,
-				trim: true,
-				validate: [contentsValidate, 'A name is required.']
+				trim: true
+				//validate: [contentsValidate, 'A name is required.']
 			},
 			start_date: {
 				type: Date,
-				validate: [dateMustBeAtLeastToday, 'Date must be at least today if not later', contentsValidate, 'Start date is required.']
+				validate: [dateMustBeAtLeastToday, 'Date must be at least today if not later'] //, contentsValidate, 'Start date is required.']
 			},
 			end_date: {
 				type: Date,
-				validate: [dateMustBeBeforeStart, 'End date must not exceed the start date', contentsValidate, 'End date is required.']
+				validate: [dateMustBeBeforeStart, 'End date must not exceed the start date'] //, contentsValidate, 'End date is required.']
 			},
 			location: {
 				type: String,
-				trim: true,
-				validate: [contentsValidate, 'A location is required.']
+				trim: true
+				//validate: [contentsValidate, 'A location is required.']
 			}
 		},
-		unique: true
+		unique: true,
+		validate: [contentsValidate, 'Name, start and end date, and location are all required.']
 	},
 	schedule: {
 		type: String,

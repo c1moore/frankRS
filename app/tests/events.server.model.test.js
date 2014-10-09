@@ -22,22 +22,22 @@ describe('Event Model Unit Tests',function() {
 	describe('Method Save',function(){
 		beforeEach(function(done){
 			event1 = new events({
-				contents: {
-					name:  "testing123",
-					start_date: "10.30.2014",
-					end_date: "10.31.2014",
-					location: "UF"
+			contents: {
+					name:  'testing123',
+					start_date: '10.30.2014',
+					end_date: '10.31.2014',
+					location: 'UF'
 				},
-				schedule: "www.google.com"
+			schedule: 'www.google.com'
 			});
 			event2 = new events({
 				contents: {
-					name:  "testing123",
-					start_date: "10.30.2014",
-					end_date: "10.31.2014",
-					location: "UF"
+					name:  'testing123',
+					start_date: '10.30.2014',
+					end_date: '10.31.2014',
+					location: 'UF'
 				},
-			schedule: "www.google.com"
+			schedule: 'www.google.com'
 			});
 			done();
 		});
@@ -72,112 +72,109 @@ describe('Event Model Unit Tests',function() {
 		});
 
 		it('should allow getting the event start date',function(done){
-			event1.save();
-			var esdate = event1.contents.start_date;
-			(esdate === undefined).should.be.false;
-			(esdate).should.be.equal(event1.contents.start_date);
-			done();
+			event1.save(function() {
+				var query = events.findOne({'contents.start_date': event1.contents.start_date});
+				query.exec(function (err, result) {
+					(result.contents.start_date === undefined).should.be.false;
+					(result.contents.start_date).should.be.equal(event1.contents.start_date);
+					done();
+				});
+			});
 		});
 
 		it('should allow getting the event end date',function(done){
-			event1.save();	
-			var eedate = event1.contents.end_date;
-			(eedate === undefined).should.be.false;
-			(eedate).should.be.equal(event1.contents.end_date);
-			done();
+			event1.save(function() {
+				var query = events.findOne({'contents.end_date': event1.contents.end_date});
+				query.exec(function (err, result) {
+					(result.contents.end_date === undefined).should.be.false;
+					(result.contents.end_date).should.be.equal(event1.contents.end_date);
+					done();
+				});
+			});
 		});
 
 		it('should allow getting the event location',function(done){
-			event1.save();	
-			var eloc = event1.contents.location;
-			(eloc === undefined).should.be.false;
-			(eloc).should.be.equal(event1.contents.location);
-			done();
+			event1.save(function() {
+				var query = events.findOne({'contents.location': event1.contents.location});
+				query.exec(function (err, result) {
+					(result.contents.location === undefined).should.be.false;
+					(result.contents.location).should.be.equal(event1.contents.location);
+					done();
+				});
+			});
 		});
 
 		it('should allow getting the event schedule',function(done){
-			event1.save();	
-			var esched = event1.schedule;
-			(esched === undefined).should.be.false;
-			(esched).should.be.equal(event1.schedule);
-			done();
+			event1.save(function() {
+				var query = events.findOne({'schedule': event1.schedule});
+				query.exec(function (err, result) {
+					(result.schedule === undefined).should.be.false;
+					(result.schedule).should.be.equal(event1.schedule);
+					done();
+				});
+			});
 		});
 
 
-		it('should be able to show an error when try to save without a name', function(done) {
+		it('should be able to show an error when trying to save without a name', function(done) {
 			event1.contents.name = '';
-			return event1.save(function(err) {
+			return event1.save(function(err, obj, num) {
 				should.exist(err);
 				done();
 			});
 		});
 
-
 		it('should be able to show an error when try to save without a start date', function(done) {
-			var esdate_old = event1.contents.start_date;
 			event1.contents.start_date= '';
 			return event1.save(function(err) {
-				event1.contents.start_date = esdate_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save without a end date', function(done) {
-			var eedate_old = event1.contents.end_date;
 			event1.contents.end_date= '';
 			return event1.save(function(err) {
-				event1.contents.end_date = eedate_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save without a location', function(done) {
-			var eloc_old = event1.contents.location;
 			event1.contents.location= '';
 			return event1.save(function(err) {
-				event1.contents.location = eloc_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save with a passed start date', function(done) {
-			var esdate_old = event1.contents.start_date;
 			event1.contents.start_date= '10.31.2000';
 			return event1.save(function(err) {
-				event1.contents.start_date = esdate_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save with a passed end date', function(done) {
-			var eedate_old = event1.contents.end_date;
 			event1.contents.end_date= '10.31.2000';
 			return event1.save(function(err) {
-				event1.contents.end_date = eedate_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save without a valid end date', function(done) {
-			var eedate_old = event1.contents.end_date;
 			event1.contents.end_date= 'this is not a date';
 			return event1.save(function(err) {
-				event1.contents.end_date = eedate_old;
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when try to save with an end date before the start date', function(done) {
-			var eedate_old = event1.contents.end_date;
 			event1.contents.end_date= '10.29.2014';
 			return event1.save(function(err) {
-				event1.contents.end_date = eedate_old;
 				should.exist(err);
 				done();
 			});
