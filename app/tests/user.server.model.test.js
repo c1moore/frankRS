@@ -12,6 +12,14 @@ var should = require('should'),
  */
 var user, user2;
 
+function arraysEqual(array0,array1) {
+    if (array0.length != array1.length) return false;
+    for (var i = 0; i<array0.length; i++) {
+        if (array0[i] !== array1[i]) return false;
+    }
+    return true;
+};
+
 /**
  * Unit tests
  */
@@ -50,81 +58,123 @@ describe('User Model Unit Tests:', function() {
 		});
 
 		it('should fail to save an existing user again', function(done) {
-			user.save();
-			return user2.save(function(err) {
-				should.exist(err);
-				done();
+			user.save(function(err1) {
+				return user2.save(function(err2) {
+					should.exist(err2);
+					done();
+				});	
 			});
 		});
 
 		it('should allow getting the first name', function(done) {
-			var fname = user.fName;
-			(fname === undefined).should.be.false;
-			(fname).should.be.equal(user.fName);
-			done();
+			user.save(function(err) {
+				var query = Model.findOne({'fName' : user.fName});
+				query.exec(function(err, result) {
+					(result.fName === undefined).should.be.false;
+					result.fName.should.equal(user.fName);
+					done();
+				});
+			});
 		});
 
 		it('should allow getting the last name', function(done) {
-			var lname = user.lName;
-			(lname === undefined).should.be.false;
-			(lname).should.be.equal(user.lName);
-			done();
+			user.save(function(err) {
+				var query = Model.findOne({'lName' : user.lName});
+				query.exec(function(err, result) {
+					(result.lName === undefined).should.be.false;
+					(result.lName).should.be.equal(user.lName);
+					done();
+				});
+			});
+
 		});
 
 		it('should allow getting the email', function(done) {
-			var email = user.email;
-			(email === undefined).should.be.false;
-			(email).should.be.equal(user.email);
-			done();
+			user.save(function(err) {
+				var query = Model.findOne({'email':user.email});
+				query.exec(function(err,result) {
+					(result.email === undefined).should.be.false;
+					(result.email).should.be.equal(user.email)
+					done();
+				});
+			});
 		});
 
 		it('should allow getting the password', function(done) {
-			var password = user.password;
-			(password === undefined).should.be.false;
-			(password).should.be.equal(user.password);
-			done();
+			user.save(function(err) {
+				var query = Model.findOne({'password':user.password});
+				query.exec(function(err,result) {
+					(result.password === undefined).should.be.false;
+					(result.password).should.be.equal(user.password);
+					done();
+				});
+			});
 		});
 
 		it('should allow getting the password salt', function(done) {
-			var salt = user.salt;
-			(salt === undefined).should.be.false;
-			(salt).should.be.equal(user.salt);
-			done();
+			user.save(function(err) {
+				var query = Model.findOne({'salt':user.salt});
+				query.exec(function(err,result) {
+					(result.salt===undefined).should.be.false;
+					(result.salt).should.be.equal(user.salt);
+					done();
+				});
+			});
 		});
 
 		it('should allow getting the roles', function(done) {
-			var roles = user.roles;
-			(roles === undefined).should.be.false;
-			(roles).should.be.equal(user.roles);
-			done();
+			user.save(function(err) {
+				var query = Model.findOne({'roles':user.roles});
+				query.exec(function(err,result) {
+					(result.roles===undefined).should.be.false;
+					(result.roles).should.be.equal(user.roles);
+					done();
+				});
+			});
 		});
 
 		it('should allow getting the status', function(done) {
-			var status = user.status;
-			(status === undefined).should.be.false;
-			(status).should.be.equal(user.status);
-			done();
+			user.save(function(err) {
+				var query = Model.findOne({'status':user.status});
+				query.exec(function(err,result) {
+					(result.status===undefined).should.be.false;
+					(result.status).should.be.equal(user.status);
+					done();
+				});
+			});
 		});
 
 		it('should allow getting the rank', function(done) {
-			var rank = user.rank;
-			(rank === undefined).should.be.false;
-			(rank).should.be.equal(user.rank);
-			done();
+			user.save(function(err) {
+				var query = Model.findOne({'rank':user.rank});
+				query.exec(function(err,result) {
+					(result.rank===undefined).should.be.false;
+					(result.rank).should.be.equal(user.rank);
+					done();
+				});
+			});
 		});
 		
 		it('should allow getting the login_enabled', function(done) {
-			var login_enabled = user.login_enabled;
-			(login_enabled === undefined).should.be.false;
-			(login_enabled).should.be.equal(user.login_enabled);
-			done();
+			user.save(function(err) {
+				var query = Mode.findOne({'login_enabled':user.login_enabled});
+				query.exec(function(err,result) {
+					(result.login_enabled===undefined).should.be.false);
+					(result.login_enabled).should.be.equal(user.login_enabled);
+					done();
+				});
+			});
 		});
 
 		it('should allow getting the templates', function(done) {
-			var templates = user.templates;
-			(templates === undefined).should.be.false;
-			(templates).should.be.equal(user.templates);
-			done();
+			user.save(function(err) {
+				var query = Mode.findOne({'templates':user.templates});
+				query.exec(function(err,result) {
+					(result.templates===undefined).should.be.false;
+					(arraysEqual(result.templates,user.templates)).should.be.equal(true);
+					done();
+				});
+			});
 		});
 
 		it('should be able to show an error when try to save without first name', function(done) {
@@ -200,7 +250,7 @@ describe('User Model Unit Tests:', function() {
 		});
 
 		it('should be able to show an error when try to save with an invalid role', function(done) {
-			user.role = ["Giant sabertooth tiger","Attendee"];
+			user.role = ["Giant sabertooth tiger","attendee"];
 			return user.save(function(err) {
 				should.exist(err);
 				done();
@@ -219,7 +269,8 @@ describe('User Model Unit Tests:', function() {
 	});
 
 	afterEach(function(done) {
-		User.remove().exec();
+		user.remove();
+		user2.remove();
 		done();
 	});
 });
