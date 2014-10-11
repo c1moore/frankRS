@@ -221,14 +221,6 @@ describe('User Model Unit Tests:', function() {
 			});
 		});
 
-		it('should be able to show an error when try to save without a status associative array', function(done) {
-			user.status = undefined;
-			return user.save(function(err) {
-				should.exist(err);
-				done();
-			});
-		});
-
 		it('should be able to show an error when try to save without a login_enabled', function(done) {
 			user.login_enabled = undefined;
 			return user.save(function(err) {
@@ -260,16 +252,6 @@ describe('User Model Unit Tests:', function() {
 				done();
 			});
 		});
-
-		it('should be able to show an error when try to save with a non-boolean login_enabled', function(done) {
-			user.login_enabled = 'nottrue';
-			return user.save(function(err) {
-				should.exist(err);
-				done();
-			});
-		});
-
-
 	});
 
 	afterEach(function(done) {
