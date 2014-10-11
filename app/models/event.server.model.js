@@ -8,17 +8,12 @@ var mongoose = require('mongoose'),
 
 //Validation functions
 var dateMustBeAtLeastToday = function(start_date) {
-	return (Date.parse(start_date) > new Date().getTime());
+	return (start_date > new Date().getTime());
 };
-/*
-var dateMustBeBeforeStart = function(end_date) {
-	return (Date(start_date).getTime() < Date(end_date).getTime());
-};*/
 
 var contentsValidate = function(property) {
-	return ((property.name && property.name.length) && (property.start_date && property.start_date.length) && (property.end_date && property.end_date.length) && (property.location && property.location.length));
-	//return (property && property.length);
-
+	//return ((property.name && property.name.length) && (property.start_date && property.start_date.length && (property.start_date > new Date().getTime())) && (property.end_date && property.end_date.length) && (property.location && property.location.length));
+	return ((property.name && property.name.length) && (property.location && property.location.length));
 };
 
 /**
@@ -30,20 +25,16 @@ var EventSchema = new Schema({
 			name: {
 				type: String,
 				trim: true
-				//validate: [contentsValidate, 'A name is required.']
 			},
 			start_date: {
-				type: String,
-				validate: [dateMustBeAtLeastToday, 'Date must be at least today if not later'] //, contentsValidate, 'Start date is required.']
+				type: Number
 			},
 			end_date: {
-				type: String
-				//validate: [dateMustBeBeforeStart, 'End date must not exceed the start date'] //, contentsValidate, 'End date is required.']
+				type: Number
 			},
 			location: {
 				type: String,
 				trim: true
-				//validate: [contentsValidate, 'A location is required.']
 			}
 		},
 		unique: true,
@@ -57,21 +48,17 @@ var EventSchema = new Schema({
 });
 
 EventSchema.pre('validate', function(next) {
-	if(Date.parse(this.contents.start_date) > Date.parse(this.contents.end_date)){
+	if(this.contents.start_date > this.contents.end_date){
 		this.invalidate('end_date','end date must be after start date');
 	}	
-	if(Date.parse(this.contents.end_date) < new Date().getTime()){
+	if(this.contents.end_date < new Date().getTime()){
 		this.invalidate('end_date','end date must not be in the past');
 	}
-	next();
-});
-
-EventSchema.pre('save', function(next) {
-	if (this.contents.start_date) {
-		this.contents.start_date=this.contents.start_date.toString();
+	if(this.contents.start_date < new Date().getTime()) {
+		this.invalidate('start_date', 'Event must start later than now.');
 	}
-	if (this.contents.end_date) {
-		this.contents.end_date=this.contents.end_date.toString();
+	if(isNaN(new Date(this.contents.end_date).getDate()) || isNaN(new Date(this.contents.start_date).getDate())) {
+		this.invalidate('contents', 'Dates must be valid.')
 	}
 	next();
 });

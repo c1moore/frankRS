@@ -29,6 +29,20 @@ var validateLogin = function(enabled) {
 	return (typeof enabled === 'boolean');
 };
 
+var validateRole = function(property) {
+	if(property.length == 0)
+		return false;
+
+	var valid = true;
+	for(var i=0; i<property.length; i++) {
+		if(!(property[i] === 'admin' || property[i] === 'recruiter' || property[i] === 'attendee')) {
+			valid = false;
+			break;
+		}
+	}
+	return valid;
+};
+
 /**
  * User Schema
  */
@@ -67,7 +81,6 @@ var UserSchema = new Schema({
 	},
 	provider: {
 		type: String,
-		//required: 'Provider is required'
 		validate: [validateRequired, 'Provider required.']
 	},
 	providerData: {},
@@ -77,9 +90,7 @@ var UserSchema = new Schema({
 			type: String,
 			enum: ['admin', 'recruiter', 'attendee']
 		}],
-		//default: ['user']
-		//required: 'User role is requred'
-		validate: [validateRequired, 'At least one role is required.']
+		validate: [validateRole, 'A valid role is required.']
 	},
 	updated: {
 		type: Date
@@ -121,11 +132,10 @@ var UserSchema = new Schema({
   	},
   	rank: {
   		type: Number,
-  		min: 1//[1, 'Rank must be at least 1']
+  		min: 1
   	},
   	login_enabled: {
   		type: Boolean,
-  		//required: 'login_enabled required'
   		validate: [validateLogin, 'login_enabled is required.']
   	},
   	templates: {

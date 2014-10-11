@@ -262,7 +262,7 @@ describe('User Model Unit Tests:', function() {
 		});
 
 		it('should be able to show an error when try to save with a non-boolean login_enabled', function(done) {
-			user.login_enabled = 'true';
+			user.login_enabled = 'nottrue';
 			return user.save(function(err) {
 				should.exist(err);
 				done();

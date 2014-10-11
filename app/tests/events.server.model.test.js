@@ -26,8 +26,8 @@ describe('Event Model Unit Tests',function() {
 			event1 = new events({
 			contents: {
 					name:  'testing123',
-					start_date: new Date(2014,11,30,10,0,0), //year, month, day, hour, minute, millisec
-					end_date:  new Date(2015,11,30,10,0,0),  //month is zero based.  11 = dec
+					start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
+					end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
 					location: 'UF'
 				},
 			schedule: 'www.google.com'
@@ -35,8 +35,8 @@ describe('Event Model Unit Tests',function() {
 			event2 = new events({
 				contents: {
 					name:  'testing123',
-					start_date: new Date(2014,11,30,10,0,0), //year, month, day, hour, minute, millisec
-					end_date:  new Date(2015,11,30,10,0,0),  //month is zero based.  11 = dec
+					start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
+					end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
 					location: 'UF'
 				},
 			schedule: 'www.google.com'
@@ -140,8 +140,6 @@ describe('Event Model Unit Tests',function() {
 		it('should be able to show an error when trying to save without a end date', function(done) {
 			event1.contents.end_date= '';
 			return event1.save(function(err, obj) {
-			//	console.log(obj);
-			//	console.log(obj.contents.end_date == true);
 				should.exist(err);
 				done();
 			});
@@ -150,15 +148,13 @@ describe('Event Model Unit Tests',function() {
 		it('should be able to show an error when trying to save without a location', function(done) {
 			event1.contents.location= '';
 			return event1.save(function(err, obj) {
-			//	console.log(obj);
-			//	console.log(obj.contents.location==true);
 				should.exist(err);
 				done();
 			});
 		});
 
 		it('should be able to show an error when trying to save with a past start date', function(done) {
-			event1.contents.start_date= new Date(2013,10,20,10,0,0);
+			event1.contents.start_date= new Date(2013,10,20,10,0,0).getTime();
 			return event1.save(function(err) {
 				should.exist(err);
 				done();
@@ -166,10 +162,7 @@ describe('Event Model Unit Tests',function() {
 		});
 
 		it('should be able to show an error when trying to save with a past end date', function(done) {
-			event1.contents.end_date= new Date(2013,10,20,10,0,0);
-				console.log(Date.parse(event1.contents.end_date)>=new Date().getTime());
-				console.log(Date.parse(event1.contents.end_date));
-				console.log(Date.getTime());
+			event1.contents.end_date= new Date(2013,10,20,10,0,0).getTime();
 			return event1.save(function(err) {
 				should.exist(err);
 				done();
@@ -185,7 +178,7 @@ describe('Event Model Unit Tests',function() {
 		});
 
 		it('should be able to show an error when trying to save with an end date before the start date', function(done) {
-			event1.contents.end_date=  new Date(2014,11,20,10,0,0);
+			event1.contents.end_date=  new Date(2014,11,20,10,0,0).getTime();
 			return event1.save(function(err) {
 				should.exist(err);
 				done();
