@@ -19,7 +19,7 @@
 				<div class="row">
 					<!-- these divs col values will generatgoogle mapse dynamicaly through angular -->
 					<div ng-repeat="button in data.buttons" class="col-md-3">
-						<a href="#"><img src="/modules/core/img/temp/242.svg" alt="Place holder"></a>
+						<a href="#" class="text-center"><img src="/modules/core/img/temp/242.svg" alt="Place holder"></a>
 						<div class="caption text-center">
 							<h3>{{button.name}}</h3>
 						</div>
@@ -38,7 +38,7 @@
   				</div>
 
   				<div class="panel-body">
-    				Panel content
+    				<p ng-repeat="comment in data.comments">{{comment}}</p>
   				</div>
   				
 			</div>
