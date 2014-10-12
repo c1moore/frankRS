@@ -13,11 +13,12 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 				{name:"Button 2", description:"Description 2"},
 				{name:"Button 3", description:"Description 3"},
 				{name:"Button 4", description:"Description 4"}
-			]
+			],
+			comments: ["Comment 1", "Comment 2"]
 		};
 
 		$scope.displayComments = true;
-		$scope.buttonsGrid = "col-md-10"
+		$scope.buttonsGrid = "col-md-10";
 
 		$scope.toggleComments = function(){
 			$scope.displayComments = !$scope.displayComments;
@@ -26,6 +27,12 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 			}
 			else if (!$scope.displayComments) {
 				$scope.buttonsGrid = "col-md-12";
+			}
+		}
+
+		$scope.showComments = function() {
+			if (comments.length === 0) {
+				return "No users";
 			}
 		}
 	}
