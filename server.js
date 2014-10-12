@@ -22,6 +22,9 @@ var db = mongoose.connect(config.db, function(err) {
 // Init the express application
 var app = require('./config/express')(db);
 
+// Configure signed cookies
+app.use(express.cookieParser('supersecretpassword'));
+
 // Bootstrap passport config
 require('./config/passport')();
 
