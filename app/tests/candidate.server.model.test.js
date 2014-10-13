@@ -40,10 +40,11 @@ describe('Candidate Model Unit Tests:', function() {
 		});
 
 		it('should fail to save an existing candidate again', function(done) {
-			candidate1.save();
-			return duplicate.save(function(err) {
-				should.exist(err);
-				done();
+			candidate1.save(function(err1) {
+				return duplicate.save(function(err) {
+					should.exist(err);
+					done();
+				});
 			});
 		});
 
@@ -68,6 +69,28 @@ describe('Candidate Model Unit Tests:', function() {
 			return candidate1.save(function(err) {
 				should.exist(err);
 				done();
+			});
+		});
+
+		it('should allow getting the first name', function(done) {
+			candidate1.save(function(err) {
+				var query = candidate.findOne({'fName' : candidate1.fName});
+				query.exec(function(err, result) {
+					(result.fName === undefined).should.be.false;
+					result.fName.should.equal(candidate1.fName);
+					done();
+				});
+			});
+		});
+
+		it('should all getting last name', function(done) {
+			candidate1.save(function(err) {
+				var query = candidate.findOne({'lName' : candidate1.lName});
+				query.exec(function (err, result) {
+					(result.lName === undefined).should.be.false;
+					result.lName.should.equal(candidate1.lName);
+					done();
+				});
 			});
 		});
 
