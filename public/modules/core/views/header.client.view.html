@@ -8,7 +8,18 @@
 		</button>
 		<a href="/#!/" class="navbar-brand">frank Recruiter System</a>
 	</div>
+
+	<!--Collection of links-->
 	<nav class="collapse navbar-collapse" collapse="!isCollapsed" role="navigation">
+		<ul class="nav navbar-nav">
+				<li ui-route="/invite" ng-class="{active: $uiRoute}">
+					<a href="/#!/invite">Invitations</a>
+				</li>
+				<li ui-route="/leaderboard" ng-class="{active: $uiRoute}">
+					<a href="/#!/leaderboard">Leaderboard</a>
+				</li>
+		</ul>
+
 		<ul class="nav navbar-nav" data-ng-if="menu.shouldRender(authentication.user);">
 			<li data-ng-repeat="item in menu.items | orderBy: 'position'" data-ng-if="item.shouldRender(authentication.user);" ng-switch="item.menuItemType" ui-route="{{item.uiRoute}}" class="{{item.menuItemClass}}" ng-class="{active: ($uiRoute)}" dropdown="item.menuItemType === 'dropdown'">
 				<a ng-switch-when="dropdown" class="dropdown-toggle">
