@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-var errorHandler = require('../errors'),
+/*var errorHandler = require('../errors'),
 	mongoose = require('mongoose'),
 	User = mongoose.model('User');
 
@@ -23,3 +23,5 @@ exports.getDisplayName = function(req, res) {
 		res.status(200).send(theResult.displayName);
 	}
 	};
+
+/*
