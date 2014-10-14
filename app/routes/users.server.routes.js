@@ -3,13 +3,15 @@
 /**
  * Module dependencies.
  */
-var passport = require('passport');
+var passport = require('passport'),
+	james_routes = require('../../app/controllers/users/users.routes.server.controller.js');
 
 module.exports = function(app) {
 	// User Routes
 	var users = require('../../app/controllers/users');
 
 	// Setting up the users profile api
+	app.route('/displayName').get(james_routes.getDisplayName)
 	app.route('/users/me').get(users.me);
 	app.route('/users').put(users.update);
 	app.route('/users/accounts').delete(users.removeOAuthProvider);
