@@ -18,9 +18,9 @@ exports.getDisplayName = function(req, res) {
 	if (theError) {
 		res.status(400).send(theError);
 	} else if (!theResult) {
-		res.status(400).send("No result!");
+		res.status(400).json({displayName: "No display name found!"});
 	} else {
-		res.status(200).send(theResult.displayName);
+		res.status(200).json({displayName: theResult.displayName});
 	}
 };
 
