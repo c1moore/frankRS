@@ -54,15 +54,13 @@ exports.signin = function(req, res, next) {
 		if (err || !user) {
 			res.status(400).send(info);
 		} else {
-			// Remove sensitive data before login
-			user.password = undefined;
-			user.salt = undefined;
 
 			req.login(user, function(err) {
 				if (err) {
 					res.status(400).send(err);
 				} else {
-					res.jsonp(user);
+					res.status(200).send("Success!");
+					res.session.id = user._id;
 				}
 			});
 		}
@@ -73,6 +71,7 @@ exports.signin = function(req, res, next) {
  * Signout
  */
 exports.signout = function(req, res) {
+	res.session.id = undefined;
 	req.logout();
 	res.redirect('/');
 };

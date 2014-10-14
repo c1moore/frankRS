@@ -140,5 +140,7 @@ module.exports = function(db) {
 		});
 	});
 
+	app.use(cookieParser('supersecretpassword'));
+
 	return app;
 };
