@@ -5,7 +5,8 @@
  */
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
-	User = mongoose.model('User');
+	User = mongoose.model('User'),
+	Event = mongoose.model('Event');
 
 //Validation functions
 var validateRequired = function(prop) {
@@ -24,27 +25,26 @@ var AttendeesSchema = new Schema({
 	time : {
 		type: Number,
 		validate: [validateRequired, 'Registration time is required.']
+	},
+	eventid : {
+		type: Schema.ObjectID,
+		validate: [validateRequired, "Event ID required."]
 	}
 });
 
 AttendeesSchema.pre('validate', function(next) {
 	var query = User.findOne({'_id' : attendee});
-	query.exec(function(err) {
-		if(err)
+	query.exec(function(err, result) {
+		if(err || !result.fName)
 			this.invalidate('attendee', 'User ID not found.');
 	});
-	next();
-});
 
-AttendeesSchema.pre('save', function(next) {
-	Attendees.count({}, function(err, result) {
-		if(result > 10) {
-			var query = Attendees.findOne({});
-			query.sort({'time' : 'desc'});
-			query.remove();
-			query.exec();
-		}
+	var query = Event.findOne({'_id' : eventid});
+	query.exec(function(err) {
+		if(err || !result.contents.name)
+			this.invalidate('eventid', 'Event ID not found.');
 	});
+	next();
 });
 
 mongoose.model('Attendees', AttendeesSchema);
