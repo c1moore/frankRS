@@ -58,7 +58,7 @@ EventSchema.pre('validate', function(next) {
 		this.invalidate('start_date', 'Event must start later than now.');
 	}
 	if(isNaN(new Date(this.contents.end_date).getDate()) || isNaN(new Date(this.contents.start_date).getDate())) {
-		this.invalidate('contents', 'Dates must be valid.')
+		this.invalidate('contents', 'Dates must be valid.');
 	}
 	next();
 });
