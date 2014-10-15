@@ -12,10 +12,10 @@ var should = require('should'),
 /**
  * Globals
  */
-var attendee1,
+var attendee1, attendee2u, attendee3e,
 	duplicate,
-	user, userdoc,
-	event1, eventdoc;
+	user,  user2,
+	event1, event2;
 
 /**
  * Unit tests
@@ -35,6 +35,18 @@ describe('Attendees Model Unit Tests:', function() {
 			provider: 'local',
 			login_enabled: false
 		});
+		user2 = new User({
+			fName: 'Full',
+			lName: 'Name',
+			roles: ['attendee'],
+			displayName: 'Full Name',
+			email: 'test2@test.com',
+			password: 'password',
+			salt: 'abc123',
+			rank: 1,
+			provider: 'local',
+			login_enabled: false
+		});
 
 		event1 = new Event({
 			contents: {
@@ -45,10 +57,25 @@ describe('Attendees Model Unit Tests:', function() {
 			},
 			schedule: 'www.google.com'
 		});
+		event2 = new Event({
+			contents: {
+					name:  'attendeeteste2',
+					start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
+					end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+					location: 'UF'
+			},
+			schedule: 'www.google.com'
+		});
 
 		user.save(function() {
 			event1.save(function() {
-				done();
+				user2.save(function(err) {
+					if(err) console.log(err);
+					event2.save(function(err) {
+					if(err) console.log(err);
+						done();
+					});
+				});
 			});
 		});
 	});
@@ -60,6 +87,16 @@ describe('Attendees Model Unit Tests:', function() {
 			attendee1 = new Attendees ({
 				attendee : user._id,
 				eventid : event1._id,
+				time : ctime
+			});
+			attendee2u = new Attendees ({
+				attendee : user2._id,
+				eventid : event1._id,
+				time : ctime
+			});
+			attendee3e = new Attendees ({
+				attendee : user._id,
+				eventid : event2._id,
 				time : ctime
 			});
 
@@ -74,6 +111,18 @@ describe('Attendees Model Unit Tests:', function() {
 
 		it('should save without problems', function(done) {
 			attendee1.save(done);
+		});
+
+		it('should save when everything is the same except user id', function(done) {
+			attendee1.save(function() {
+				attendee2u.save(done);
+			})
+		});
+
+		it('should save when everything is the same except event id', function(done) {
+			attendee1.save(function() {
+				attendee3e.save(done);
+			})
 		});
 
 		it('should fail to save the same attendee twice', function(done) {
@@ -161,6 +210,8 @@ describe('Attendees Model Unit Tests:', function() {
 		afterEach(function(done) {
 			attendee1.remove();
 			duplicate.remove();
+			attendee2u.remove();
+			attendee3e.remove();
 			done();
 		});
 	});
@@ -168,6 +219,8 @@ describe('Attendees Model Unit Tests:', function() {
 	after(function(done) {
 		user.remove();
 		event1.remove();
+		user2.remove();
+		event2.remove();
 		done();
 	});
 });
