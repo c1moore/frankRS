@@ -61,7 +61,7 @@ var CandidateSchema = new Schema({
 
 });
 
-CandidateSchema.plugin(invalidator);
+CandidateSchema.plugin(idvalidator);
 
 CandidateSchema.methods.CreateAcceptKey = function() {
 	    var chars = "01@2345$6789-ABCDEF+GHIJK=LMNO*PQRSTU#VWXT+Zabcdefghiklmnopqrstuvwxyz"; 
