@@ -5,7 +5,8 @@
  */
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
-	crypto = require('crypto');
+	crypto = require('crypto'),
+	idvalidator = require('mongoose-id-validator');
 
 /**
  * A Validation function for local strategy properties
@@ -42,6 +43,16 @@ var validateRole = function(property) {
 	}
 	return valid;
 };
+
+var ListSchema = new Schema({
+	user_id: {type: mongoose.Schema.Types.ObjectId, ref:'User'},
+	event_id: {type: mongoose.Schema.Types.ObjectId, ref:'Event'}
+}, {_id:false});
+
+var StatusSchema = new Schema({
+	event_id: {type: mongoose.Schema.Types.ObjectId, ref:'Event'},
+	status: {type: Boolean}
+}, {_id:false})
 
 /**
  * User Schema
@@ -107,28 +118,16 @@ var UserSchema = new Schema({
   		type: Date
   	},
   	status: {
-  		type: [{
-  			event_id: {type: mongoose.Schema.Types.ObjectId},
-  			status: {type: Boolean}
-  		}]
+  		type: [StatusSchema]
   	},
   	inviteeList: {
-  		type: [{
-  			user_id: {type: mongoose.Schema.Types.ObjectId},
-  			event_id: {type: mongoose.Schema.Types.ObjectId}
-  		}]
+  		type: [ListSchema]
   	},
   	attendeeList: {
-  		type: [{
-  			user_id: {type: mongoose.Schema.Types.ObjectId},
-  			event_id: {type: mongoose.Schema.Types.ObjectId}
-  		}]
+  		type: [ListSchema]
   	},
   	almostList: {
-  		type: [{
-  			user_id: {type: mongoose.Schema.Types.ObjectId},
-  			event_id: {type: mongoose.Schema.Types.ObjectId}
-  		}]
+  		type: [ListSchema]
   	},
   	rank: {
   		type: Number,
@@ -145,6 +144,10 @@ var UserSchema = new Schema({
   		}]
   	}
 });
+
+//Validate that ObjectIds reference actual IDs from other schemas.
+ListSchema.plugin(idvalidator);
+StatusSchema.plugin(idvalidator);
 
 /**
  * Hook a pre save method to hash the password
