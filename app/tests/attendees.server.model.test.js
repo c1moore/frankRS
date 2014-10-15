@@ -49,21 +49,17 @@ describe('Attendees Model Unit Tests:', function() {
 		});
 
 		event1 = new Event({
-			contents: {
-					name:  'attendeetest',
-					start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
-					end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
-					location: 'UF'
-			},
+			name:  'attendeetest',
+			start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
+			end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+			location: 'UF',
 			schedule: 'www.google.com'
 		});
 		event2 = new Event({
-			contents: {
-					name:  'attendeeteste2',
-					start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
-					end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
-					location: 'UF'
-			},
+			name:  'attendeeteste2',
+			start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
+			end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+			location: 'UF',
 			schedule: 'www.google.com'
 		});
 

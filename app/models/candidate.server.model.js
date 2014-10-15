@@ -15,7 +15,10 @@ var validateLocalStrategyProperty = function(property) {
 	return (property && property.length);
 };
 
-
+var eventsArray = new Schema({
+	eventsID: {type: mongoose.Schema.Types.ObjectId, ref: 'Event'},
+	accepted: {type: Boolean, default: 'false'}
+}, {_id:false});
 
 var CandidateSchema = new Schema({
 	fName: {
@@ -43,11 +46,7 @@ var CandidateSchema = new Schema({
 		default: 'volunteer'
 	},
 	events: {
-		type: [{
-			eventsID: {type: mongoose.Schema.Types.ObjectId, ref: 'Event'},
-			accepted: {type: Boolean, default: 'false'}
-		}]
-
+		type: [eventsArray]
 	},
 	accept_key: {
 		type: String,
@@ -61,7 +60,7 @@ var CandidateSchema = new Schema({
 
 });
 
-CandidateSchema.plugin(idvalidator);
+eventsArray.plugin(idvalidator);
 
 CandidateSchema.methods.CreateAcceptKey = function() {
 	    var chars = "01@2345$6789-ABCDEF+GHIJK=LMNO*PQRSTU#VWXT+Zabcdefghiklmnopqrstuvwxyz"; 
