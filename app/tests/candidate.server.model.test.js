@@ -5,7 +5,8 @@
  */
 var should = require('should'),
 	mongoose = require('mongoose'),
-	candidate = mongoose.model('Candidate');
+	candidate = mongoose.model('Candidate'),
+	Event = mongoose.model('Event');
 
 /**
  * Globals
@@ -90,6 +91,36 @@ describe('Candidate Model Unit Tests:', function() {
 					(result.lName === undefined).should.be.false;
 					result.lName.should.equal(candidate1.lName);
 					done();
+				});
+			});
+		});
+
+		it('should fail to save when an objectid in the event array does not reference an event.', function(done) {
+			candidate1.events = [{eventsID: mongoose.Types.ObjectId(), accepted: false}];
+			candidate1.save(function(err) {
+				should.exist(err);
+				done();
+			});
+		});
+
+		it('should save when an objectid in the events array does reference an Event.', function(done) {
+			var event1 = new Event({
+				contents: {
+						name:  'attendeeteste2',
+						start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
+						end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+						location: 'UF'
+				},
+				schedule: 'www.google.com'
+			});
+
+			event1.save(function() {
+				candidate1.events = [{eventsID: event1._id, accepted: false}];
+				candidate1.save(function(err, result) {
+					should.exist(result);
+					event1.remove(function() {
+						done();
+					});
 				});
 			});
 		});
