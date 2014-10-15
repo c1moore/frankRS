@@ -4,6 +4,7 @@
  * Module dependencies.
  */
 var mongoose = require('mongoose'),
+	idvalidator = require('mongoose-id-validator'),
 	Schema = mongoose.Schema;
 
 	/**
@@ -43,7 +44,7 @@ var CandidateSchema = new Schema({
 	},
 	events: {
 		type: [{
-			eventsID: {type: mongoose.Schema.Types.ObjectId},
+			eventsID: {type: mongoose.Schema.Types.ObjectId, ref: 'Event'},
 			accepted: {type: Boolean, default: 'false'}
 		}]
 
@@ -60,6 +61,8 @@ var CandidateSchema = new Schema({
 
 });
 
+CandidateSchema.plugin(invalidator);
+
 CandidateSchema.methods.CreateAcceptKey = function() {
 	    var chars = "01@2345$6789-ABCDEF+GHIJK=LMNO*PQRSTU#VWXT+Zabcdefghiklmnopqrstuvwxyz"; 
         var randomstring = ''; 
@@ -70,11 +73,5 @@ CandidateSchema.methods.CreateAcceptKey = function() {
         }
         return randomstring;
 };
-
-
-
-
-
-
 
 mongoose.model('Candidate', CandidateSchema);
