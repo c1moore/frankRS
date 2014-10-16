@@ -10,18 +10,14 @@ var errorHandler = require('../errors'),
 exports.getDisplayName = function(req, res) {
 	var id = req.body.session.id;
 	var query = User.findOne({_id:id });
-	var theResult = undefined;
-	var theError = undefined;
+	
 	query.exec(function(err,result) {
-		theResult = result;
-		theError = err; });
-	if (theError) {
-		res.status(400).send(theError);
-	} else if (!theResult) {
-		res.status(400).json({displayName: "No display name found!"});
-	} else {
-		res.status(200).json({displayName: theResult.displayName});
-	}
+		if(err) {
+			res.status(400).send(err);
+		} else if(!result) {
+			res.status(400).json({displayName: "No display name found!"});
+		} else {
+			res.status(200).json({displayName : result.displayName});
+		}
+	});
 };
-
-

@@ -22,7 +22,7 @@ exports.signup = function(req, res) {
 
 	// Add missing user fields
 	user.provider = 'local';
-	user.displayName = user.firstName + ' ' + user.lastName;
+	user.displayName = user.lName + ', ' + user.fName;
 
 	// Then save the user 
 	user.save(function(err) {
@@ -31,7 +31,10 @@ exports.signup = function(req, res) {
 				message: errorHandler.getErrorMessage(err)
 			});
 		} else {
-			// Remove sensitive data before login
+			//No need to login, send response saying everything was added properly.
+			res.status(200).send();
+			
+			/*// Remove sensitive data before login
 			user.password = undefined;
 			user.salt = undefined;
 
@@ -41,7 +44,7 @@ exports.signup = function(req, res) {
 				} else {
 					res.jsonp(user);
 				}
-			});
+			});*/
 		}
 	});
 };
