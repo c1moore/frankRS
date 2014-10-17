@@ -10,8 +10,8 @@ var errorHandler = require('../errors'),
 exports.getDisplayName = function(req, res) {
 	var id = req.body.session.id;
 	var query = User.findOne({_id:id });
-	var theResult = undefined;
-	var theError = undefined;
+	var theResult;
+	var theError;
 	query.exec(function(err,result) {
 		theResult = result;
 		theError = err; });
