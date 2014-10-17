@@ -7,6 +7,7 @@
  */
 var should = require('should'),
 	mongoose = require('mongoose'),
+	Event = mongoose.model('Event'),
 	User = mongoose.model('User');
 
 /**
@@ -252,11 +253,91 @@ describe('User Model Unit Tests:', function() {
 				done();
 			});
 		});
-	});
 
-	afterEach(function(done) {
-		user.remove();
-		user2.remove();
-		done();
+		it('should show an error when trying to save to one of the lists without a proper user id.', function(done) {
+			var event1 = new Event({
+				name:  'attendeeteste2',
+				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
+				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+				location: 'UF',
+				schedule: 'www.google.com'
+			});
+
+			user.attendeeList = [{user_id : user2._id, event_id : event1._id}];
+			user.save(function(err) {
+				should.exist(err);
+				event1.remove(function() {
+					done();
+				});
+			});
+		});
+
+		it('should show an error when trying to save to one of the lists without a proper event id.', function(done) {
+			user.attendeeList = [{user_id : user._id, event_id : mongoose.Types.ObjectId()}];
+			user.save(function(err) {
+				should.exist(err);
+				done();
+			});
+		});
+
+		it('should be able to save properly when a proper user and event id are given to one of the lists', function(done) {
+			var event1 = new Event({
+				name:  'attendeeteste2',
+				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
+				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+				location: 'UF',
+				schedule: 'www.google.com'
+			});
+
+			user2.email = 'user2@email.com';
+
+			event1.save(function() {
+				user2.save(function() {
+					user.attendeeList = [{user_id : user2._id, event_id : event1._id}];
+					user.save(function(err, result) {
+						console.log(err);
+						should.exist(result);
+						event1.remove(function() {
+							done();
+						});
+					});
+				});
+			});
+		});
+
+		it('should be able to save properly when a proper event id is passed to the status array', function(done) {
+			var event1 = new Event({
+				name:  'attendeeteste2',
+				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
+				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+				location: 'UF',
+				schedule: 'www.google.com'
+			});
+
+			event1.save(function() {
+				user.attendeeList = [{event_id : event1._id, status : true}];
+				user.save(function(err, result) {
+					console.log(err);
+					should.exist(result);
+					event1.remove(function() {
+						done();
+					});
+				});
+			});
+		});
+
+		it('should fail to save properly when an invalid event id is passed to the status array', function(done) {
+			user.status = [{event_id : mongoose.Types.ObjectId(), status : true}];
+			user.save(function(err) {
+				should.exist(err);
+				done();
+			});
+		});
+
+		afterEach(function(done) {
+			user.remove();
+			user2.remove();
+			done();
+		});
 	});
 });

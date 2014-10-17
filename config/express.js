@@ -3,6 +3,9 @@
 /**
  * Module dependencies.
  */
+
+var secret = "supersecretpassword";
+
 var express = require('express'),
 	morgan = require('morgan'),
 	bodyParser = require('body-parser'),
@@ -83,13 +86,13 @@ module.exports = function(db) {
 	app.enable('jsonp callback');
 
 	// CookieParser should be above session
-	app.use(cookieParser());
+	app.use(cookieParser(secret));
 
 	// Express MongoDB session storage
 	app.use(session({
 		saveUninitialized: true,
 		resave: true,
-		secret: config.sessionSecret,
+		secret: secret,
 		store: new mongoStore({
 			db: db.connection.db,
 			collection: config.sessionCollection
@@ -139,8 +142,6 @@ module.exports = function(db) {
 			error: 'Not Found'
 		});
 	});
-
-	app.use(cookieParser('supersecretpassword'));
 
 	return app;
 };

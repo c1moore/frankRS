@@ -5,7 +5,8 @@
  */
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
-	crypto = require('crypto');
+	crypto = require('crypto'),
+	idvalidator = require('mongoose-id-validator');
 
 /**
  * A Validation function for local strategy properties
@@ -42,6 +43,16 @@ var validateRole = function(property) {
 	}
 	return valid;
 };
+
+var ListSchema = new Schema({
+	user_id: {type: mongoose.Schema.Types.ObjectId, ref:'User'},
+	event_id: {type: mongoose.Schema.Types.ObjectId, ref:'Event'}
+}, {_id:false});
+
+var StatusSchema = new Schema({
+	event_id: {type: mongoose.Schema.Types.ObjectId, ref:'Event'},
+	status: {type: Boolean}
+}, {_id:false})
 
 /**
  * User Schema
@@ -107,28 +118,16 @@ var UserSchema = new Schema({
   		type: Date
   	},
   	status: {
-  		type: [{
-  			event_id: {type: mongoose.Schema.Types.ObjectId},
-  			status: {type: Boolean}
-  		}]
+  		type: [StatusSchema]
   	},
   	inviteeList: {
-  		type: [{
-  			user_id: {type: mongoose.Schema.Types.ObjectId},
-  			event_id: {type: mongoose.Schema.Types.ObjectId}
-  		}]
+  		type: [ListSchema]
   	},
   	attendeeList: {
-  		type: [{
-  			user_id: {type: mongoose.Schema.Types.ObjectId},
-  			event_id: {type: mongoose.Schema.Types.ObjectId}
-  		}]
+  		type: [ListSchema]
   	},
   	almostList: {
-  		type: [{
-  			user_id: {type: mongoose.Schema.Types.ObjectId},
-  			event_id: {type: mongoose.Schema.Types.ObjectId}
-  		}]
+  		type: [ListSchema]
   	},
   	rank: {
   		type: Number,
@@ -145,6 +144,10 @@ var UserSchema = new Schema({
   		}]
   	}
 });
+
+//Validate that ObjectIds reference actual IDs from other schemas.
+ListSchema.plugin(idvalidator);
+StatusSchema.plugin(idvalidator);
 
 /**
  * Hook a pre save method to hash the password
@@ -175,27 +178,5 @@ UserSchema.methods.hashPassword = function(password) {
 UserSchema.methods.authenticate = function(password) {
 	return this.password === this.hashPassword(password);
 };
-
-/**
- * Find possible not used username
- */
-/**UserSchema.statics.findUniqueUsername = function(username, suffix, callback) {
-	var _this = this;
-	var possibleUsername = username + (suffix || '');
-
-	_this.findOne({
-		username: possibleUsername
-	}, function(err, user) {
-		if (!err) {
-			if (!user) {
-				callback(possibleUsername);
-			} else {
-				return _this.findUniqueUsername(username, (suffix || 0) + 1, callback);
-			}
-		} else {
-			callback(null);
-		}
-	});
-};**/
 
 mongoose.model('User', UserSchema);
