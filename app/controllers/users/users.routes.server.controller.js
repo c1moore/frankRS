@@ -1,5 +1,7 @@
 'use strict';
 
+//Yes, this should probably go in routes, but I'm lazy
+
 /**
  * Module dependencies.
  */
@@ -10,7 +12,6 @@ var errorHandler = require('../errors'),
 exports.getDisplayName = function(req, res) {
 	var id = req.body.session.id;
 	var query = User.findOne({_id:id });
-	
 	query.exec(function(err,result) {
 		if(err) {
 			res.status(400).send(err);

@@ -28,12 +28,12 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 			else if (!$scope.displayComments) {
 				$scope.buttonsGrid = "col-md-12";
 			}
-		}
+		};
 
 		$scope.showComments = function() {
 			if (comments.length === 0) {
 				return "No users";
 			}
-		}
+		};
 	}
 ]);
