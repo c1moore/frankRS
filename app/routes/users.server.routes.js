@@ -4,14 +4,22 @@
  * Module dependencies.
  */
 var passport = require('passport'),
-	james_routes = require('../../app/controllers/users/users.routes.server.controller.js');
+	james_user_routes = require('../../app/controllers/users/users.routes.server.controller.js'),
+	james_event_routes = require('../../app/controllers/users/event.routes.server.controller.js');
 
 module.exports = function(app) {
 	// User Routes
 	var users = require('../../app/controllers/users');
 
+	// Event Routes
+	app.route('/event/getStartDate').get(james_event_routes.getStartDate);
+	app.route('/event/getEndDate').get(james_event_routes.getEndDate);
+	app.route('/event/getLocation').get(james_event_routes.getLocation);
+	app.route('/event/getEventObj').get(james_event_routes.getEventObj);
+	app.route('/event/getSchedule').get(james_event_routes.getSchedule);
+
 	// Setting up the users profile api
-	app.route('/displayName').get(james_routes.getDisplayName)
+	app.route('/displayName').get(james_user_routes.getDisplayName)
 	app.route('/users/me').get(users.me);
 	app.route('/users').put(users.update);
 	app.route('/users/accounts').delete(users.removeOAuthProvider);
