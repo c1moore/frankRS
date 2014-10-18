@@ -27,8 +27,8 @@ function arraysEqual(array0,array1) {
 /**
  * Unit tests
  */
-describe('Express.js Route Unit Tests:', function() {
-	it("should be able to access the main page", function(done) {
+describe('Express.js User Route Unit Tests:', function() {
+	it("should be able to access the main page from the user route testing mechanism", function(done) {
 		request('http://localhost:3001')
 			.get('/')
 			.expect(200);

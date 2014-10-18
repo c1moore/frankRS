@@ -5,11 +5,10 @@
  */
 var errorHandler = require('../errors'),
 	mongoose = require('mongoose'),
-	User = mongoose.model('Event');
+	Event = mongoose.model('Event');
 
 exports.getStartDate = function(req, res) {
-	var id = req.body.session.id;
-	var eventName = req.body.eventName;
+	var eventName = req.body.name;
 	var query = Event.findOne({name: eventName});
 	var theResult;
 	var err;
@@ -23,8 +22,7 @@ exports.getStartDate = function(req, res) {
 };
 
 exports.getEndDate = function(req, res) {
-	var id = req.body.session.id;
-	var eventName = req.body.eventName;
+	var eventName = req.body.name;
 	var query = Event.findOne({name: eventName});
 	var theResult;
 	var err;
@@ -38,8 +36,7 @@ exports.getEndDate = function(req, res) {
 };
 
 exports.getLocation = function(req, res) {
-	var id = req.body.session.id;
-	var eventName = req.body.eventName;
+	var eventName = req.body.name;
 	var query = Event.findOne({name: eventName});
 	var theResult;
 	var err;
@@ -53,8 +50,7 @@ exports.getLocation = function(req, res) {
 };
 
 exports.getEventObj = function(req, res) {
-	var id = req.body.session.id;
-	var eventName = req.body.eventName;
+	var eventName = req.body.name;
 	var query = Event.findOne({name: eventName});
 	var theResult;
 	var err;
@@ -68,8 +64,7 @@ exports.getEventObj = function(req, res) {
 };
 
 exports.getSchedule = function(req, res) {
-	var id = req.body.session.id;
-	var eventName = req.body.eventName;
+	var eventName = req.body.name;
 	var query = Event.findOne({name: eventName});
 	var theResult;
 	var err;

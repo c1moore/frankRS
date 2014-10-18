@@ -12,11 +12,11 @@ module.exports = function(app) {
 	var users = require('../../app/controllers/users');
 
 	// Event Routes
-	app.route('/event/getStartDate').get(james_event_routes.getStartDate);
-	app.route('/event/getEndDate').get(james_event_routes.getEndDate);
-	app.route('/event/getLocation').get(james_event_routes.getLocation);
-	app.route('/event/getEventObj').get(james_event_routes.getEventObj);
-	app.route('/event/getSchedule').get(james_event_routes.getSchedule);
+	app.route('/events/getStartDate').get(james_event_routes.getStartDate);
+	app.route('/events/getEndDate').get(james_event_routes.getEndDate);
+	app.route('/events/getLocation').get(james_event_routes.getLocation);
+	app.route('/events/getEventObj').get(james_event_routes.getEventObj);
+	app.route('/events/getSchedule').get(james_event_routes.getSchedule);
 
 	// Setting up the users profile api
 	app.route('/displayName').get(james_user_routes.getDisplayName)
