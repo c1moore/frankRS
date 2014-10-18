@@ -31,7 +31,7 @@ var validateLogin = function(enabled) {
 };
 
 var validateRole = function(property) {
-	if(property.length == 0)
+	if(property.length === 0)
 		return false;
 
 	var valid = true;
@@ -52,7 +52,7 @@ var ListSchema = new Schema({
 var StatusSchema = new Schema({
 	event_id: {type: mongoose.Schema.Types.ObjectId, ref:'Event'},
 	status: {type: Boolean}
-}, {_id:false})
+}, {_id:false});
 
 /**
  * User Schema

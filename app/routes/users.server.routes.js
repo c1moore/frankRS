@@ -19,7 +19,7 @@ module.exports = function(app) {
 	app.route('/events/getSchedule').get(james_event_routes.getSchedule);
 
 	// Setting up the users profile api
-	app.route('/displayName').get(james_user_routes.getDisplayName)
+	app.route('/displayName').get(james_user_routes.getDisplayName);
 	app.route('/users/me').get(users.me);
 	app.route('/users').put(users.update);
 	app.route('/users/accounts').delete(users.removeOAuthProvider);

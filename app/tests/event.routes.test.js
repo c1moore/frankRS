@@ -56,7 +56,7 @@ describe('Express.js Event Route Unit Tests:', function() {
 		done();
 	});
 
-	it("should be able to get the event start_date", function(done) {
+	it("should be able to get the event start date", function(done) {
 		event1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/events/getStartDate')
@@ -65,7 +65,70 @@ describe('Express.js Event Route Unit Tests:', function() {
 				.end(function(err,res) {
 					if (err) throw err;
 					res.body.should.have.property('start_date');
-					done()
+					done();
+				});
+		});
+	});
+
+	it("should be able to get the event end date", function(done) {
+		event1.save(function(err) {
+			request('http://localhost:3001')
+				.get('/events/getEndDate')
+				.send({name: "testing123"})
+				.expect(200)
+				.end(function(err,res) {
+					if (err) throw err;
+					res.body.should.have.property('end_date');
+					done();
+				});
+		});
+	});
+
+	it("should be able to get the event location", function(done) {
+		event1.save(function(err) {
+			request('http://localhost:3001')
+				.get('/events/getLocation')
+				.send({name: "testing123"})
+				.expect(200)
+				.end(function(err,res) {
+					if (err) throw err;
+					res.body.should.have.property('location');
+					res.body.location.should.be.equal('UF');
+					done();
+				});
+		});
+	});
+
+	it("should be able to get the event schedule", function(done) {
+		event1.save(function(err) {
+			request('http://localhost:3001')
+				.get('/events/getSchedule')
+				.send({name: "testing123"})
+				.expect(200)
+				.end(function(err,res) {
+					if (err) throw err;
+					res.body.should.have.property('schedule');
+					res.body.schedule.should.be.equal('www.google.com');
+					done();
+				});
+		});
+	});
+
+	it("should be able to get the event object in its entirety", function(done) {
+		event1.save(function(err) {
+			request('http://localhost:3001')
+				.get('/events/getEventObj')
+				.send({name: "testing123"})
+				.expect(200)
+				.end(function(err,res) {
+					if (err) throw err;
+					res.body.should.have.property('schedule');
+					res.body.should.have.property('location');
+					res.body.should.have.property('start_date');
+					res.body.should.have.property('end_date');
+					res.body.schedule.should.be.equal('www.google.com');
+					res.body.location.should.be.equal('UF');
+					done();
 				});
 		});
 	});

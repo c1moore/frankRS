@@ -1,3 +1,5 @@
+'use strict';
+
 angular.module('leaderboard').config(['$stateProvider', '$urlRouterProvider',
 	function($stateProvider, $urlRouterProvider) {
 		// Home state routing

@@ -1,5 +1,7 @@
 'use strict';
 
+/*jshint expr:true */
+
 /**
  * Module dependencies.
  */
@@ -112,13 +114,13 @@ describe('Attendees Model Unit Tests:', function() {
 		it('should save when everything is the same except user id', function(done) {
 			attendee1.save(function() {
 				attendee2u.save(done);
-			})
+			});
 		});
 
 		it('should save when everything is the same except event id', function(done) {
 			attendee1.save(function() {
 				attendee3e.save(done);
-			})
+			});
 		});
 
 		it('should fail to save the same attendee twice', function(done) {
