@@ -1,5 +1,7 @@
 'use strict';
 
+//Yes, this should probably go in routes, but I'm lazy
+
 /**
  * Module dependencies.
  */
