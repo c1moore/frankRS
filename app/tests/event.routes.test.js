@@ -30,22 +30,6 @@ function arraysEqual(array0,array1) {
  * Unit tests
  */
 describe('Express.js Event Route Unit Tests:', function() {
-	before(function(done) {
-		user = new User({
-			fName: 'Full',
-			lName: 'Name',
-			roles: ['attendee'],
-			displayName: 'Full Name',
-			email: 'test@test.com',
-			password: 'password',
-			salt: 'abc123',
-			rank: 1,
-			provider: 'local',
-			login_enabled: false
-		});
-		done();
-	});
-
 	beforeEach(function(done){
 		event1 = new Event({
 			name:  'testing123',
@@ -63,6 +47,20 @@ describe('Express.js Event Route Unit Tests:', function() {
 			schedule: 'www.google.com'
 		});
 		
+		user = new User({
+			fName: 'Full',
+			lName: 'Name',
+			roles: ['attendee'],
+			displayName: 'Full Name',
+			email: 'test@test.com',
+			password: 'password',
+			status: [{eventID: event1._id, attending:false, recruiter:false}],
+			salt: 'abc123',
+			rank: 1,
+			provider: 'local',
+			login_enabled: false
+		});
+		user.save(function(err){if(err)throw err;});
 			
 		done();
 	});
@@ -74,71 +72,68 @@ describe('Express.js Event Route Unit Tests:', function() {
 		done();
 	});
 
-	it("should be able to get the event start date", function(done) {
+	it("should not be able to enumerate events when not signed in",function(done) {
+		event1.save(function(err) {
+			request('http://localhost:3001')
+				.get('/events/enumerate')
+				.expect(400);
+			done();
+		});
+	});
+
+	it("should not be able to get the event start date when not signed in", function(done) {
 		event1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/events/getStartDate')
 				.send({eventID: event1._id})
-				.expect(200)
-				.end(function(err,res) {
-					if (err) throw err;
-					res.body.should.have.property('start_date');
-					done();
-				});
+				.expect(400);
+			done();
 		});
 	});
 
-	it("should be able to get the event end date", function(done) {
+	it("should not be able to get the event end date when not signed in", function(done) {
 		event1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/events/getEndDate')
 				.send({eventID: event1._id})
-				.expect(200)
-				.end(function(err,res) {
-					if (err) throw err;
-					res.body.should.have.property('end_date');
-					done();
-				});
+				.expect(400);
+			done();
 		});
 	});
 
-	it("should be able to get the event location", function(done) {
+	it("should not be able to get the event location when not signed in", function(done) {
 		event1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/events/getLocation')
 				.send({eventID: event1._id})
-				.expect(200)
-				.end(function(err,res) {
-					if (err) throw err;
-					res.body.should.have.property('location');
-					res.body.location.should.be.equal('UF');
-					done();
-				});
+				.expect(400);
+				//.end(function(err,res) {
+				//	if (err) throw err;
+				//	res.body.should.have.property('location');
+				//	res.body.location.should.be.equal('UF');
+				//	done();
+				//});
+			done();
 		});
 	});
 
-	it("should be able to get the event schedule", function(done) {
+	it("should not be able to get the event schedule when not signed in", function(done) {
 		event1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/events/getSchedule')
 				.send({eventID: event1._id})
-				.expect(200)
-				.end(function(err,res) {
-					if (err) throw err;
-					res.body.should.have.property('schedule');
-					res.body.schedule.should.be.equal('www.google.com');
-					done();
-				});
+				.expect(400);
+			done();
 		});
 	});
 
-	it("should be able to get the event object in its entirety", function(done) {
+	it("should not be able to get the event object when not signed in", function(done) {
 		event1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/events/getEventObj')
 				.send({eventID: event1._id})
-				.expect(200)
-				.end(function(err,res) {
+				.expect(400);
+				/*.end(function(err,res) {
 					if (err) throw err;
 					res.body.should.have.property('schedule');
 					res.body.should.have.property('location');
@@ -146,6 +141,30 @@ describe('Express.js Event Route Unit Tests:', function() {
 					res.body.should.have.property('end_date');
 					res.body.schedule.should.be.equal('www.google.com');
 					res.body.location.should.be.equal('UF');
+					done();
+				});*/
+			done();
+		});
+	});
+
+	it("should be able to sign in correctly", function(done) {
+		request('http://localhost:3001')
+			.post('/auth/signin')
+			.send({username: 'test@test.com', password: 'password'})
+			.expect(200);
+		done();
+	});
+
+	it('should now be able to enumerate events when signed in', function(done) {
+		request('http://localhost:3001').post('/auth/signin')
+			.send({username: 'test@test.com', password: 'password'})
+		event1.save(function(err) {
+			request('http://localhost:3001')
+				.get('/events/enumerate')
+				.expect(200)
+				.end(function(err,res) {
+					if (err) throw err;
+					res.body.should.have.property('events');
 					done();
 				});
 		});

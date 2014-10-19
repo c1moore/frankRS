@@ -5,17 +5,22 @@
  */
 var errorHandler = require('../errors'),
 	mongoose = require('mongoose'),
+	superagent = require('superagent')
 	User = mongoose.model('User'),
 	Event = mongoose.model('Event');
 
 exports.getMyEvents = function(req, res) {
+	if (!req.body.session || !req.body.session.id) {
+		res.status(400).json({events: ["You are not logged in"]});
+		return;
+	}
 	var id = req.body.session.id;
 	var query = User.findOne({_id: id});
 	var user;
 	query.exec(function(err,result) {
 		user = result;
-		if (err) res.status(400).send(err);
-		else if (!user) res.status(400).json({events: ["No user found!"]});
+		if (err) {res.status(400).send(err);return;}
+		else if (!user) {res.status(400).json({events: ["No user found!"]});return;}
 		var myEvents = [];
 		var statusArray = user.status;
 		for (var i = 0; i<statusArray.length;i++)
@@ -23,9 +28,13 @@ exports.getMyEvents = function(req, res) {
 		res.status(200).json({events: myEvents});
 	});
 };
-		
 
 exports.getStartDate = function(req, res) {
+	if (!req.body.session || !req.body.session.id) {
+		res.status(400).json({start_date: "You are not logged in"});
+		return;
+	}
+	var id = req.body.session.id;
 	var eventID = req.body.eventID;
 	var query = Event.findOne({_id: eventID});
 	var theResult;
@@ -38,6 +47,11 @@ exports.getStartDate = function(req, res) {
 };
 
 exports.getEndDate = function(req, res) {
+	if (!req.body.session || !req.body.session.id) {
+		res.status(400).json({end_date: "You are not logged in"});
+		return;
+	}
+	var id = req.body.session.id;
 	var eventID = req.body.eventID;
 	var query = Event.findOne({_id: eventID});
 	var theResult;
@@ -50,6 +64,11 @@ exports.getEndDate = function(req, res) {
 };
 
 exports.getLocation = function(req, res) {
+	if (!req.body.session || !req.body.session.id) {
+		res.status(400).json({location: "You are not logged in"});
+		return;
+	}
+	var id = req.body.session.id;
 	var eventID = req.body.eventID;
 	var query = Event.findOne({_id: eventID});
 	var theResult;
@@ -62,6 +81,11 @@ exports.getLocation = function(req, res) {
 };
 
 exports.getEventObj = function(req, res) {
+	if (!req.body.session || !req.body.session.id) {
+		res.status(400).json({message: "You are not logged in"});
+		return;
+	}
+	var id = req.body.session.id;
 	var eventID = req.body.eventID;
 	var query = Event.findOne({_id: eventID});
 	var theResult;
@@ -74,6 +98,11 @@ exports.getEventObj = function(req, res) {
 };
 
 exports.getSchedule = function(req, res) {
+	if (!req.body.session || !req.body.session.id) {
+		res.status(400).json({schedule: "You are not logged in"});
+		return;
+	}
+	var id = req.body.session.id;
 	var eventID = req.body.eventID;
 	var query = Event.findOne({_id: eventID});
 	var theResult;
