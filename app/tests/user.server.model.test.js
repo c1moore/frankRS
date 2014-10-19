@@ -295,7 +295,6 @@ describe('User Model Unit Tests:', function() {
 				user2.save(function() {
 					user.attendeeList = [{user_id : user2._id, event_id : event1._id}];
 					user.save(function(err, result) {
-						console.log(err);
 						should.exist(result);
 						event1.remove(function() {
 							done();
@@ -315,9 +314,28 @@ describe('User Model Unit Tests:', function() {
 			});
 
 			event1.save(function() {
+				user.attendeeList = [{event_id : event1._id, status : true, recruiter : false}];
+				user.save(function(err, result) {
+					should.exist(result);
+					event1.remove(function() {
+						done();
+					});
+				});
+			});
+		});
+
+		it('should fail to save when all fields of the status array are not defined.', function(done) {
+			var event1 = new Event({
+				name:  'attendeeteste2',
+				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
+				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+				location: 'UF',
+				schedule: 'www.google.com'
+			});
+
+			event1.save(function() {
 				user.attendeeList = [{event_id : event1._id, status : true}];
 				user.save(function(err, result) {
-					console.log(err);
 					should.exist(result);
 					event1.remove(function() {
 						done();
@@ -327,7 +345,7 @@ describe('User Model Unit Tests:', function() {
 		});
 
 		it('should fail to save properly when an invalid event id is passed to the status array', function(done) {
-			user.status = [{event_id : mongoose.Types.ObjectId(), status : true}];
+			user.status = [{event_id : mongoose.Types.ObjectId(), status : true, recruiter: false}];
 			user.save(function(err) {
 				should.exist(err);
 				done();

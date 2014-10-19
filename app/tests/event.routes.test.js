@@ -9,13 +9,14 @@ var should = require('should'),
 	mongoose = require('mongoose'),
 	http = require('http'),
 	Event = mongoose.model('Event'),
+	User = mongoose.model('User'),
 	config = require('../../config/config'),
 	request = require('supertest');
 
 /**
  * Globals
  */
-var event1, event2;
+var event1, event2, user;
 
 function arraysEqual(array0,array1) {
     if (array0.length !== array1.length) return false;
@@ -29,6 +30,22 @@ function arraysEqual(array0,array1) {
  * Unit tests
  */
 describe('Express.js Event Route Unit Tests:', function() {
+	before(function(done) {
+		user = new User({
+			fName: 'Full',
+			lName: 'Name',
+			roles: ['attendee'],
+			displayName: 'Full Name',
+			email: 'test@test.com',
+			password: 'password',
+			salt: 'abc123',
+			rank: 1,
+			provider: 'local',
+			login_enabled: false
+		});
+		done();
+	});
+
 	beforeEach(function(done){
 		event1 = new Event({
 			name:  'testing123',
@@ -45,6 +62,7 @@ describe('Express.js Event Route Unit Tests:', function() {
 				location: 'UF',
 			schedule: 'www.google.com'
 		});
+		
 			
 		done();
 	});
@@ -60,7 +78,7 @@ describe('Express.js Event Route Unit Tests:', function() {
 		event1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/events/getStartDate')
-				.send({name: "testing123"})
+				.send({eventID: event1._id})
 				.expect(200)
 				.end(function(err,res) {
 					if (err) throw err;
@@ -74,7 +92,7 @@ describe('Express.js Event Route Unit Tests:', function() {
 		event1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/events/getEndDate')
-				.send({name: "testing123"})
+				.send({eventID: event1._id})
 				.expect(200)
 				.end(function(err,res) {
 					if (err) throw err;
@@ -88,7 +106,7 @@ describe('Express.js Event Route Unit Tests:', function() {
 		event1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/events/getLocation')
-				.send({name: "testing123"})
+				.send({eventID: event1._id})
 				.expect(200)
 				.end(function(err,res) {
 					if (err) throw err;
@@ -103,7 +121,7 @@ describe('Express.js Event Route Unit Tests:', function() {
 		event1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/events/getSchedule')
-				.send({name: "testing123"})
+				.send({eventID: event1._id})
 				.expect(200)
 				.end(function(err,res) {
 					if (err) throw err;
@@ -118,7 +136,7 @@ describe('Express.js Event Route Unit Tests:', function() {
 		event1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/events/getEventObj')
-				.send({name: "testing123"})
+				.send({eventID: event1._id})
 				.expect(200)
 				.end(function(err,res) {
 					if (err) throw err;
@@ -136,6 +154,7 @@ describe('Express.js Event Route Unit Tests:', function() {
 	afterEach(function(done){
 		event1.remove();
 		event2.remove();
+		user.remove();
 		done();
 	});
 });

@@ -1,3 +1,45 @@
-<section>
-Invites
+<section ng-app="inviteApp" ng-controller="inviteController">
+    <div id="header">
+      <h1>Frank Recruit Control Room</h1>
+    </div>
+    <div id="invite">
+      <div id="from">
+        <p><strong>From:</strong>example@gmail.com</p>
+      </div>
+      <div id="to">
+        <h3>To:<span style="margin-left:10%"></span></h3><br>
+        Email:<input type="text" ng-model="email" placeholder="example@gmail.com" /><br>
+        First Name:<input type="text" ng-model="firstName"/>
+        Last Name: <input type="text" ng-model="lastName"/><br>
+        Personal Message:<input type="text" ng-model="personalMessage"/><br>
+        Live Preview:<p>Hey {{firstName + " " + lastName}}, you have been officially invited to Frank!</p>
+        {{personalMessage}}
+        <p>Probably going to include a button for newcomers or something of the like to generate an automated message that explains Frank</p>
+        <span style="margin-left:5%"></span><input type="submit" value="Send" class="btn btn-primary btn-lg"/>
+      </div>
+    </div>
+    <div id="accepted">
+    {{friends.length}} people are attending. They are:
+                <input type="search" ng-model="q" placeholder="Search..." />
+      <ul class="animate-container">
+        <li class="animate-repeat"  ng-repeat="friend in friends | limitTo:attendingLimit | filter:q as results">
+         {{friend.name + " " + friend.email}}
+        </li>
+        <li class="animate-repeat" ng-if="results.length == 0">
+          <strong>No results found...</strong>
+        </li>
+      </ul>
+    </div>
+    <div id="invites">
+    {{invites.length}} people have been invited. They are:
+                <input type="search" ng-model="n" placeholder="Search..." />
+      <ul class="animate-container2">
+        <li class="animate-repeat2" ng-repeat="invite in invites | limitTo:inviteLimit | filter:n as resultstwo">
+         {{invite.name}} {{invite.email}}
+      </li>
+        <li class="animate-repeat2" ng-if="resultstwo.length == 0">
+          <strong>No results found...</strong>
+        </li>
+      </ul>
+    </div>
 </section>

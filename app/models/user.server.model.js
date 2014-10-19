@@ -26,6 +26,12 @@ var validateRequired = function(property) {
 	return (property && property.length);
 };
 
+var validateOptional = function(property) {
+	if(property && property.length)
+		return (property.event_id && property.event_id.length && property.status && property.status.length && property.recruiter && property.recruiter.length);
+	return true;
+};
+
 var validateLogin = function(enabled) {
 	return (typeof enabled === 'boolean');
 };
@@ -51,8 +57,9 @@ var ListSchema = new Schema({
 
 var StatusSchema = new Schema({
 	event_id: {type: mongoose.Schema.Types.ObjectId, ref:'Event'},
-	status: {type: Boolean}
-}, {_id:false});
+	status: {type: Boolean},
+	recruiter: {type:Boolean}
+}, {_id:false, validate : [validateOptional, 'All fields of status required.']});
 
 /**
  * User Schema
