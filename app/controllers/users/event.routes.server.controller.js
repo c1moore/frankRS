@@ -26,8 +26,8 @@ exports.getMyEvents = function(req, res) {
 		
 
 exports.getStartDate = function(req, res) {
-	var eventName = req.body.name;
-	var query = Event.findOne({name: eventName});
+	var eventID = req.body.eventID;
+	var query = Event.findOne({_id: eventID});
 	var theResult;
 	query.exec(function(err,result) {
 		theResult = result;
@@ -38,8 +38,8 @@ exports.getStartDate = function(req, res) {
 };
 
 exports.getEndDate = function(req, res) {
-	var eventName = req.body.name;
-	var query = Event.findOne({name: eventName});
+	var eventID = req.body.eventID;
+	var query = Event.findOne({_id: eventID});
 	var theResult;
 	query.exec(function(err,result) {
 		theResult = result;
@@ -50,8 +50,8 @@ exports.getEndDate = function(req, res) {
 };
 
 exports.getLocation = function(req, res) {
-	var eventName = req.body.name;
-	var query = Event.findOne({name: eventName});
+	var eventID = req.body.eventID;
+	var query = Event.findOne({_id: eventID});
 	var theResult;
 	query.exec(function(err,result) {
 		theResult = result;
@@ -62,8 +62,8 @@ exports.getLocation = function(req, res) {
 };
 
 exports.getEventObj = function(req, res) {
-	var eventName = req.body.name;
-	var query = Event.findOne({name: eventName});
+	var eventID = req.body.eventID;
+	var query = Event.findOne({_id: eventID});
 	var theResult;
 	query.exec(function(err,result) {
 		theResult = result;
@@ -74,8 +74,8 @@ exports.getEventObj = function(req, res) {
 };
 
 exports.getSchedule = function(req, res) {
-	var eventName = req.body.name;
-	var query = Event.findOne({name: eventName});
+	var eventID = req.body.eventID;
+	var query = Event.findOne({_id: eventID});
 	var theResult;
 	query.exec(function(err,result) {
 		theResult = result;

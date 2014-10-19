@@ -78,7 +78,7 @@ describe('Express.js Event Route Unit Tests:', function() {
 		event1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/events/getStartDate')
-				.send({name: "testing123"})
+				.send({eventID: event1._id})
 				.expect(200)
 				.end(function(err,res) {
 					if (err) throw err;
@@ -92,7 +92,7 @@ describe('Express.js Event Route Unit Tests:', function() {
 		event1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/events/getEndDate')
-				.send({name: "testing123"})
+				.send({eventID: event1._id})
 				.expect(200)
 				.end(function(err,res) {
 					if (err) throw err;
@@ -106,7 +106,7 @@ describe('Express.js Event Route Unit Tests:', function() {
 		event1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/events/getLocation')
-				.send({name: "testing123"})
+				.send({eventID: event1._id})
 				.expect(200)
 				.end(function(err,res) {
 					if (err) throw err;
@@ -121,7 +121,7 @@ describe('Express.js Event Route Unit Tests:', function() {
 		event1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/events/getSchedule')
-				.send({name: "testing123"})
+				.send({eventID: event1._id})
 				.expect(200)
 				.end(function(err,res) {
 					if (err) throw err;
@@ -136,7 +136,7 @@ describe('Express.js Event Route Unit Tests:', function() {
 		event1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/events/getEventObj')
-				.send({name: "testing123"})
+				.send({eventID: event1._id})
 				.expect(200)
 				.end(function(err,res) {
 					if (err) throw err;
