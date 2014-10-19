@@ -8,7 +8,7 @@
 var should = require('should'),
 	mongoose = require('mongoose'),
 	http = require('http'),
-	Candidate = mongoose.model('candidate'),
+	candidate = mongoose.model('Candidate'),
 	config = require('../../config/config'),
 	request = require('supertest');
 
@@ -27,7 +27,7 @@ function arraysEqual(array0,array1) {
 
 /**
  * Unit tests
- */
+ *
 describe('Express.js Canidate Route Unit Tests:', function() {
 	it("should be able to access the main page from the candidate route testing mechanism", function(done) {
 		request('http://localhost:3001')
@@ -36,9 +36,9 @@ describe('Express.js Canidate Route Unit Tests:', function() {
 		done();
 	});
 });
+*/
 
 
-/*
 describe('Candidate Route Tests:', function() {
 
 	describe('Method Save', function() {
@@ -72,7 +72,7 @@ it("should be able to get the candidate first name", function(done) {
 		candidate1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/candidate/getfName')
-				.send({email: "test@test.com"})
+				.send({candidateID: candidate1._id})
 				.expect(200)
 				.end(function(err,res) {
 					if (err) throw err;
@@ -87,7 +87,7 @@ it("should be able to get the candidate last name", function(done) {
 		candidate1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/candidate/getlName')
-				.send({name: "test@test.com"})
+				.send({candidateID: candidate1._id})
 				.expect(200)
 				.end(function(err,res) {
 					if (err) throw err;
@@ -101,7 +101,7 @@ it("should be able to get the candidate last name", function(done) {
 		candidate1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/candidate/getlName')
-				.send({name: "test@test.com"})
+				.send({candidateID: candidate1._id})
 				.expect(200)
 				.end(function(err,res) {
 					if (err) throw err;
@@ -115,7 +115,7 @@ it("should be able to get the candidate email", function(done) {
 		candidate1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/candidate/getEmail')
-				.send({name: "test@test.com"})
+				.send({candidateID: candidate1._id})
 				.expect(200)
 				.end(function(err,res) {
 					if (err) throw err;
@@ -128,7 +128,7 @@ it("should be able to get the candidate status", function(done) {
 		candidate1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/candidate/getStatus')
-				.send({name: "test@test.com"})
+				.send({candidateID: candidate1._id})
 				.expect(200)
 				.end(function(err,res) {
 					if (err) throw err;
@@ -141,7 +141,7 @@ it("should be able to get the candidate events", function(done) {
 		candidate1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/candidate/getEvents')
-				.send({name: "test@test.com"})
+				.send({candidateID: candidate1._id})
 				.expect(200)
 				.end(function(err,res) {
 					if (err) throw err;
@@ -154,7 +154,7 @@ it("should be able to get the candidate accpet_key", function(done) {
 		candidate1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/candidate/getAccept_Key')
-				.send({name: "test@test.com"})
+				.send({candidateID: candidate1._id})
 				.expect(200)
 				.end(function(err,res) {
 					if (err) throw err;
@@ -166,7 +166,7 @@ it("should be able to get the candidate accpet_key", function(done) {
 it("should be able to get the candidate note", function(done) {
 		candidate1.save(function(err) {
 			request('http://localhost:3001')
-				.get('/candidate/getNote')
+				.send({candidateID: candidate1._id})
 				.send({name: "test@test.com"})
 				.expect(200)
 				.end(function(err,res) {
@@ -187,4 +187,3 @@ it("should be able to get the candidate note", function(done) {
 	});
 });
 
-*/
