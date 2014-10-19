@@ -11,36 +11,36 @@ var errorHandler = require('../errors'),
 
 
 
-exports.getfName= function(req, res) {
-	var id = req.session.id;
-	var query = Candidate.findOne({_id:id });
+exports.getfName = function(req, res) {
+	var candidateID = req.body.candidateID;
+	var query = Candidate.findOne({_id: candidateID});
+	var theResult;
 	query.exec(function(err,result) {
-		if(err) {
-			res.status(400).send(err);
-		} else if(!result) {
-			res.status(400).json({fName: "No first name found!"});
-		} else {
-			res.status(200).json({fName : result.fName});
-		}
+		theResult = result;
+		if (err) res.status(400).send(err);
+		else if (!theResult) res.status(400).json({fName: "No start date!"});
+		else res.status(200).json({fName: theResult.fName});
 	});
 };
 
 exports.getlName= function(req, res) {
-	var id = req.session.id;
-	var query = Candidate.findOne({_id:id });
+var candidateID=req.body.candidateID;
+var query = Candidate.findOne({_id:candidateID });
+	var theResult;
 	query.exec(function(err,result) {
+		theResult=result;
 		if(err) {
 			res.status(400).send(err);
-		} else if(!result) {
+		} else if(!theResult) {
 			res.status(400).json({lName: "No last name found!"});
 		} else {
-			res.status(200).json({lName : result.lName});
+			res.status(200).json({lName : theResult.lName});
 		}
 	});
 };
 exports.getEmail= function(req, res) {
-	var id = req.session.id;
-	var query = Candidate.findOne({_id:id });
+var candidateID=req.body.candidateID;
+var query = Candidate.findOne({_id:candidateID });
 	query.exec(function(err,result) {
 		if(err) {
 			res.status(400).send(err);
@@ -52,8 +52,8 @@ exports.getEmail= function(req, res) {
 	});
 };
 exports.getStatus= function(req, res) {
-	var id = req.session.id;
-	var query = Candidate.findOne({_id:id });
+var candidateID=req.body.candidateID;
+var query = Candidate.findOne({_id:candidateID });
 	query.exec(function(err,result) {
 		if(err) {
 			res.status(400).send(err);
@@ -65,8 +65,8 @@ exports.getStatus= function(req, res) {
 	});
 };
 exports.getEvents= function(req, res) {
-	var id = req.session.id;
-	var query = Candidate.findOne({_id:id });
+var candidateID=req.body.candidateID;
+var query = Candidate.findOne({_id:candidateID });
 	query.exec(function(err,result) {
 		if(err) {
 			res.status(400).send(err);
@@ -79,8 +79,8 @@ exports.getEvents= function(req, res) {
 };
 
 exports.getAccept_Key= function(req, res) {
-	var id = req.session.id;
-	var query = Candidate.findOne({_id:id });
+var candidateID=req.body.candidateID;
+var query = Candidate.findOne({_id:candidateID });
 	query.exec(function(err,result) {
 		if(err) {
 			res.status(400).send(err);
@@ -92,8 +92,8 @@ exports.getAccept_Key= function(req, res) {
 	});
 };
 exports.getNote= function(req, res) {
-	var id = req.session.id;
-	var query = Candidate.findOne({_id:id });
+var candidateID=req.body.candidateID;
+var query = Candidate.findOne({_id:candidateID });
 	query.exec(function(err,result) {
 		if(err) {
 			res.status(400).send(err);

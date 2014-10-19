@@ -77,6 +77,7 @@ it("should be able to get the candidate first name", function(done) {
 				.end(function(err,res) {
 					if (err) throw err;
 					res.body.should.have.property('fName');
+					res.body.fName.should.be.equal('Full');
 					done();
 				});
 		});
@@ -92,6 +93,8 @@ it("should be able to get the candidate last name", function(done) {
 				.end(function(err,res) {
 					if (err) throw err;
 					res.body.should.have.property('lName');
+					res.body.lName.should.be.equal('Name');
+
 					done();
 				});
 		});
@@ -106,6 +109,8 @@ it("should be able to get the candidate email", function(done) {
 				.end(function(err,res) {
 					if (err) throw err;
 					res.body.should.have.property('email');
+					res.body.email.should.be.equal('test@test.com');
+
 					done();
 				});
 		});
@@ -119,11 +124,12 @@ it("should be able to get the candidate status", function(done) {
 				.end(function(err,res) {
 					if (err) throw err;
 					res.body.should.have.property('status');
+					res.body.status.should.be.equal('volunteer');
 					done();
 				});
 		});
 	});
-it("should be able to get the candidate accpet_key", function(done) {
+it("should be able to get the candidate accept_key", function(done) {
 		candidate1.save(function(err) {
 			request('http://localhost:3001')
 				.get('/candidate/getAccept_Key')
@@ -132,6 +138,7 @@ it("should be able to get the candidate accpet_key", function(done) {
 				.end(function(err,res) {
 					if (err) throw err;
 					res.body.should.have.property('accept_key');
+					res.body.accept_key.should.be.equal(false);
 					done();
 				});
 		});
@@ -144,6 +151,8 @@ it("should be able to get the candidate note", function(done) {
 				.end(function(err,res) {
 					if (err) throw err;
 					res.body.should.have.property('note');
+					res.body.fName.should.be.equal('this is a test');
+
 					done();
 				});
 		});
@@ -160,6 +169,7 @@ it("should be able to get the candidate in its entirety", function(done) {
 					res.body.should.have.property('lName');
 					res.body.should.have.property('email');
 					res.body.should.have.property('status');
+					res.body.should.have.property('accept_key');
 					res.body.should.have.property('note');
 					done();
 				});

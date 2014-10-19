@@ -16,4 +16,8 @@ app.route('/candidate/getStatus').get(dan_candidate_routes.getStatus);
 app.route('/candidate/getEvents').get(dan_candidate_routes.getEvents);
 app.route('/candidate/getAccept_Key').get(dan_candidate_routes.getAccept_Key);
 app.route('/candidate/getNote').get(dan_candidate_routes.getNote);
+
+//Finish by binding//app.param('candidateId',candidate.candidateByID);
+
+
 };
