@@ -1,0 +1,118 @@
+.animate-container {
+    background:white;
+    border:1px solid black;
+    list-style:none;
+    margin:0;
+    padding:0 10px;
+    border-radius:10px;
+  }
+
+.animate-container2 {
+    background:white;
+    border:1px solid black;
+    list-style:none;
+    margin:0;
+    padding:0 10px;
+    border-radius:10px;
+  }
+
+
+  .animate-repeat {
+    line-height:40px;
+    list-style:none;
+    box-sizing:border-box;
+  }
+  
+  .animate-repeat2 {
+    line-height:40px;
+    list-style:none;
+    box-sizing:border-box;
+  }
+
+  .animate-repeat.ng-move,
+  .animate-repeat.ng-enter,
+  .animate-repeat.ng-leave {
+    -webkit-transition:all linear 0.5s;
+    transition:all linear 0.5s;
+  }
+
+  .animate-repeat.ng-leave.ng-leave-active,
+  .animate-repeat.ng-move,
+  .animate-repeat.ng-enter {
+    opacity:0;
+    max-height:0;
+  }
+
+  .animate-repeat.ng-leave,
+  .animate-repeat.ng-move.ng-move-active,
+  .animate-repeat.ng-enter.ng-enter-active {
+    opacity:1;
+    max-height:40px;
+  }
+  
+  .animate-repeat2.ng-move,
+  .animate-repeat2.ng-enter,
+  .animate-repeat2.ng-leave {
+    -webkit-transition:all linear 0.5s;
+    transition:all linear 0.5s;
+  }
+
+  .animate-repeat2.ng-leave.ng-leave-active,
+  .animate-repeat2.ng-move,
+  .animate-repeat2.ng-enter {
+    opacity:0;
+    max-height:0;
+  }
+
+  .animate-repeat2.ng-leave,
+  .animate-repeat2.ng-move.ng-move-active,
+  .animate-repeat2.ng-enter.ng-enter-active {
+    opacity:1;
+    max-height:40px;
+  }
+  
+  #invites {
+    margin-left:70%;
+    margin-top:30%;
+    position:absolute;
+    margin-right:5%;
+  }
+  #accepted {
+    position:absolute;
+    margin-left:70%;
+    margin-right:5%;
+    margin-top:10%;
+  }
+  #invite {
+    border:1px solid black;
+    height:90%;
+    position:absolute;
+    margin-left:5%;
+    width:55%;
+    border-radius:10px;
+    box-shadow: 10px 10px 5px black;
+  }
+  #from {
+    border:1px solid black;
+    margin-left:5%;
+    margin-right:5%;
+    margin-top:5%;
+    border-radius:5px;
+    height:25px;
+  }
+  #to {
+    border:1px solid black;
+    margin-top:10%;
+    height:70%;
+    position:relative;
+    margin-left:5%;
+    margin-right:5%;
+    border-radius:10px;
+  }
+  #header {
+    text-align:center;
+    position:relative;
+  }
+  body {
+    background-color:#F5F5F5;
+  }
