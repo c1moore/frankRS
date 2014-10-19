@@ -314,7 +314,7 @@ describe('User Model Unit Tests:', function() {
 			});
 
 			event1.save(function() {
-				user.attendeeList = [{event_id : event1._id, status : true, recruiter : false}];
+				user.attendeeList = [{event_id : event1._id, attending : true, recruiter : false}];
 				user.save(function(err, result) {
 					should.exist(result);
 					event1.remove(function() {
@@ -334,7 +334,7 @@ describe('User Model Unit Tests:', function() {
 			});
 
 			event1.save(function() {
-				user.attendeeList = [{event_id : event1._id, status : true}];
+				user.attendeeList = [{event_id : event1._id, attending : true}];
 				user.save(function(err, result) {
 					should.exist(result);
 					event1.remove(function() {
@@ -345,7 +345,7 @@ describe('User Model Unit Tests:', function() {
 		});
 
 		it('should fail to save properly when an invalid event id is passed to the status array', function(done) {
-			user.status = [{event_id : mongoose.Types.ObjectId(), status : true, recruiter: false}];
+			user.status = [{event_id : mongoose.Types.ObjectId(), attending : true, recruiter: false}];
 			user.save(function(err) {
 				should.exist(err);
 				done();
