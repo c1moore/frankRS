@@ -76,7 +76,7 @@ exports.getEvents= function(req, res) {
 	});
 };
 
-exports.getAccept_key= function(req, res) {
+exports.getAccept_Key= function(req, res) {
 	var id = req.body.session.id;
 	var query = Candidate.findOne({_id:id });
 	query.exec(function(err,result) {
