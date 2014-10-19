@@ -146,37 +146,18 @@ it("should be able to get the candidate accept_key", function(done) {
 it("should be able to get the candidate note", function(done) {
 		candidate1.save(function(err) {
 			request('http://localhost:3001')
+				.get('/candidate/getNote')
 				.send({candidateID: candidate1._id})
 				.expect(200)
 				.end(function(err,res) {
 					if (err) throw err;
 					res.body.should.have.property('note');
-					res.body.fName.should.be.equal('this is a test');
+					res.body.note.should.be.equal('this is a test');
 
 					done();
 				});
 		});
 	});
-
-it("should be able to get the candidate in its entirety", function(done) {
-		candidate1.save(function(err) {
-			request('http://localhost:3001')
-				.send({candidateID: candidate1._id})
-				.expect(200)
-				.end(function(err,res) {
-					if (err) throw err;
-					res.body.should.have.property('fName');
-					res.body.should.have.property('lName');
-					res.body.should.have.property('email');
-					res.body.should.have.property('status');
-					res.body.should.have.property('accept_key');
-					res.body.should.have.property('note');
-					done();
-				});
-		});
-	});
-
-
 
 afterEach(function(done) {
 			candidate1.remove();
