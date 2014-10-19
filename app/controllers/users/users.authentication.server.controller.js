@@ -63,7 +63,7 @@ exports.signin = function(req, res, next) {
 					res.status(400).send(err);
 				} else {
 					res.status(200).send("Success!");
-					res.session.id = user._id;
+					req.session.id = user._id;
 				}
 			});
 		}
@@ -74,7 +74,7 @@ exports.signin = function(req, res, next) {
  * Signout
  */
 exports.signout = function(req, res) {
-	res.session.id = undefined;
+	req.session.id = undefined;
 	req.logout();
 	res.redirect('/');
 };
