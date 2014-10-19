@@ -43,7 +43,7 @@ describe('Express.js Event Route Unit Tests:', function() {
 			provider: 'local',
 			login_enabled: false
 		});
-		user.save(function(err){done();});
+		done();
 	});
 
 	beforeEach(function(done){
@@ -154,10 +154,7 @@ describe('Express.js Event Route Unit Tests:', function() {
 	afterEach(function(done){
 		event1.remove();
 		event2.remove();
-		done();
-	});
-	after(function(done){
 		user.remove();
-		done()
+		done();
 	});
 });
