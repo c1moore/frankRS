@@ -28,7 +28,7 @@ var validateRequired = function(property) {
 
 var validateOptional = function(property) {
 	if(property && property.length)
-		return (property.event_id && property.event_id.length && property.status && property.status.length && property.recruiter && property.recruiter.length);
+		return (property.event_id && property.event_id.length && property.attending && property.attending.length && property.recruiter && property.recruiter.length);
 	return true;
 };
 
@@ -57,7 +57,7 @@ var ListSchema = new Schema({
 
 var StatusSchema = new Schema({
 	event_id: {type: mongoose.Schema.Types.ObjectId, ref:'Event'},
-	status: {type: Boolean},
+	attending: {type: Boolean},
 	recruiter: {type:Boolean}
 }, {_id:false, validate : [validateOptional, 'All fields of status required.']});
 
