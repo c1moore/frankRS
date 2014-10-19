@@ -9,8 +9,10 @@ var errorHandler = require('../errors'),
 	mongoose = require('mongoose'),
 	Candidate = mongoose.model('Candidate');
 
+
+
 exports.getfName= function(req, res) {
-	var id = req.body.session.id;
+	var id = req.session.id;
 	var query = Candidate.findOne({_id:id });
 	query.exec(function(err,result) {
 		if(err) {
@@ -24,7 +26,7 @@ exports.getfName= function(req, res) {
 };
 
 exports.getlName= function(req, res) {
-	var id = req.body.session.id;
+	var id = req.session.id;
 	var query = Candidate.findOne({_id:id });
 	query.exec(function(err,result) {
 		if(err) {
@@ -37,7 +39,7 @@ exports.getlName= function(req, res) {
 	});
 };
 exports.getEmail= function(req, res) {
-	var id = req.body.session.id;
+	var id = req.session.id;
 	var query = Candidate.findOne({_id:id });
 	query.exec(function(err,result) {
 		if(err) {
@@ -50,7 +52,7 @@ exports.getEmail= function(req, res) {
 	});
 };
 exports.getStatus= function(req, res) {
-	var id = req.body.session.id;
+	var id = req.session.id;
 	var query = Candidate.findOne({_id:id });
 	query.exec(function(err,result) {
 		if(err) {
@@ -63,7 +65,7 @@ exports.getStatus= function(req, res) {
 	});
 };
 exports.getEvents= function(req, res) {
-	var id = req.body.session.id;
+	var id = req.session.id;
 	var query = Candidate.findOne({_id:id });
 	query.exec(function(err,result) {
 		if(err) {
@@ -77,7 +79,7 @@ exports.getEvents= function(req, res) {
 };
 
 exports.getAccept_Key= function(req, res) {
-	var id = req.body.session.id;
+	var id = req.session.id;
 	var query = Candidate.findOne({_id:id });
 	query.exec(function(err,result) {
 		if(err) {
@@ -90,7 +92,7 @@ exports.getAccept_Key= function(req, res) {
 	});
 };
 exports.getNote= function(req, res) {
-	var id = req.body.session.id;
+	var id = req.session.id;
 	var query = Candidate.findOne({_id:id });
 	query.exec(function(err,result) {
 		if(err) {

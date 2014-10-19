@@ -97,20 +97,6 @@ it("should be able to get the candidate last name", function(done) {
 		});
 	});
 
-it("should be able to get the candidate last name", function(done) {
-		candidate1.save(function(err) {
-			request('http://localhost:3001')
-				.get('/candidate/getlName')
-				.send({candidateID: candidate1._id})
-				.expect(200)
-				.end(function(err,res) {
-					if (err) throw err;
-					res.body.should.have.property('lName');
-					done();
-				});
-		});
-	});
-
 it("should be able to get the candidate email", function(done) {
 		candidate1.save(function(err) {
 			request('http://localhost:3001')
@@ -137,19 +123,6 @@ it("should be able to get the candidate status", function(done) {
 				});
 		});
 	});
-it("should be able to get the candidate events", function(done) {
-		candidate1.save(function(err) {
-			request('http://localhost:3001')
-				.get('/candidate/getEvents')
-				.send({candidateID: candidate1._id})
-				.expect(200)
-				.end(function(err,res) {
-					if (err) throw err;
-					res.body.should.have.property('events');
-					done();
-				});
-		});
-	});
 it("should be able to get the candidate accpet_key", function(done) {
 		candidate1.save(function(err) {
 			request('http://localhost:3001')
@@ -167,7 +140,6 @@ it("should be able to get the candidate note", function(done) {
 		candidate1.save(function(err) {
 			request('http://localhost:3001')
 				.send({candidateID: candidate1._id})
-				.send({name: "test@test.com"})
 				.expect(200)
 				.end(function(err,res) {
 					if (err) throw err;
@@ -177,11 +149,30 @@ it("should be able to get the candidate note", function(done) {
 		});
 	});
 
+it("should be able to get the candidate in its entirety", function(done) {
+		candidate1.save(function(err) {
+			request('http://localhost:3001')
+				.send({candidateID: candidate1._id})
+				.expect(200)
+				.end(function(err,res) {
+					if (err) throw err;
+					res.body.should.have.property('fName');
+					res.body.should.have.property('lName');
+					res.body.should.have.property('email');
+					res.body.should.have.property('status');
+					res.body.should.have.property('note');
+					done();
+				});
+		});
+	});
 
 
 
-
-
+afterEach(function(done) {
+			candidate1.remove();
+			duplicate.remove();
+			done();
+		});
 
 
 	});

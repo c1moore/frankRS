@@ -6,6 +6,8 @@ var dan_candidate_routes = require('../../app/controllers/users/candidate.routes
 //candidate routes
 module.exports = function(app){
 
+var candidate = require('../../app/controllers/users');
+
 //candidate routes
 app.route('/candidate/getfName').get(dan_candidate_routes.getfName);
 app.route('/candidate/getlName').get(dan_candidate_routes.getlName);
