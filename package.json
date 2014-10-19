@@ -19,6 +19,7 @@
 	},
 	"dependencies": {
 		"supertest": "0.14.0",
+		"superagent": "~0.20.0",
 		"express": "~4.7.2",
 		"express-session": "~1.7.2",
 		"body-parser": "~1.5.2",

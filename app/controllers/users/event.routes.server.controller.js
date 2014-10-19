@@ -5,7 +5,7 @@
  */
 var errorHandler = require('../errors'),
 	mongoose = require('mongoose'),
-	superagent = require('superagent')
+	superagent = require('superagent'),
 	User = mongoose.model('User'),
 	Event = mongoose.model('Event');
 
