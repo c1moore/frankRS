@@ -20,7 +20,7 @@ module.exports = function(app) {
 	app.route('/events/getSchedule').get(james_event_routes.getSchedule);
 
 	// Setting up the users profile api
-	app.route('/displayName').get(james_user_routes.getDisplayName);
+	//app.route('/displayName').get(james_user_routes.getDisplayName);
 	app.route('/users/me').get(users.me);
 	app.route('/users').put(users.update);
 	app.route('/users/accounts').delete(users.removeOAuthProvider);
@@ -64,7 +64,7 @@ module.exports = function(app) {
 	app.route('/auth/github/callback').get(users.oauthCallback('github'));
 
 	//Returning Leaderboard data
-	app.route('/leaderboard/recruiterInfo').post(james_user_routes.getLeaderboard());
+	//app.route('/leaderboard/recruiterInfo').post(james_user_routes.getLeaderboard());
 
 	// Finish by binding the user middleware
 	app.param('userId', users.userByID);

@@ -7,8 +7,6 @@ var errorHandler = require('../errors'),
 	mongoose = require('mongoose'),
 	User = mongoose.model('User');
 
-exports.getDisplayName = function(req, res) { res.status(400).send({}) }; //Placeholder
-
 /*exports.getDisplayName = function(req, res) {
 	var id = req.session.id;
 	var query = User.findOne({_id:id });
@@ -21,7 +19,7 @@ exports.getDisplayName = function(req, res) { res.status(400).send({}) }; //Plac
 			res.status(200).json({displayName : result.displayName});
 		}
 	});
-};*/
+};
 
 exports.getLeaderboard = function(req, res) {
 	var id = req.session.id;
@@ -38,4 +36,4 @@ exports.getLeaderboard = function(req, res) {
 			res.status(200).send(result);
 		}
 	});
-};
+};*/
