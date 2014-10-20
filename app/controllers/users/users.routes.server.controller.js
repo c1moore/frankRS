@@ -9,7 +9,9 @@ var errorHandler = require('../errors'),
 	mongoose = require('mongoose'),
 	User = mongoose.model('User');
 
-exports.getDisplayName = function(req, res) {
+exports.getDisplayName = function(req, res) { res.status(400).send({}) };
+
+/*exports.getDisplayName = function(req, res) {
 	var id = req.body.session.id;
 	var query = User.findOne({_id:id });
 	query.exec(function(err,result) {
@@ -21,4 +23,4 @@ exports.getDisplayName = function(req, res) {
 			res.status(200).json({displayName : result.displayName});
 		}
 	});
-};
+};*/
