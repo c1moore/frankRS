@@ -1,5 +1,7 @@
 angular.module('leaderboard').controller('LeaderboardController', ['$scope', 'Authentication',
 	function($scope, Authentication) {
+		// route will be leaderboard/recuiterInfo
+
 		$scope.data = {
 			users: [
 				{rank:2 ,username:"User 1", invites:23, attending:10},
