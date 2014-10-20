@@ -7,7 +7,7 @@ var errorHandler = require('../errors'),
 	mongoose = require('mongoose'),
 	User = mongoose.model('User');
 
-/*exports.getDisplayName = function(req, res) {
+exports.getDisplayName = function(req, res) {
 	var id = req.session.id;
 	var query = User.findOne({_id:id });
 	query.exec(function(err,result) {
@@ -22,7 +22,6 @@ var errorHandler = require('../errors'),
 };
 
 exports.getLeaderboard = function(req, res) {
-	var id = req.session.id;
 	var query = User.find({'role' : 'recruiter'});
 	query.select('displayName rank inviteeList attendeeList');
 	query.populate('inviteeList.user_id', 'displayName');
@@ -36,4 +35,4 @@ exports.getLeaderboard = function(req, res) {
 			res.status(200).send(result);
 		}
 	});
-};*/
+};
