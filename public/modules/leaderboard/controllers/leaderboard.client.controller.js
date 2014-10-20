@@ -1,4 +1,4 @@
-angular.module('leaderboard').controller('LeaderboardController', ['$scope', 'Authentication',
+angular.module('leaderboard').controller('LeaderboardController', ['$scope', 'Authentication', '$http',
 	function($scope, Authentication) {
 		// route will be leaderboard/recuiterInfo
 
@@ -13,8 +13,12 @@ angular.module('leaderboard').controller('LeaderboardController', ['$scope', 'Au
 			categories: ["Rank","User","Invited","Attending"]
 		};
 
-		$scope.limitVal = 10;
-		$scope.sortBy = '+rank';
+		//number of people to display on a page
+		$scope.limitVal = 4;
+
+		$scope.totalVal = $scope.data.users.length;
+		$scope.currentPage = 1;
+		
 
 		$scope.activeOrder = function(order) {
 			return order == $scope.sortBy ? "btn-primary" : "";

@@ -1,33 +1,23 @@
 <section ng-controller="LeaderboardController">
 	<div class="container">
 		<tabset>
-			<tab heading="Score">Score</tab>
+			<tab heading="Score">
+				Score
+			</tab>
 			<tab heading="Leaderboard">
 				<table class="table table-bordered">
 					<tr>
-						<th>
-							Rank
-						</th>
-						<th>
-							Username
-						</th>
-						<th>
-							Invited
-						</th>
-						<th>
-							Attending
-						</th>
+						<th ng-repeat="category in data.categories">{{category}}</th>
 					</tr>
-					<tr ng-repeat="user in data.users | orderBy:sortBy | limitTo:limitVal">
+					
+					<tr ng-repeat="user in data.users | orderBy:'+rank' | offset:(currentPage-1)*limitVal | limitTo:limitVal">
 						<td>{{user.rank}}</td>
 						<td>{{user.username}}</td>
 						<td>{{user.invites}}</td>
 						<td>{{user.attending}}</td>
 					</tr>
 				</table>
-				<ul class="pagination">
-			
-				</ul>
+				<pagination total-items="totalVal" items-per-page="limitVal" ng-model="currentPage"></pagination>
 			</tab>
 			<tab heading="Ranking">Ranking</tab>
 		</tabset>
