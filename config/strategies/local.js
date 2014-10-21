@@ -20,16 +20,16 @@ module.exports = function() {
 				if (err) {
 					return done(err);
 				}
-				if (!user) {
+				if (!user || !user.authenticate(password)) {
 					return done(null, false, {
-						message: 'Unknown user'
+						message: 'Email or password is unknown.'
 					});
 				}
-				if (!user.authenticate(password)) {
+				/*if (!user.authenticate(password)) {
 					return done(null, false, {
 						message: 'Invalid password'
 					});
-				}
+				}*/
 
 				return done(null, user);
 			});
