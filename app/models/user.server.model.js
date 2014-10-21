@@ -50,6 +50,7 @@ var validateRole = function(property) {
 	return valid;
 };
 
+//Create schemas that will be used in arrays.  Based on loose research, this method seems the easiest and most efficient for arrays of objects.
 var ListSchema = new Schema({
 	user_id: {type: mongoose.Schema.Types.ObjectId, ref:'User'},
 	event_id: {type: mongoose.Schema.Types.ObjectId, ref:'Event'}
@@ -60,6 +61,11 @@ var StatusSchema = new Schema({
 	attending: {type: Boolean},
 	recruiter: {type:Boolean}
 }, {_id:false, validate : [validateOptional, 'All fields of status required.']});
+
+var RoleSchema = new Schema({
+	event_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Event'},
+	place: {type: Number, min: 1}
+}, {_id : false});
 
 /**
  * User Schema
@@ -137,8 +143,7 @@ var UserSchema = new Schema({
   		type: [ListSchema]
   	},
   	rank: {
-  		type: Number,
-  		min: 1
+  		type: [RoleSchema]
   	},
   	login_enabled: {
   		type: Boolean,
@@ -155,6 +160,7 @@ var UserSchema = new Schema({
 //Validate that ObjectIds reference actual IDs from other schemas.
 ListSchema.plugin(idvalidator);
 StatusSchema.plugin(idvalidator);
+RoleSchema.plugin(idvalidator);
 
 /**
  * Hook a pre save method to hash the password

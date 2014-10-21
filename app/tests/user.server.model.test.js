@@ -13,7 +13,7 @@ var should = require('should'),
 /**
  * Globals
  */
-var user, user2;
+var user, user2, event;
 
 function arraysEqual(array0,array1) {
     if (array0.length !== array1.length) return false;
@@ -23,10 +23,32 @@ function arraysEqual(array0,array1) {
     return true;
 }
 
+var ranksEqual = function(arr1, arr2) {
+	if(arr1.length !== arr2.length) return false;
+	for(var i=0; i<arr1.length; i++) {
+		if(arr1[i].event_id.toString() !== arr2[i].event_id.toString() || arr1[i].place !== arr2[i].place)
+			return false;
+	}
+
+	return true;
+};
+
 /**
  * Unit tests
  */
 describe('User Model Unit Tests:', function() {
+
+	before(function(done) {
+		event = new Event({
+			name:  'UserTestEvent',
+			start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
+			end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+			location: 'UF',
+			schedule: 'www.google.com'
+		});
+
+		event.save(done);
+	});
 
 	describe('Method', function() {
 		beforeEach(function(done) {
@@ -38,7 +60,7 @@ describe('User Model Unit Tests:', function() {
 				email: 'test@test.com',
 				password: 'password',
 				salt: 'abc123',
-				rank: 1,
+				rank: [{'event_id': event._id, 'place': 1}],
 				provider: 'local',
 				login_enabled: false
 			});
@@ -50,7 +72,7 @@ describe('User Model Unit Tests:', function() {
 				email: 'test@test.com',
 				password: 'password',
 				salt: 'abc123',
-				rank: 2,
+				rank: [{'event_id': event._id, 'place': 1}],
 				provider: 'local',
 				login_enabled: false
 			});
@@ -151,10 +173,10 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the rank', function(done) {
 			user.save(function(err) {
-				var query = User.findOne({'rank':user.rank});
+				var query = User.findOne({'_id':user._id});
 				query.exec(function(err,result) {
 					(result.rank===undefined).should.be.false;
-					(result.rank).should.be.equal(user.rank);
+					(ranksEqual(result.rank, user.rank)).should.be.equal(true);
 					done();
 				});
 			});
@@ -357,5 +379,9 @@ describe('User Model Unit Tests:', function() {
 			user2.remove();
 			done();
 		});
+	});
+
+	after(function(done) {
+		event.remove(done);
 	});
 });

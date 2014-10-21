@@ -58,7 +58,7 @@ describe('Express.js Event Route Unit Tests:', function() {
 			password: 'password',
 			status: [{eventID: event1._id, attending:false, recruiter:false}],
 			salt: 'abc123',
-			rank: 1,
+			rank: [],
 			provider: 'local',
 			login_enabled: false
 		});
