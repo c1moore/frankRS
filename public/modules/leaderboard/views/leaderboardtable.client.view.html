@@ -1,0 +1,14 @@
+<table class="table table-bordered">
+	<tr>
+		<th ng-repeat="category in data.categories">{{category}}</th>
+	</tr>
+
+	<tr ng-repeat="user in data.users | orderBy:'+rank' | offset:(currentPage-1)*limitVal | limitTo:limitVal">
+		<td>{{user.rank}}</td>
+		<td>{{user.displayName}}</td>
+		<td>{{user.inviteeList.length}}</td>
+		<td>{{user.attendeeList.length}}</td>
+	</tr>
+</table>
+
+<pagination total-items="data.users.length" items-per-page="limitVal" ng-model="currentPage"></pagination>
