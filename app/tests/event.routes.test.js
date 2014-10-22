@@ -8,7 +8,7 @@
 var should = require('should'),
 	mongoose = require('mongoose'),
 	http = require('http'),
-	//superagent = require('superagent'),
+	superagent = require('superagent'),
 	Event = mongoose.model('Event'),
 	User = mongoose.model('User'),
 	config = require('../../config/config'),
@@ -18,7 +18,7 @@ var should = require('should'),
  * Globals
  */
 var event1, event2, user;
-//var agent = superagent.agent();
+var agent = superagent.agent();
 
 function arraysEqual(array0,array1) {
     if (array0.length !== array1.length) return false;
