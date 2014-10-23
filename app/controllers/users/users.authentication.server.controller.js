@@ -31,10 +31,7 @@ exports.signup = function(req, res) {
 				message: errorHandler.getErrorMessage(err)
 			});
 		} else {
-			//No need to login, send response saying everything was added properly.
-			res.status(200).send();
-			
-			/*// Remove sensitive data before login
+			// Remove sensitive data before login
 			user.password = undefined;
 			user.salt = undefined;
 
@@ -44,7 +41,7 @@ exports.signup = function(req, res) {
 				} else {
 					res.jsonp(user);
 				}
-			});*/
+			});
 		}
 	});
 };
