@@ -8,14 +8,16 @@
 var should = require('should'),
 	mongoose = require('mongoose'),
 	http = require('http'),
+	superagent=require('superagent'),
 	candidate = mongoose.model('Candidate'),
+	User = mongoose.model('User'),
 	config = require('../../config/config'),
 	request = require('supertest');
 
 /**
  * Globals
  */
-var candidate1, duplicate;
+var candidate1, duplicate, user;
 
 function arraysEqual(array0,array1) {
     if (array0.length !== array1.length) return false;
@@ -24,20 +26,6 @@ function arraysEqual(array0,array1) {
     }
     return true;
 }
-
-/**
- * Unit tests
- *
-describe('Express.js Canidate Route Unit Tests:', function() {
-	it("should be able to access the main page from the candidate route testing mechanism", function(done) {
-		request('http://localhost:3001')
-			.get('/')
-			.expect(200);
-		done();
-	});
-});
-*/
-
 
 describe('Candidate Route Tests:', function() {
 
@@ -58,8 +46,19 @@ describe('Candidate Route Tests:', function() {
 				note : 'testing'
 			});
 
+			user = new User({
+				fName: 'Test',
+				lName: 'ing',
+				roles: ['admin'],
+				email: 'test@test.com',
+				password: 'password',
+				login_enable: true
+
+			});
+user.save(function(err){if(err)throw err;});
 			done();
 		});
+
 	
 
 it("should be able to access the main page from the candidate route testing mechanism", function(done) {
@@ -68,6 +67,24 @@ it("should be able to access the main page from the candidate route testing mech
 			.expect(200);
 		done();
 	});
+
+it("should be able to sign in correctly", function(done) {
+	superagent.post('http://localhost:3001/auth/signin')
+		.send({username: 'test@test.com', password: 'password'})
+		//.expect(200)
+		.end(function (err, res) {
+			console.log(res.body);
+			res.statusCode.should.equal(200);
+     				if (err) {
+       				throw err;
+    				}
+			done();
+      				//agent.saveCookies(res);
+      				//done(agent);
+			});
+    	});
+
+
 it("should be able to get the candidate first name", function(done) {
 		candidate1.save(function(err) {
 			request('http://localhost:3001')
@@ -77,7 +94,8 @@ it("should be able to get the candidate first name", function(done) {
 				.end(function(err,res) {
 					if (err) throw err;
 					res.body.should.have.property('fName');
-					res.body.fName.should.be.equal('Full');
+					res.body.lName.should.be.equal('Full');
+
 					done();
 				});
 		});
@@ -162,6 +180,7 @@ it("should be able to get the candidate note", function(done) {
 afterEach(function(done) {
 			candidate1.remove();
 			duplicate.remove();
+			user.remove();
 			done();
 		});
 
