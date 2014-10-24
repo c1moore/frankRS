@@ -20,7 +20,7 @@ exports.getfName = function(req, res) {
 	if(!req.isAuthenticated)
 		return res.status(401).send("User is not logged in");
 
-	if (req.hasAuthorization == 'admin'){
+	if (req.hasAuthorization("admin")){
 		var candidateID = req.body.candidateID;
 		var query = Candidate.findOne({_id: candidateID});
 		var theResult;
