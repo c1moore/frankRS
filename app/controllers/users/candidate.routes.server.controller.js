@@ -7,21 +7,33 @@
  */
 var errorHandler = require('../errors'),
 	mongoose = require('mongoose'),
+	User = mongoose.model('User'),
+	Event = mongoose.model('Event'),
 	Candidate = mongoose.model('Candidate');
 
 
 
 exports.getfName = function(req, res) {
-	var candidateID = req.body.candidateID;
-	var query = Candidate.findOne({_id: candidateID});
-	var theResult;
-	query.exec(function(err,result) {
-		theResult = result;
-		if (err) res.status(400).send(err);
-		else if (!theResult) res.status(400).json({fName: "No start date!"});
-		else res.status(200).json({fName: theResult.fName});
-	});
-};
+	var user = req.user;
+	//var userId = user._id;
+
+	if(!req.isAuthenticated)
+		return res.status(401).send("User is not logged in");
+
+	if (req.hasAuthorization("admin")){
+		var candidateID = req.body.candidateID;
+		var query = Candidate.findOne({_id: candidateID});
+		var theResult;
+		query.exec(function(err,result) {
+			theResult = result;
+			if (err) res.status(400).send(err);
+			else if (!theResult) res.status(400).json({fName: "No first name found!"});
+			else res.status(200).json({fName: theResult.fName});
+		});
+	}
+	else
+		return res.status(401).send("User does not have permission");
+	};
 
 exports.getlName= function(req, res) {
 var candidateID=req.body.candidateID;
