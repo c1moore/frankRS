@@ -16,7 +16,7 @@ var should = require('should'),
 /**
  * Globals
  */
-var user, useragent;
+var user, user2, useragent, useragent2;
 
 /**
  * Unit tests
@@ -32,8 +32,26 @@ describe('Express.js User Route Unit Tests:', function() {
 			login_enable : true
 		});
 
+		user2 = new User({
+			fName : 'Calvin',
+			lName : 'Moore',
+			email : 'calvin@example.com',
+			roles : ['attendee'],
+			password : 'password',
+			login_enable : true
+		});
+
 		user.save(function(err) {
 			useragent = agent.agent();
+			user2.save(function(err) {
+				useragent2 = agent.agent();
+				useragent2
+					.post('http://localhost:3001/auth/sigin')
+					.send({'email' : user2.email, 'password' : user2.password})
+					.end(function(err, res) {
+						done(err);
+					});
+			});
 			/*useragent
 				.post('http://localhost:3000/auth/signin')
 				.send({'email' : 'test@example.com', 'password' : 'password'})
@@ -42,7 +60,6 @@ describe('Express.js User Route Unit Tests:', function() {
           			console.log(res);
           			done();
 				});*/
-			done();
 		});
 	});
 
@@ -76,7 +93,7 @@ describe('Express.js User Route Unit Tests:', function() {
 			});
 	});
 
-	it('should be able to log in.', function(done) {
+	it('should be able to get leaderboard when they have the proper roles.', function(done) {
 		useragent
 			.post('http://localhost:3001/leaderboard/maintable')
 			.end(function(err, res) {
@@ -86,8 +103,19 @@ describe('Express.js User Route Unit Tests:', function() {
 			});
 	});
 
+	it('should fail to get leaderboard when the user does not have proper roles.', function(done) {
+		useragent2
+			.post('http://localhost:3001/leaderboard/maintable')
+			.end(function(err, res) {
+         		should.not.exist(err);
+          		res.status.should.equal(401);
+				done();
+			});
+	});
+
 	after(function(done) {
 		user.remove();
+		user2.remove();
 		done();
 	});
 

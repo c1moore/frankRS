@@ -1,0 +1,12 @@
+In case the request.js file in ./node_modules/passport/lib/http/request.js ever gets overwritten by future updates, the following code snippet will have to be added to the end of the file to allow to check user authorization:
+
+
+
+/**
+* Test if the user has the specified role.
+*
+* @return {Boolean}
+**/
+req.hasAuthorization = function(user, roles) {
+  return (_.intersection(user.roles, roles).length);
+};
