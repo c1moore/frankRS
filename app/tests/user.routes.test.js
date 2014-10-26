@@ -46,21 +46,11 @@ describe('Express.js User Route Unit Tests:', function() {
 			user2.save(function(err) {
 				useragent2
 					.post('http://localhost:3001/auth/signin')
-					.send({'email' : user2.email, 'password' : user2.password})
+					.send({'email' : user2.email, 'password' : 'password'})
 					.end(function(err, res) {
-						console.log(err);
-						console.log(res.status);
 						done(err);
 					});
 			});
-			/*useragent
-				.post('http://localhost:3000/auth/signin')
-				.send({'email' : 'test@example.com', 'password' : 'password'})
-				.end(function(err, res) {
-          			console.log(err);
-          			console.log(res);
-          			done();
-				});*/
 		});
 	});
 
@@ -86,7 +76,7 @@ describe('Express.js User Route Unit Tests:', function() {
 	it('should be able to log in.', function(done) {
 		useragent
 			.post('http://localhost:3001/auth/signin')
-			.send({'email' : 'test@example.com', 'password' : 'password'})
+			.send({'email' : user.email, 'password' : 'password'})
 			.end(function(err, res) {
          		should.not.exist(err);
           		res.status.should.equal(200);
@@ -98,7 +88,6 @@ describe('Express.js User Route Unit Tests:', function() {
 		useragent
 			.post('http://localhost:3001/leaderboard/maintable')
 			.end(function(err, res) {
-				console.log(res.body);
          		should.not.exist(err);
           		res.status.should.equal(200);
 				done();
