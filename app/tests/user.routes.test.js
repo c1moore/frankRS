@@ -34,14 +34,14 @@ describe('Express.js User Route Unit Tests:', function() {
 
 		user.save(function(err) {
 			useragent = agent.agent();
-			useragent
+			/*useragent
 				.post('http://localhost:3000/auth/signin')
 				.send({'email' : 'test@example.com', 'password' : 'password'})
 				.end(function(err, res) {
           			console.log(err);
           			console.log(res);
           			done();
-				});
+				});*/
 			done();
 		});
 	});
@@ -67,11 +67,22 @@ describe('Express.js User Route Unit Tests:', function() {
 
 	it('should be able to log in.', function(done) {
 		useragent
-			.post('auth/signin')
+			.post('http://localhost:3001/auth/signin')
 			.send({'email' : 'test@example.com', 'password' : 'password'})
-			.expect(200)
 			.end(function(err, res) {
-				done(err);
+         		should.not.exist(err);
+          		res.status.should.equal(200);
+				done();
+			});
+	});
+
+	it('should be able to log in.', function(done) {
+		useragent
+			.post('http://localhost:3001/leaderboard/maintable')
+			.end(function(err, res) {
+         		should.not.exist(err);
+          		res.status.should.equal(200);
+				done();
 			});
 	});
 
