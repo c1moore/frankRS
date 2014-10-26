@@ -40,33 +40,32 @@ describe('Attendees Model Unit Tests:', function() {
 			schedule: 'www.google.com'
 		});
 
-		this.timeout(10000);
-		user = new User({
-			fName: 'Full',
-			lName: 'Name',
-			roles: ['attendee'],
-			displayName: 'Full Name',
-			email: 'test@test.com',
-			password: 'password',
-			salt: 'abc123',
-			rank: [{'event_id': event1._id, 'place': 1}],
-			provider: 'local',
-			login_enabled: false
-		});
-		user2 = new User({
-			fName: 'Full',
-			lName: 'Name',
-			roles: ['attendee'],
-			displayName: 'Full Name',
-			email: 'test2@test.com',
-			password: 'password',
-			salt: 'abc123',
-			rank: [{'event_id': event1._id, 'place': 1}],
-			provider: 'local',
-			login_enabled: false
-		});
-
 		event1.save(function() {
+			user = new User({
+				fName: 'Full',
+				lName: 'Name',
+				roles: ['attendee'],
+				displayName: 'Full Name',
+				email: 'test@test.com',
+				password: 'password',
+				salt: 'abc123',
+				rank: [{'event_id': event1._id, 'place': 1}],
+				provider: 'local',
+				login_enabled: false
+			});
+			user2 = new User({
+				fName: 'Full',
+				lName: 'Name',
+				roles: ['attendee'],
+				displayName: 'Full Name',
+				email: 'test2@test.com',
+				password: 'password',
+				salt: 'abc123',
+				rank: [{'event_id': event1._id, 'place': 1}],
+				provider: 'local',
+				login_enabled: false
+			});
+
 			user.save(function() {
 				user2.save(function(err) {
 					event2.save(function(err) {

@@ -62,7 +62,7 @@ var StatusSchema = new Schema({
 	recruiter: {type:Boolean}
 }, {_id:false, validate : [validateOptional, 'All fields of status required.']});
 
-var RoleSchema = new Schema({
+var RankSchema = new Schema({
 	event_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Event'},
 	place: {type: Number, min: 1}
 }, {_id : false});
@@ -143,7 +143,7 @@ var UserSchema = new Schema({
   		type: [ListSchema]
   	},
   	rank: {
-  		type: [RoleSchema]
+  		type: [RankSchema]
   	},
   	login_enabled: {
   		type: Boolean,
@@ -160,7 +160,7 @@ var UserSchema = new Schema({
 //Validate that ObjectIds reference actual IDs from other schemas.
 ListSchema.plugin(idvalidator);
 StatusSchema.plugin(idvalidator);
-RoleSchema.plugin(idvalidator);
+RankSchema.plugin(idvalidator);
 
 /**
  * Hook a pre save method to hash the password
