@@ -1,17 +1,17 @@
-<section ng-controller="LeaderboardController">
+<section>
 	<div class="container">
 		<tabset>
 			<tab heading="Score">
 				<ng-include src="'/modules/leaderboard/views/score.client.view.html'"></ng-include>
 			</tab>
-			<tab heading="Leaderboard">
+			<tab heading="Leaderboard" ng-controller="LeaderboardController">
 				<ng-include src="'/modules/leaderboard/views/leaderboardtable.client.view.html'"></ng-include>
 			</tab>
-			<tab heading="Attending">
+			<tab heading="Attending" ng-controller="AttendingController">
 				<ng-include src="'/modules/leaderboard/views/attending.client.view.html'"></ng-include>
 			</tab>
-			<tab heading="Invited">
-				Invited
+			<tab heading="Invited" ng-controller="InvitedController">
+				<ng-include src="'/modules/leaderboard/views/invited.client.view.html'"></ng-include>
 			</tab>
 		</tabset>
 
