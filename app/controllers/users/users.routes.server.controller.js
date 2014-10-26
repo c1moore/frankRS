@@ -27,7 +27,7 @@ exports.getDisplayName = function(req, res) {
 exports.getLeaderboard = function(req, res) {
 	if(!req.isAuthenticated()) {
 		res.status(401).send("User is not logged in.");
-	} //else if(req.hasAuthorization("recruiter") || req.hasAuthorization("admin")) {
+	} else if(req.hasAuthorization(req.user, ["recruiter", "admin"])) {
 		var query = User.find({'role' : 'recruiter'});
 		query.select('displayName rank inviteeList attendeeList');
 		query.populate('inviteeList.user_id', 'displayName');
@@ -41,9 +41,9 @@ exports.getLeaderboard = function(req, res) {
 				res.status(200).send(result);
 			}
 		});
-	//} else {
-	//	res.status(401).send("User does not have permission.");
-	//}
+	} else {
+		res.status(401).send("User does not have permission.");
+	}
 };
 
 //Get a list of events for which this user is a recruiter.
