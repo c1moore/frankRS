@@ -19,19 +19,19 @@ module.exports = function() {
 			}, function(err, user) {
 				if (err) {
 					return done(err);
-				}
-				if (!user || !user.authenticate(password)) {
+				} else if (!user || !user.authenticate(password)) {
 					return done(null, false, {
 						message: 'Email or password is unknown.'
 					});
-				}
-				/*if (!user.authenticate(password)) {
-					return done(null, false, {
-						message: 'Invalid password'
-					});
-				}*/
+				} else {
+					/*if (!user.authenticate(password)) {
+						return done(null, false, {
+							message: 'Invalid password'
+						});
+					}*/
 
-				return done(null, user);
+					return done(null, user);
+				}
 			});
 		}
 	));

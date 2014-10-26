@@ -5,6 +5,7 @@
  */
 var errorHandler = require('../errors'),
 	mongoose = require('mongoose'),
+	_ = require('lodash'),
 	User = mongoose.model('User');
 
 exports.getDisplayName = function(req, res) {

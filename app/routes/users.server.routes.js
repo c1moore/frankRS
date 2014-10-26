@@ -9,7 +9,8 @@ var passport = require('passport'),
 
 module.exports = function(app) {
 	// User Routes
-	var users = require('../../app/controllers/users');
+	var users = require('../../app/controllers/users'),
+	users2 = require('../../app/controllers/users/users.routes.server.controller.js');
 
 	// Event Routes
 	// app.route('/events/enumerate').get(james_event_routes.getMyEvents);
@@ -64,7 +65,7 @@ module.exports = function(app) {
 	app.route('/auth/github/callback').get(users.oauthCallback('github'));
 
 	//Returning Leaderboard data
-	// app.route('/leaderboard/maintable').post(users.getLeaderboard);
+	app.route('/leaderboard/maintable').post(users2.getLeaderboard);
 	// app.route('/leaderboard/recruiterinfo').get(users.getRecruiterInfo);
 	// app.route('/leaderboard/attendeetable').post(users.getAttendees);
 	// app.route('/leaderboard/inviteetable').post(users.getInvitees);
