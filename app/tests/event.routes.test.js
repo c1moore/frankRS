@@ -74,14 +74,14 @@ describe('Express.js Event Route Unit Tests:', function() {
  		done();
  	});
 
-// 	it("should not be able to enumerate events when not signed in",function(done) {
-// 		event1.save(function(err) {
-// 			request('http://localhost:3001')
-// 				.get('/events/enumerate')
-// 				.expect(400);
-// 			done();
-// 		});
-// 	});
+ 	it("should not be able to enumerate events when not signed in",function(done) {
+ 		event1.save(function(err) {
+ 			request('http://localhost:3001')
+				.get('/events/enumerate')
+ 				.expect(400);
+ 			done();
+ 		});
+ 	});
 
 // 	it("should not be able to get the event start date when not signed in", function(done) {
 // 		event1.save(function(err) {
