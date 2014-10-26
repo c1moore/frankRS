@@ -16,7 +16,8 @@ var should = require('should'),
 /**
  * Globals
  */
-var user, user2, useragent, useragent2;
+var user, user2,
+	useragent = agent.agent(), useragent2 = agent.agent();
 
 /**
  * Unit tests
@@ -42,13 +43,13 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 
 		user.save(function(err) {
-			useragent = agent.agent();
 			user2.save(function(err) {
-				useragent2 = agent.agent();
 				useragent2
-					.post('http://localhost:3001/auth/sigin')
+					.post('http://localhost:3001/auth/signin')
 					.send({'email' : user2.email, 'password' : user2.password})
 					.end(function(err, res) {
+						console.log(err);
+						console.log(res.status);
 						done(err);
 					});
 			});
@@ -97,6 +98,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		useragent
 			.post('http://localhost:3001/leaderboard/maintable')
 			.end(function(err, res) {
+				console.log(res.body);
          		should.not.exist(err);
           		res.status.should.equal(200);
 				done();
@@ -107,6 +109,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		useragent2
 			.post('http://localhost:3001/leaderboard/maintable')
 			.end(function(err, res) {
+				console.log(res.body);
          		should.not.exist(err);
           		res.status.should.equal(401);
 				done();
