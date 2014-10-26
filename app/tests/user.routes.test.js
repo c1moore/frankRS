@@ -33,7 +33,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 
 		user.save(function(err) {
-			/*useragent = agent.agent();
+			useragent = agent.agent();
 			useragent
 				.post('http://localhost:3000/auth/signin')
 				.send({'email' : 'test@example.com', 'password' : 'password'})
@@ -41,7 +41,7 @@ describe('Express.js User Route Unit Tests:', function() {
           			console.log(err);
           			console.log(res);
           			done();
-				});*/
+				});
 			done();
 		});
 	});
@@ -66,7 +66,7 @@ describe('Express.js User Route Unit Tests:', function() {
 	});*/
 
 	it('should be able to log in.', function(done) {
-		request('http://localhost:3001/')
+		useragent
 			.post('auth/signin')
 			.send({'email' : 'test@example.com', 'password' : 'password'})
 			.expect(200)
