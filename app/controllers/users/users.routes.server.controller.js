@@ -31,7 +31,7 @@ exports.getLeaderboard = function(req, res) {
 		var query = User.find({'role' : 'recruiter'});
 		query.select('displayName rank inviteeList attendeeList');
 		query.populate('inviteeList.user_id', 'displayName');
-		query.populate('attendeeList.user_id', 'displayName');
+		query.populate('attendeeList.user_id', 'displayName');0
 		query.exec(function(err, result) {
 			if(err) {
 				res.status(400).send(err);

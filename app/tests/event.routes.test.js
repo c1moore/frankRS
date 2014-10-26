@@ -83,103 +83,97 @@ describe('Express.js Event Route Unit Tests:', function() {
  		});
  	});
 
-// 	it("should not be able to get the event start date when not signed in", function(done) {
-// 		event1.save(function(err) {
-// 			request('http://localhost:3001')
-// 				.get('/events/getStartDate')
-// 				.send({eventID: event1._id})
-// 				.expect(400);
-// 			done();
-// 		});
-// 	});
+ 	it("should not be able to get the event start date when not signed in", function(done) {
+ 		event1.save(function(err) {
+ 			request('http://localhost:3001')
+ 				.get('/events/getStartDate')
+ 				.send({eventID: event1._id})
+ 				.expect(400);
+ 			done();
+ 		});
+ 	});
 
-// 	it("should not be able to get the event end date when not signed in", function(done) {
-// 		event1.save(function(err) {
-// 			request('http://localhost:3001')
-// 				.get('/events/getEndDate')
-// 				.send({eventID: event1._id})
-// 				.expect(400);
-// 			done();
-// 		});
-// 	});
+ 	it("should not be able to get the event end date when not signed in", function(done) {
+ 		event1.save(function(err) {
+ 			request('http://localhost:3001')
+ 				.get('/events/getEndDate')
+ 				.send({eventID: event1._id})
+ 				.expect(400);
+ 			done();
+ 		});
+ 	});
 
-// 	it("should not be able to get the event location when not signed in", function(done) {
-// 		event1.save(function(err) {
-// 			request('http://localhost:3001')
-// 				.get('/events/getLocation')
-// 				.send({eventID: event1._id})
-// 				.expect(400);
-// 				//.end(function(err,res) {
-// 				//	if (err) throw err;
-// 				//	res.body.should.have.property('location');
-// 				//	res.body.location.should.be.equal('UF');
-// 				//	done();
-// 				//});
-// 			done();
-// 		});
-// 	});
+	it("should not be able to get the event location when not signed in", function(done) {
+ 		event1.save(function(err) {
+ 			request('http://localhost:3001')
+ 				.get('/events/getLocation')
+ 				.send({eventID: event1._id})
+ 				.expect(400)
+ 				.end(function(err,res) {
+ 					if (err) throw err;
+ 					res.body.should.have.property('location');
+ 					res.body.location.should.be.equal('UF');
+ 					done();
+ 				});
+ 		});
+ 	});
 
-// 	it("should not be able to get the event schedule when not signed in", function(done) {
-// 		event1.save(function(err) {
-// 			request('http://localhost:3001')
-// 				.get('/events/getSchedule')
-// 				.send({eventID: event1._id})
-// 				.expect(400);
-// 			done();
-// 		});
-// 	});
+ 	it("should not be able to get the event schedule when not signed in", function(done) {
+ 		event1.save(function(err) {
+ 			request('http://localhost:3001')
+ 				.get('/events/getSchedule')
+ 				.send({eventID: event1._id})
+ 				.expect(400);
+ 			done();
+ 		});
+ 	});
 
-// 	it("should not be able to get the event object when not signed in", function(done) {
-// 		event1.save(function(err) {
-// 			request('http://localhost:3001')
-// 				.get('/events/getEventObj')
-// 				.send({eventID: event1._id})
-// 				.expect(400);
-// 				/*.end(function(err,res) {
-// 					if (err) throw err;
-// 					res.body.should.have.property('schedule');
-// 					res.body.should.have.property('location');
-// 					res.body.should.have.property('start_date');
-// 					res.body.should.have.property('end_date');
-// 					res.body.schedule.should.be.equal('www.google.com');
-// 					res.body.location.should.be.equal('UF');
-// 					done();
-// 				});*/
-// 			done();
-// 		});
-// 	});
+ 	it("should not be able to get the event object when not signed in", function(done) {
+ 		event1.save(function(err) {
+ 			request('http://localhost:3001')
+ 				.get('/events/getEventObj')
+ 				.send({eventID: event1._id})
+ 				.expect(400)
+ 				.end(function(err,res) {
+ 					if (err) throw err;
+ 					res.body.should.have.property('schedule');
+ 					res.body.should.have.property('location');
+ 					res.body.should.have.property('start_date');
+ 					res.body.should.have.property('end_date');
+ 					res.body.schedule.should.be.equal('www.google.com');
+ 					res.body.location.should.be.equal('UF');
+ 					done();
+ 				});
+ 		});
+ 	});
 
-// 	it("should be able to sign in correctly", function(done) {
-// 		request('http://localhost:3001')
-// 			.post('/auth/signin')
-// 			.send({username: user.email, password: user.password})
-// 			.expect(400)
-// 			.end(function (err, res) {
-// 				console.log(res.body);
-//       				if (err) {
-//         				throw err;
-//       				}
-// 				done();
-//       				//agent.saveCookies(res);
-//       				//done(agent);
-// 			});
-//     	});
+ 	it("should be able to sign in correctly", function(done) {
+ 		agent
+ 			.post('http://localhost:3001/auth/signin')
+ 			.send({email: user.email, password: user.password})
+ 			.end(function (err, res) {
+				res.status.should.be.equal(200);
+				should.not.exist(err);
+       				if (err) {
+         				throw err;
+       				}
+       				done();
+ 			});
+     	});
 
-// 	/*it('should now be able to enumerate events when signed in', function(done) {
-// 		request('http://localhost:3001').post('/auth/signin')
-// 			.send({username: user.email, password: user.password})
-// 		event1.save(function(err) {
-// 			var req = request('http://localhost:3001').get('/events/enumerate');
-// 			agent.attachCookies(req);
-// 			req	
-// 				.expect(200)
-// 				.end(function(err,res) {
-// 					if (err) throw err;
-// 					res.body.should.have.property('events');
-// 					done();
-// 				});
-// 		});
-// 	});*/
+ 	it('should now be able to enumerate events when signed in', function(done) {
+ 		event1.save(function(err) {
+ 			agent
+				.get('http://localhost:3001/events/enumerate')
+ 				.end(function(err,res) {
+ 					if (err) throw err;
+					console.log(res.body); //You are not signed in
+					res.status.should.be.equal(200);
+ 					res.body.should.have.property('events');
+ 					done();
+ 				});
+ 		});
+ 	});
 
  	afterEach(function(done){
  		event1.remove();

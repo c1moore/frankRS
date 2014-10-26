@@ -9,11 +9,11 @@ var errorHandler = require('../errors'),
 	Event = mongoose.model('Event');
 
 exports.getMyEvents = function(req, res) {
-	if (!req.session || !req.session.id) {
+	if (!req.isAuthenticated()) {
 		res.status(400).json({events: ["You are not logged in"]});
 		return;
 	}
-	var id = req.session.id;
+	var id = req.user._id;
 	var query = User.findOne({_id: id});
 	var user;
 	query.exec(function(err,result) {
@@ -63,11 +63,11 @@ exports.getEndDate = function(req, res) {
 };
 
 exports.getLocation = function(req, res) {
-	if (!req.session || !req.session.id) {
+	if (!req.isAuthenticated()) {
 		res.status(400).json({location: "You are not logged in"});
 		return;
 	}
-	var id = req.session.id;
+	var id = req.user._id;
 	var eventID = req.body.eventID;
 	var query = Event.findOne({_id: eventID});
 	var theResult;

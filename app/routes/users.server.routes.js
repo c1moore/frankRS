@@ -13,12 +13,12 @@ module.exports = function(app) {
 	users2 = require('../../app/controllers/users/users.routes.server.controller.js');
 
 	// Event Routes
-	// app.route('/events/enumerate').get(james_event_routes.getMyEvents);
-	// app.route('/events/getStartDate').get(james_event_routes.getStartDate);
-	// app.route('/events/getEndDate').get(james_event_routes.getEndDate);
-	// app.route('/events/getLocation').get(james_event_routes.getLocation);
-	// app.route('/events/getEventObj').get(james_event_routes.getEventObj);
-	// app.route('/events/getSchedule').get(james_event_routes.getSchedule);
+	app.route('/events/enumerate').get(james_event_routes.getMyEvents);
+	app.route('/events/getStartDate').get(james_event_routes.getStartDate);
+	app.route('/events/getEndDate').get(james_event_routes.getEndDate);
+	app.route('/events/getLocation').get(james_event_routes.getLocation);
+	app.route('/events/getEventObj').get(james_event_routes.getEventObj);
+	app.route('/events/getSchedule').get(james_event_routes.getSchedule);
 
 	// Setting up the users profile api
 	//app.route('/displayName').get(users.getDisplayName);
