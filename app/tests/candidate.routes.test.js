@@ -59,9 +59,9 @@
   			user.save(function(err, res) {
 	  			user1
 	  				.post('http://localhost:3001/auth/signin')
-	  				.send({'email': user.email, 'password': user.password})
+	  				.send({'email': user.email, 'password': 'password'})
 	  				.end(function (err, res) {
-	  					console.log(res.body.message);
+	  					console.log(res.status);
 	  					done();
 	  				});
   			});
@@ -77,15 +77,15 @@
   			});
   		});
 
-  		it("should return me.", function(done) {
+  		/*it("should return me.", function(done) {
   			user1
   				.post('http://localhost:3001/auth/signin')
   				.end(function(err, res) {
-  					console.log(res.body);
+  					console.log(res.status);
   					console.log(res.jsonp);
   					done();
   				});
-  		})
+  		})*/
 
   		it("should be able to access the main page from the candidate route testing mechanism", function(done) {
   			request('http://localhost:3001')
@@ -102,11 +102,13 @@
   				//.expect(200)
   				.end(function(err,res) {
   					if (err) throw err;
-  					console.log(res.body.message);
-  					console.log(err);
+  					//console.log(res.body.message);
+  					console.log(res.status);
+            console.log(res.body);
+            console.log(res.user);
   					res.status.should.equal(200);
   					res.body.should.have.property('fName');
-  					res.body.lName.should.be.equal('Full');
+  					res.body.fName.should.be.equal('Full');
 
   					done();
   				});
