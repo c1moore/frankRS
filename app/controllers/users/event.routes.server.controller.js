@@ -4,7 +4,6 @@
  * Module dependencies.
  */
 
-//TODO All error messages return 'message' field
 //TODO New authentication mechanism
 var errorHandler = require('../errors'),
 	mongoose = require('mongoose'),
@@ -13,7 +12,7 @@ var errorHandler = require('../errors'),
 
 exports.getMyEvents = function(req, res) {
 	if (!req.isAuthenticated()) {
-		res.status(400).json({events: ["You are not logged in"]});
+		res.status(400).json({message: ["You are not logged in"]});
 		return;
 	}
 	var id = req.user._id;
@@ -22,7 +21,7 @@ exports.getMyEvents = function(req, res) {
 	query.exec(function(err,result) {
 		user = result;
 		if (err) {res.status(400).send(err);return;}
-		else if (!user) {res.status(400).json({events: ["No user found!"]});return;}
+		else if (!user) {res.status(400).json({message: ["No user found!"]});return;}
 		var myEvents = [];
 		var statusArray = user.status;
 		for (var i = 0; i<statusArray.length;i++)
@@ -33,7 +32,7 @@ exports.getMyEvents = function(req, res) {
 
 exports.getStartDate = function(req, res) {
 	if (!req.session || !req.session.id) {
-		res.status(400).json({start_date: "You are not logged in"});
+		res.status(400).json({message: "You are not logged in"});
 		return;
 	}
 	var id = req.session.id;
@@ -43,14 +42,14 @@ exports.getStartDate = function(req, res) {
 	query.exec(function(err,result) {
 		theResult = result;
 		if (err) res.status(400).send(err);
-		else if (!theResult) res.status(400).json({start_date: "No start date!"});
+		else if (!theResult) res.status(400).json({message: "No start date!"});
 		else res.status(200).json({start_date: theResult.start_date});
 	});
 };
 
 exports.getEndDate = function(req, res) {
 	if (!req.session || !req.session.id) {
-		res.status(400).json({end_date: "You are not logged in"});
+		res.status(400).json({message: "You are not logged in"});
 		return;
 	}
 	var id = req.session.id;
@@ -60,14 +59,14 @@ exports.getEndDate = function(req, res) {
 	query.exec(function(err,result) {
 		theResult = result;
 		if (err) res.status(400).send(err);
-		else if (!theResult) res.status(400).json({end_date: "No end date!"});
+		else if (!theResult) res.status(400).json({message: "No end date!"});
 		else res.status(200).json({end_date: theResult.end_date});
 	});
 };
 
 exports.getLocation = function(req, res) {
 	if (!req.isAuthenticated()) {
-		res.status(400).json({location: "You are not logged in"});
+		res.status(400).json({message: "You are not logged in"});
 		return;
 	}
 	var id = req.user._id;
@@ -77,7 +76,7 @@ exports.getLocation = function(req, res) {
 	query.exec(function(err,result) {
 		theResult = result;
 		if (err) res.status(400).send(err);
-		else if (!theResult) res.status(400).json({location: "No location!"});
+		else if (!theResult) res.status(400).json({message: "No location!"});
 		else res.status(200).json({location: theResult.location});
 	});
 };
@@ -101,7 +100,7 @@ exports.getEventObj = function(req, res) {
 
 exports.getSchedule = function(req, res) {
 	if (!req.session || !req.session.id) {
-		res.status(400).json({schedule: "You are not logged in"});
+		res.status(400).json({message: "You are not logged in"});
 		return;
 	}
 	var id = req.session.id;
@@ -111,7 +110,7 @@ exports.getSchedule = function(req, res) {
 	query.exec(function(err,result) {
 		theResult = result;
 		if (err) res.status(400).send(err);
-		else if (!theResult) res.status(400).json({schedule: "No schedule!"});
+		else if (!theResult) res.status(400).json({message: "No schedule!"});
 		else res.status(200).json({schedule: theResult.schedule});
 	});
 };
