@@ -5,6 +5,7 @@
 /**
  * Module dependencies.
  */
+//TODO get sessions working
 var should = require('should'),
 	mongoose = require('mongoose'),
  	http = require('http'),
@@ -150,9 +151,11 @@ describe('Express.js Event Route Unit Tests:', function() {
  	it("should be able to sign in correctly", function(done) {
  		agent
  			.post('http://localhost:3001/auth/signin')
- 			.send({email: user.email, password: user.password})
+ 			.send({email: user.email, password: 'password'})
  			.end(function (err, res) {
 				res.status.should.be.equal(200);
+				console.log(res.status)
+				console.log(res.body);
 				should.not.exist(err);
        				if (err) {
          				throw err;

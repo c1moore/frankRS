@@ -3,6 +3,9 @@
 /**
  * Module dependencies.
  */
+
+//TODO All error messages return 'message' field
+//TODO New authentication mechanism
 var errorHandler = require('../errors'),
 	mongoose = require('mongoose'),
 	User = mongoose.model('User'),
