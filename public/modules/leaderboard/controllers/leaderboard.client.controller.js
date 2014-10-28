@@ -6,7 +6,7 @@ angular.module('leaderboard').controller('LeaderboardController', ['$scope', 'Au
 			error: null
 		};
 
-		$http.get('/modules/leaderboard/tests/MOCK_DATA.json').success(function(data) {
+		$http.post('/leaderboard/maintable').success(function(data) {
 			$scope.leaderboardData.users = data;
 		}).error(function(error){
 			$scope.data.error = error;
