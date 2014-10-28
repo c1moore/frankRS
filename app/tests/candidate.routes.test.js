@@ -11,13 +11,15 @@
   superagent=require('superagent'),
   candidate = mongoose.model('Candidate'),
   User = mongoose.model('User'),
+  Event = mongoose.model('Event'),
+
   config = require('../../config/config'),
   request = require('supertest');
 
  /**
   * Globals
   */
-  var candidate1, duplicate, user, user1;
+  var candidate1, duplicate, user, user1,event1,event2;
 
   function arraysEqual(array0,array1) {
   	if (array0.length !== array1.length) return false;
@@ -31,40 +33,63 @@
 
   	describe('Method Save', function() {
   		before(function(done){
-  			user = new User({
-  				fName: 'Test',
-  				lName: 'ing',
-  				roles: ['admin'],
-  				email: 'test@test.com',
-  				password: 'password',
-  				login_enable: true
+  			event1 = new Event({
+				name:  'testing123',
+				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
+				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+				location: 'UF',
+				schedule: 'www.google.com'
+			});
 
-  			});
-  			candidate1 = new candidate({
-  				fName : 'Full',
-  				lName : 'Name',
-  				email : 'test@test.com',
-  				status : 'volunteer',
-  				note : 'this is a test'
-  			});
-  			duplicate = new candidate({
-  				fName : 'Full',
-  				lName : 'Name',
-  				email : 'test@test.com',
-  				status : 'volunteer',
-  				note : 'testing'
-  			});
-  			user1 = superagent.agent();
+			event2 = new Event({
+					name:  'testing123',
+					start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
+					end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+					location: 'SFCC',
+				schedule: 'www.google.com'
+			});
 
-  			user.save(function(err, res) {
-  				user1
-  				.post('http://localhost:3001/auth/signin')
-  				.send({'email': user.email, 'password': 'password'})
-  				.end(function (err, res) {
-	  					//console.log(res.status);
-	  					done();
-	  				});
-  			});
+
+			event1.save(function() {
+				event2.save(function() {
+		  			user = new User({
+		  				fName: 'Test',
+		  				lName: 'ing',
+		  				roles: ['admin'],
+		  				email: 'test@test.com',
+		  				password: 'password',
+		  				login_enable: true
+
+		  			});
+
+		  			candidate1 = new candidate({
+		  				fName : 'Full',
+		  				lName : 'Name',
+		  				email : 'test@test.com',
+		  				status : 'volunteer',
+		  				events: [{eventsID: event1._id, accepted: false}],
+		  				note : 'this is a test'
+		  			});
+		  			duplicate = new candidate({
+		  				fName : 'Full',
+		  				lName : 'Name',
+		  				email : 'test@test.com',
+		  				status : 'volunteer',
+		  				note : 'testing'
+		  			});
+
+		  			user.save(function(err, res) {
+  						user1 = superagent.agent();
+		  				user1
+		  				.post('http://localhost:3001/auth/signin')
+		  				.send({'email': user.email, 'password': 'password'})
+		  				.end(function (err, res) {
+			  					//console.log(res.status);
+			  					done();
+			  				});
+		  			});
+				});
+			});
   			
   		});
 
@@ -175,15 +200,29 @@
  		});
  	});
  });
-
- it("should be able to get the candidate note", function(done) {
- 	candidate1.save(function(err) {
- 		request('http://localhost:3001')
- 		.get('/candidate/getNote')
+ it("should be able to get the candidate EventsID", function(done) {
+	candidate1.save(function(err) {
+ 		user1
+ 		.get('http://localhost:3001/candidate/getEvents')
  		.send({candidateID: candidate1._id})
- 		.expect(200)
  		.end(function(err,res) {
  			if (err) throw err;
+ 			res.status.should.equal(200);
+ 			res.body.should.have.property('events');
+ 			(res.body.events[0].eventsID.toString()).should.be.equal(event1._id.toString());
+ 			(res.body.events[0].accepted.toString()).should.be.equal('false');
+ 			done();
+ 		});
+ 	});
+ });
+ it("should be able to get the candidate note", function(done) {
+	candidate1.save(function(err) {
+ 		user1
+ 		.get('http://localhost:3001/candidate/getNote')
+ 		.send({candidateID: candidate1._id})
+ 		.end(function(err,res) {
+ 			if (err) throw err;
+ 			res.status.should.equal(200);
  			res.body.should.have.property('note');
  			res.body.note.should.be.equal('this is a test');
 
@@ -193,11 +232,12 @@
  });
 
 
-
  after(function(done) {
  	candidate1.remove();
  	duplicate.remove();
  	user.remove();
+ 	event1.remove();
+ 	event2.remove();
  	done();
  });
 
