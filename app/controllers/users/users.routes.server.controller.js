@@ -26,9 +26,9 @@ exports.getDisplayName = function(req, res) {
 /*This method will need to be modified so it will only return the information related to the event the user specified.*/
 exports.getLeaderboard = function(req, res) {
 	if(!req.isAuthenticated()) {
-		res.status(401).send("User is not logged in.");
+		res.status(401).send({'message' : "User is not logged in."});
 	} else if(req.hasAuthorization(req.user, ["recruiter", "admin"])) {
-		var query = User.find({'role' : 'recruiter'});
+		var query = User.find({'roles' : 'recruiter'});
 		query.select('displayName rank inviteeList attendeeList');
 		query.populate('inviteeList.user_id', 'displayName');
 		query.populate('attendeeList.user_id', 'displayName');
@@ -36,13 +36,13 @@ exports.getLeaderboard = function(req, res) {
 			if(err) {
 				res.status(400).send(err);
 			} else if(!result) {
-				res.status(400).json({message : 'No recruiters found!'});
+				res.status(400).send({message : 'No recruiters found!'});
 			} else {
 				res.status(200).send(result);
 			}
 		});
 	} else {
-		res.status(401).send("User does not have permission.");
+		res.status(401).send({'message' : "User does not have permission."});
 	}
 };
 
