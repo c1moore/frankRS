@@ -63,24 +63,21 @@ describe('Express.js Event Route Unit Tests:', function() {
  			provider: 'local',
  			login_enabled: false
  		});
- 		user.save(function(err){if(err)throw err;});
-			
- 		done();
+ 		user.save(function(err){if(err)throw err;done();});
+		
  	});
 
  	it("should be able to access the main page from the event route testing mechanism", function(done) {
  		request('http://localhost:3001')
  			.get('/')
- 			.expect(200);
- 		done();
+ 			.expect(200,done);
  	});
 
  	it("should not be able to enumerate events when not signed in",function(done) {
  		event1.save(function(err) {
  			request('http://localhost:3001')
 				.get('/events/enumerate')
- 				.expect(400);
- 			done();
+ 				.expect(400,done);
  		});
  	});
 
@@ -89,8 +86,8 @@ describe('Express.js Event Route Unit Tests:', function() {
  			request('http://localhost:3001')
  				.get('/events/getStartDate')
  				.send({eventID: event1._id})
- 				.expect(400);
- 			done();
+ 				.expect(400,done);
+
  		});
  	});
 
@@ -99,8 +96,7 @@ describe('Express.js Event Route Unit Tests:', function() {
  			request('http://localhost:3001')
  				.get('/events/getEndDate')
  				.send({eventID: event1._id})
- 				.expect(400);
- 			done();
+ 				.expect(400,done);
  		});
  	});
 
@@ -124,8 +120,7 @@ describe('Express.js Event Route Unit Tests:', function() {
  			request('http://localhost:3001')
  				.get('/events/getSchedule')
  				.send({eventID: event1._id})
- 				.expect(400);
- 			done();
+ 				.expect(400,done);
  		});
  	});
 
@@ -170,7 +165,7 @@ describe('Express.js Event Route Unit Tests:', function() {
 				.get('http://localhost:3001/events/enumerate')
  				.end(function(err,res) {
  					if (err) throw err;
-					console.log(res.body); //You are not signed in
+					console.log(res.body); //You are not logged in
 					res.status.should.be.equal(200);
  					res.body.should.have.property('events');
  					done();
