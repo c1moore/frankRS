@@ -33,7 +33,7 @@ function arraysEqual(array0,array1) {
  * Unit tests
  */
 describe('Express.js Event Route Unit Tests:', function() {
-	beforeEach(function(done){
+	before(function(done) {
 		event1 = new Event({
 			name:  'testing123',
  			start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
@@ -43,14 +43,14 @@ describe('Express.js Event Route Unit Tests:', function() {
  		});
 
  		event2 = new Event({
- 				name:  'testing123',
- 				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
- 				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
- 				location: 'UF',
+ 			name:  'testing123',
+ 			start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
+ 			end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+ 			location: 'UF2',
  			schedule: 'www.google.com'
  		});
-		
- 		user = new User({
+
+		 user = new User({
  			fName: 'Full',
  			lName: 'Name',
  			roles: ['attendee'],
@@ -63,9 +63,17 @@ describe('Express.js Event Route Unit Tests:', function() {
  			provider: 'local',
  			login_enabled: false
  		});
- 		user.save(function(err){if(err)throw err;done();});
-		
- 	});
+ 		user.save(function(err){
+			if(err) throw err;
+			event1.save(function(err){
+				if(err) throw err;
+				event2.save(function(err){
+					if(err) throw err;
+					done();
+				});
+			});
+		});
+	});
 
  	it("should be able to access the main page from the event route testing mechanism", function(done) {
  		request('http://localhost:3001')
@@ -149,8 +157,6 @@ describe('Express.js Event Route Unit Tests:', function() {
  			.send({email: user.email, password: 'password'})
  			.end(function (err, res) {
 				res.status.should.be.equal(200);
-				console.log(res.status)
-				console.log(res.body);
 				should.not.exist(err);
        				if (err) {
          				throw err;
@@ -165,7 +171,6 @@ describe('Express.js Event Route Unit Tests:', function() {
 				.get('http://localhost:3001/events/enumerate')
  				.end(function(err,res) {
  					if (err) throw err;
-					console.log(res.body); //You are not logged in
 					res.status.should.be.equal(200);
  					res.body.should.have.property('events');
  					done();
@@ -176,7 +181,11 @@ describe('Express.js Event Route Unit Tests:', function() {
  	afterEach(function(done){
  		event1.remove();
  		event2.remove();
- 		user.remove();
  		done();
  	});
+
+	after(function(done) {
+		user.remove();
+ 		done();
+	});
 });
