@@ -57,17 +57,17 @@ describe('Express.js Event Route Unit Tests:', function() {
  			displayName: 'Full Name',
  			email: 'test@test.com',
  			password: 'password',
- 			status: [{eventID: event1._id, attending:false, recruiter:false}],
+ 			status: [{event_id: event1._id, attending:false, recruiter:false}],
  			salt: 'abc123',
  			rank: [],
  			provider: 'local',
  			login_enabled: false
  		});
- 		user.save(function(err){
+ 		event1.save(function(err){
 			if(err) throw err;
-			event1.save(function(err){
+			event2.save(function(err){
 				if(err) throw err;
-				event2.save(function(err){
+				user.save(function(err){
 					if(err) throw err;
 					done();
 				});
