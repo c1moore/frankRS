@@ -31,7 +31,7 @@ exports.getMyEvents = function(req, res) {
 };
 
 exports.getStartDate = function(req, res) {
-	if (!req.session || !req.session.id) {
+	if (!req.isAuthenticated()) {
 		res.status(400).json({message: "You are not logged in"});
 		return;
 	}
@@ -48,7 +48,7 @@ exports.getStartDate = function(req, res) {
 };
 
 exports.getEndDate = function(req, res) {
-	if (!req.session || !req.session.id) {
+	if (!req.isAuthenticated()) {
 		res.status(400).json({message: "You are not logged in"});
 		return;
 	}
@@ -82,7 +82,7 @@ exports.getLocation = function(req, res) {
 };
 
 exports.getEventObj = function(req, res) {
-	if (!req.session || !req.session.id) {
+	if (!req.isAuthenticated()) {
 		res.status(400).json({message: "You are not logged in"});
 		return;
 	}
@@ -99,7 +99,7 @@ exports.getEventObj = function(req, res) {
 };
 
 exports.getSchedule = function(req, res) {
-	if (!req.session || !req.session.id) {
+	if (!req.isAuthenticated) {
 		res.status(400).json({message: "You are not logged in"});
 		return;
 	}
