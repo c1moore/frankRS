@@ -17,10 +17,13 @@ exports.getfName = function(req, res) {
 	var user = req.user;
 	//var userId = user._id;
 
+	//return res.status(951).send({'message' : req.user});
+	//return res.status(951).send({'message' : "you are getting a message."});
+
 	if(!req.isAuthenticated)
 		return res.status(401).send("User is not logged in");
 
-	if (req.hasAuthorization("admin")){
+	if (req.hasAuthorization(req.user, ["admin"])){
 		var candidateID = req.body.candidateID;
 		var query = Candidate.findOne({_id: candidateID});
 		var theResult;
@@ -32,8 +35,8 @@ exports.getfName = function(req, res) {
 		});
 	}
 	else
-		return res.status(401).send("User does not have permission");
-	};
+		return res.status(403).send({'message' : req.user});
+};
 
 exports.getlName= function(req, res) {
 var candidateID=req.body.candidateID;
