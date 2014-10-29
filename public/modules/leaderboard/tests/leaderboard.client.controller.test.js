@@ -12,6 +12,6 @@
 			});
 		}));
 
-		it('should return')
-	})
+		it('should return');
+	});
 })();

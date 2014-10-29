@@ -17,7 +17,7 @@ var canViewEvent = function(user,eventID) {
 		}
 	}
 	return false;
-}
+};
 
 exports.getMyEvents = function(req, res) {
 	if (!req.isAuthenticated()) {
@@ -49,7 +49,7 @@ exports.getAllEvents = function(req, res) {
 	}
 	var query = Event.find({});
 	query.exec(function(err,result) {
-		if (err) {res.status(400).send(Err);return;}
+		if (err) {res.status(400).send(err);return;}
 		else if (!result) {res.status(400).json({message: "No events found?!"});return;}
 		res.status(200).json(result);
 	});

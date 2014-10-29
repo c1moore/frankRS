@@ -1,3 +1,5 @@
+'use strict'; // :)
+
 angular.module('leaderboard').controller('InvitedController', ['$scope', 'Authentication', '$http',
 	function($scope, Authentication, $http) {
 		// route will be leaderboard/recuiterInfo

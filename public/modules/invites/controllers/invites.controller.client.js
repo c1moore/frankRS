@@ -1,3 +1,5 @@
+'use strict'; // :)
+
 angular.module('inviteApp', ['ngAnimate'])
       .controller('inviteController', ['$scope', function($scope) {
         $scope.friends = [{name:'Dom',email:'dom@hotmail.com'},
