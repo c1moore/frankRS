@@ -1,0 +1,29 @@
+.table .progress {
+	margin-bottom:0;
+}
+
+.table {
+	margin-bottom:0;
+	border-collapse: separate;
+}
+
+.pagination {
+	margin-top:2px;
+}
+
+.attendingBar{
+	.background:#c54e92;
+}
+
+.invitedBar {
+
+}
+
+.rankCol {
+	width:80px;
+}
+
+.progress-bar {
+	.background-image: none;
+	.background-color: #c54e92;
+}
