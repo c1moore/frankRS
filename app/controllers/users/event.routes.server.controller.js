@@ -4,8 +4,6 @@
  * Module dependencies.
  */
 
-//TODO req.hasAuthorization(req.user,String[]) implement role verification
-
 var errorHandler = require('../errors'),
 	mongoose = require('mongoose'),
 	User = mongoose.model('User'),
