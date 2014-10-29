@@ -82,44 +82,45 @@ describe('Express.js Event Route Unit Tests:', function() {
  	});
 
  	it("should not be able to enumerate events when not signed in",function(done) {
- 		event1.save(function(err) {
- 			request('http://localhost:3001')
-				.get('/events/enumerate')
- 				.expect(400,done);
- 		});
+ 		request('http://localhost:3001')
+			.get('/events/enumerate')
+ 			.expect(400,done);
  	});
 
  	it("should not be able to get the event start date when not signed in", function(done) {
- 		event1.save(function(err) {
- 			request('http://localhost:3001')
- 				.get('/events/getStartDate')
- 				.send({eventID: event1._id})
- 				.expect(400,done);
+ 		request('http://localhost:3001')
+ 			.get('/events/getStartDate')
+ 			.send({eventID: event1._id})
+ 			.expect(400,done);
 
- 		});
+ 	});
+
+ 	it("should not be able to get the event name when not signed in", function(done) {
+ 		request('http://localhost:3001')
+ 			.get('/events/getName')
+ 			.send({eventID: event1._id})
+ 			.expect(400,done);
+
  	});
 
  	it("should not be able to get the event end date when not signed in", function(done) {
- 		event1.save(function(err) {
- 			request('http://localhost:3001')
- 				.get('/events/getEndDate')
- 				.send({eventID: event1._id})
- 				.expect(400,done);
- 		});
+ 		request('http://localhost:3001')
+ 			.get('/events/getEndDate')
+ 			.send({eventID: event1._id})
+ 			.expect(400,done);
  	});
 
 	it("should not be able to get the event location when not signed in", function(done) {
- 		event1.save(function(err) {
- 			request('http://localhost:3001')
- 				.get('/events/getLocation')
- 				.send({eventID: event1._id})
- 				.expect(400)
- 				.end(function(err,res) {
- 					if (err) throw err;
-					res.body.should.have.property('message');
- 					done();
- 				});
- 		});
+ 		request('http://localhost:3001')
+ 			.get('/events/getLocation')
+ 			.send({eventID: event1._id})
+ 			.expect(400)
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+				res.body.should.have.property('message');
+ 				done();
+ 			});
+
  	});
 
  	it("should not be able to get the event schedule when not signed in", function(done) {
@@ -130,17 +131,16 @@ describe('Express.js Event Route Unit Tests:', function() {
  	});
 
  	it("should not be able to get the event object when not signed in", function(done) {
- 		event1.save(function(err) {
- 			request('http://localhost:3001')
- 				.get('/events/getEventObj')
- 				.send({eventID: event1._id})
- 				.expect(400)
- 				.end(function(err,res) {
- 					if (err) throw err;
- 					res.body.should.have.property('message');
- 					done();
- 				});
- 		});
+ 		request('http://localhost:3001')
+ 			.get('/events/getEventObj')
+ 			.send({eventID: event1._id})
+ 			.expect(400)
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+ 				res.body.should.have.property('message');
+ 				done();
+ 			});
+
  	});
 
  	it("should be able to sign in correctly", function(done) {
@@ -158,31 +158,176 @@ describe('Express.js Event Route Unit Tests:', function() {
      	});
 
  	it('should now be able to enumerate events when signed in', function(done) {
- 		event1.save(function(err) {
- 			agent
-				.get('http://localhost:3001/events/enumerate')
- 				.end(function(err,res) {
- 					if (err) throw err;
-					res.status.should.be.equal(200);
- 					res.body.should.have.property('events');
- 					done();
- 				});
- 		});
+ 		agent
+			.get('http://localhost:3001/events/enumerate')
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+				res.status.should.be.equal(200);
+ 				res.body.should.have.property('events');
+ 				done();
+ 			});
+ 	});
+
+ 	it("should now be able to get the event name when signed in", function(done) {
+ 		agent
+ 			.get('http://localhost:3001/events/getName')
+ 			.send({eventID: event1._id})
+ 			.end(function(err,res) {
+				if (err) throw erro;
+				res.status.should.be.equal(200);
+				res.body.should.have.property('name');
+				done();
+			});
+
  	});
 
 	 it("should now be able to get the event start date when signed in", function(done) {
- 		event1.save(function(err) {
- 			agent
- 				.get('http://localhost:3001/events/getStartDate')
- 				.send({eventID: event1._id})
-				.end(function(err,res) {
-					if (err) throw err;
-					console.log(res.body);
-					res.status.should.be.equal(200);
-					res.body.should.have.property('start_date');
-					done();
-				});
- 		});
+ 		agent
+ 			.get('http://localhost:3001/events/getStartDate')
+ 			.send({eventID: event1._id})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(200);
+				res.body.should.have.property('start_date');
+				done();
+			});
+ 	});
+
+	 it("should now be able to get the event end date when signed in", function(done) {
+ 		agent
+ 			.get('http://localhost:3001/events/getEndDate')
+ 			.send({eventID: event1._id})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(200);
+				res.body.should.have.property('end_date');
+				done();
+			});
+
+ 	});
+
+	it("should now be able to get the event location when signed in", function(done) {
+ 		agent
+ 			.get('http://localhost:3001/events/getLocation')
+ 			.send({eventID: event1._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+				res.status.should.be.equal(200);
+				res.body.should.have.property('location');
+ 				done();
+ 			});
+ 	});
+
+	it("should now be able to get the event schedule when signed in", function(done) {
+ 		agent
+ 			.get('http://localhost:3001/events/getSchedule')
+ 			.send({eventID: event1._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+				res.status.should.be.equal(200);
+				res.body.should.have.property('schedule');
+ 				done();
+ 			});
+ 	});
+
+	it("should now be able to get the event object when signed in", function(done) {
+ 		agent
+ 			.get('http://localhost:3001/events/getEventObj')
+ 			.send({eventID: event1._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+				res.status.should.be.equal(200);
+				res.body.should.have.property('start_date');
+				res.body.should.have.property('end_date');
+				res.body.should.have.property('schedule');
+				res.body.should.have.property('location');
+				res.body.should.have.property('name');
+ 				done();
+ 			});
+ 	});
+
+	it("should not be able to enumerate all events when not an admin", function(done) {
+ 		agent
+ 			.get('http://localhost:3001/events/enumerateAll')
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
+				res.body.message.should.be.equal('Access Denied. This incident will be reported.');
+ 				done();
+ 			});
+ 	});
+
+	it("should not be able to access an eventObj by ID if the user shouldn't know about it", function(done) {
+ 		agent
+ 			.get('http://localhost:3001/events/getEventObj')
+			.send({eventID: event2._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
+ 				done();
+ 			});
+ 	});
+
+	it("should not be able to access start_date if the user shouldn't know about that event", function(done) {
+ 		agent
+ 			.get('http://localhost:3001/events/getStartDate')
+			.send({eventID: event2._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
+ 				done();
+ 			});
+ 	});
+
+	it("should not be able to access end_date if the user shouldn't know about that event", function(done) {
+ 		agent
+ 			.get('http://localhost:3001/events/getEndDate')
+			.send({eventID: event2._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
+ 				done();
+ 			});
+ 	});
+
+	it("should not be able to access location if the user shouldn't know about that event", function(done) {
+ 		agent
+ 			.get('http://localhost:3001/events/getLocation')
+			.send({eventID: event2._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
+ 				done();
+ 			});
+ 	});
+
+	it("should not be able to access schedule if the user shouldn't know about that event", function(done) {
+ 		agent
+ 			.get('http://localhost:3001/events/getSchedule')
+			.send({eventID: event2._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
+ 				done();
+ 			});
+ 	});
+
+	it("should not be able to access event name if the user shouldn't know about that event", function(done) {
+ 		agent
+ 			.get('http://localhost:3001/events/getName')
+			.send({eventID: event2._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
+ 				done();
+ 			});
  	});
 
 	after(function(done) {

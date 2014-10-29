@@ -11,9 +11,19 @@ var errorHandler = require('../errors'),
 	User = mongoose.model('User'),
 	Event = mongoose.model('Event');
 
+var canViewEvent = function(user,eventID) {
+	var statusArray = user.status;
+	for (var i = 0; i<statusArray.length;i++) {
+		if(statusArray[i].event_id==eventID) {
+			return true;
+		}
+	}
+	return false;
+}
+
 exports.getMyEvents = function(req, res) {
 	if (!req.isAuthenticated()) {
-		res.status(400).json({message: ["You are not logged in"]});
+		res.status(400).json({message: "You are not logged in"});
 		return;
 	}
 	var id = req.user._id;
@@ -22,7 +32,7 @@ exports.getMyEvents = function(req, res) {
 	query.exec(function(err,result) {
 		user = result;
 		if (err) {res.status(400).send(err);return;}
-		else if (!user) {res.status(400).json({message: ["No user found!"]});return;}
+		else if (!user) {res.status(400).json({message: "No user found!"});return;}
 		var myEvents = [];
 		var statusArray = user.status;
 		for (var i = 0; i<statusArray.length;i++)
@@ -31,9 +41,28 @@ exports.getMyEvents = function(req, res) {
 	});
 };
 
+exports.getAllEvents = function(req, res) {
+	if (!req.isAuthenticated()) {
+		res.status(400).json({message: "You are not logged in"});
+		return;
+	} else if (!req.hasAuthorization(req.user,["admin"])) {
+		res.status(401).json({message: "Access Denied. This incident will be reported."});
+		return;
+	}
+	var query = Event.find({});
+	query.exec(function(err,result) {
+		if (err) {res.status(400).send(Err);return;}
+		else if (!result) {res.status(400).json({message: "No events found?!"});return;}
+		res.status(200).json(result);
+	});
+};
+
 exports.getStartDate = function(req, res) {
 	if (!req.isAuthenticated()) {
 		res.status(400).json({message: "You are not logged in"});
+		return;
+	} else if (!canViewEvent(req.user,req.body.eventID)) {
+		res.status(401).json({message: "Access denied"});
 		return;
 	}
 	var id = req.session.id;
@@ -52,6 +81,9 @@ exports.getEndDate = function(req, res) {
 	if (!req.isAuthenticated()) {
 		res.status(400).json({message: "You are not logged in"});
 		return;
+	} else if (!canViewEvent(req.user,req.body.eventID)) {
+		res.status(401).json({message: "Access denied"});
+		return;
 	}
 	var id = req.session.id;
 	var eventID = req.body.eventID;
@@ -68,6 +100,9 @@ exports.getEndDate = function(req, res) {
 exports.getLocation = function(req, res) {
 	if (!req.isAuthenticated()) {
 		res.status(400).json({message: "You are not logged in"});
+		return;
+	} else if (!canViewEvent(req.user,req.body.eventID)) {
+		res.status(401).json({message: "Access denied"});
 		return;
 	}
 	var id = req.user._id;
@@ -86,6 +121,9 @@ exports.getEventObj = function(req, res) {
 	if (!req.isAuthenticated()) {
 		res.status(400).json({message: "You are not logged in"});
 		return;
+	} else if (!canViewEvent(req.user,req.body.eventID)) {
+		res.status(401).json({message: "Access denied"});
+		return;
 	}
 	var id = req.session.id;
 	var eventID = req.body.eventID;
@@ -103,6 +141,9 @@ exports.getSchedule = function(req, res) {
 	if (!req.isAuthenticated()) {
 		res.status(400).json({message: "You are not logged in"});
 		return;
+	} else if (!canViewEvent(req.user,req.body.eventID)) {
+		res.status(401).json({message: "Access denied"});
+		return;
 	}
 	var id = req.session.id;
 	var eventID = req.body.eventID;
@@ -113,5 +154,25 @@ exports.getSchedule = function(req, res) {
 		if (err) res.status(400).send(err);
 		else if (!theResult) res.status(400).json({message: "No schedule!"});
 		else res.status(200).json({schedule: theResult.schedule});
+	});
+};
+
+exports.getName = function(req, res) {
+	if (!req.isAuthenticated()) {
+		res.status(400).json({message: "You are not logged in"});
+		return;
+	} else if (!canViewEvent(req.user,req.body.eventID)) {
+		res.status(401).json({message: "Access denied"});
+		return;
+	}
+	var id = req.session.id;
+	var eventID = req.body.eventID;
+	var query = Event.findOne({_id: eventID});
+	var theResult;
+	query.exec(function(err,result) {
+		theResult = result;
+		if (err) res.status(400).send(err);
+		else if (!theResult) res.status(400).json({message: "No name!"});
+		else res.status(200).json({name: theResult.name});
 	});
 };

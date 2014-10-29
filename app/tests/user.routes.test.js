@@ -98,7 +98,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		useragent2
 			.post('http://localhost:3001/leaderboard/maintable')
 			.end(function(err, res) {
-				console.log(res.body);
+				//console.log(res.body);
          		should.not.exist(err);
           		res.status.should.equal(401);
 				done();

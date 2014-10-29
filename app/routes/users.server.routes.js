@@ -19,6 +19,8 @@ module.exports = function(app) {
 	app.route('/events/getLocation').get(james_event_routes.getLocation);
 	app.route('/events/getEventObj').get(james_event_routes.getEventObj);
 	app.route('/events/getSchedule').get(james_event_routes.getSchedule);
+	app.route('/events/enumerateAll').get(james_event_routes.getAllEvents);
+	app.route('/events/getName').get(james_event_routes.getName);
 
 	// Setting up the users profile api
 	//app.route('/displayName').get(users.getDisplayName);
