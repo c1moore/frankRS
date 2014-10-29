@@ -4,7 +4,8 @@
  * Module dependencies.
  */
 
-//TODO New authentication mechanism
+//TODO req.hasAuthorization(req.user,String[]) implement role verification
+
 var errorHandler = require('../errors'),
 	mongoose = require('mongoose'),
 	User = mongoose.model('User'),
@@ -42,7 +43,7 @@ exports.getStartDate = function(req, res) {
 	query.exec(function(err,result) {
 		theResult = result;
 		if (err) res.status(400).send(err);
-		else if (!theResult) res.status(400).json({message: "No start date!"});
+		else if (!theResult) res.status(400).json({message: "No event with that id!"});
 		else res.status(200).json({start_date: theResult.start_date});
 	});
 };
@@ -99,7 +100,7 @@ exports.getEventObj = function(req, res) {
 };
 
 exports.getSchedule = function(req, res) {
-	if (!req.isAuthenticated) {
+	if (!req.isAuthenticated()) {
 		res.status(400).json({message: "You are not logged in"});
 		return;
 	}

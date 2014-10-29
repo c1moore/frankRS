@@ -116,20 +116,17 @@ describe('Express.js Event Route Unit Tests:', function() {
  				.expect(400)
  				.end(function(err,res) {
  					if (err) throw err;
- 					res.body.should.have.property('location');
- 					res.body.location.should.be.equal('UF');
+					res.body.should.have.property('message');
  					done();
  				});
  		});
  	});
 
  	it("should not be able to get the event schedule when not signed in", function(done) {
- 		event1.save(function(err) {
- 			request('http://localhost:3001')
- 				.get('/events/getSchedule')
- 				.send({eventID: event1._id})
- 				.expect(400,done);
- 		});
+ 		request('http://localhost:3001')
+ 			.get('/events/getSchedule')
+ 			.send({eventID: event1._id})
+ 			.expect(400,done);
  	});
 
  	it("should not be able to get the event object when not signed in", function(done) {
@@ -140,12 +137,7 @@ describe('Express.js Event Route Unit Tests:', function() {
  				.expect(400)
  				.end(function(err,res) {
  					if (err) throw err;
- 					res.body.should.have.property('schedule');
- 					res.body.should.have.property('location');
- 					res.body.should.have.property('start_date');
- 					res.body.should.have.property('end_date');
- 					res.body.schedule.should.be.equal('www.google.com');
- 					res.body.location.should.be.equal('UF');
+ 					res.body.should.have.property('message');
  					done();
  				});
  		});
@@ -178,13 +170,24 @@ describe('Express.js Event Route Unit Tests:', function() {
  		});
  	});
 
- 	afterEach(function(done){
- 		event1.remove();
- 		event2.remove();
- 		done();
+	 it("should now be able to get the event start date when signed in", function(done) {
+ 		event1.save(function(err) {
+ 			agent
+ 				.get('http://localhost:3001/events/getStartDate')
+ 				.send({eventID: event1._id})
+				.end(function(err,res) {
+					if (err) throw err;
+					console.log(res.body);
+					res.status.should.be.equal(200);
+					res.body.should.have.property('start_date');
+					done();
+				});
+ 		});
  	});
 
 	after(function(done) {
+		event1.remove();
+		event2.remove();
 		user.remove();
  		done();
 	});
