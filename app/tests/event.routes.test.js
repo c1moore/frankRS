@@ -33,7 +33,7 @@ function arraysEqual(array0,array1) {
 /**
  * Unit tests
  */
-describe('Express.js Event Route Unit Tests:', function() {
+describe('Express.js Event Route Integration Tests:', function() {
 	before(function(done) {
 		event1 = new Event({
 			name:  'testing123',
@@ -362,6 +362,87 @@ describe('Express.js Event Route Unit Tests:', function() {
        				done();
  			});
      	});
+
+	it("should be able to enumerate all events when admin", function(done) {
+ 		agentAdmin //IMPORTANT: Agent does not support expect, use should
+ 			.get('http://localhost:3001/events/enumerateAll')
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+				res.status.should.be.equal(200);
+ 				done();
+ 			});
+ 	});
+
+	it("should be able to access any event by ID if admin", function(done) {
+ 		agentAdmin //IMPORTANT: Agent does not support expect, use should
+ 			.get('http://localhost:3001/events/getEventObj')
+			.send({eventID: event2._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+				res.status.should.be.equal(200);
+ 				done();
+ 			});
+ 	});
+
+	it("should be able to access start_date of any event if admin", function(done) {
+ 		agentAdmin //IMPORTANT: Agent does not support expect, use should
+ 			.get('http://localhost:3001/events/getStartDate')
+			.send({eventID: event2._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+				res.status.should.be.equal(200);
+				res.body.should.have.property('start_date');
+ 				done();
+ 			});
+ 	});
+
+	it("should be able to access any end_date if admin", function(done) {
+ 		agentAdmin //IMPORTANT: Agent does not support expect, use should
+ 			.get('http://localhost:3001/events/getEndDate')
+			.send({eventID: event2._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+				res.status.should.be.equal(200);
+				res.body.should.have.property('end_date');
+ 				done();
+ 			});
+ 	});
+
+	it("should be able to access any location if admin", function(done) {
+ 		agentAdmin //IMPORTANT: Agent does not support expect, use should
+ 			.get('http://localhost:3001/events/getLocation')
+			.send({eventID: event2._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+				res.status.should.be.equal(200);
+				res.body.should.have.property('location');
+ 				done();
+ 			});
+ 	});
+
+	it("should be able to access any schedule if admin", function(done) {
+ 		agentAdmin //IMPORTANT: Agent does not support expect, use should
+ 			.get('http://localhost:3001/events/getSchedule')
+			.send({eventID: event2._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+				res.status.should.be.equal(200);
+				res.body.should.have.property('schedule');
+ 				done();
+ 			});
+ 	});
+
+	it("should be able to access any event name if admin", function(done) {
+ 		agentAdmin //IMPORTANT: Agent does not support expect, use should
+ 			.get('http://localhost:3001/events/getName')
+			.send({eventID: event2._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+				res.status.should.be.equal(200);
+				res.body.should.have.property('name');
+ 				done();
+ 			});
+ 	});
 	
 
 	after(function(done) {
