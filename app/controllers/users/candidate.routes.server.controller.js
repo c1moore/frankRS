@@ -30,7 +30,7 @@
  		});
  	}
  	else
- 		return res.status(403).send("User not Authorized");
+ 		return res.status(401).send("User not Authorized");
  };
 
  exports.getlName= function(req, res) {
@@ -50,7 +50,7 @@
  		});
  	}
  	else
- 		return res.status(403).send("User not Authorized");
+ 		return res.status(401).send("User not Authorized");
  };
  exports.getEmail= function(req, res) {
  	if(!req.isAuthenticated())
@@ -70,7 +70,7 @@
  		});
  	}
  	else
- 		return res.status(403).send("User not Authorized");
+ 		return res.status(401).send("User not Authorized");
 
  };
  exports.getStatus= function(req, res) {
@@ -91,7 +91,7 @@
  		});
  	}
  	else
- 		return res.status(403).send("User not Authorized");
+ 		return res.status(401).send("User not Authorized");
  };
  exports.getEvents= function(req, res) {
  	if(!req.isAuthenticated())
@@ -111,7 +111,7 @@
  		});
  	}
  	else
- 		return res.status(403).send("User not Authorized");
+ 		return res.status(401).send("User not Authorized");
  };
 
  exports.getAccept_Key= function(req, res) {
@@ -132,7 +132,7 @@
  		});
  	}
  	else
- 		return res.status(403).send("User not Authorized");
+ 		return res.status(401).send("User not Authorized");
  };
  exports.getNote= function(req, res) {
  	if(!req.isAuthenticated())
@@ -152,5 +152,5 @@
  		});
  	}
  	else
- 		return res.status(403).send("User not Authorized");
+ 		return res.status(401).send("User not Authorized");
  };
