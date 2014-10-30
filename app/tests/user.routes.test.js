@@ -63,16 +63,6 @@ describe('Express.js User Route Unit Tests:', function() {
 			});
 	});
 
-	/*it("should be able to access the main page from the user route testing mechanism", function(done) {
-		request('http://localhost:3001/')
-			.post('leaderboard/maintable')
-			.expect(200)
-			.end(function(err, res) {
-				console.log(res);
-				done(err);
-			});
-	});*/
-
 	it('should be able to log in.', function(done) {
 		useragent
 			.post('http://localhost:3001/auth/signin')
@@ -98,9 +88,21 @@ describe('Express.js User Route Unit Tests:', function() {
 		useragent2
 			.post('http://localhost:3001/leaderboard/maintable')
 			.end(function(err, res) {
-				console.log(res.body);
          		should.not.exist(err);
           		res.status.should.equal(401);
+          		res.body.message.should.equal('User does not have permission.');
+				done();
+			});
+	});
+
+	it('should fail to get leaderboard when the user is not logged in.', function(done) {
+		var useragent3 = agent.agent();
+		useragent3
+			.post('http://localhost:3001/leaderboard/maintable')
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(401);
+				res.body.message.should.equal('User is not logged in.');
 				done();
 			});
 	});

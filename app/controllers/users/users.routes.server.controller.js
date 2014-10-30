@@ -207,7 +207,7 @@ exports.getUserTemplates = function(req, res) {
 */
 exports.getEmail = function(req, res) {
 	if(!req.isAuthenticated())
-		res.status(401_.send({'message' : 'User is not signed in.'}));
+		res.status(401).send({'message' : 'User is not signed in.'});
 	else {
 		var id = req.user_id;
 		var query = User.findOne({'_id' : id});
