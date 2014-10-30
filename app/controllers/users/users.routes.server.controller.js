@@ -13,8 +13,9 @@ var errorHandler = require('../errors'),
 */
 exports.getDisplayName = function(req, res) {
 	if(!req.isAuthenticated())
-		var id = req.user._id;
+		res.status(401).send({'message' : 'User is not logged in.'});
 	else {
+		var id = req.user._id;
 		var query = User.findOne({'_id':id});
 		query.exec(function(err,result) {
 			if(err) {
@@ -38,7 +39,7 @@ exports.getLeaderboard = function(req, res) {
 	if(!req.isAuthenticated()) {
 		res.status(401).send({'message' : "User is not logged in."});
 	} else if(req.hasAuthorization(req.user, ["recruiter", "admin"])) {
-		var query = User.find({'roles' : 'recruiter'});
+		var query = User.find({'roles' : 'recruiter', 'status' : {'event_id' : req.body.event_id, 'recruiter' : true}});
 		query.select('displayName rank inviteeList attendeeList');
 		query.populate('inviteeList.user_id', 'displayName');
 		query.populate('attendeeList.user_id', 'displayName');0
@@ -58,19 +59,32 @@ exports.getLeaderboard = function(req, res) {
 
 //Get a list of events for which this user is a recruiter.
 exports.getRecruiterEvents = function(req, res) {
-	var id = req.user._id;
-	var query = User.findOne({'_id' : id, 'status.recruiter' : true});
-	query.select('status');
-	query.populate('status.event_id');
-	query.exec(function(err, result) {
-		if(err) {
-			res.status(400).send(err);
-		} else if(!result) {
-			res.status(400).json({message : 'User not found or is not a recruiter!'});
-		} else {
-			res.status(200).send(result);
-		}
-	});
+	if(!req.isAuthenticated()) {
+		res.status(401).send({'message' : 'User is not logged in.'});
+	} else if(req.hasAuthorization(req.user, ["recruiter", "admin"])) {
+		var id = req.user._id;
+		var query = User.findOne({'_id' : id});
+		query.select('status');
+		query.populate('status.event_id');
+		query.exec(function(err, result) {
+			if(err) {
+				res.status(400).send(err);
+			} else if(!result) {
+				res.status(400).json({message : 'User not found or is not a recruiter!'});
+			} else {
+				var events = [], j=0;
+				for(var i=0; i<result.status.length; i++) {
+					if(result.status[i].recruiter) {
+						events[j] = result.status[i];
+						j++;
+					}
+				}
+				res.status(200).send(events);
+			}
+		});
+	} else {
+		res.status(401).send({'message' : 'User does not have permission.'});
+	}
 };
 
 //Get the list of attendees for the event specified.
@@ -185,7 +199,7 @@ exports.getRecruiterInfo = function(req, res) {
 */
 exports.getUserTemplates = function(req, res) {
 	if(!req.isAuthenticated())
-		res.status(401).send({'message' : 'User is not signed in.'});
+		res.status(401).send({'message' : 'User is not logged in.'});
 	else {
 		var id = req.user._id;
 		var query = User.findOne({'_id' : id});
@@ -207,18 +221,18 @@ exports.getUserTemplates = function(req, res) {
 */
 exports.getEmail = function(req, res) {
 	if(!req.isAuthenticated())
-		res.status(401).send({'message' : 'User is not signed in.'});
+		res.status(401).send({'message' : 'User is not logged in.'});
 	else {
-		var id = req.user_id;
+		var id = req.user._id;
 		var query = User.findOne({'_id' : id});
 		query.select('email');
 		query.exec(function(err, result) {
 			if(err) {
 				res.status(400).send(err);
 			} else if(!result) {
-				res.status(400).json({'message' : 'The impossible has occurred: no email found for user.'});
+				res.status(400).json({'message' : 'The impossible has occurred: no email found for user.', 'result' : result});
 			} else {
-				res.status(200).send(result);
+				res.status(200).send({'email' : result.email});
 			}
 		});
 	}
