@@ -9,13 +9,14 @@ var errorHandler = require('./errors'),
 	User = mongoose.model('User'),
 	Event = mongoose.model('Event');
 
-var canViewEvent = function(user,eventID) {
+var canViewEvent = function(user,eventID,hasAuthorization) {
 	var statusArray = user.status;
 	for (var i = 0; i<statusArray.length;i++) {
 		if(statusArray[i].event_id==eventID) {
 			return true;
 		}
 	}
+	if (hasAuthorization(user,['admin'])) return true;
 	return false;
 };
 
@@ -64,7 +65,7 @@ exports.getStartDate = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.body.eventID)) {
+	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
 		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
@@ -86,7 +87,7 @@ exports.getEndDate = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.body.eventID)) {
+	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
 		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
@@ -107,7 +108,7 @@ exports.getLocation = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.body.eventID)) {
+	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
 		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
@@ -128,7 +129,7 @@ exports.getEventObj = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.body.eventID)) {
+	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
 		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
@@ -149,7 +150,7 @@ exports.getSchedule = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.body.eventID)) {
+	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
 		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
@@ -170,7 +171,7 @@ exports.getName = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.body.eventID)) {
+	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
 		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}

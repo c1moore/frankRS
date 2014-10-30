@@ -18,8 +18,9 @@ var should = require('should'),
 /**
  * Globals
  */
-var event1, event2, user;
+var event1, event2, user, userAdmin;
 var agent = superagent.agent();
+var agentAdmin = superagent.agent();
 
 function arraysEqual(array0,array1) {
     if (array0.length !== array1.length) return false;
@@ -50,7 +51,7 @@ describe('Express.js Event Route Unit Tests:', function() {
  			schedule: 'www.google.com'
  		});
 
-		 user = new User({
+		user = new User({
  			fName: 'Full',
  			lName: 'Name',
  			roles: ['attendee'],
@@ -63,13 +64,31 @@ describe('Express.js Event Route Unit Tests:', function() {
  			provider: 'local',
  			login_enabled: false
  		});
+
+		userAdmin = new User({
+ 			fName: 'Full',
+ 			lName: 'Name',
+ 			roles: ['admin'],
+ 			displayName: 'Full Name',
+ 			email: 'admin@test.com',
+ 			password: 'password',
+ 			status: [{event_id: event1._id, attending:false, recruiter:false}],
+ 			salt: 'abc123',
+ 			rank: [],
+ 			provider: 'local',
+ 			login_enabled: false
+ 		});
+
  		event1.save(function(err){
 			if(err) throw err;
 			event2.save(function(err){
 				if(err) throw err;
 				user.save(function(err){
 					if(err) throw err;
-					done();
+					userAdmin.save(function(err){
+						if(err) throw err;
+						done();
+					});
 				});
 			});
 		});
@@ -330,10 +349,26 @@ describe('Express.js Event Route Unit Tests:', function() {
  			});
  	});
 
+	it("should be able to login as admin",function(done) {
+		agentAdmin
+			.post('http://localhost:3001/auth/signin')
+			.send({email: userAdmin.email, password: 'password'})
+ 			.end(function (err, res) {
+				res.status.should.be.equal(200);
+				should.not.exist(err);
+       				if (err) {
+         				throw err;
+       				}
+       				done();
+ 			});
+     	});
+	
+
 	after(function(done) {
 		event1.remove();
 		event2.remove();
 		user.remove();
+		userAdmin.remove();
  		done();
 	});
 });
