@@ -158,7 +158,7 @@ describe('Express.js Event Route Unit Tests:', function() {
      	});
 
  	it('should now be able to enumerate events when signed in', function(done) {
- 		agent
+ 		agent //IMPORTANT: Agent does not support expect, use should
 			.get('http://localhost:3001/events/enumerate')
  			.end(function(err,res) {
  				if (err) throw err;
@@ -169,7 +169,7 @@ describe('Express.js Event Route Unit Tests:', function() {
  	});
 
  	it("should now be able to get the event name when signed in", function(done) {
- 		agent
+ 		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getName')
  			.send({eventID: event1._id})
  			.end(function(err,res) {
@@ -182,7 +182,7 @@ describe('Express.js Event Route Unit Tests:', function() {
  	});
 
 	 it("should now be able to get the event start date when signed in", function(done) {
- 		agent
+ 		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getStartDate')
  			.send({eventID: event1._id})
 			.end(function(err,res) {
@@ -194,7 +194,7 @@ describe('Express.js Event Route Unit Tests:', function() {
  	});
 
 	 it("should now be able to get the event end date when signed in", function(done) {
- 		agent
+ 		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getEndDate')
  			.send({eventID: event1._id})
 			.end(function(err,res) {
@@ -207,7 +207,7 @@ describe('Express.js Event Route Unit Tests:', function() {
  	});
 
 	it("should now be able to get the event location when signed in", function(done) {
- 		agent
+ 		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getLocation')
  			.send({eventID: event1._id})
  			.end(function(err,res) {
@@ -219,7 +219,7 @@ describe('Express.js Event Route Unit Tests:', function() {
  	});
 
 	it("should now be able to get the event schedule when signed in", function(done) {
- 		agent
+ 		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getSchedule')
  			.send({eventID: event1._id})
  			.end(function(err,res) {
@@ -231,7 +231,7 @@ describe('Express.js Event Route Unit Tests:', function() {
  	});
 
 	it("should now be able to get the event object when signed in", function(done) {
- 		agent
+ 		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getEventObj')
  			.send({eventID: event1._id})
  			.end(function(err,res) {
@@ -247,7 +247,7 @@ describe('Express.js Event Route Unit Tests:', function() {
  	});
 
 	it("should not be able to enumerate all events when not an admin", function(done) {
- 		agent
+ 		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/enumerateAll')
  			.end(function(err,res) {
  				if (err) throw err;
@@ -259,7 +259,7 @@ describe('Express.js Event Route Unit Tests:', function() {
  	});
 
 	it("should not be able to access an eventObj by ID if the user shouldn't know about it", function(done) {
- 		agent
+ 		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getEventObj')
 			.send({eventID: event2._id})
  			.end(function(err,res) {
@@ -271,7 +271,7 @@ describe('Express.js Event Route Unit Tests:', function() {
  	});
 
 	it("should not be able to access start_date if the user shouldn't know about that event", function(done) {
- 		agent
+ 		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getStartDate')
 			.send({eventID: event2._id})
  			.end(function(err,res) {
@@ -283,7 +283,7 @@ describe('Express.js Event Route Unit Tests:', function() {
  	});
 
 	it("should not be able to access end_date if the user shouldn't know about that event", function(done) {
- 		agent
+ 		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getEndDate')
 			.send({eventID: event2._id})
  			.end(function(err,res) {
@@ -295,7 +295,7 @@ describe('Express.js Event Route Unit Tests:', function() {
  	});
 
 	it("should not be able to access location if the user shouldn't know about that event", function(done) {
- 		agent
+ 		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getLocation')
 			.send({eventID: event2._id})
  			.end(function(err,res) {
@@ -307,7 +307,7 @@ describe('Express.js Event Route Unit Tests:', function() {
  	});
 
 	it("should not be able to access schedule if the user shouldn't know about that event", function(done) {
- 		agent
+ 		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getSchedule')
 			.send({eventID: event2._id})
  			.end(function(err,res) {
@@ -319,7 +319,7 @@ describe('Express.js Event Route Unit Tests:', function() {
  	});
 
 	it("should not be able to access event name if the user shouldn't know about that event", function(done) {
- 		agent
+ 		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getName')
 			.send({eventID: event2._id})
  			.end(function(err,res) {
