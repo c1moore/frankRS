@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-var errorHandler = require('../errors'),
+var errorHandler = require('./errors'),
 	mongoose = require('mongoose'),
 	User = mongoose.model('User'),
 	Event = mongoose.model('Event');
@@ -19,6 +19,8 @@ var canViewEvent = function(user,eventID) {
 	return false;
 };
 
+//NOTE: Leaderboard in User has more routes to get events just for recruiters, events being recruited for
+//		etc. This event getter is just the tip of the iceberg
 exports.getMyEvents = function(req, res) {
 	if (!req.isAuthenticated()) {
 		res.status(400).json({message: "You are not logged in"});

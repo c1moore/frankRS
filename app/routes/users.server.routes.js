@@ -5,7 +5,7 @@
  */
 var passport = require('passport'),
 	//james_user_routes = require('../../app/controllers/users/users.routes.server.controller.js'),
-	james_event_routes = require('../../app/controllers/users/event.routes.server.controller.js');
+	james_event_routes = require('../../app/controllers/event.routes.server.controller.js');
 
 module.exports = function(app) {
 	// User Routes
