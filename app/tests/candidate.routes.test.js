@@ -9,7 +9,7 @@
   mongoose = require('mongoose'),
   http = require('http'),
   superagent=require('superagent'),
-  candidate = mongoose.model('Candidate'),
+  Candidate = mongoose.model('Candidate'),
   User = mongoose.model('User'),
   Event = mongoose.model('Event'),
 
@@ -29,7 +29,7 @@
   	return true;
   }
 
-  describe('Candidate Route Tests:', function() {
+  describe('Candidate Route Integration Tests:', function() {
 
   		before(function(done){
   			event1 = new Event({
@@ -61,7 +61,7 @@
 
   					});
 
-  					candidate1 = new candidate({
+  					candidate1 = new Candidate({
   						fName : 'Full',
   						lName : 'Name',
   						email : 'test@test.com',
@@ -76,7 +76,6 @@
   						.post('http://localhost:3001/auth/signin')
   						.send({'email': user.email, 'password': 'password'})
   						.end(function (err, res) {
-			  					//console.log(res.status);
 			  					done();
 			  				});
   					});
@@ -88,9 +87,7 @@
  it("should save the user.", function(done) {
  	var query = User.findOne({"email" : user.email});
  	query.exec(function(err, res) {
-  				//console.log(err);
-  				//console.log(res);
-  				done(err);
+  			done(err);
   			});
  });
 
@@ -209,6 +206,35 @@
  	});
  });
 
+  it("should be able to set the candidate first name", function(done) {
+ 		user1
+ 		.get('http://localhost:3001/candidate/setfName')
+ 		.send({candidateID: candidate1._id,newname:'dan'})
+ 		.end(function(err,res) {
+ 			if (err) throw err;
+			//console.log(res);
+ 			res.status.should.equal(200);
+ 			//res.body.should.have.property('fName');
+ 			//res.body.fName.should.be.equal('Full');
+ 			//done();
+ 			user1
+	 			.get('http://localhost:3001/candidate/getfName')
+	 			.send({candidateID: candidate1._id})
+	 			.end(function(err,res1) {
+ 					if (err) throw err;
+
+
+ 		
+			 			console.log(res1.body);
+			 			if (err) throw err;
+			 			res1.status.should.equal(200);
+			 			res1.body.should.have.property('fName');
+			 			res1.body.fName.should.be.equal('dan');
+			 			done();
+  		});
+ 	});
+
+});
 
  after(function(done) {
  	candidate1.remove();

@@ -6,7 +6,7 @@ var dan_candidate_routes = require('../../app/controllers/candidate.routes.serve
 //candidate routes
 module.exports = function(app){
 
-var candidate = require('../../app/controllers/users');
+//var candidate = require('../../app/controllers');
 
 //candidate routes
 app.route('/candidate/getfName').get(dan_candidate_routes.getfName);
@@ -16,6 +16,8 @@ app.route('/candidate/getStatus').get(dan_candidate_routes.getStatus);
 app.route('/candidate/getEvents').get(dan_candidate_routes.getEvents);
 app.route('/candidate/getAccept_Key').get(dan_candidate_routes.getAccept_Key);
 app.route('/candidate/getNote').get(dan_candidate_routes.getNote);
+
+app.route('/candidate/setfName').get(dan_candidate_routes.setfName);
 
 //Finish by binding//app.param('candidateId',candidate.candidateByID);
 
