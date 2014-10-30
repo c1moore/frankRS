@@ -9,26 +9,28 @@ var errorHandler = require('./errors'),
 	User = mongoose.model('User'),
 	Event = mongoose.model('Event');
 
-var canViewEvent = function(user,eventID) {
+var canViewEvent = function(user,eventID,hasAuthorization) {
 	var statusArray = user.status;
 	for (var i = 0; i<statusArray.length;i++) {
 		if(statusArray[i].event_id==eventID) {
 			return true;
 		}
 	}
+	if (hasAuthorization(user,['admin'])) return true;
 	return false;
 };
 
 //NOTE: Leaderboard in User has more routes to get events just for recruiters, events being recruited for
 //		etc. This event getter is just the tip of the iceberg
 exports.getMyEvents = function(req, res) {
-	if (!req.isAuthenticated()) {
-		res.status(400).json({message: "You are not logged in"});
+	if (!req.isAuthenticated()) { //Check if the user is authenticated
+		res.status(401).json({message: "You are not logged in"});
 		return;
 	}
 	var id = req.user._id;
 	var query = User.findOne({_id: id});
 	var user;
+	//Retrieve user events on behalf of the authenticated user
 	query.exec(function(err,result) {
 		user = result;
 		if (err) {res.status(400).send(err);return;}
@@ -42,13 +44,14 @@ exports.getMyEvents = function(req, res) {
 };
 
 exports.getAllEvents = function(req, res) {
-	if (!req.isAuthenticated()) {
-		res.status(400).json({message: "You are not logged in"});
+	if (!req.isAuthenticated()) { //Must be logged in
+		res.status(401).json({message: "You are not logged in"});
 		return;
-	} else if (!req.hasAuthorization(req.user,["admin"])) {
+	} else if (!req.hasAuthorization(req.user,["admin"])) { //Only admins can view all events
 		res.status(401).json({message: "Access Denied. This incident will be reported."});
 		return;
 	}
+	//Find and return all events in the collection
 	var query = Event.find({});
 	query.exec(function(err,result) {
 		if (err) {res.status(400).send(err);return;}
@@ -58,13 +61,15 @@ exports.getAllEvents = function(req, res) {
 };
 
 exports.getStartDate = function(req, res) {
-	if (!req.isAuthenticated()) {
-		res.status(400).json({message: "You are not logged in"});
+	if (!req.isAuthenticated()) { //Check authorization
+		res.status(401).json({message: "You are not logged in"});
 		return;
-	} else if (!canViewEvent(req.user,req.body.eventID)) {
-		res.status(401).json({message: "Access denied"});
+	//Must have permission to make requests on this ID
+	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
+		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
+	//Retrieve the requested field
 	var id = req.session.id;
 	var eventID = req.body.eventID;
 	var query = Event.findOne({_id: eventID});
@@ -78,11 +83,12 @@ exports.getStartDate = function(req, res) {
 };
 
 exports.getEndDate = function(req, res) {
-	if (!req.isAuthenticated()) {
-		res.status(400).json({message: "You are not logged in"});
+	if (!req.isAuthenticated()) { //Must be logged in
+		res.status(401).json({message: "You are not logged in"});
 		return;
-	} else if (!canViewEvent(req.user,req.body.eventID)) {
-		res.status(401).json({message: "Access denied"});
+	//Must have permission to make requests on this ID
+	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
+		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
 	var id = req.session.id;
@@ -98,11 +104,12 @@ exports.getEndDate = function(req, res) {
 };
 
 exports.getLocation = function(req, res) {
-	if (!req.isAuthenticated()) {
-		res.status(400).json({message: "You are not logged in"});
+	if (!req.isAuthenticated()) { //Must be logged in
+		res.status(401).json({message: "You are not logged in"});
 		return;
-	} else if (!canViewEvent(req.user,req.body.eventID)) {
-		res.status(401).json({message: "Access denied"});
+	//Must have permission to make requests on this ID
+	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
+		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
 	var id = req.user._id;
@@ -118,11 +125,12 @@ exports.getLocation = function(req, res) {
 };
 
 exports.getEventObj = function(req, res) {
-	if (!req.isAuthenticated()) {
-		res.status(400).json({message: "You are not logged in"});
+	if (!req.isAuthenticated()) { //Must be logged in
+		res.status(401).json({message: "You are not logged in"});
 		return;
-	} else if (!canViewEvent(req.user,req.body.eventID)) {
-		res.status(401).json({message: "Access denied"});
+	//Must have permission to make requests on this ID
+	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
+		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
 	var id = req.session.id;
@@ -138,11 +146,12 @@ exports.getEventObj = function(req, res) {
 };
 
 exports.getSchedule = function(req, res) {
-	if (!req.isAuthenticated()) {
-		res.status(400).json({message: "You are not logged in"});
+	if (!req.isAuthenticated()) { //Must be logged in
+		res.status(401).json({message: "You are not logged in"});
 		return;
-	} else if (!canViewEvent(req.user,req.body.eventID)) {
-		res.status(401).json({message: "Access denied"});
+	//Must have permission to make requests on this ID
+	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
+		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
 	var id = req.session.id;
@@ -158,11 +167,12 @@ exports.getSchedule = function(req, res) {
 };
 
 exports.getName = function(req, res) {
-	if (!req.isAuthenticated()) {
-		res.status(400).json({message: "You are not logged in"});
+	if (!req.isAuthenticated()) { //Must be logged in
+		res.status(401).json({message: "You are not logged in"});
 		return;
-	} else if (!canViewEvent(req.user,req.body.eventID)) {
-		res.status(401).json({message: "Access denied"});
+	//Must have permission to make requests on this ID
+	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
+		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
 	var id = req.session.id;
