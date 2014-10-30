@@ -8,22 +8,32 @@ var errorHandler = require('../errors'),
 	_ = require('lodash'),
 	User = mongoose.model('User');
 
+/*
+* Return the user's displayname (Last, First).
+*/
 exports.getDisplayName = function(req, res) {
-	var id = req.user._id;
-	var query = User.findOne({'_id':id});
-	query.exec(function(err,result) {
-		if(err) {
-			res.status(400).send(err);
-		} else if(!result) {
-			res.status(400).json({"message": "No display name found!"});
-		} else {
-			res.status(200).json({'displayName' : result.displayName});
-		}
-	});
+	if(!req.isAuthenticated())
+		var id = req.user._id;
+	else {
+		var query = User.findOne({'_id':id});
+		query.exec(function(err,result) {
+			if(err) {
+				res.status(400).send(err);
+			} else if(!result) {
+				res.status(400).json({"message": "No display name found!"});
+			} else {
+				res.status(200).json({'displayName' : result.displayName});
+			}
+		});
+	}
 };
 
-//Get the data that will be displayed for in the leaderboard.
-/*This method will need to be modified so it will only return the information related to the event the user specified.*/
+/*
+* Get the data that will be displayed for in the leaderboard.  This data includes all of the recruiter names, their rank,
+* and the inviteeList and attendeeList, properly populated with the displayName of each user in one of these lists.
+* 
+* This method will need to be modified so it will only return the information related to the event the user specified.
+*/
 exports.getLeaderboard = function(req, res) {
 	if(!req.isAuthenticated()) {
 		res.status(401).send({'message' : "User is not logged in."});
@@ -167,3 +177,49 @@ exports.getRecruiterInfo = function(req, res) {
 	});
 };
 
+/*
+* This method returns any and all templates saved for this user.
+* If no templates are found, returns a JSON object with field message
+* set as 'No templates have been saved.'  If there was an error, the
+* error is returned.  If there were no errors, the result is returned.
+*/
+exports.getUserTemplates = function(req, res) {
+	if(!req.isAuthenticated())
+		res.status(401).send({'message' : 'User is not signed in.'});
+	else {
+		var id = req.user._id;
+		var query = User.findOne({'_id' : id});
+		query.select('templates');
+		query.exec(function(err, result) {
+			if(err) {
+				res.status(400).send(err);
+			} else if(!result || !result.length) {
+				res.status(400).json({'message' : 'No templates have been saved.'});
+			} else {
+				res.status(200).send(result);
+			}
+		});
+	}
+};
+
+/*
+* This method returns the email address for the user currently signed in.
+*/
+exports.getEmail = function(req, res) {
+	if(!req.isAuthenticated())
+		res.status(401).send({'message' : 'User is not signed in.'});
+	else {
+		var id = req.user_id;
+		var query = User.findOne({'_id' : id});
+		query.select('email');
+		query.exec(function(err, result) {
+			if(err) {
+				res.status(400).send(err);
+			} else if(!result) {
+				res.status(400).json({'message' : 'The impossible has occurred: no email found for user.'});
+			} else {
+				res.status(200).send(result);
+			}
+		});
+	}
+};
