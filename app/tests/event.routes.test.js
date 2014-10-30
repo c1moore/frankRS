@@ -84,14 +84,14 @@ describe('Express.js Event Route Unit Tests:', function() {
  	it("should not be able to enumerate events when not signed in",function(done) {
  		request('http://localhost:3001')
 			.get('/events/enumerate')
- 			.expect(400,done);
+ 			.expect(401,done);
  	});
 
  	it("should not be able to get the event start date when not signed in", function(done) {
  		request('http://localhost:3001')
  			.get('/events/getStartDate')
  			.send({eventID: event1._id})
- 			.expect(400,done);
+ 			.expect(401,done);
 
  	});
 
@@ -99,7 +99,7 @@ describe('Express.js Event Route Unit Tests:', function() {
  		request('http://localhost:3001')
  			.get('/events/getName')
  			.send({eventID: event1._id})
- 			.expect(400,done);
+ 			.expect(401,done);
 
  	});
 
@@ -107,14 +107,14 @@ describe('Express.js Event Route Unit Tests:', function() {
  		request('http://localhost:3001')
  			.get('/events/getEndDate')
  			.send({eventID: event1._id})
- 			.expect(400,done);
+ 			.expect(401,done);
  	});
 
 	it("should not be able to get the event location when not signed in", function(done) {
  		request('http://localhost:3001')
  			.get('/events/getLocation')
  			.send({eventID: event1._id})
- 			.expect(400)
+ 			.expect(401)
  			.end(function(err,res) {
  				if (err) throw err;
 				res.body.should.have.property('message');
@@ -127,14 +127,14 @@ describe('Express.js Event Route Unit Tests:', function() {
  		request('http://localhost:3001')
  			.get('/events/getSchedule')
  			.send({eventID: event1._id})
- 			.expect(400,done);
+ 			.expect(401,done);
  	});
 
  	it("should not be able to get the event object when not signed in", function(done) {
  		request('http://localhost:3001')
  			.get('/events/getEventObj')
  			.send({eventID: event1._id})
- 			.expect(400)
+ 			.expect(401)
  			.end(function(err,res) {
  				if (err) throw err;
  				res.body.should.have.property('message');
