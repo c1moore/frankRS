@@ -1,7 +1,7 @@
 'use strict';
 
 //routes to get info from candidate
-var dan_candidate_routes = require('../../app/controllers/users/candidate.routes.server.controller.js');
+var dan_candidate_routes = require('../../app/controllers/candidate.routes.server.controller.js');
 
 //candidate routes
 module.exports = function(app){
