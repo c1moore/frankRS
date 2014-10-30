@@ -172,14 +172,14 @@
  			}
  			else{
  				result.fname=req.body.newname;
- 				result.save(function(err){
+ 				result.save(function(err,result1){
  					if(err){
  						return res.status(400).send({
  							message: errorHandler.getErrorMessage(err)
  						});
  					}
  					else
- 						return res.status(200).send("Candidate fname updated!");
+ 						return res.status(200).send(result1);
  				});
  			}
 

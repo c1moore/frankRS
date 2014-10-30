@@ -29,7 +29,7 @@
   	return true;
   }
 
-  describe('Candidate Route Tests:', function() {
+  describe('Candidate Route Integration Tests:', function() {
 
   		before(function(done){
   			event1 = new Event({
@@ -220,20 +220,18 @@
  			user1
 	 			.get('http://localhost:3001/candidate/getfName')
 	 			.send({candidateID: candidate1._id})
-	 			.end(function(err,res) {
+	 			.end(function(err,res1) {
  					if (err) throw err;
 
-	 				var query = Candidate.findOne({_id:candidate1._id });
- 					query.exec(function(err,result){
+
  		
-			 			//console.log(res);
+			 			console.log(res1.body);
 			 			if (err) throw err;
-			 			res.status.should.equal(200);
-			 			res.body.should.have.property('fName');
-			 			res.body.fName.should.be.equal('dan');
+			 			res1.status.should.equal(200);
+			 			res1.body.should.have.property('fName');
+			 			res1.body.fName.should.be.equal('dan');
 			 			done();
- 	 		});
- 		});
+  		});
  	});
 
 });
