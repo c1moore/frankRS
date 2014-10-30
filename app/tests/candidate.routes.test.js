@@ -208,30 +208,7 @@
  		});
  	});
  });
-  it("should be able to set the candidate first name", function(done) {
- 		user1
- 		.get('http://localhost:3001/candidate/setfName')
- 		.send({candidateID: candidate1._id,name:'dan'})
- 		.end(function(err,res) {
- 			if (err) throw err;
- 			res.status.should.equal(200);
- 			//res.body.should.have.property('fName');
- 			//res.body.fName.should.be.equal('Full');
- 			//done();
- 		});
- 		/*user1
- 		.get('http://localhost:3001/candidate/getfName')
- 		.send({candidateID: candidate1._id})
- 		.end(function(err,res) {
- 			if (err) throw err;
- 			res.status.should.equal(200);
- 			res.body.should.have.property('fName');
- 			res.body.fName.should.be.equal('dan');
- 			done();
- 	 });
- */
 
-});
 
  after(function(done) {
  	candidate1.remove();
