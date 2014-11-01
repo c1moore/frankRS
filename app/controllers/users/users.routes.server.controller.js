@@ -57,7 +57,11 @@ exports.getLeaderboard = function(req, res) {
 	}
 };
 
-//Get a list of events for which this user is a recruiter.
+/*
+* Get a list of events for which this user is a recruiter.  The method first queries the database for the currently logged in recruiter,
+* then, if found, goes through the array of all events with which this recruiter is associated and returns only those events for which the
+* user is a recruiter.
+*/
 exports.getRecruiterEvents = function(req, res) {
 	if(!req.isAuthenticated()) {
 		res.status(401).send({'message' : 'User is not logged in.'});

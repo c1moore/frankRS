@@ -182,6 +182,29 @@ describe('Express.js User Route Unit Tests:', function() {
 			});
 	});
 
+	it('should return an error when the user is not a recruiter', function(done) {
+		useragent2
+			.post('http://localhost:3001/recruiter/events')
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(401);
+				res.body.message.should.equal('User does not have permission.');
+				done();
+			});
+	});
+
+	it('should return the proper error when the user is not logged in.', function(done) {
+		var useragent3 = agent.agent();
+		useragent3
+			.post('http://localhost:3001/recruiter/events')
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(401);
+				res.body.message.should.equal('User is not logged in.');
+				done();
+			});
+	});
+
 	describe('Obtain specific user information:', function() {
 		it('should return the user displayname, which should be in the format "Last, First"', function(done) {
 			useragent
