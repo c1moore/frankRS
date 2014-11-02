@@ -310,9 +310,9 @@ exports.setEventObj = function(req, res) {
 		if (err) res.status(400).send(err);
 		else if (!theResult) res.status(400).json({message: "No such object!"});
 		else {
-			for (var key in validKeys) {
-				result[key]=new_event[key];
-				res.status(400).send(key);
+			for (var i=0; i<validKeys.length; i++) {
+				result[validKeys[i]]=new_event[validKeys[i]];
+				//res.status(400).send(key);
 			}
 			/*for (var i = 0; i < 5; i++) {
 			result.name = new_event.name;

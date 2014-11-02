@@ -798,7 +798,10 @@ describe('Express.js Event Route Integration Tests:', function() {
 						res.body.should.have.property('name');
 						res.body.name.should.be.equal(
 							"ReallyNewName");
-						done();
+						Event.findOne({'_id' : event2._id}, function(err, result) {
+							res.body.name.should.be.equal(result.name);
+							done();	
+						})
 					});
 			});
 	});
