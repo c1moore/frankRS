@@ -169,19 +169,36 @@ exports.getRecruiterAttendees = function(req, res) {
 //Get the list of invitees for the event specified.
 /*This method will also need to be modified so it will return only the attendees for the specified event.*/
 exports.getRecruiterInvitees = function(req, res) {
-	var id = req.user._id;
-	var query = User.findOne({'_id' : id});
-	query.select('inviteeList');
-	query.populate('attendeeList.user_id', 'displayName email');
-	query.exec(function(err, result) {
-		if(err) {
-			res.status(400).send(err);
-		} else if(!result || !result.length) {
-			res.status(400).json({'message' : 'User not found or the user has not invited anybody yet.'});
-		} else {
-			res.status(200).send(result);
-		}
-	});
+	if(req.body.event_id === undefined) {
+		res.status(400).send({'message' : 'Event not specified.'});
+		return;
+	}
+	if(!req.isAuthenticated()) {
+		res.status(401).send({'message' : 'User is not logged in.'});
+	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
+		var id = req.user._id;
+		var query = User.findOne({'_id' : id});
+		query.select('inviteeList');
+		query.populate('inviteeList.user_id', 'displayName email');
+		query.exec(function(err, result) {
+			if(err) {
+				res.status(400).send(err);
+			} else if(!result || !result.inviteeList.length) {
+				res.status(400).json({'message' : 'User not found or the user has not invited anybody yet.'});
+			} else {
+				var inviteeList = [], j=0;
+				for(var i=0; i<result.inviteeList.length; i++) {
+					if(result.inviteeList[i].event_id.toString() === req.body.event_id.toString()) {
+						inviteeList[j] =result.inviteeList[i];
+						j++;
+					}
+				}
+				res.status(200).send(inviteeList);
+			}
+		});
+	} else {
+		res.status(401).send({'message' : 'User does not have permission.'});
+	}
 };
 
 //Retrieve the list of all people who are signed up to attend the event.
