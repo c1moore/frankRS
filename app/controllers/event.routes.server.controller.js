@@ -194,8 +194,8 @@ exports.setStartDate = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
-		res.status(401).json({message: "You do not have permission to request this ID"});
+	} else if (!req.hasAuthorization(req.user,["admin"])) {
+		res.status(401).json({message: "Access denied"});
 		return;
 	}
 	//Retrieve the requested field
@@ -215,7 +215,7 @@ exports.setStartDate = function(req, res) {
 					res.status(400).send(err);
 					return;
 				}
-				res.status(200);
+				res.status(200).send();
 			});
 		}
 	});
@@ -226,8 +226,8 @@ exports.setEndDate = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
-		res.status(401).json({message: "You do not have permission to request this ID"});
+	} else if (!req.hasAuthorization(req.user,["admin"])) {
+		res.status(401).json({message: "Access denied"});
 		return;
 	}
 	var id = req.session.id;
@@ -246,7 +246,7 @@ exports.setEndDate = function(req, res) {
 					res.status(400).send(err);
 					return;
 				}
-				res.status(200);
+				res.status(200).send();
 			});
 		}
 	});
@@ -257,8 +257,8 @@ exports.setLocation = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
-		res.status(401).json({message: "You do not have permission to request this ID"});
+	} else if (!req.hasAuthorization(req.user,["admin"])) {
+		res.status(401).json({message: "Access denied"});
 		return;
 	}
 	var id = req.user._id;
@@ -277,7 +277,7 @@ exports.setLocation = function(req, res) {
 					res.status(400).send(err);
 					return;
 				}
-				res.status(200);
+				res.status(200).send();
 			});
 		}
 	});
@@ -288,31 +288,46 @@ exports.setEventObj = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
-		res.status(401).json({message: "You do not have permission to request this ID"});
+	} else if (!req.hasAuthorization(req.user,["admin"])) {
+		res.status(401).json({message: "Access denied"});
 		return;
 	}
 	var id = req.session.id;
 	var eventID = req.body.eventID;
 	var new_event = req.body.event;
+	if (new_event==undefined) {
+		res.status(400).json({message: "No event provided"});
+		return;
+	} else if (typeof(new_event)!="object") {
+		res.status(400).json({message: "Unexpected type"});
+		return;
+	}
 	var query = Event.findOne({_id: eventID});
 	var theResult;
+	var validKeys = ["name","schedule","location","start_date","end_date"];
 	query.exec(function(err,result) {
 		theResult = result;
 		if (err) res.status(400).send(err);
 		else if (!theResult) res.status(400).json({message: "No such object!"});
 		else {
-			for (var key in new_event) {
-				if(new_event.hasOwnProperty(key)&&key!='_id') {
-					result[key]=new_event[key];
-				}
+			for (var key in validKeys) {
+				result[key]=new_event[key];
+				res.status(400).send(key);
 			}
+			/*for (var i = 0; i < 5; i++) {
+			result.name = new_event.name;
+			result.schedule = new_event.schedule;
+			result.start_date = new_event.start_date;
+			result.end_date = new_event.end_date;
+			result.location = new_event.location;
+			}*/
+			//res.status(400).json(new_event[]);
 			result.save(function(err) {
 				if (err) {
 					res.status(400).send(err);
 					return;
 				}
-				res.status(200);
+				res.status(200).send();
 			});
 		}
 	});
@@ -323,8 +338,8 @@ exports.setSchedule = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
-		res.status(401).json({message: "You do not have permission to request this ID"});
+	} else if (!req.hasAuthorization(req.user,["admin"])) {
+		res.status(401).json({message: "Access denied"});
 		return;
 	}
 	var id = req.session.id;
@@ -343,7 +358,7 @@ exports.setSchedule = function(req, res) {
 					res.status(400).send(err);
 					return;
 				}
-				res.status(200);
+				res.status(200).send();
 			});
 		}
 	});
@@ -354,8 +369,8 @@ exports.setName = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
-		res.status(401).json({message: "You do not have permission to request this ID"});
+	} else if (!req.hasAuthorization(req.user,["admin"])) {
+		res.status(401).json({message: "Access denied"});
 		return;
 	}
 	var id = req.session.id;
@@ -374,7 +389,7 @@ exports.setName = function(req, res) {
 					res.status(400).send(err);
 					return;
 				}
-				res.status(200);
+				res.status(200).send();
 			});
 		}
 	});
