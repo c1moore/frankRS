@@ -166,8 +166,9 @@ exports.getRecruiterAttendees = function(req, res) {
 	}
 };
 
-//Get the list of invitees for the event specified.
-/*This method will also need to be modified so it will return only the attendees for the specified event.*/
+/*
+* Get the invitee list of the currently logged in recruiter for the event specified.
+*/
 exports.getRecruiterInvitees = function(req, res) {
 	if(req.body.event_id === undefined) {
 		res.status(400).send({'message' : 'Event not specified.'});
@@ -194,6 +195,42 @@ exports.getRecruiterInvitees = function(req, res) {
 					}
 				}
 				res.status(200).send(inviteeList);
+			}
+		});
+	} else {
+		res.status(401).send({'message' : 'User does not have permission.'});
+	}
+};
+
+/*
+* Get the almost list of the currently logged in recruiter for the event specified.
+*/
+exports.getRecruiterAlmosts = function(req, res) {
+	if(req.body.event_id === undefined) {
+		res.status(400).send({'message' : 'Event not specified.'});
+		return;
+	}
+	if(!req.isAuthenticated()) {
+		res.status(401).send({'message' : 'User is not logged in.'});
+	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
+		var id = req.user._id;
+		var query = User.findOne({'_id' : id});
+		query.select('almostList');
+		query.populate('almostList.user_id', 'displayName email');
+		query.exec(function(err, result) {
+			if(err) {
+				res.status(400).send(err);
+			} else if(!result || !result.almostList.length) {
+				res.status(400).json({'message' : 'User not found or the user has not invited anybody yet.'});
+			} else {
+				var almostList = [], j=0;
+				for(var i=0; i<result.almostList.length; i++) {
+					if(result.almostList[i].event_id.toString() === req.body.event_id.toString()) {
+						almostList[j] =result.almostList[i];
+						j++;
+					}
+				}
+				res.status(200).send(almostList);
 			}
 		});
 	} else {

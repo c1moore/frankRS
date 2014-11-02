@@ -77,6 +77,7 @@ module.exports = function(app) {
 	app.route('/recruiter/events').post(users2.getRecruiterEvents);
 	app.route('/recruiter/attendees').post(users2.getRecruiterAttendees);
 	app.route('/recruiter/invitees').post(users2.getRecruiterInvitees);
+	app.route('/recruiter/almosts').post(users2.getRecruiterAlmosts);
 
 	// Finish by binding the user middleware
 	app.param('userId', users.userByID);
