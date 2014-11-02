@@ -166,77 +166,123 @@ describe('Express.js User Route Unit Tests:', function() {
 			});
 	});
 
-	it('should be able to get leaderboard when they have the proper roles.', function(done) {
-		useragent
-			.post('http://localhost:3001/leaderboard/maintable')
-			.send({'event_id' : event1._id})
-			.end(function(err, res) {
-         		should.not.exist(err);
-          		res.status.should.equal(200);
-          		res.body[0].attendeeList.length.should.equal(2);
-          		res.body[0].inviteeList.length.should.equal(1);
-          		res.body[0].place.should.equal(1);
-          		var testemail = res.body[0].attendeeList[0].user_id.email;
-          		(testemail === 'calvin@example.com' || testemail === 'example.name@example.com').should.be.true;
-				done();
-			});
+	describe('Leaderboard routes:', function() {
+		it('should be able to get leaderboard when they have the proper roles.', function(done) {
+			useragent
+				.post('http://localhost:3001/leaderboard/maintable')
+				.send({'event_id' : event1._id})
+				.end(function(err, res) {
+	         		should.not.exist(err);
+	          		res.status.should.equal(200);
+	          		res.body[0].attendeeList.length.should.equal(2);
+	          		res.body[0].inviteeList.length.should.equal(1);
+	          		res.body[0].place.should.equal(1);
+	          		var testemail = res.body[0].attendeeList[0].user_id.email;
+	          		(testemail === 'calvin@example.com' || testemail === 'example.name@example.com').should.be.true;
+					done();
+				});
+		});
+
+		it('should fail to get leaderboard when the user does not have proper roles.', function(done) {
+			useragent2
+				.post('http://localhost:3001/leaderboard/maintable')
+				.end(function(err, res) {
+	         		should.not.exist(err);
+	          		res.status.should.equal(401);
+	          		res.body.message.should.equal('User does not have permission.');
+					done();
+				});
+		});
+
+		it('should fail to get leaderboard when the user is not logged in.', function(done) {
+			var useragent3 = agent.agent();
+			useragent3
+				.post('http://localhost:3001/leaderboard/maintable')
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal('User is not logged in.');
+					done();
+				});
+		});
 	});
 
-	it('should fail to get leaderboard when the user does not have proper roles.', function(done) {
-		useragent2
-			.post('http://localhost:3001/leaderboard/maintable')
-			.end(function(err, res) {
-         		should.not.exist(err);
-          		res.status.should.equal(401);
-          		res.body.message.should.equal('User does not have permission.');
-				done();
-			});
+	describe('Recruiter events routes:', function() {
+		it('should return an array of events for which the user is recruiting', function(done) {
+			useragent
+				.post('http://localhost:3001/recruiter/events')
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(200);
+					checkRecruiterEvents(res.body).should.be.true;
+					done();
+				});
+		});
+
+		it('should return an error when the user is not a recruiter', function(done) {
+			useragent2
+				.post('http://localhost:3001/recruiter/events')
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal('User does not have permission.');
+					done();
+				});
+		});
+
+		it('should return the proper error when the user is not logged in.', function(done) {
+			var useragent3 = agent.agent();
+			useragent3
+				.post('http://localhost:3001/recruiter/events')
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal('User is not logged in.');
+					done();
+				});
+		});
 	});
 
-	it('should fail to get leaderboard when the user is not logged in.', function(done) {
-		var useragent3 = agent.agent();
-		useragent3
-			.post('http://localhost:3001/leaderboard/maintable')
-			.end(function(err, res) {
-				should.not.exist(err);
-				res.status.should.equal(401);
-				res.body.message.should.equal('User is not logged in.');
-				done();
-			});
-	});
+	describe("Recruiter's attendeeList routes:", function() {
+		it("should return a recruiter's attendeeList for a specific event.", function(done) {
+			useragent
+				.post('http://localhost:3001/recruiter/attendees')
+				.send({'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(200);
+					res.body.length.should.equal(2);
+					for(var i=0; i<res.body.length; i++) {
+						res.body[i].event_id.toString().should.equal(event1._id.toString());
+					}
+					done();
+				});
+		});
 
-	it('should return an array of events for which the user is recruiting', function(done) {
-		useragent
-			.post('http://localhost:3001/recruiter/events')
-			.end(function(err, res) {
-				should.not.exist(err);
-				res.status.should.equal(200);
-				checkRecruiterEvents(res.body).should.be.true;
-				done();
-			});
-	});
+		it('should return the proper error when the user does not have the proper permissions.', function(done) {
+			useragent2
+				.post('http://localhost:3001/recruiter/attendees')
+				.send({'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal('User does not have permission.');
+					done();
+				});
+		});
 
-	it('should return an error when the user is not a recruiter', function(done) {
-		useragent2
-			.post('http://localhost:3001/recruiter/events')
-			.end(function(err, res) {
-				should.not.exist(err);
-				res.status.should.equal(401);
-				res.body.message.should.equal('User does not have permission.');
-				done();
-			});
-	});
-
-	it('should return the proper error when the user is not logged in.', function(done) {
-		var useragent3 = agent.agent();
-		useragent3
-			.post('http://localhost:3001/recruiter/events')
-			.end(function(err, res) {
-				should.not.exist(err);
-				res.status.should.equal(401);
-				res.body.message.should.equal('User is not logged in.');
-				done();
-			});
+		it('should return the proper error when the user is not logged in.', function(done) {
+			var useragent3 = agent.agent();
+			useragent3
+				.post('http://localhost:3001/recruiter/attendees')
+				.send({'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal('User is not logged in.');
+					done();
+				});
+		});
 	});
 
 	describe('Obtain specific user information:', function() {

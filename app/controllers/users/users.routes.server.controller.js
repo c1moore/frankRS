@@ -123,24 +123,39 @@ exports.getRecruiterEvents = function(req, res) {
 	}
 };
 
-//Get the list of attendees for the event specified.
+/*
+* Get the list of attendees for the event specified and the recruiter that is currently logged in.
+*/
 /*This method will need to be modified so it will return only the attendees for the specified event.  This should be simple,
 simply replace the the definition of query with the following line:
 	var query = User.findOne({'_id' : id, 'attendeeList.event_id' : req.});*/
 exports.getRecruiterAttendees = function(req, res) {
-	var id = req.user._id;
-	var query = User.findOne({'_id' : id});
-	query.select('attendeeList');
-	query.populate('attendeeList.user_id', 'displayName email');
-	query.exec(function(err, result) {
-		if(err) {
-			res.status(400).send(err);
-		} else if(!result || !result.length) {
-			res.status(400).json({'message' : 'User not found or nobody the user invited has signed up to attend yet.'});
-		} else {
-			res.status(200).send(result);
-		}
-	});
+	if(!req.isAuthenticated()) {
+		res.status(401).send({'message' : 'User is not logged in.'});
+	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
+		var id = req.user._id;
+		var query = User.findOne({'_id' : id});
+		query.select('attendeeList');
+		query.populate('attendeeList.user_id', 'displayName email');
+		query.exec(function(err, result) {
+			if(err) {
+				res.status(400).send(err);
+			} else if(!result || !result.attendeeList.length) {
+				res.status(400).json({'message' : 'User not found or nobody the user invited has signed up to attend yet.'});
+			} else {
+				var attendeeList = [], j=0;
+				for(var i=0; i<result.attendeeList.length; i++) {
+					if(result.attendeeList[i].event_id.toString() === req.body.event_id.toString()) {
+						attendeeList[j] =result.attendeeList[i];
+						j++;
+					}
+				}
+				res.status(200).send(attendeeList);
+			}
+		});
+	} else {
+		res.status(401).send({'message' : 'User does not have permission.'});
+	}
 };
 
 //Get the list of invitees for the event specified.
