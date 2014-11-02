@@ -1,7 +1,11 @@
 <table ng-table="tableParams" class="table table-bordered leaderboard">
 	<tr ng-repeat="user in $data">
-		<td data-title="'Rank'">{{user.rank}}</td>
-		<td data-title="'Name'">{{user.displayName}}</td>
+		<td data-title="'Rank'" sortable="'rank'">
+			{{user.rank}}
+		</td>
+		<td data-title="'Name'" sortable="'displayName'">
+			{{user.displayName}}
+		</td>
 		<td data-title="'Attending/Invited Count'">
 			<progress>
 				<bar class="attendingBar" value="user.attendeeList.length">
