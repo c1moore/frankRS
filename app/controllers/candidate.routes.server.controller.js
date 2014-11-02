@@ -171,16 +171,13 @@
  				res.status(400).json("No candidate found!");
  			}
  			else{
- 				result.fname=req.body.newname;
- 				result.save(function(err,result1){
- 					if(err){
- 						return res.status(400).send({
- 							message: errorHandler.getErrorMessage(err)
- 						});
- 					}
- 					else
- 						return res.status(200).send(result1);
- 				});
+ 				Candidate.findByIdAndUpdate(candidateID, { $set: { fName: req.body.newname }}, function (err, cand) {
+  					if (err) {
+  						res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
+  					} else {
+  						return res.status(200).send(cand);
+  					}
+				});
  			}
 
  		});

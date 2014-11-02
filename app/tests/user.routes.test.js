@@ -18,7 +18,7 @@ var should = require('should'),
 /**
  * Globals
  */
-var user, user2, event1, event2, event3, event4,
+var user, user2, user3, user4, event1, event2, event3, event4,
 	useragent = agent.agent(), useragent2 = agent.agent();
 
 /*
@@ -81,20 +81,10 @@ describe('Express.js User Route Unit Tests:', function() {
 			event2.save(function() {
 				event3.save(function() {
 					event4.save(function() {
-						user = new User({
-							fName : 'Calvin',
-							lName : 'Moore',
-							displayName : 'Moore, Calvin',
-							email : 'test@example.com',
-							roles : ['recruiter'],
-							status : [{'event_id':event1._id, 'attending':true, 'recruiter':true}, {'event_id':event2._id, 'attending':false, 'recruiter':true}, {'event_id':event3._id, 'attending':true, 'recruiter':true}, {'event_id':event4._id, 'attending':true, 'recruiter':false}],
-							password : 'password',
-							login_enable : true
-						});
-
 						user2 = new User({
 							fName : 'Calvin',
 							lName : 'Moore',
+							displayName : 'Moore, Calvin',
 							email : 'calvin@example.com',
 							roles : ['attendee'],
 							status : [{'event_id':event1._id, 'attending':true, 'recruiter':true}, {'event_id':event2._id, 'attending':false, 'recruiter':true}, {'event_id':event3._id, 'attending':true, 'recruiter':true}, {'event_id':event4._id, 'attending':true, 'recruiter':false}],
@@ -102,14 +92,53 @@ describe('Express.js User Route Unit Tests:', function() {
 							login_enable : true
 						});
 
-						user.save(function(err) {
-							user2.save(function(err) {
-								useragent2
-									.post('http://localhost:3001/auth/signin')
-									.send({'email' : user2.email, 'password' : 'password'})
-									.end(function(err, res) {
-										done(err);
+						user3 = new User({
+							fName : 'Nother',
+							lName : 'Name',
+							displayName : 'Name, Nother',
+							email : 'nother.name@example.com',
+							roles : ['attendee'],
+							status : [],						password : 'password',
+							login_enable : true
+						});
+
+						user4 = new User({
+							fName : 'Example',
+							lName : 'Name',
+							displayName : 'Name, Example',
+							email : 'example.name@example.com',
+							roles : ['attendee'],
+							status : [],						password : 'password',
+							login_enable : true
+						});
+
+						user = new User({
+							fName : 'Calvin',
+							lName : 'Moore',
+							displayName : 'Moore, Calvin',
+							email : 'test@example.com',
+							roles : ['recruiter'],
+							status : [{'event_id':event1._id, 'attending':true, 'recruiter':true}, {'event_id':event2._id, 'attending':false, 'recruiter':true}, {'event_id':event3._id, 'attending':true, 'recruiter':true}, {'event_id':event4._id, 'attending':true, 'recruiter':false}],
+							rank : [{'event_id':event1._id, 'place':1}, {'event_id':event2._id, 'place':2}, {'event_id':event3._id, 'place':3}],
+							password : 'password',
+							attendeeList : [{'user_id' : user2._id, 'event_id' : event1._id}, {'user_id' : user3._id, 'event_id' : event2._id}, {'user_id' : user4._id, 'event_id' : event1._id}],
+							inviteeList : [{'user_id' : user3._id, 'event_id' : event1._id}],
+							almostList : [{'user_id' : user4._id, 'event_id' : event2._id}, {'user_id' : user2._id, 'event_id' : event2._id}],
+							login_enable : true
+						});
+
+						user2.save(function(err) {
+							user3.save(function(err) {
+								user4.save(function(err) {
+									user.save(function(err) {
+										useragent2
+											.post('http://localhost:3001/auth/signin')
+											.send({'email' : user2.email, 'password' : 'password'})
+											.end(function(err, res) {
+												done(err);
+											});
 									});
+								});
 							});
 						});
 					});
@@ -138,48 +167,251 @@ describe('Express.js User Route Unit Tests:', function() {
 			});
 	});
 
-	it('should be able to get leaderboard when they have the proper roles.', function(done) {
-		useragent
-			.post('http://localhost:3001/leaderboard/maintable')
-			.end(function(err, res) {
-         		should.not.exist(err);
-          		res.status.should.equal(200);
-				done();
-			});
+	describe('Leaderboard routes:', function() {
+		it('should be able to get leaderboard when they have the proper roles.', function(done) {
+			useragent
+				.post('http://localhost:3001/leaderboard/maintable')
+				.send({'event_id' : event1._id})
+				.end(function(err, res) {
+	         		should.not.exist(err);
+	          		res.status.should.equal(200);
+	          		res.body[0].attendeeList.length.should.equal(2);
+	          		res.body[0].inviteeList.length.should.equal(1);
+	          		res.body[0].place.should.equal(1);
+	          		var testemail = res.body[0].attendeeList[0].user_id.email;
+	          		(testemail === 'calvin@example.com' || testemail === 'example.name@example.com').should.be.true;
+					done();
+				});
+		});
+
+		it('should return an error when no event_id is specified.', function(done) {
+			useragent
+				.post('http://localhost:3001/leaderboard/maintable')
+				.end(function(err, res) {
+	         		should.not.exist(err);
+	          		res.status.should.equal(400);
+	          		res.body.message.should.equal('Event not specified.');
+					done();
+				});
+		});
+
+		it('should fail to get leaderboard when the user does not have proper roles.', function(done) {
+			useragent2
+				.post('http://localhost:3001/leaderboard/maintable')
+				.send({'event_id' : event1._id})
+				.end(function(err, res) {
+	         		should.not.exist(err);
+	          		res.status.should.equal(401);
+	          		res.body.message.should.equal('User does not have permission.');
+					done();
+				});
+		});
+
+		it('should fail to get leaderboard when the user is not logged in.', function(done) {
+			var useragent3 = agent.agent();
+			useragent3
+				.post('http://localhost:3001/leaderboard/maintable')
+				.send({'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal('User is not logged in.');
+					done();
+				});
+		});
 	});
 
-	it('should fail to get leaderboard when the user does not have proper roles.', function(done) {
-		useragent2
-			.post('http://localhost:3001/leaderboard/maintable')
-			.end(function(err, res) {
-         		should.not.exist(err);
-          		res.status.should.equal(401);
-          		res.body.message.should.equal('User does not have permission.');
-				done();
-			});
+	describe('Recruiter events routes:', function() {
+		it('should return an array of events for which the user is recruiting', function(done) {
+			useragent
+				.post('http://localhost:3001/recruiter/events')
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(200);
+					checkRecruiterEvents(res.body).should.be.true;
+					done();
+				});
+		});
+
+		it('should return an error when the user is not a recruiter', function(done) {
+			useragent2
+				.post('http://localhost:3001/recruiter/events')
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal('User does not have permission.');
+					done();
+				});
+		});
+
+		it('should return the proper error when the user is not logged in.', function(done) {
+			var useragent3 = agent.agent();
+			useragent3
+				.post('http://localhost:3001/recruiter/events')
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal('User is not logged in.');
+					done();
+				});
+		});
 	});
 
-	it('should fail to get leaderboard when the user is not logged in.', function(done) {
-		var useragent3 = agent.agent();
-		useragent3
-			.post('http://localhost:3001/leaderboard/maintable')
-			.end(function(err, res) {
-				should.not.exist(err);
-				res.status.should.equal(401);
-				res.body.message.should.equal('User is not logged in.');
-				done();
-			});
+	describe("Recruiter's attendeeList routes:", function() {
+		it("should return a recruiter's attendeeList for a specific event.", function(done) {
+			useragent
+				.post('http://localhost:3001/recruiter/attendees')
+				.send({'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(200);
+					res.body.length.should.equal(2);
+					for(var i=0; i<res.body.length; i++) {
+						res.body[i].event_id.toString().should.equal(event1._id.toString());
+					}
+					done();
+				});
+		});
+
+		it("should return an error when the event_id is not specified.", function(done) {
+			useragent
+				.post('http://localhost:3001/recruiter/attendees')
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(400);
+					res.body.message.should.equal("Event not specified.");
+					done();
+				});
+		});
+
+		it('should return the proper error when the user does not have the proper permissions.', function(done) {
+			useragent2
+				.post('http://localhost:3001/recruiter/attendees')
+				.send({'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal('User does not have permission.');
+					done();
+				});
+		});
+
+		it('should return the proper error when the user is not logged in.', function(done) {
+			var useragent3 = agent.agent();
+			useragent3
+				.post('http://localhost:3001/recruiter/attendees')
+				.send({'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal('User is not logged in.');
+					done();
+				});
+		});
 	});
 
-	it('should return an array of events for which the user is recruiting', function(done) {
-		useragent
-			.post('http://localhost:3001/recruiter/events')
-			.end(function(err, res) {
-				should.not.exist(err);
-				res.status.should.equal(200);
-				checkRecruiterEvents(res.body).should.be.true;
-				done();
-			});
+	describe("Recruiter's inviteeList routes:", function() {
+		it("should return a recruiter's inviteeList for a specific event.", function(done) {
+			useragent
+				.post('http://localhost:3001/recruiter/invitees')
+				.send({'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(200);
+					res.body.length.should.equal(1);
+					res.body[0].event_id.toString().should.equal(event1._id.toString());
+					done();
+				});
+		});
+
+		it("should return an error when the event_id is not specified.", function(done) {
+			useragent
+				.post('http://localhost:3001/recruiter/invitees')
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(400);
+					res.body.message.should.equal("Event not specified.");
+					done();
+				});
+		});
+
+		it('should return the proper error when the user does not have the proper permissions.', function(done) {
+			useragent2
+				.post('http://localhost:3001/recruiter/invitees')
+				.send({'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal('User does not have permission.');
+					done();
+				});
+		});
+
+		it('should return the proper error when the user is not logged in.', function(done) {
+			var useragent3 = agent.agent();
+			useragent3
+				.post('http://localhost:3001/recruiter/invitees')
+				.send({'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal('User is not logged in.');
+					done();
+				});
+		});
+	});
+
+	describe("Recruiter's almostList routes:", function() {
+		it("should return a recruiter's almostList for a specific event.", function(done) {
+			useragent
+				.post('http://localhost:3001/recruiter/almosts')
+				.send({'event_id' : event2._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(200);
+					res.body.length.should.equal(2);
+					for(var i=0; i<res.body.length; i++) {
+						res.body[i].event_id.toString().should.equal(event2._id.toString());
+					}
+					done();
+				});
+		});
+
+		it("should return an error when the event_id is not specified.", function(done) {
+			useragent
+				.post('http://localhost:3001/recruiter/almosts')
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(400);
+					res.body.message.should.equal("Event not specified.");
+					done();
+				});
+		});
+
+		it('should return the proper error when the user does not have the proper permissions.', function(done) {
+			useragent2
+				.post('http://localhost:3001/recruiter/almosts')
+				.send({'event_id' : event2._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal('User does not have permission.');
+					done();
+				});
+		});
+
+		it('should return the proper error when the user is not logged in.', function(done) {
+			var useragent3 = agent.agent();
+			useragent3
+				.post('http://localhost:3001/recruiter/almosts')
+				.send({'event_id' : event2._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal('User is not logged in.');
+					done();
+				});
+		});
 	});
 
 	describe('Obtain specific user information:', function() {
@@ -237,6 +469,8 @@ describe('Express.js User Route Unit Tests:', function() {
 		event4.remove();
 		user.remove();
 		user2.remove();
+		user3.remove();
+		user4.remove();
 		done();
 	});
 
