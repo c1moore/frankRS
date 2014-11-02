@@ -9,6 +9,25 @@ var errorHandler = require('../errors'),
 	User = mongoose.model('User');
 
 /*
+* Helper function to search through one of the lists (invitee, attendee, almost) and return only those users who are attending the
+* specified event.
+*
+* ONLY WORKS IF event_id HAS NOT BEEN POPULATED.
+*/
+
+var searchByEvent = function(eventID, arr) {
+	var temp = [], j=0;
+	for(var i=0; i<arr.length; i++) {
+		if(arr[i].event_id.toString() === eventID.toString()) {
+			temp[j] = arr[i];
+			j++;
+		}
+	}
+
+	return temp;
+}
+
+/*
 * Return the user's displayname (Last, First).
 */
 exports.getDisplayName = function(req, res) {
@@ -32,23 +51,36 @@ exports.getDisplayName = function(req, res) {
 /*
 * Get the data that will be displayed for in the leaderboard.  This data includes all of the recruiter names, their rank,
 * and the inviteeList and attendeeList, properly populated with the displayName of each user in one of these lists.
-* 
-* This method will need to be modified so it will only return the information related to the event the user specified.
 */
 exports.getLeaderboard = function(req, res) {
 	if(!req.isAuthenticated()) {
 		res.status(401).send({'message' : "User is not logged in."});
 	} else if(req.hasAuthorization(req.user, ["recruiter", "admin"])) {
-		var query = User.find({'roles' : 'recruiter', 'status' : {'event_id' : req.body.event_id, 'recruiter' : true}});
-		query.select('displayName rank inviteeList attendeeList');
-		query.populate('inviteeList.user_id', 'displayName');
-		query.populate('attendeeList.user_id', 'displayName');0
+		var query = User.find({'roles' : 'recruiter', 'status.event_id' : req.body.event_id, 'status.recruiter' : true});
+		query.select('fName lName rank inviteeList attendeeList');
+		query.populate('inviteeList.user_id', 'displayName email');
+		query.populate('attendeeList.user_id', 'displayName email');0
 		query.exec(function(err, result) {
 			if(err) {
 				res.status(400).send(err);
-			} else if(!result) {
+			} else if(!result.length) {
 				res.status(400).send({message : 'No recruiters found!'});
 			} else {
+				for(var i=0; i<result.length; i++) {
+					result[i] = result[i].toObject();
+					result[i].inviteeList = searchByEvent(req.body.event_id, result[i].inviteeList);
+					result[i].attendeeList = searchByEvent(req.body.event_id, result[i].attendeeList);
+
+					for(var j=0; j<result[i].rank.length; j++) {
+						if(result[i].rank[j].event_id.toString() === req.body.event_id.toString()) {
+							var temp = parseInt(result[i].rank[j].place);
+							delete result[i].rank;//result[i].rank = null;
+							result[i].place = temp;//result[i].rank[j].place;
+							break;
+						}
+					}
+				}
+
 				res.status(200).send(result);
 			}
 		});
