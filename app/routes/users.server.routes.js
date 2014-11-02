@@ -70,7 +70,7 @@ module.exports = function(app) {
 	//Returning Leaderboard data
 	app.route('/leaderboard/maintable').post(users2.getLeaderboard);
 	app.route('/leaderboard/recruiterinfo').get(users2.getRecruiterInfo);
-	app.route('/leaderboard/attendeetable').post(users2.getAttendees);
+	app.route('/leaderboard/attendees').post(users2.getAttendees);
 	app.route('/leaderboard/inviteetable').post(users2.getInvitees);
 
 	//Setting Recruiter specific routes

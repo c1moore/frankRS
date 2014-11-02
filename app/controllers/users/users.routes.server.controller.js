@@ -238,25 +238,41 @@ exports.getRecruiterAlmosts = function(req, res) {
 	}
 };
 
-//Retrieve the list of all people who are signed up to attend the event.
+/*
+* Retrieve the list of all people who are signed up to attend the event.
+*/
 /*This will need to be modified so that only the event specified by the recruiter will be searched.  This can be done
 easily by replacing 
 	User.find({'role':'recruiter'});
 with
 	User.find({'role':'recruiter', 'attendeeList.event_id' : specifiedevent});*/
 exports.getAttendees = function(req, res) {
-	var query = User.find({'role' : 'recruiter'});
-	query.select('attendeeList displayName');
-	query.populate('attendeeList.user_id', 'displayName organization');
-	query.exec(function(err, result) {
-		if(err) {
-			res.status(400).send(err);
-		} else if(!result || !result.length) {
-			res.status(400).json({'message' : 'Nobody is attending yet.'});
-		} else {
-			res.status(200).send(result);
-		}
-	});
+	if(req.body.event_id === undefined) {
+		res.status(400).send({'message' : 'Event not specified.'});
+		return;
+	}
+	if(!req.isAuthenticated()) {
+		res.status(401).send({'message' : 'User is not logged in.'});
+	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
+		var query = User.find({'role' : 'recruiter', 'status' : {'event_id' : req.body.event_id, 'recruiter' : true}});//'status.event_id' : req.body.event_id, 'status.recruiter' : true});
+		query.select('fName lName attendeeList');
+		query.populate('attendeeList.user_id', 'displayName organization');
+		query.exec(function(err, result) {
+			if(err) {
+				res.status(400).send(err);
+			} else if(!result || !result.length) {
+				res.status(400).json({'message' : 'Nobody is attending yet.', 'result' : result});
+			} else {
+				for(var i=0; i<result.length; i++) {
+					result[i].toObject();
+					result[i].attendeeList = searchByEvent(req.body.event_id, result[i].attendeeList);
+				}
+				res.status(200).send(result);
+			}
+		});
+	} else {
+		res.status(401).send({'message' : 'User does not have permission.'});
+	}
 };
 
 //Retrieve the list of all people who are invited to attend the specified event.
