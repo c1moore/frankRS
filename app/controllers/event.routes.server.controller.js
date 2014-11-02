@@ -302,7 +302,11 @@ exports.setEventObj = function(req, res) {
 		if (err) res.status(400).send(err);
 		else if (!theResult) res.status(400).json({message: "No such object!"});
 		else {
-			// Find out how to update the database
+			for (var key in new_event) {
+				if(new_event.hasOwnProperty(key)&&key!='_id') {
+					result[key]=new_event[key];
+				}
+			}
 			result.save(function(err) {
 				if (err) {
 					res.status(400).send(err);

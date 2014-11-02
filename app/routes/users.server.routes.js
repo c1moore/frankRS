@@ -21,6 +21,11 @@ module.exports = function(app) {
 	app.route('/events/getSchedule').get(james_event_routes.getSchedule);
 	app.route('/events/enumerateAll').get(james_event_routes.getAllEvents);
 	app.route('/events/getName').get(james_event_routes.getName);
+	app.route('/events/setStartDate').post(james_event_routes.setStartDate);
+	app.route('/events/setEndDate').post(james_event_routes.setEndDate);
+	app.route('/events/setLocation').post(james_event_routes.setLocation);
+	app.route('/events/setEventObj').post(james_event_routes.setEventObj);
+	app.route('/events/setSchedule').post(james_event_routes.setSchedule);
 
 	// Setting up the users profile api
 	app.route('/users/me').get(users.me);
