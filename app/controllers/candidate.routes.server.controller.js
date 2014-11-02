@@ -365,16 +365,14 @@
  					else{
  						res.status(400).send("No candidate event found");
  					}
-
+ 					
  				}
-			result.save(function(err, result) {
- 				
+ 			}	
  			if(err) {
  				res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
  			} else {
  				return res.status(200).send(result);
  			}
- 		}
 
  		});
  				}
