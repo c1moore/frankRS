@@ -53,6 +53,10 @@ exports.getDisplayName = function(req, res) {
 * and the inviteeList and attendeeList, properly populated with the displayName of each user in one of these lists.
 */
 exports.getLeaderboard = function(req, res) {
+	if(req.body.event_id === undefined) {
+		res.status(400).send({'message' : 'Event not specified.'});
+		return;
+	}
 	if(!req.isAuthenticated()) {
 		res.status(401).send({'message' : "User is not logged in."});
 	} else if(req.hasAuthorization(req.user, ["recruiter", "admin"])) {
@@ -130,6 +134,10 @@ exports.getRecruiterEvents = function(req, res) {
 simply replace the the definition of query with the following line:
 	var query = User.findOne({'_id' : id, 'attendeeList.event_id' : req.});*/
 exports.getRecruiterAttendees = function(req, res) {
+	if(req.body.event_id === undefined) {
+		res.status(400).send({'message' : 'Event not specified.'});
+		return;
+	}
 	if(!req.isAuthenticated()) {
 		res.status(401).send({'message' : 'User is not logged in.'});
 	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {

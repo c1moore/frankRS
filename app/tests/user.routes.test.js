@@ -183,9 +183,21 @@ describe('Express.js User Route Unit Tests:', function() {
 				});
 		});
 
+		it('should return an error when no event_id is specified.', function(done) {
+			useragent
+				.post('http://localhost:3001/leaderboard/maintable')
+				.end(function(err, res) {
+	         		should.not.exist(err);
+	          		res.status.should.equal(400);
+	          		res.body.message.should.equal('Event not specified.');
+					done();
+				});
+		});
+
 		it('should fail to get leaderboard when the user does not have proper roles.', function(done) {
 			useragent2
 				.post('http://localhost:3001/leaderboard/maintable')
+				.send({'event_id' : event1._id})
 				.end(function(err, res) {
 	         		should.not.exist(err);
 	          		res.status.should.equal(401);
@@ -198,6 +210,7 @@ describe('Express.js User Route Unit Tests:', function() {
 			var useragent3 = agent.agent();
 			useragent3
 				.post('http://localhost:3001/leaderboard/maintable')
+				.send({'event_id' : event1._id})
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(401);
@@ -255,6 +268,17 @@ describe('Express.js User Route Unit Tests:', function() {
 					for(var i=0; i<res.body.length; i++) {
 						res.body[i].event_id.toString().should.equal(event1._id.toString());
 					}
+					done();
+				});
+		});
+
+		it("should return an error when the event_id is not specified.", function(done) {
+			useragent
+				.post('http://localhost:3001/recruiter/attendees')
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(400);
+					res.body.message.should.equal("Event not specified.");
 					done();
 				});
 		});
