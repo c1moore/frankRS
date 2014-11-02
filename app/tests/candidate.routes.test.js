@@ -19,7 +19,7 @@
  /**
   * Globals
   */
-  var candidate1, user, user1,event1,event2;
+  var candidate1, user, user1,event1,event2,event3;
 
   function arraysEqual(array0,array1) {
   	if (array0.length !== array1.length) return false;
@@ -31,26 +31,35 @@
 
   describe('Candidate Route Integration Tests:', function() {
 
-  		before(function(done){
-  			event1 = new Event({
-  				name:  'testing123',
+  	before(function(done){
+  		event1 = new Event({
+  			name:  'testing123',
 				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
 				location: 'UF',
 				schedule: 'www.google.com'
 			});
 
-  			event2 = new Event({
-  				name:  'testing123',
+  		event2 = new Event({
+  			name:  'testing123',
 					start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 					end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
 					location: 'SFCC',
 					schedule: 'www.google.com'
 				});
+  		event3 = new Event({
+  			name:  'testing123',
+					start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
+					end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+					location: 'Orlando',
+					schedule: 'www.google.com'
+				});
 
 
-  			event1.save(function() {
-  				event2.save(function() {
+  		event1.save(function() {
+  			event2.save(function() {
+  				event3.save(function(err){
+  					console.log(err);
   					user = new User({
   						fName: 'Test',
   						lName: 'ing',
@@ -76,19 +85,20 @@
   						.post('http://localhost:3001/auth/signin')
   						.send({'email': user.email, 'password': 'password'})
   						.end(function (err, res) {
-			  					done();
-			  				});
+  							done();
+  						});
   					});
   				});
-	});
+  			});
+  		});
 
-});
+  	});
 
  it("should save the user.", function(done) {
  	var query = User.findOne({"email" : user.email});
  	query.exec(function(err, res) {
-  			done(err);
-  			});
+ 		done(err);
+ 	});
  });
 
  it("should be able to access the main page from the candidate route testing mechanism", function(done) {
@@ -206,41 +216,204 @@
  	});
  });
 
-  it("should be able to set the candidate first name", function(done) {
- 		user1
- 		.get('http://localhost:3001/candidate/setfName')
- 		.send({candidateID: candidate1._id,newname:'dan'})
- 		.end(function(err,res) {
- 			if (err) throw err;
+ it("should be able to set the candidate first name", function(done) {
+ 	user1
+ 	.get('http://localhost:3001/candidate/setfName')
+ 	.send({candidateID: candidate1._id,newfName:'dan'})
+ 	.end(function(err,res) {
+ 		if (err) throw err;
 			//console.log(res);
- 			res.status.should.equal(200);
+			res.status.should.equal(200);
  			//res.body.should.have.property('fName');
  			//res.body.fName.should.be.equal('Full');
  			//done();
  			user1
-	 			.get('http://localhost:3001/candidate/getfName')
-	 			.send({candidateID: candidate1._id})
-	 			.end(function(err,res1) {
- 					if (err) throw err;
+ 			.get('http://localhost:3001/candidate/getfName')
+ 			.send({candidateID: candidate1._id})
+ 			.end(function(err,res1) {
+ 				if (err) throw err;
 
 
- 		
-			 			console.log(res1.body);
+
+			 			//console.log(res1.body);
 			 			if (err) throw err;
 			 			res1.status.should.equal(200);
 			 			res1.body.should.have.property('fName');
 			 			res1.body.fName.should.be.equal('dan');
 			 			done();
-  		});
- 	});
+			 		});
+ 		});
 
+ });
+ it("should be able to set the candidate last name", function(done) {
+ 	user1
+ 	.get('http://localhost:3001/candidate/setlName')
+ 	.send({candidateID: candidate1._id,newlName:'pickle'})
+ 	.end(function(err,res) {
+ 		if (err) throw err;
+			//console.log(res);
+			res.status.should.equal(200);
+ 			//res.body.should.have.property('fName');
+ 			//res.body.fName.should.be.equal('Full');
+ 			//done();
+ 			user1
+ 			.get('http://localhost:3001/candidate/getlName')
+ 			.send({candidateID: candidate1._id})
+ 			.end(function(err,res1) {
+ 				if (err) throw err;
+
+
+
+			 			//console.log(res1.body);
+			 			if (err) throw err;
+			 			res1.status.should.equal(200);
+			 			res1.body.should.have.property('lName');
+			 			res1.body.lName.should.be.equal('pickle');
+			 			done();
+			 		});
+ 		});
+
+ });
+
+ it("should be able to set the candidate email", function(done) {
+ 	user1
+ 	.get('http://localhost:3001/candidate/setEmail')
+ 	.send({candidateID: candidate1._id,newEmail:'DanP@test.com'})
+ 	.end(function(err,res) {
+ 		if (err) throw err;
+			//console.log(res);
+			res.status.should.equal(200);
+ 			//res.body.should.have.property('fName');
+ 			//res.body.fName.should.be.equal('Full');
+ 			//done();
+ 			user1
+ 			.get('http://localhost:3001/candidate/getEmail')
+ 			.send({candidateID: candidate1._id})
+ 			.end(function(err,res1) {
+ 				if (err) throw err;
+
+
+
+			 			//console.log(res1.body);
+			 			if (err) throw err;
+			 			res1.status.should.equal(200);
+			 			res1.body.should.have.property('email');
+			 			res1.body.email.should.be.equal('DanP@test.com');
+			 			done();
+			 		});
+ 		});
+
+ });
+ it("should be able to set the candidate status", function(done) {
+ 	user1
+ 	.get('http://localhost:3001/candidate/setStatus')
+ 	.send({candidateID: candidate1._id,newStatus:'accepted'})
+ 	.end(function(err,res) {
+ 		if (err) throw err;
+			//console.log(res);
+			res.status.should.equal(200);
+ 			//res.body.should.have.property('fName');
+ 			//res.body.fName.should.be.equal('Full');
+ 			//done();
+ 			user1
+ 			.get('http://localhost:3001/candidate/getStatus')
+ 			.send({candidateID: candidate1._id})
+ 			.end(function(err,res1) {
+ 				if (err) throw err;
+
+
+
+			 			//console.log(res1.body);
+			 			if (err) throw err;
+			 			res1.status.should.equal(200);
+			 			res1.body.should.have.property('status');
+			 			res1.body.status.should.be.equal('accepted');
+			 			done();
+			 		});
+ 		});
+
+ });
+ it("should be able to add(set) candidate event", function(done) {
+ 	user1
+ 	.get('http://localhost:3001/candidate/setEvent')
+ 	.send({candidateID: candidate1._id,newEvent:{eventsID: event3._id, accepted: true}})
+ 	.end(function(err,res) {
+ 		if (err) throw err;
+ 		//console.log(res.body.message);
+ 		res.status.should.equal(200);
+ 			//res.body.should.have.property('fName');
+ 			//res.body.fName.should.be.equal('Full');
+ 			//done();
+ 			user1
+ 			candidate1.save(function(err) {
+ 				user1
+ 				.get('http://localhost:3001/candidate/getEvents')
+ 				.send({candidateID: candidate1._id})
+ 				.end(function(err,res) {
+ 					if (err) throw err;
+ 					res.status.should.equal(200);
+ 					res.body.should.have.property('events');
+ 				/*	console.log(res.body.events);
+ 					console.log(event1._id);
+ 					console.log(event2._id);
+ 					console.log(event3._id);
+ 					*/
+ 					(res.body.events[0].eventsID.toString()).should.be.equal(event1._id.toString());
+ 					(res.body.events[0].accepted.toString()).should.be.equal('false');
+ 					(res.body.events[1].eventsID.toString()).should.be.equal(event2._id.toString());
+ 					(res.body.events[1].accepted.toString()).should.be.equal('false');
+ 					(res.body.events[2].eventsID.toString()).should.be.equal(event3._id.toString());
+ 					(res.body.events[2].accepted.toString()).should.be.equal('true');
+ 					done();
+ 				});
+ 			});
+
+ 		});
 });
+it("should be able to set candidate event accepted field", function(done) {
+ 	user1
+ 	.get('http://localhost:3001/candidate/setEvent')
+ 	//.send({candidateID: candidate1._id,oldEventStatus:{eventsID: event2._id, accepted: false},newEventStatus:{eventsID: event2._id, accepted: true}})
+ 	.send({candidateID: candidate1._id,eventsID: event2._id, accepted: true})
+ 	.end(function(err,res) {
+ 		if (err) throw err;
+ 		//console.log(res.body.message);
+ 		res.status.should.equal(200);
+ 			//res.body.should.have.property('fName');
+ 			//res.body.fName.should.be.equal('Full');
+ 			//done();
+ 			user1
+ 			candidate1.save(function(err) {
+ 				user1
+ 				.get('http://localhost:3001/candidate/getEvents')
+ 				.send({candidateID: candidate1._id})
+ 				.end(function(err,res) {
+ 					if (err) throw err;
+ 					res.status.should.equal(200);
+ 					res.body.should.have.property('events');
+ 					console.log(res.body.events);
+ 					/*console.log(event1._id);
+ 					console.log(event2._id);
+ 					console.log(event3._id);
+ 					*/
+ 					(res.body.events[0].eventsID.toString()).should.be.equal(event1._id.toString());
+ 					(res.body.events[0].accepted.toString()).should.be.equal('false');
+ 					(res.body.events[1].eventsID.toString()).should.be.equal(event2._id.toString());
+ 					(res.body.events[1].accepted.toString()).should.be.equal('true');
+ 					(res.body.events[2].eventsID.toString()).should.be.equal(event3._id.toString());
+ 					(res.body.events[2].accepted.toString()).should.be.equal('true');
+ 					done();
+ 				});
+ 			});
 
+ 		});
+});
  after(function(done) {
  	candidate1.remove();
  	user.remove();
  	event1.remove();
  	event2.remove();
+ 	event3.remove();
  	done();
  });
 }); 

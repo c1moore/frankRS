@@ -18,6 +18,11 @@ app.route('/candidate/getAccept_Key').get(dan_candidate_routes.getAccept_Key);
 app.route('/candidate/getNote').get(dan_candidate_routes.getNote);
 
 app.route('/candidate/setfName').get(dan_candidate_routes.setfName);
+app.route('/candidate/setlName').get(dan_candidate_routes.setlName);
+app.route('/candidate/setEmail').get(dan_candidate_routes.setEmail);
+app.route('/candidate/setStatus').get(dan_candidate_routes.setStatus);
+app.route('/candidate/setEvent').get(dan_candidate_routes.setEvent);
+
 
 //Finish by binding//app.param('candidateId',candidate.candidateByID);
 
