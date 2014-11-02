@@ -1,30 +1,8 @@
-<table class="table table-bordered leaderboard">
-	<colgroup>
-		<col span="1" class="rankCol">
-	</colgroup>
-
-	<thead>
-		<tr>
-			<th ng-click="setOrder('rank')">
-				Rank
-				<span ng-show="orderPredicate=='+rank'" class="glyphicon glyphicon-chevron-up"></span>
-				<span ng-show="orderPredicate=='-rank'" class="glyphicon glyphicon-chevron-down"></span>
-			</th>
-			<th ng-click="setOrder('displayName')">
-				Name
-				<span ng-show="orderPredicate=='+displayName'" class="glyphicon glyphicon-chevron-up"></span>
-				<span ng-show="orderPredicate=='-displayName'" class="glyphicon glyphicon-chevron-down"></span>
-			</th>
-			<th>
-				Invited/Attending
-			</th>
-		</tr>
-	</thead>
-
-	<tr ng-repeat="user in leaderboardData.users | orderBy:orderPredicate | offset:(currentPage-1)*limitVal | limitTo:limitVal">
-		<td>{{user.rank}}</td>
-		<td>{{user.displayName}}</td>
-		<td>
+<table ng-table="tableParams" class="table table-bordered leaderboard">
+	<tr ng-repeat="user in $data">
+		<td data-title="'Rank'">{{user.rank}}</td>
+		<td data-title="'Name'">{{user.displayName}}</td>
+		<td data-title="'Attending/Invited Count'">
 			<progress>
 				<bar class="attendingBar" value="user.attendeeList.length">
 					<span style="color:black; white-space:nowrap;">{{user.attendeeList.length}}</span>
@@ -36,5 +14,3 @@
 		</td>
 	</tr>
 </table>
-
-<pagination total-items="leaderboardData.users.length" items-per-page="limitVal" ng-model="currentPage"></pagination>
