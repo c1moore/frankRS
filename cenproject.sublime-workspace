@@ -1,0 +1,338 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"res",
+				"responseBody"
+			],
+			[
+				"route",
+				"route"
+			],
+			[
+				"date",
+				"date_handler"
+			],
+			[
+				"star",
+				"startTime"
+			],
+			[
+				"bod",
+				"bodyParser"
+			],
+			[
+				"li",
+				"library"
+			],
+			[
+				"port",
+				"port"
+			],
+			[
+				"fun",
+				"fun	Function"
+			],
+			[
+				"ti",
+				"time"
+			],
+			[
+				"req",
+				"require"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "public/modules/core/views/home.client.view.html",
+			"settings":
+			{
+				"buffer_size": 1673,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "app/models/user.server.model.js",
+			"settings":
+			{
+				"buffer_size": 4610,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+			[
+				"git b",
+				"Git: Change Branch"
+			],
+			[
+				"git checkout",
+				"Git: Checkout Current File"
+			],
+			[
+				"git pull",
+				"Git: Pull"
+			],
+			[
+				"git push",
+				"Git: Push"
+			],
+			[
+				"git pu",
+				"Git: Pull"
+			],
+			[
+				"git chec",
+				"Git: Change Branch"
+			],
+			[
+				"git che",
+				"Git: Checkout Current File"
+			],
+			[
+				"git config ",
+				"Git: Open Config File"
+			],
+			[
+				"git q",
+				"Git: Quick Commit"
+			],
+			[
+				"git commit",
+				"Git: Commit"
+			],
+			[
+				"git Add ",
+				"Git: Add..."
+			],
+			[
+				"add",
+				"Git: Add Current File"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 575.0
+	},
+	"console":
+	{
+		"height": 146.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/dalton/Programming/cen3031project/.git/config",
+		"/home/dalton/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings",
+		"/home/dalton/.config/sublime-text-2/Packages/User/Preferences.sublime-settings",
+		"/home/dalton/Downloads/Ex_Files_UaR_SublimeTxt_2/Exercise Files/roux_website/_scripts/SpryTabbedPanels.js",
+		"/home/dalton/Downloads/Ex_Files_UaR_SublimeTxt_2/Exercise Files/roux_website/index.htm",
+		"/home/dalton/Programming/python-RTS-Analyzer/ScheduleGenerator.py",
+		"/home/dalton/Programming/rts-scraper/route20schedule.json",
+		"/home/dalton/Programming/rts-scraper/route20schedule-readable.json",
+		"/home/dalton/Programming/rts-scraper/route20schedule",
+		"/home/dalton/Programming/rts-scraper/package.json",
+		"/home/dalton/Programming/rts-scraper/app/models/bus.js",
+		"/home/dalton/Programming/rts-scraper/public/index.html",
+		"/home/dalton/Programming/rts-scraper/config/db.js",
+		"/home/dalton/Programming/rts-scraper/server.js",
+		"/home/dalton/Programming/rts-scraper/app/routes.js",
+		"/home/dalton/Programming/rts-scraper/app/config/db.js",
+		"/home/dalton/Programming/rts-scraper/output.json",
+		"/home/dalton/Programming/rts-scraper/scraper.js",
+		"/home/dalton/Programming/rts-scraper/bus.js",
+		"/home/dalton/Programming/rts-scraper/bot.js"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"class",
+			"panel",
+			") ",
+			"response",
+			".minute",
+			"));\n",
+			"stop",
+			"minute",
+			"hour",
+			"stop",
+			"firstbus"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"['minute']",
+			"routeStops[i]",
+			"\"minute\"",
+			"\"hour\"",
+			"\"stop\"",
+			"data"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "public/modules/core/views/home.client.view.html",
+					"settings":
+					{
+						"buffer_size": 1673,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								561,
+								561
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "app/models/user.server.model.js",
+					"settings":
+					{
+						"buffer_size": 4610,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 34.0
+	},
+	"input":
+	{
+		"height": 33.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 112.0
+	},
+	"output.git":
+	{
+		"height": 212.0
+	},
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 270.0,
+	"status_bar_visible": true
+}
