@@ -453,7 +453,6 @@ describe('Express.js User Route Unit Tests:', function() {
 				.send({'event_id' : event1._id})
 				.end(function(err, res) {
 					should.not.exist(err);
-					console.log(res.body);
 					res.status.should.equal(200);
 					res.body.length.should.equal(2);
 					(res.body[0].attendeeList.length + res.body[1].attendeeList.length).should.equal(3);
