@@ -59,7 +59,7 @@
 			event1.save(function() {
 				event2.save(function() {
 					event3.save(function(err){
-						console.log(err);
+					//	console.log(err);
 						user = new User({
 							fName: 'Test',
 							lName: 'ing',
@@ -395,6 +395,33 @@
 				});
 			});
 	});
+
+ it("should be able to set the candidate status", function(done) {
+	user1
+	.get('http://localhost:3001/candidate/setNote')
+	.send({candidateID: candidate1._id,newNote:'I have changed the candidate note'})
+	.end(function(err,res) {
+		if (err) throw err;
+			res.status.should.equal(200);
+			
+			user1
+			.get('http://localhost:3001/candidate/getNote')
+			.send({candidateID: candidate1._id})
+			.end(function(err,res1) {
+				if (err) throw err;
+
+
+
+						//console.log(res1.body);
+						if (err) throw err;
+						res1.status.should.equal(200);
+						res1.body.should.have.property('note');
+						res1.body.note.should.be.equal('I have changed the candidate note');
+						done();
+					});
+		});
+
+ });
 
  after(function(done) {
 	candidate1.remove();

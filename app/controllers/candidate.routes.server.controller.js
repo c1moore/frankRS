@@ -372,3 +372,34 @@ exports.setEventStatus = function(req,res){
 	} else
 		return res.status(401).send('User not Authorized');
 };
+exports.setNote = function(req,res){
+ 	if(!req.isAuthenticated())
+ 		return res.status(401).send("User is not logged in");
+ 	if (req.hasAuthorization(req.user, ["admin"])){
+ 		var candidateID=req.body.candidateID;
+ 		var query = Candidate.findOne({_id:candidateID });
+ 		query.exec(function(err,result){
+ 			if(err){
+ 				res.status(400).send(err);
+ 			}
+ 			else if(!result){
+ 				res.status(400).json("No candidate found!");
+ 			}
+ 			else{
+ 				result.note = req.body.newNote;
+
+ 				result.save(function(err, result) {
+ 					if(err) {
+ 						res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
+ 					} else {
+ 						return res.status(200).send(result);
+ 					}
+
+ 				});
+ 			}
+ 		});
+ 	}
+ 	else
+ 		return res.status(401).send('User not Authorized');
+
+ };
