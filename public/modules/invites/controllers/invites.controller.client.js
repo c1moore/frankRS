@@ -22,5 +22,5 @@ angular.module('inviteApp', ['ngAnimate'])
           {name:'James', email:'james@gmail.com'},
           {name:'James', email:'james@gmail.com'}];
         $scope.inviteLimit = 5;
-        $scope.livepreview = false;
+        $scope.livepreview = true;
       }]);
