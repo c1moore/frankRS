@@ -37,16 +37,16 @@ describe('Express.js Event Route Integration Tests:', function() {
 	before(function(done) {
 		event1 = new Event({
 			name:  'testing123',
- 			start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
- 			end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+ 			start_date: new Date(2140,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
+ 			end_date:  new Date(2150,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
  			location: 'UF',
  			schedule: 'www.google.com'
  		});
 
  		event2 = new Event({
  			name:  'testing123',
- 			start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
- 			end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+ 			start_date: new Date(2140,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
+ 			end_date:  new Date(2150,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
  			location: 'UF2',
  			schedule: 'www.google.com'
  		});
@@ -443,10 +443,393 @@ describe('Express.js Event Route Integration Tests:', function() {
  				done();
  			});
  	});
+
+	//Post tests
 	
+	it("should be able to set the name if admin", function(done) {
+		agentAdmin
+			.post('http://localhost:3001/events/setName')
+			.send({eventID: event2._id, name:"ItsANewNameDog"})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(200);
+				agentAdmin
+					.get('http://localhost:3001/events/getName')
+					.send({eventID: event2._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						res.status.should.be.equal(200);
+						res.body.should.have.property('name');
+						res.body.name.should.be.equal("ItsANewNameDog");
+						done();
+					});
+			});
+	});
+
+	it("should not be able to set invalid name if admin", function(done) {
+		agentAdmin
+			.post('http://localhost:3001/events/setName')
+			.send({eventID: event2._id, name:""})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(400);
+				agentAdmin
+					.get('http://localhost:3001/events/getName')
+					.send({eventID: event2._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						res.status.should.be.equal(200);
+						res.body.should.have.property('name');
+						res.body.name.should.be.equal("ItsANewNameDog");
+						done();
+					});
+			});
+	});
+
+	it("should not be able to set name if user", function(done) {
+		agent
+			.post('http://localhost:3001/events/setName')
+			.send({eventID: event1._id, name:"UserName"})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(401);
+				agentAdmin
+					.get('http://localhost:3001/events/getName')
+					.send({eventID: event1._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						res.status.should.be.equal(200);
+						res.body.should.have.property('name');
+						res.body.name.should.be.equal("testing123");
+						done();
+					});
+			});
+	});
+
+	it("should not be able to set invalid start_date if admin", function(done) {
+		agentAdmin
+			.post('http://localhost:3001/events/setStartDate')
+			.send({eventID: event2._id, start_date:new Date(2004,11,30,10,0,0).getTime()})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(400);
+				agentAdmin
+					.get('http://localhost:3001/events/getStartDate')
+					.send({eventID: event2._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						res.status.should.be.equal(200);
+						res.body.should.have.property('start_date');
+						res.body.start_date.should.be.equal(
+							new Date(2140,11,30,10,0,0).getTime());
+						done();
+					});
+			});
+	});
+
+	it("should be able to set start_date if admin", function(done) {
+		agentAdmin
+			.post('http://localhost:3001/events/setStartDate')
+			.send({eventID: event2._id, start_date:new Date(2145,11,30,10,0,0).getTime()})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(200);
+				agentAdmin
+					.get('http://localhost:3001/events/getStartDate')
+					.send({eventID: event2._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						res.status.should.be.equal(200);
+						res.body.should.have.property('start_date');
+						res.body.start_date.should.be.equal(
+							new Date(2145,11,30,10,0,0).getTime());
+						done();
+					});
+			});
+	});
+
+	it("should not be able to set start_date if user", function(done) {
+		agent
+			.post('http://localhost:3001/events/setStartDate')
+			.send({eventID: event1._id, start_date:new Date(2146,11,30,10,0,0).getTime()})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(401);
+				agentAdmin
+					.get('http://localhost:3001/events/getStartDate')
+					.send({eventID: event1._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						res.status.should.be.equal(200);
+						res.body.should.have.property('start_date');
+						res.body.start_date.should.be.equal(
+							new Date(2140,11,30,10,0,0).getTime());
+						done();
+					});
+			});
+	});
+
+	it("should be able to set end_date if admin", function(done) {
+		agentAdmin
+			.post('http://localhost:3001/events/setEndDate')
+			.send({eventID: event2._id, end_date:new Date(2155,11,30,10,0,0).getTime()})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(200);
+				agentAdmin
+					.get('http://localhost:3001/events/getEndDate')
+					.send({eventID: event2._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						res.status.should.be.equal(200);
+						res.body.should.have.property('end_date');
+						res.body.end_date.should.be.equal(
+							new Date(2155,11,30,10,0,0).getTime());
+						done();
+					});
+			});
+	});
+
+	it("should not be able to set invalid end_date if admin", function(done) {
+		agentAdmin
+			.post('http://localhost:3001/events/setEndDate')
+			.send({eventID: event2._id, end_date:new Date(2105,11,30,10,0,0).getTime()})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(400);
+				agentAdmin
+					.get('http://localhost:3001/events/getEndDate')
+					.send({eventID: event2._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						res.status.should.be.equal(200);
+						res.body.should.have.property('end_date');
+						res.body.end_date.should.be.equal(
+							new Date(2155,11,30,10,0,0).getTime());
+						done();
+					});
+			});
+	});
+
+	it("should not be able to set end_date if user", function(done) {
+		agent
+			.post('http://localhost:3001/events/setEndDate')
+			.send({eventID: event1._id, end_date:new Date(2146,11,30,10,0,0).getTime()})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(401);
+				agent
+					.get('http://localhost:3001/events/getEndDate')
+					.send({eventID: event1._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						res.status.should.be.equal(200);
+						res.body.should.have.property('end_date');
+						res.body.end_date.should.be.equal(
+							new Date(2150,11,30,10,0,0).getTime());
+						done();
+					});
+			});
+	});
+
+
+	it("should be able to set location if admin", function(done) {
+		agentAdmin
+			.post('http://localhost:3001/events/setLocation')
+			.send({eventID: event2._id, location:"Rainbow2"})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(200);
+				agentAdmin
+					.get('http://localhost:3001/events/getLocation')
+					.send({eventID: event2._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						res.status.should.be.equal(200);
+						res.body.should.have.property('location');
+						res.body.location.should.be.equal(
+							"Rainbow2");
+						done();
+					});
+			});
+	});
+
+	it("should not be able to set invalid location if admin", function(done) {
+		agentAdmin
+			.post('http://localhost:3001/events/setLocation')
+			.send({eventID: event2._id, location:""})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(400);
+				agentAdmin
+					.get('http://localhost:3001/events/getLocation')
+					.send({eventID: event2._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						res.status.should.be.equal(200);
+						res.body.should.have.property('location');
+						res.body.location.should.be.equal(
+							"Rainbow2");
+						done();
+					});
+			});
+	});
+
+	it("should not be able to set location if user", function(done) {
+		agent
+			.post('http://localhost:3001/events/setLocation')
+			.send({eventID: event1._id, location:"UserLocation"})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(401);
+				agent
+					.get('http://localhost:3001/events/getLocation')
+					.send({eventID: event1._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						res.status.should.be.equal(200);
+						res.body.should.have.property('location');
+						res.body.location.should.be.equal(
+							"UF");
+						done();
+					});
+			});
+	});
+
+	it("should be able to set schedule if admin", function(done) {
+		agentAdmin
+			.post('http://localhost:3001/events/setSchedule')
+			.send({eventID: event2._id, schedule:"BoBoBo"})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(200);
+				agentAdmin
+					.get('http://localhost:3001/events/getSchedule')
+					.send({eventID: event2._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						res.status.should.be.equal(200);
+						res.body.should.have.property('schedule');
+						res.body.schedule.should.be.equal(
+							"BoBoBo");
+						done();
+					});
+			});
+	});
+
+	it("should be able to set schedule to empty string if admin", function(done) {
+		agentAdmin
+			.post('http://localhost:3001/events/setSchedule')
+			.send({eventID: event2._id, schedule:""})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(200);
+				agentAdmin
+					.get('http://localhost:3001/events/getSchedule')
+					.send({eventID: event2._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						res.status.should.be.equal(200);
+						res.body.should.have.property('schedule');
+						res.body.schedule.should.be.equal(
+							"");
+						done();
+					});
+			});
+	});
+
+	it("should not be able to set schedule if user for event I don't know about", function(done) {
+		agent
+			.post('http://localhost:3001/events/setSchedule')
+			.send({eventID: event2._id, schedule:"UserSchedule"})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(401);
+				agentAdmin
+					.get('http://localhost:3001/events/getSchedule')
+					.send({eventID: event2._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						res.status.should.be.equal(200);
+						res.body.should.have.property('schedule');
+						res.body.schedule.should.be.equal(
+							"");
+						done();
+					});
+			});
+	});
+
+	it("should not be able to set schedule if user in general", function(done) {
+		agent
+			.post('http://localhost:3001/events/setSchedule')
+			.send({eventID: event1._id, schedule:"UserSchedule"})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(401);
+				agent
+					.get('http://localhost:3001/events/getSchedule')
+					.send({eventID: event1._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						res.status.should.be.equal(200);
+						res.body.should.have.property('schedule');
+						res.body.schedule.should.be.equal(
+							"www.google.com");
+						done();
+					});
+			});
+	});
+
+	it("should be able to update the event object if admin", function(done) {
+		event2.name = "ReallyNewName";
+		agentAdmin
+			.post('http://localhost:3001/events/setEventObj')
+			.send({eventID: event2._id, event:event2})
+			.end(function(err,res) {
+				if (err) throw err;
+				console.log(res.body);
+				res.status.should.be.equal(200);
+				agentAdmin
+					.get('http://localhost:3001/events/getName')
+					.send({eventID: event2._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						res.status.should.be.equal(200);
+						res.body.should.have.property('name');
+						res.body.name.should.be.equal(
+							"ReallyNewName");
+						Event.findOne({'_id' : event2._id}, function(err, result) {
+							res.body.name.should.be.equal(result.name);
+							done();	
+						})
+					});
+			});
+	});
+
+	it("should not be able to update the event object if user", function(done) {
+		event1.name = "ReallyNewName2";
+		agent
+			.post('http://localhost:3001/events/setEventObj')
+			.send({eventID: event1._id, event:event1})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(401);
+				agent
+					.get('http://localhost:3001/events/getName')
+					.send({eventID: event1._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						res.status.should.be.equal(200);
+						res.body.should.have.property('name');
+						res.body.name.should.be.equal(
+							"testing123");
+						done();
+					});
+			});
+	});
 
 	after(function(done) {
-		event1.remove();
+		event1.remove()
 		event2.remove();
 		user.remove();
 		userAdmin.remove();
