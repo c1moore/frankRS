@@ -396,7 +396,7 @@
 			});
 	});
 
- it("should be able to set the candidate status", function(done) {
+ it("should be able to set the candidate's note", function(done) {
 	user1
 	.get('http://localhost:3001/candidate/setNote')
 	.send({candidateID: candidate1._id,newNote:'I have changed the candidate note'})
