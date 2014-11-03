@@ -108,7 +108,7 @@ describe('Express.js User Route Unit Tests:', function() {
 							lName : 'Name',
 							displayName : 'Name, Example',
 							email : 'example.name@example.com',
-							roles : ['attendee'],
+							roles : ['attendee', 'recruiter'],
 							status : [{'event_id':event1._id, 'attending':true, 'recruiter':true}],
 							attendeeList : [{'user_id' : user2._id, 'event_id' : event1._id}],
 							password : 'password',
@@ -178,10 +178,18 @@ describe('Express.js User Route Unit Tests:', function() {
 				.end(function(err, res) {
 	         		should.not.exist(err);
 	          		res.status.should.equal(200);
-	          		res.body[0].attendeeList.length.should.equal(2);
-	          		res.body[0].inviteeList.length.should.equal(1);
-	          		res.body[0].place.should.equal(1);
-	          		var testemail = res.body[0].attendeeList[0].user_id.email;
+	          		res.body.length.should.equal(2);
+
+	          		var i;
+	          		for(i=0; i<res.body.length; i++) {
+	          			if(res.body[i]._id.toString() === user._id.toString())
+	          				break;
+	          		}
+
+	          		res.body[i].attendeeList.length.should.equal(2);
+	          		res.body[i].inviteeList.length.should.equal(1);
+	          		res.body[i].place.should.equal(1);
+	          		var testemail = res.body[i].attendeeList[0].user_id.email;
 	          		(testemail === 'calvin@example.com' || testemail === 'example.name@example.com').should.be.true;
 					done();
 				});
@@ -447,9 +455,12 @@ describe('Express.js User Route Unit Tests:', function() {
 					should.not.exist(err);
 					console.log(res.body);
 					res.status.should.equal(200);
-					res.body.length.should.equal(3);
+					res.body.length.should.equal(2);
+					(res.body[0].attendeeList.length + res.body[1].attendeeList.length).should.equal(3);
 					for(var i=0; i<res.body.length; i++) {
-						res.body[i].event_id.toString().should.equal(event1._id.toString());
+						for(var j=0; j<res.body[i].attendeeList.length; j++) {
+							res.body[i].attendeeList[j].event_id.toString().should.equal(event1._id.toString());
+						}
 					}
 					done();
 				});

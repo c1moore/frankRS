@@ -25,7 +25,7 @@ var searchByEvent = function(eventID, arr) {
 	}
 
 	return temp;
-}
+};
 
 /*
 * Return the user's displayname (Last, First).
@@ -63,7 +63,7 @@ exports.getLeaderboard = function(req, res) {
 		var query = User.find({'roles' : 'recruiter', 'status.event_id' : req.body.event_id, 'status.recruiter' : true});
 		query.select('fName lName rank inviteeList attendeeList');
 		query.populate('inviteeList.user_id', 'displayName email');
-		query.populate('attendeeList.user_id', 'displayName email');0
+		query.populate('attendeeList.user_id', 'displayName email');
 		query.exec(function(err, result) {
 			if(err) {
 				res.status(400).send(err);
@@ -254,7 +254,14 @@ exports.getAttendees = function(req, res) {
 	if(!req.isAuthenticated()) {
 		res.status(401).send({'message' : 'User is not logged in.'});
 	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
-		var query = User.find({'role' : 'recruiter', 'status' : {'event_id' : req.body.event_id, 'recruiter' : true}});//'status.event_id' : req.body.event_id, 'status.recruiter' : true});
+		var query = User.find({'roles' : 'recruiter', 'status.event_id' : req.body.event_id, 'status.recruiter' : true});
+		/*query.elemMatch('status', function(elem) {
+			elem.where('event_id', req.body.event_id)
+			elem.where('recruiter', true);
+		});*/
+		/*query.$where(function() {
+
+		});*/
 		query.select('fName lName attendeeList');
 		query.populate('attendeeList.user_id', 'displayName organization');
 		query.exec(function(err, result) {
