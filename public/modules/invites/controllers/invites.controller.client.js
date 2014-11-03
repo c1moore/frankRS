@@ -1,7 +1,7 @@
 'use strict'; // :)
 
-angular.module('inviteApp', ['ngAnimate'])
-      .controller('inviteController', ['$scope', function($scope) {
+angular.module('invites').controller('invitesCtrl', ['$scope', 
+  function($scope) {
         $scope.friends = [{name:'Dom',email:'dom@hotmail.com'},
           {name:'Dan', email:'dan@gmail.com'},
           {name:'Dalton', email:'dalton@gmail.com'},
@@ -23,4 +23,4 @@ angular.module('inviteApp', ['ngAnimate'])
           {name:'James', email:'james@gmail.com'}];
         $scope.inviteLimit = 5;
         $scope.livepreview = false;
-      }]);
+  }]);
