@@ -1,0 +1,20 @@
+<table ng-table="mainTableParams" show-filter="true" class="table table-bordered leaderboard">
+	<tr ng-repeat="user in $data">
+		<td data-title="'Rank'" sortable="'rank'">
+			{{user.rank}}
+		</td>
+		<td data-title="'Name'" sortable="'displayName'" filter="{'displayName':'text'}">
+			{{user.displayName}}
+		</td>
+		<td data-title="'Attending/Invited Count'">
+			<progress>
+				<bar class="attendingBar" value="user.attendeeList.length">
+					<span style="color:black; white-space:nowrap;">{{user.attendeeList.length}}</span>
+				</bar>
+				<bar class="invitedBar" value="user.inviteeList.length" type="success">
+					<span style="color:black; white-space:nowrap;">{{user.inviteeList.length}}</span>
+				</bar>
+			</progress>
+		</td>
+	</tr>
+</table>
