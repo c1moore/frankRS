@@ -186,3 +186,211 @@ exports.getName = function(req, res) {
 		else res.status(200).json({name: theResult.name});
 	});
 };
+
+//Setter routes
+
+exports.setStartDate = function(req, res) {
+	if (!req.isAuthenticated()) { //Check authorization
+		res.status(401).json({message: "You are not logged in"});
+		return;
+	//Must have permission to make requests on this ID
+	} else if (!req.hasAuthorization(req.user,["admin"])) {
+		res.status(401).json({message: "Access denied"});
+		return;
+	}
+	//Retrieve the requested field
+	var id = req.session.id;
+	var eventID = req.body.eventID;
+	var new_start_date = req.body.start_date;
+	var query = Event.findOne({_id: eventID});
+	var theResult;
+	query.exec(function(err,result) {
+		theResult = result;
+		if (err) res.status(400).send(err);
+		else if (!theResult) res.status(400).json({message: "No event object with that ID"});
+		else {
+			result.start_date = new_start_date;
+			result.save(function(err) {
+				if (err) {
+					res.status(400).send(err);
+					return;
+				}
+				res.status(200).send();
+			});
+		}
+	});
+};
+
+exports.setEndDate = function(req, res) {
+	if (!req.isAuthenticated()) { //Must be logged in
+		res.status(401).json({message: "You are not logged in"});
+		return;
+	//Must have permission to make requests on this ID
+	} else if (!req.hasAuthorization(req.user,["admin"])) {
+		res.status(401).json({message: "Access denied"});
+		return;
+	}
+	var id = req.session.id;
+	var eventID = req.body.eventID;
+	var new_end_date = req.body.end_date;
+	var query = Event.findOne({_id: eventID});
+	var theResult;
+	query.exec(function(err,result) {
+		theResult = result;
+		if (err) res.status(400).send(err);
+		else if (!theResult) res.status(400).json({message: "No event object with that ID"});
+		else {
+			result.end_date = new_end_date;
+			result.save(function(err) {
+				if (err) {
+					res.status(400).send(err);
+					return;
+				}
+				res.status(200).send();
+			});
+		}
+	});
+};
+
+exports.setLocation = function(req, res) {
+	if (!req.isAuthenticated()) { //Must be logged in
+		res.status(401).json({message: "You are not logged in"});
+		return;
+	//Must have permission to make requests on this ID
+	} else if (!req.hasAuthorization(req.user,["admin"])) {
+		res.status(401).json({message: "Access denied"});
+		return;
+	}
+	var id = req.user._id;
+	var eventID = req.body.eventID;
+	var new_location = req.body.location;
+	var query = Event.findOne({_id: eventID});
+	var theResult;
+	query.exec(function(err,result) {
+		theResult = result;
+		if (err) res.status(400).send(err);
+		else if (!theResult) res.status(400).json({message: "No event object with that ID"});
+		else {
+			result.location = new_location;
+			result.save(function(err) {
+				if (err) {
+					res.status(400).send(err);
+					return;
+				}
+				res.status(200).send();
+			});
+		}
+	});
+};
+
+exports.setEventObj = function(req, res) {
+	if (!req.isAuthenticated()) { //Must be logged in
+		res.status(401).json({message: "You are not logged in"});
+		return;
+	//Must have permission to make requests on this ID
+	} else if (!req.hasAuthorization(req.user,["admin"])) {
+		res.status(401).json({message: "Access denied"});
+		return;
+	}
+	var id = req.session.id;
+	var eventID = req.body.eventID;
+	var new_event = req.body.event;
+	if (new_event==undefined) {
+		res.status(400).json({message: "No event provided"});
+		return;
+	} else if (typeof(new_event)!="object") {
+		res.status(400).json({message: "Unexpected type"});
+		return;
+	}
+	var query = Event.findOne({_id: eventID});
+	var theResult;
+	var validKeys = ["name","schedule","location","start_date","end_date"];
+	query.exec(function(err,result) {
+		theResult = result;
+		if (err) res.status(400).send(err);
+		else if (!theResult) res.status(400).json({message: "No such object!"});
+		else {
+			for (var i=0; i<validKeys.length; i++) {
+				result[validKeys[i]]=new_event[validKeys[i]];
+				//res.status(400).send(key);
+			}
+			/*for (var i = 0; i < 5; i++) {
+			result.name = new_event.name;
+			result.schedule = new_event.schedule;
+			result.start_date = new_event.start_date;
+			result.end_date = new_event.end_date;
+			result.location = new_event.location;
+			}*/
+			//res.status(400).json(new_event[]);
+			result.save(function(err) {
+				if (err) {
+					res.status(400).send(err);
+					return;
+				}
+				res.status(200).send();
+			});
+		}
+	});
+};
+
+exports.setSchedule = function(req, res) {
+	if (!req.isAuthenticated()) { //Must be logged in
+		res.status(401).json({message: "You are not logged in"});
+		return;
+	//Must have permission to make requests on this ID
+	} else if (!req.hasAuthorization(req.user,["admin"])) {
+		res.status(401).json({message: "Access denied"});
+		return;
+	}
+	var id = req.session.id;
+	var eventID = req.body.eventID;
+	var new_schedule = req.body.schedule;
+	var query = Event.findOne({_id: eventID});
+	var theResult;
+	query.exec(function(err,result) {
+		theResult = result;
+		if (err) res.status(400).send(err);
+		else if (!theResult) res.status(400).json({message: "No event object with that ID"});
+		else {
+			result.schedule = new_schedule;
+			result.save(function(err) {
+				if (err) {
+					res.status(400).send(err);
+					return;
+				}
+				res.status(200).send();
+			});
+		}
+	});
+};
+
+exports.setName = function(req, res) {
+	if (!req.isAuthenticated()) { //Must be logged in
+		res.status(401).json({message: "You are not logged in"});
+		return;
+	//Must have permission to make requests on this ID
+	} else if (!req.hasAuthorization(req.user,["admin"])) {
+		res.status(401).json({message: "Access denied"});
+		return;
+	}
+	var id = req.session.id;
+	var eventID = req.body.eventID;
+	var new_name = req.body.name;
+	var query = Event.findOne({_id: eventID});
+	var theResult;
+	query.exec(function(err,result) {
+		theResult = result;
+		if (err) res.status(400).send(err);
+		else if (!theResult) res.status(400).json({message: "No event object with that ID"});
+		else {
+			result.name = new_name;
+			result.save(function(err) {
+				if (err) {
+					res.status(400).send(err);
+					return;
+				}
+				res.status(200).send();
+			});
+		}
+	});
+};

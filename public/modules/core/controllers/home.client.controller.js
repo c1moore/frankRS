@@ -9,10 +9,10 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 		// Temporary data for buttons
 		$scope.data = {
 			buttons: [
-				{name:"Button 1", description:"Description 1"},
-				{name:"Button 2", description:"Description 2"},
-				{name:"Button 3", description:"Description 3"},
-				{name:"Button 4", description:"Description 4"}
+				{name:"leaderboard", description:"Description 1", link:'/#!/leaderboard'},
+				{name:"Button 2", description:"Description 2", link:'#'},
+				{name:"Button 3", description:"Description 3", link:'#'},
+				{name:"Button 4", description:"Description 4", link:'#'}
 			],
 			comments: ["Comment 1", "Comment 2"]
 		};
