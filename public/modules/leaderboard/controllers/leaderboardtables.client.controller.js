@@ -1,9 +1,16 @@
-angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Authentication', '$http', 'ngTableParams', '$filter', '$resource',
-	function($scope, Authentication, $http, ngTableParams, $filter, $resource) {
+angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Authentication', '$http', 'ngTableParams', '$filter', '$resource', '$location',
+	function($scope, Authentication, $http, ngTableParams, $filter, $resource, $location) {
+
+		$scope.authentication = Authentication;
+
+		//sends person to home page if not logged in
+		if($scope.authentication.user != true) {
+			$location.path('/');
+		}
 
 		var mainApi = $resource('/leaderboard/maintable');
 		var attendingApi = $resource('/modules/leaderboard/tests/MOCK_ATTENDEE_DATA.json')
-		var invitedApi = $resource('/modules/leaderboard/tests/MOCK_INVITED_DATA.json');
+		var invitedApi = $resource('/modules/leaderboard/tests/MOCK_INVITEE_DATA.json');
 		var testApi = $resource('/modules/leaderboard/tests/MOCK_DATA.json');
 
 		$scope.mainTableParams = new ngTableParams({
@@ -25,6 +32,9 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 	            	var orderedData = params.sorting() ? 
 	            		$filter('orderBy')(filteredData, params.orderBy()) : 
 	            		data;
+	           
+	            	var maxFilter = ($filter('orderBy')(data,'inviteeList.length'));
+	            	$scope.maxInvited = maxFilter[0].inviteeList.length;
 
 	            	params.total(orderedData.length); //set total recalculation for paganation
 	            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
@@ -77,6 +87,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 	            	var orderedData = params.sorting() ? 
 	            		$filter('orderBy')(filteredData, params.orderBy()) : 
 	            		data;
+
 
 	            	params.total(orderedData.length); //set total recalculation for paganation
 	            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
