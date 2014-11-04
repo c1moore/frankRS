@@ -787,7 +787,6 @@ describe('Express.js Event Route Integration Tests:', function() {
 			.send({eventID: event2._id, event:event2})
 			.end(function(err,res) {
 				if (err) throw err;
-				console.log(res.body);
 				res.status.should.be.equal(200);
 				agentAdmin
 					.get('http://localhost:3001/events/getName')
