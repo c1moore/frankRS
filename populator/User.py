@@ -13,7 +13,7 @@ ROLES = ['admin', 'recruiter', 'attendee']
 def makeTemplates(min,max):
   result = []
   for i in range(0,random.randint(min,max)):
-    result.append({'name':randomString(2,12),'template':randomString(0,500)})
+    result.append({'name':randomString(2,12,' '),'template':randomString(0,500,' ')})
   return result
 
 class User:
@@ -24,7 +24,7 @@ class User:
   def randomize(self):
     self.fName = randomString(2,16).capitalize()
     self.lName = randomString(2,16).capitalize()
-    self.displayName = randomString(2,16)
+    self.displayName = randomString(2,16,' ')
     self.email = (randomString(4,35).lower()+'@'+randomString(4,35)+
 			random.choice(WEBS))
     self.password = ""

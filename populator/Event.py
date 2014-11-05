@@ -13,9 +13,9 @@ class Event:
     pass
 
   def randomize(self):
-    self.name = randomString(3,20)
+    self.name = randomString(3,20,' ')
     self.schedule = 'www.' + randomString(6,12) + random.choice(WEBS)
-    self.location = randomString(2,10)
+    self.location = randomString(2,10,' ')
     self.start_date = randomTimeInMS()
     self.end_date = randomTimeInMS(self.start_date)
 

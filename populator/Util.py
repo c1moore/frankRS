@@ -10,12 +10,12 @@ TWENTY_YEARS = 631138519494
 THIRTY_YEARS = 946707779241
 MONGO_PATH = '/usr/bin/mongo'
 DATABASE = "frank-recruiter-system-dev"
-WEBS = ('.com','.org','.nz','.biz')
+WEBS = ('.com','.org','.nz','.biz','.gov','.cc')
 PymongoDB = None
 
-def randomString(min,max):
+def randomString(min,max,extras=""):
   return ''.join(random.choice(string.ascii_uppercase+string.ascii_lowercase+
-			string.digits+set(' ')) for _ in range(int(random.uniform(min,max))))
+			string.digits+set(extras)) for _ in range(random.randint(min,max)))
 
 def randomTimeInMS(mininum=TWENTY_YEARS):
   return random.randint(mininum,mininum+THIRTY_YEARS)
