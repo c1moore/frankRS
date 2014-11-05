@@ -18,7 +18,7 @@ def randomString(min,max):
 			string.digits+set(' ')) for _ in range(int(random.uniform(min,max))))
 
 def randomTimeInMS(mininum=TWENTY_YEARS):
-  return int(random.uniform(mininum,mininum+THIRTY_YEARS))
+  return random.randint(mininum,mininum+THIRTY_YEARS)
 
 def resetMongo():
   os.system('{} --eval "db.dropDatabase();" frank-recruiter-system-test'.format(MONGO_PATH))

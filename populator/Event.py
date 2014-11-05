@@ -2,7 +2,7 @@
 
 from Util import randomString
 from Util import randomTimeInMS
-from Util import DATABASE, WEBS
+from Util import WEBS
 from Util import getPymongoDB
 
 import inspect
