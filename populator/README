@@ -1,0 +1,5 @@
+To install depdendencies:
+
+sudo aptitude install python-pip build-essential python-dev
+sudo pip install pymongo
+

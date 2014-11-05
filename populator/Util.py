@@ -4,10 +4,18 @@ import random
 import string
 import os
 
+TWENTY_YEARS = 631138519494
+THIRTY_YEARS = 946707779241
+MONGO_PATH = '/usr/bin/mongo'
+DATABASE = "frank-recruiter-system-dev"
+
 def randomString(min,max):
   return ''.join(random.choice(string.ascii_uppercase+string.ascii_lowercase+
 			string.digits+set(' ')) for _ in range(int(random.uniform(min,max))))
 
+def randomTimeInMS(mininum=TWENTY_YEARS):
+  return int(random.uniform(mininum,mininum+THIRTY_YEARS))
+
 def resetMongo():
-  os.system('/usr/bin/mongo --eval "db.dropDatabase();" frank-recruiter-system-test')
-  os.system('/usr/bin/mongo --eval "db.dropDatabase();" frank-recruiter-system-dev')
+  os.system('{} --eval "db.dropDatabase();" frank-recruiter-system-test'.format(MONGO_PATH))
+  os.system('{} --eval "db.dropDatabase();" {}'.format(MONGO_PATH,DATABASE))
