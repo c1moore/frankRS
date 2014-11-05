@@ -53,7 +53,16 @@ class User:
     self.login_enabled = True
     self.templates = makeTemplates()
 
-  def #Add to status
+  def decide(self,eventID,attending,recruiting,recruiter=None):
+    statdict = {'event_id':eventID,'attending':attending,'recruiter':recruiting}
+    self.status.append(statdict)
+    if attending and recruiter:
+      attendeedict = {'user_id':self.id,'event_id':eventID}
+      recruiter.attendeeList.append(attendeedict)
+
+  def invite(self,userID,eventID):
+    inviteedict = {'user_id':userID,'event_id':eventID}
+    self.inviteeList.append(inviteedict)
 
   def valid(self):
     return True #Too lazy to write code to check all the attrs atm
