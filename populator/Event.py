@@ -6,6 +6,7 @@ from Util import WEBS
 from Util import getPymongoDB
 
 import inspect
+import time
 
 class Event:
 
@@ -16,7 +17,7 @@ class Event:
     self.name = randomString(3,20,' ')
     self.schedule = 'www.' + randomString(6,12) + random.choice(WEBS)
     self.location = randomString(2,10,' ')
-    self.start_date = randomTimeInMS()
+    self.start_date = randomTimeInMS()+time.time()*1000
     self.end_date = randomTimeInMS(self.start_date)
 
   def valid(self):
