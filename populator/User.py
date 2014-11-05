@@ -53,8 +53,10 @@ class User:
     self.login_enabled = True
     self.templates = makeTemplates()
 
+  def #Add to status
+
   def valid(self):
-    return True #Too lazy to write code to check all the attrs
+    return True #Too lazy to write code to check all the attrs atm
 
   def save(self):
     members = inspect.getMembers(self)
