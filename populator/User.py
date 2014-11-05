@@ -63,7 +63,7 @@ class User:
 		not inspect.ismodule(val) and not inspect.ismethod(val) and
 		not inspect.isbuiltin(val)]
     if not self.valid():
-      raise RuntimeError("Candidate: Object is not ready")
+      raise RuntimeError("User: Object is not ready")
     db = getPymongoDB()
     dic = dict()
     for name in names:
