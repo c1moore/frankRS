@@ -2,7 +2,7 @@
 
 from Util import randomString
 from Util import randomTimeInMS
-from Util import DATABASE
+from Util import DATABASE, WEBS
 from Util import getPymongoDB
 
 import inspect
@@ -14,7 +14,7 @@ class Event:
 
   def randomize(self):
     self.name = randomString(3,20)
-    self.schedule = 'www.' + randomString(6,12) + random.choice(['.com','.org','.nz','.biz'])
+    self.schedule = 'www.' + randomString(6,12) + random.choice(WEBS)
     self.location = randomString(2,10)
     self.start_date = randomTimeInMS()
     self.end_date = randomTimeInMS(self.start_date)

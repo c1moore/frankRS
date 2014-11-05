@@ -10,6 +10,7 @@ TWENTY_YEARS = 631138519494
 THIRTY_YEARS = 946707779241
 MONGO_PATH = '/usr/bin/mongo'
 DATABASE = "frank-recruiter-system-dev"
+WEBS = ('.com','.org','.nz','.biz')
 PymongoDB = None
 
 def randomString(min,max):
