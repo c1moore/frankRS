@@ -27,3 +27,13 @@
 	.background-image: none;
 	.background-color: #c54e92;
 }
+
+.ranktext {
+	font-size:20em;
+	margin-top:0px;
+}
+
+.ranktitle {
+	font-size:2em;
+	margin-bottom:0px;
+}

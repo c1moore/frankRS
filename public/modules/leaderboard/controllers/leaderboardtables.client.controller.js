@@ -4,9 +4,11 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		$scope.authentication = Authentication;
 
 		//sends person to home page if not logged in
+		/*
 		if($scope.authentication.user != true) {
 			$location.path('/');
 		}
+		*/
 
 		var mainApi = $resource('/leaderboard/maintable');
 		var attendingApi = $resource('/modules/leaderboard/tests/MOCK_ATTENDEE_DATA.json')
