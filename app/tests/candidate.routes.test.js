@@ -422,7 +422,35 @@
 		});
 
  });
+it("should be able to set a new candidate", function(done) {
+	user1
+	.get('http://localhost:3001/candidate/setCandidate')
+	.send({newfName: 'John',newlName: 'Smith',newEmail:'JohnS@test.com',newStatus:'volunteer',newEvent: event1._id,newAccept_Key:false,newNote:'I Volunteer as Tribute!'})
+	.end(function(err,res) {
+		if (err) throw err;
+			console.log(res.body);
+			res.status.should.equal(200);
+			//res.body.should.have.property('fName');
+			//res.body.fName.should.be.equal('Full');
+			//done();
+			/*user1
+			.get('http://localhost:3001/candidate/getStatus')
+			.send({candidateID: candidate1._id})
+			.end(function(err,res1) {
+				if (err) throw err;
 
+
+
+						//console.log(res1.body);
+						if (err) throw err;
+						res1.status.should.equal(200);
+						res1.body.should.have.property('status');
+						res1.body.status.should.be.equal('accepted');
+						done();
+					});*/
+		});
+
+ });
  after(function(done) {
 	candidate1.remove();
 	user.remove();
