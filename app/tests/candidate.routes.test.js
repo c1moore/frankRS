@@ -856,6 +856,7 @@ it("attendees should NOT be able to get the candidate first name", function(done
  	event1.remove();
  	event2.remove();
  	event3.remove();
+ 	event4.remove();
  	done();
  });
 }); 
