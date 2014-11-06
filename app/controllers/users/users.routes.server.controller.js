@@ -241,11 +241,6 @@ exports.getRecruiterAlmosts = function(req, res) {
 /*
 * Retrieve the list of all people who are signed up to attend the event.
 */
-/*This will need to be modified so that only the event specified by the recruiter will be searched.  This can be done
-easily by replacing 
-	User.find({'role':'recruiter'});
-with
-	User.find({'role':'recruiter', 'attendeeList.event_id' : specifiedevent});*/
 exports.getAttendees = function(req, res) {
 	if(req.body.event_id === undefined) {
 		res.status(400).send({'message' : 'Event not specified.'});
@@ -282,13 +277,17 @@ exports.getAttendees = function(req, res) {
 	}
 };
 
-//Retrieve the list of all people who are invited to attend the specified event.
-/*This will need to be modified so that only the event specified by the recruiter will be searched.  This can be done
-easily by replacing 
-	User.find({'role':'recruiter'});
-with
-	User.find({'role':'recruiter', 'inviteeList.event_id' : specifiedevent});*/
+/*
+* Retrieve the list of all people who are invited to attend the specified event.
+*/
 exports.getInvitees = function(req, res) {
+	if(req.body.event_id === undefined) {
+		res.status(400).send({'message' : 'Event not specified.'});
+		return;
+	}
+	if(!req.isAuthenticated()) {
+		res.status(401).send({'message' : 'User is not logged in.'});
+	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
 	var query = User.find({'role' : 'recruiter'});
 	query.select('inviteeList displayName');
 	query.populate('inviteeList.user_id', 'displayName');
