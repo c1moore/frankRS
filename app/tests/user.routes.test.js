@@ -111,6 +111,7 @@ describe('Express.js User Route Unit Tests:', function() {
 							roles : ['attendee', 'recruiter'],
 							status : [{'event_id':event1._id, 'attending':true, 'recruiter':true}],
 							attendeeList : [{'user_id' : user2._id, 'event_id' : event1._id}],
+							inviteeList : [{'user_id' : user3._id, 'event_id' : event1._id}, {'user_id' : user2._id, 'event_id' : event1._id}],
 							password : 'password',
 							login_enable : true
 						});
@@ -235,7 +236,7 @@ describe('Express.js User Route Unit Tests:', function() {
 	describe('Recruiter events routes:', function() {
 		it('should return an array of events for which the user is recruiting', function(done) {
 			useragent
-				.post('http://localhost:3001/recruiter/events')
+				.get('http://localhost:3001/recruiter/events')
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(200);
@@ -246,7 +247,7 @@ describe('Express.js User Route Unit Tests:', function() {
 
 		it('should return an error when the user is not a recruiter', function(done) {
 			useragent2
-				.post('http://localhost:3001/recruiter/events')
+				.get('http://localhost:3001/recruiter/events')
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(401);
@@ -258,7 +259,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		it('should return the proper error when the user is not logged in.', function(done) {
 			var useragent3 = agent.agent();
 			useragent3
-				.post('http://localhost:3001/recruiter/events')
+				.get('http://localhost:3001/recruiter/events')
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(401);
@@ -425,27 +426,6 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 	});
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	describe("Leaderboard attendeeList controllers:", function() {
 		it("should return the attendeeList for a specific event (for all recruiters).", function(done) {
 			useragent
@@ -492,6 +472,62 @@ describe('Express.js User Route Unit Tests:', function() {
 			var useragent3 = agent.agent();
 			useragent3
 				.post('http://localhost:3001/leaderboard/attendees')
+				.send({'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal('User is not logged in.');
+					done();
+				});
+		});
+	});
+
+	describe("Leaderboard inviteeList controllers:", function() {
+		it("should return the inviteeList for a specific event (for all recruiters).", function(done) {
+			useragent
+				.post('http://localhost:3001/leaderboard/invitees')
+				.send({'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(200);
+					res.body.length.should.equal(2);
+					(res.body[0].inviteeList.length + res.body[1].inviteeList.length).should.equal(3);
+					for(var i=0; i<res.body.length; i++) {
+						for(var j=0; j<res.body[i].inviteeList.length; j++) {
+							res.body[i].inviteeList[j].event_id.toString().should.equal(event1._id.toString());
+						}
+					}
+					done();
+				});
+		});
+
+		it("should return an error when the event_id is not specified.", function(done) {
+			useragent
+				.post('http://localhost:3001/leaderboard/invitees')
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(400);
+					res.body.message.should.equal("Event not specified.");
+					done();
+				});
+		});
+
+		it('should return the proper error when the user does not have the proper permissions.', function(done) {
+			useragent2
+				.post('http://localhost:3001/leaderboard/invitees')
+				.send({'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal('User does not have permission.');
+					done();
+				});
+		});
+
+		it('should return the proper error when the user is not logged in.', function(done) {
+			var useragent3 = agent.agent();
+			useragent3
+				.post('http://localhost:3001/leaderboard/invitees')
 				.send({'event_id' : event1._id})
 				.end(function(err, res) {
 					should.not.exist(err);
