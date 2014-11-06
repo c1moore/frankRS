@@ -212,7 +212,7 @@
  		.send({candidateID: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
- 			console.log(res.body);
+ 			//console.log(res.body);
  			res.status.should.equal(200);
  			res.body.should.have.property('events');
  			(res.body.events[0].eventsID.toString()).should.be.equal(event1._id.toString());
