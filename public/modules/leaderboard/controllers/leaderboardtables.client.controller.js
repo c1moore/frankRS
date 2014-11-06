@@ -24,7 +24,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		$http.get('/recruiter/events').success(function(data) {
 			$scope.events = data;
 		}).error(function(error, status) {
-			if(status === 400) {
+			if(status === 401) {
 				$scope.selectedEvent = "Error";
 				disabled = !disabled;
 			}
