@@ -1,31 +1,32 @@
 <section>
-	<div class="container">
-		<div class="dropdown">
-			<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
-				Select Event
-				<span class="caret"></span>
-			</button>
-			<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-				<li role="presentation"><a role="menuitem" tabindex="-1" href="#">frank</a></li>
-				<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Another action</a></li>
-				<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Something else here</a></li>
-			</ul>
+	<div class="rows">
+		<div class="col-md-9">
+			<div class="dropdown">
+				<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+					Select Event
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="#">frank</a></li>
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Another action</a></li>
+					<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Something else here</a></li>
+				</ul>
+			</div>
+
+			<tabset>
+				<tab heading="Score">
+					<ng-include src="'/modules/leaderboard/views/score.client.view.html'"></ng-include>
+				</tab>
+				<tab heading="Leaderboard" ng-controller="LeaderboardTablesCtrl">
+					<ng-include src="'/modules/leaderboard/views/maintable.client.view.html'"></ng-include>
+				</tab>
+				<tab heading="Attending" ng-controller="LeaderboardTablesCtrl">
+					<ng-include src="'/modules/leaderboard/views/attending.client.view.html'"></ng-include>
+				</tab>
+				<tab heading="Invited" ng-controller="LeaderboardTablesCtrl">
+					<ng-include src="'/modules/leaderboard/views/invited.client.view.html'"></ng-include>
+				</tab>
+			</tabset>
 		</div>
-
-		<tabset>
-			<tab heading="Score">
-				<ng-include src="'/modules/leaderboard/views/score.client.view.html'"></ng-include>
-			</tab>
-			<tab heading="Leaderboard" ng-controller="LeaderboardTablesCtrl">
-				<ng-include src="'/modules/leaderboard/views/maintable.client.view.html'"></ng-include>
-			</tab>
-			<tab heading="Attending" ng-controller="LeaderboardTablesCtrl">
-				<ng-include src="'/modules/leaderboard/views/attending.client.view.html'"></ng-include>
-			</tab>
-			<tab heading="Invited" ng-controller="LeaderboardTablesCtrl">
-				<ng-include src="'/modules/leaderboard/views/invited.client.view.html'"></ng-include>
-			</tab>
-		</tabset>
-
 	</div>
 </section>
