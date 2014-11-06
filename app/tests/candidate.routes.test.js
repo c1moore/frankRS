@@ -20,7 +20,7 @@
  /**
 	* Globals
 	*/
-	var candidate1, user, user1,attendee,attendee1,event1,event2,event3,newCandidate;
+	var candidate1, user, user1,attendee,attendee1,event1,event2,event3,event4,newCandidate;
 
 	function arraysEqual(array0,array1) {
 		if (array0.length !== array1.length) return false;
@@ -55,11 +55,18 @@
 					location: 'Orlando',
 					schedule: 'www.google.com'
 				});
-
+			event4 = new Event({
+				name:  'testing123',
+					start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
+					end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+					location: 'Tampa',
+					schedule: 'www.google.com'
+				});
 
 			event1.save(function() {
 				event2.save(function() {
 					event3.save(function(err){
+						event4.save(function(err){
 					//	console.log(err);
 					user = new User({
 						fName: 'Test',
@@ -112,6 +119,7 @@
 				});
 			});
 		});
+});
 
 	});
 
@@ -215,9 +223,9 @@
  			//console.log(res.body);
  			res.status.should.equal(200);
  			res.body.should.have.property('events');
- 			(res.body.events[0].eventsID.toString()).should.be.equal(event1._id.toString());
+ 			(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
  			(res.body.events[0].accepted.toString()).should.be.equal('false');
- 			(res.body.events[1].eventsID.toString()).should.be.equal(event2._id.toString());
+ 			(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
  			(res.body.events[1].accepted.toString()).should.be.equal('false');
  			done();
  		});
@@ -374,11 +382,11 @@
  			res.status.should.equal(200);
  			res.body.should.have.property('events');
 
- 			(res.body.events[0].eventsID.toString()).should.be.equal(event1._id.toString());
+ 			(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
  			(res.body.events[0].accepted.toString()).should.be.equal('false');
- 			(res.body.events[1].eventsID.toString()).should.be.equal(event2._id.toString());
+ 			(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
  			(res.body.events[1].accepted.toString()).should.be.equal('false');
- 			(res.body.events[2].eventsID.toString()).should.be.equal(event3._id.toString());
+ 			(res.body.events[2].eventsID.name.toString()).should.be.equal(event3.name);
  			(res.body.events[2].accepted.toString()).should.be.equal('true');
 
  			done();
@@ -405,11 +413,11 @@
  				res.status.should.equal(200);
  				res.body.should.have.property('events');
 
- 				(res.body.events[0].eventsID.toString()).should.be.equal(event1._id.toString());
+ 				(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
  				(res.body.events[0].accepted.toString()).should.be.equal('false');
- 				(res.body.events[1].eventsID.toString()).should.be.equal(event2._id.toString());
+ 				(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
  				(res.body.events[1].accepted.toString()).should.be.equal('true');
- 				(res.body.events[2].eventsID.toString()).should.be.equal(event3._id.toString());
+ 				(res.body.events[2].eventsID.name.toString()).should.be.equal(event3.name);
  				(res.body.events[2].accepted.toString()).should.be.equal('true');
 
  				done();
@@ -755,7 +763,7 @@ it("attendees should NOT be able to get the candidate first name", function(done
  it("attendees should NOT be able to add(set) candidate event", function(done) {
  	attendee1
  	.get('http://localhost:3001/candidate/setEvent')
- 	.send({candidateID: candidate1._id,newEvent:{eventsID: event3._id, accepted: false}})
+ 	.send({candidateID: candidate1._id,newEvent:{eventsID: event4._id, accepted: false}})
  	.end(function(err,res) {
  		if (err) throw err;
 
@@ -770,12 +778,13 @@ it("attendees should NOT be able to get the candidate first name", function(done
  			res.status.should.equal(200);
  			res.body.should.have.property('events');
 
- 			(res.body.events[0].eventsID.toString()).should.be.equal(event1._id.toString());
+ 			(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
  			(res.body.events[0].accepted.toString()).should.be.equal('false');
- 			(res.body.events[1].eventsID.toString()).should.be.equal(event2._id.toString());
+ 			(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
  			(res.body.events[1].accepted.toString()).should.be.equal('true');
- 			(res.body.events[2].eventsID.toString()).should.be.equal(event3._id.toString());
+ 			(res.body.events[2].eventsID.name.toString()).should.be.equal(event3.name);
  			(res.body.events[2].accepted.toString()).should.be.equal('true');
+ 			should.not.exist(res.body.events[3]);
 
  			done();
  		});
@@ -801,13 +810,12 @@ it("attendees should NOT be able to get the candidate first name", function(done
  				res.status.should.equal(200);
  				res.body.should.have.property('events');
 
- 				(res.body.events[0].eventsID.toString()).should.be.equal(event1._id.toString());
+				(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
  				(res.body.events[0].accepted.toString()).should.be.equal('false');
- 				(res.body.events[1].eventsID.toString()).should.be.equal(event2._id.toString());
+ 				(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
  				(res.body.events[1].accepted.toString()).should.be.equal('true');
- 				(res.body.events[2].eventsID.toString()).should.be.equal(event3._id.toString());
+ 				(res.body.events[2].eventsID.name.toString()).should.be.equal(event3.name);
  				(res.body.events[2].accepted.toString()).should.be.equal('true');
-
  				done();
  			});
  		});
