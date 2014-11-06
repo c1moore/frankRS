@@ -100,13 +100,15 @@
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidateID=req.body.candidateID;
  		var query = Candidate.findOne({_id:candidateID });
-		query.populate('Event.eventsID', 'eventsID  name start_date candidate.accepted');
+		query.populate('events.eventsID', 'name start_date');
  		query.exec(function(err,result) {
  			if(err) {
  				res.status(400).send(err);
  			} else if(!result) {
  				res.status(400).json({events: "No events found!"});
  			} else {
+ 				var eventlist = [],j=0;
+
  				res.status(200).json({events : result.events});
  			}
  		});
