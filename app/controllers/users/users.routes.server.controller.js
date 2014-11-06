@@ -288,18 +288,25 @@ exports.getInvitees = function(req, res) {
 	if(!req.isAuthenticated()) {
 		res.status(401).send({'message' : 'User is not logged in.'});
 	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
-	var query = User.find({'role' : 'recruiter'});
-	query.select('inviteeList displayName');
-	query.populate('inviteeList.user_id', 'displayName');
-	query.exec(function (err, result) {
-		if(err) {
-			res.status(400).send(err);
-		} else if(!result || !result.length) {
-			res.status(400).json({'message' : 'Nobody is attending yet.'});
-		} else {
-			res.status(200).send(result);
-		}
-	});
+		var query = User.find({'roles' : 'recruiter', 'status.event_id' : req.body.event_id, 'status.recruiter' : true});
+		query.select('inviteeList displayName');
+		query.populate('inviteeList.user_id', 'displayName');
+		query.exec(function (err, result) {
+			if(err) {
+				res.status(400).send(err);
+			} else if(!result || !result.length) {
+				res.status(400).json({'message' : 'Nobody is invited yet.'});
+			} else {
+				for(var i=0; i<result.length; i++) {
+					result[i].toObject();
+					result[i].inviteeList = searchByEvent(req.body.event_id, result[i].inviteeList);
+				}
+				res.status(200).send(result);
+			}
+		});
+	} else {
+		res.status(401).send({'message' : 'User does not have permission.'});	
+	}
 };
 
 /*Send the information that will be displayed in the first tab of the leaderboard.  This

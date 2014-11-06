@@ -61,10 +61,11 @@ module.exports = function(app) {
 	app.route('/leaderboard/maintable').post(users2.getLeaderboard);
 	app.route('/leaderboard/recruiterinfo').get(users2.getRecruiterInfo);
 	app.route('/leaderboard/attendees').post(users2.getAttendees);
+	app.route('/leaderboard/invitees').post(users2.getInvitees);
 	app.route('/leaderboard/inviteetable').post(users2.getInvitees);
 
 	//Setting Recruiter specific routes
-	app.route('/recruiter/events').post(users2.getRecruiterEvents);
+	app.route('/recruiter/events').get(users2.getRecruiterEvents);
 	app.route('/recruiter/attendees').post(users2.getRecruiterAttendees);
 	app.route('/recruiter/invitees').post(users2.getRecruiterInvitees);
 	app.route('/recruiter/almosts').post(users2.getRecruiterAlmosts);
