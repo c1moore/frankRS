@@ -1,15 +1,16 @@
 <section>
-	<div class="rows">
+	<div ng-controller="LeaderboardTablesCtrl" class="rows">
 		<div class="col-md-9">
-			<div class="dropdown">
-				<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
-					Select Event
+			<div class="btn-group" dropdown>
+				<button type="button" class="btn btn-danger">{{selectedEvent}}</button>
+				<button type="button" class="btn btn-danger dropdown-toggle">
 					<span class="caret"></span>
+					<span class="sr-only">Split button!</span>
 				</button>
-				<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-					<li role="presentation"><a role="menuitem" tabindex="-1" href="#">frank</a></li>
-					<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Another action</a></li>
-					<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Something else here</a></li>
+				<ul class="dropdown-menu" role="menu">
+					<li ng-repeat="event in events">
+						<a href="" ng-click="changeEvent(event.event_id.name)">{{event.event_id.name}}</a>
+					</li>
 				</ul>
 			</div>
 
@@ -17,13 +18,13 @@
 				<tab heading="Score">
 					<ng-include src="'/modules/leaderboard/views/score.client.view.html'"></ng-include>
 				</tab>
-				<tab heading="Leaderboard" ng-controller="LeaderboardTablesCtrl">
+				<tab heading="Leaderboard">
 					<ng-include src="'/modules/leaderboard/views/maintable.client.view.html'"></ng-include>
 				</tab>
-				<tab heading="Attending" ng-controller="LeaderboardTablesCtrl">
+				<tab heading="Attending">
 					<ng-include src="'/modules/leaderboard/views/attending.client.view.html'"></ng-include>
 				</tab>
-				<tab heading="Invited" ng-controller="LeaderboardTablesCtrl">
+				<tab heading="Invited">
 					<ng-include src="'/modules/leaderboard/views/invited.client.view.html'"></ng-include>
 				</tab>
 			</tabset>
