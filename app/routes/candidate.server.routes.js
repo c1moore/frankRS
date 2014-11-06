@@ -26,6 +26,7 @@ app.route('/candidate/setAccepted').get(dan_candidate_routes.setEventStatus);
 app.route('/candidate/setNote').get(dan_candidate_routes.setNote);
 
 app.route('/candidate/setCandidate').get(dan_candidate_routes.setCandidate);
+app.route('/candidate/deleteCandidate').get(dan_candidate_routes.deleteCandidate);
 
 //Finish by binding//app.param('candidateId',candidate.candidateByID);
 

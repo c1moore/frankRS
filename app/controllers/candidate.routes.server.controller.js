@@ -100,6 +100,7 @@
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidateID=req.body.candidateID;
  		var query = Candidate.findOne({_id:candidateID });
+		query.populate('Event.eventsID', 'eventsID  name start_date candidate.accepted');
  		query.exec(function(err,result) {
  			if(err) {
  				res.status(400).send(err);
@@ -420,12 +421,43 @@ exports.setNote = function(req,res){
  			if(err)
  				return res.status(400).send({'message': errorHandler.getErrorMessage(err)});
  			else
- 				return res.status(200).send('A new candidate has been made');
+ 				return res.status(200).send(newCandidate);
 
  		});
+ 	}
+ 	
+
+ 	else{// if (req.hasAuthorization(req.user)){
+ 	var	newCandidate = new Candidate({
+ 			fName: req.body.newfName,
+ 			lName: req.body.newlName,
+ 			email: req.body.newEmail,
+ 			status: "volunteer",
+ 			events: [{eventsID: req.body.newEvent._id,accepted: false}],
+ 			//note: req.body.newNote
+ 		});
+
+ 		newCandidate.save(function(err){
+ 			if(err)
+ 				return res.status(400).send({'message': errorHandler.getErrorMessage(err)});
+ 			else
+ 				return res.status(200).send(newCandidate);
+
+ 		});
+ 	}
+ 	
 
 
- 	/*	var candidateID=req.body.candidateID;
+ 	/*else
+ 		return res.status(401).send('User not Authorized');
+*/
+ };
+
+ exports.deleteCandidate = function(req,res){
+ 	if(!req.isAuthenticated())
+ 		return res.status(401).send("User is not logged in");
+ 	if (req.hasAuthorization(req.user, ["admin"])){
+ 		var candidateID=req.body.candidateID;
  		var query = Candidate.findOne({_id:candidateID });
  		query.exec(function(err,result){
  			if(err){
@@ -435,9 +467,9 @@ exports.setNote = function(req,res){
  				res.status(400).json("No candidate found!");
  			}
  			else{
- 				result.note = req.body.newNote;
+ 				//result.note = req.body.newNote;
 
- 				result.save(function(err, result) {
+ 				result.remove(function(err, result) {
  					if(err) {
  						res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
  					} else {
@@ -446,7 +478,7 @@ exports.setNote = function(req,res){
 
  				});
  			}
- 		});*/
+ 		});
  	}
  	else
  		return res.status(401).send('User not Authorized');
