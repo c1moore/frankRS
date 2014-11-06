@@ -10,6 +10,9 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		}
 		*/
 
+		//lets the score tab be the first active tab
+		$scope.initialTab = true;
+
 		//the model for the list of events a recruiter is recruiting for
 		$scope.events = [
 			{event_id:{_id:1,name:'frank',end_date:12,start_date:10,location:'UF',schedule:'stuff'}},
@@ -20,13 +23,18 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 
 		$http.get('/recruiter/events').success(function(data) {
 			$scope.events = data;
-		}).error(function(error) {
+		}).error(function(error, status) {
+			if(status === 400) {
+				$scope.selectedEvent = "Error";
+				disabled = !disabled;
+			}
 			console.log(error);
 		});
 
 		//updates the table for the selected event
 		$scope.changeEvent = function(event) {
-			$scope.selectedEvent = event;
+			$scope.selectedEvent = event.name;
+			$scope.postEventId = event._id;
 		}
 
 		var mainApi = $resource('/leaderboard/maintable');

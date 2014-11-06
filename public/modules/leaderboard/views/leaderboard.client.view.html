@@ -1,21 +1,24 @@
 <section>
 	<div ng-controller="LeaderboardTablesCtrl" class="rows">
 		<div class="col-md-9">
-			<div class="btn-group" dropdown>
-				<button type="button" class="btn btn-danger">{{selectedEvent}}</button>
-				<button type="button" class="btn btn-danger dropdown-toggle">
-					<span class="caret"></span>
-					<span class="sr-only">Split button!</span>
-				</button>
-				<ul class="dropdown-menu" role="menu">
-					<li ng-repeat="event in events">
-						<a href="" ng-click="changeEvent(event.event_id.name)">{{event.event_id.name}}</a>
-					</li>
-				</ul>
-			</div>
-
 			<tabset>
-				<tab heading="Score">
+				<tab disabled="true" active="false">
+					<tab-heading class="eventSelector">
+					<div class="btn-group" dropdown>
+						<button type="button" class="btn btn-danger" ng-disabled="disabled">{{selectedEvent}}</button>
+						<button type="button" class="btn btn-danger dropdown-toggle" ng-disabled="disabled">
+							<span class="caret"></span>
+							<span class="sr-only">Split button!</span>
+						</button>
+						<ul class="dropdown-menu" role="menu">
+							<li ng-repeat="event in events">
+								<a href="" ng-click="changeEvent(event.event_id)">{{event.event_id.name}}</a>
+							</li>
+						</ul>
+					</div>
+					</tab-heading>
+				</tab>
+				<tab active="initialTab" heading="Score">
 					<ng-include src="'/modules/leaderboard/views/score.client.view.html'"></ng-include>
 				</tab>
 				<tab heading="Leaderboard">
