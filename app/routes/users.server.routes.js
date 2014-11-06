@@ -7,15 +7,15 @@ var passport = require('passport');
 
 module.exports = function(app) {
 	// User Routes
-	var users = require('../../app/controllers/users'),
-	users2 = require('../../app/controllers/users/users.routes.server.controller.js');
+	var users = require('../../app/controllers/users');
+	//users2 = require('../../app/controllers/users/users.routes.server.controller.js');
 
 	// Setting up the users profile api
 	app.route('/users/me').get(users.me);
 	app.route('/users').put(users.update);
 	app.route('/users/accounts').delete(users.removeOAuthProvider);
-	app.route('/users/displayName').get(users2.getDisplayName);
-	app.route('/users/email').get(users2.getEmail);
+	app.route('/users/displayName').get(users.getDisplayName);
+	app.route('/users/email').get(users.getEmail);
 	app.route('/users').get(users.requiresLogin);
 	app.route('/users/auth').post(users.hasAuthorization);
 
@@ -58,17 +58,17 @@ module.exports = function(app) {
 	app.route('/auth/github/callback').get(users.oauthCallback('github'));
 
 	//Returning Leaderboard data
-	app.route('/leaderboard/maintable').post(users2.getLeaderboard);
-	app.route('/leaderboard/recruiterinfo').get(users2.getRecruiterInfo);
-	app.route('/leaderboard/attendees').post(users2.getAttendees);
-	app.route('/leaderboard/invitees').post(users2.getInvitees);
-	app.route('/leaderboard/inviteetable').post(users2.getInvitees);
+	app.route('/leaderboard/maintable').post(users.getLeaderboard);
+	app.route('/leaderboard/recruiterinfo').get(users.getRecruiterInfo);
+	app.route('/leaderboard/attendees').post(users.getAttendees);
+	app.route('/leaderboard/invitees').post(users.getInvitees);
+	app.route('/leaderboard/inviteetable').post(users.getInvitees);
 
 	//Setting Recruiter specific routes
-	app.route('/recruiter/events').get(users2.getRecruiterEvents);
-	app.route('/recruiter/attendees').post(users2.getRecruiterAttendees);
-	app.route('/recruiter/invitees').post(users2.getRecruiterInvitees);
-	app.route('/recruiter/almosts').post(users2.getRecruiterAlmosts);
+	app.route('/recruiter/events').get(users.getRecruiterEvents);
+	app.route('/recruiter/attendees').post(users.getRecruiterAttendees);
+	app.route('/recruiter/invitees').post(users.getRecruiterInvitees);
+	app.route('/recruiter/almosts').post(users.getRecruiterAlmosts);
 
 	// Finish by binding the user middleware
 	app.param('userId', users.userByID);
