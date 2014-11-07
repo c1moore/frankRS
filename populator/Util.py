@@ -21,7 +21,9 @@ def randomTimeInMS(minimum=TWENTY_YEARS):
   return random.randint(minimum,minimum+THIRTY_YEARS)
 
 def ensureID(refObj):
-  if hasattr(refObj,'_id'):
+  if type(refObj).__name__=='ObjectId':
+    return refObj
+  elif hasattr(refObj,'_id'):
     return refObj._id
   else:
     refObj.save()

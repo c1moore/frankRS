@@ -43,5 +43,5 @@ class Candidate:
       dic[name] = self.__dict__[name]
     Candidates = db.candidates
     self._id = Candidates.insert(dic)
-    print("Candidates->insert: {} with id={}".format(self._id))
+    print("Candidates->insert: with id={}".format(self._id))
     return self._id

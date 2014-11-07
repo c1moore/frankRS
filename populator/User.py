@@ -5,6 +5,7 @@ from Util import WEBS
 from Util import getPymongoDB
 from Util import randomTimeInMS
 from Util import ensureID
+from Attendee import Attendee
 
 import random
 import inspect
@@ -63,15 +64,16 @@ class User:
     self.status.append(statdict)
     self.save()
     if attending and recruiter:
-      attendeedict = {'user_id':self.id,'event_id':eventID}
+      attendeedict = {'user_id':self._id,'event_id':eventID}
       recruiter.attendeeList.append(attendeedict)
       recruiter.save()
       db = getPymongoDB()
       Users = db.users
       recWhoInvitedMe = Users.find({'inviteeList': {'user_id': self._id,'event_id':eventID}})
-      for recruiter in recWhoInvitedMe:
-        recruiter.almostList.append({'user_id':self._id,'event_id':eventID})
-        Users.insert(recruiter)
+      for rec in recWhoInvitedMe:
+        if rec._id is not recruiter._id:
+          recruiter.almostList.append({'user_id':self._id,'event_id':eventID})
+          Users.insert(recruiter)
     if attending:
       Attendee(self._id,eventID,randomTimeInMS(mktime(self.updated.timetuple()))).save()
 
@@ -98,7 +100,6 @@ class User:
     for name in names:
       dic[name] = self.__dict__[name]
     Users = db.users
-    print(dic)
     self._id = Users.insert(dic)
     print("Users->insert: with id={}".format(self._id))
     return self._id
