@@ -1,14 +1,15 @@
 #Attendee object
 
 from Util import getPymongoDB
+from Util import ensureID
 
 import inspect
 
 class Attendee:
 
   def __init__(self,userID,eventID,regTimeMS):
-    self.attendee = userID
-    self.eventid = eventID
+    self.attendee = ensureID(userID)
+    self.eventid = ensureID(eventID)
     self.time = regTimeMS
 
   def valid(self):
@@ -28,5 +29,5 @@ class Attendee:
       dic[name] = self.__dict__[name]
     Attendees = db.attendees
     self._id = Attendees.insert(dic)
-    print("Attendees->insert: {} with id={}".format(str(dic),self._id))
+    print("Attendees->insert: with id={}".format(self._id))
     return self._id

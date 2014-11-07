@@ -4,6 +4,7 @@ from Util import randomString
 from Util import WEBS
 from Util import getPymongoDB
 from Util import randomTimeInMS
+from Util import ensureID
 
 import random
 import inspect
@@ -57,15 +58,14 @@ class User:
     self.templates = makeTemplates(0,5)
 
   def decide(self,eventID,attending,recruiting,recruiter=None):
-    assert type(eventID).__name__=='ObjectId' and (not recruiter or 
-					type(recruiter).__name__=='ObjectId')
+    eventID = ensureID(eventID)
     statdict = {'event_id':eventID,'attending':attending,'recruiter':recruiting}
     self.status.append(statdict)
-    self.save("update")
+    self.save()
     if attending and recruiter:
       attendeedict = {'user_id':self.id,'event_id':eventID}
       recruiter.attendeeList.append(attendeedict)
-      recruiter.save("update")
+      recruiter.save()
       db = getPymongoDB()
       Users = db.users
       recWhoInvitedMe = Users.find({'inviteeList': {'user_id': self._id,'event_id':eventID}})
@@ -76,15 +76,16 @@ class User:
       Attendee(self._id,eventID,randomTimeInMS(mktime(self.updated.timetuple()))).save()
 
   def invite(self,userID,eventID):
-    assert type(userID).__name__=='ObjectId' and type(eventID).__name__=='ObjectId'
+    userID = ensureID(userID)
+    eventID = ensureID(eventID)
     inviteedict = {'user_id':userID,'event_id':eventID}
     self.inviteeList.append(inviteedict)
-    self.save("update")
+    self.save()
 
   def valid(self):
     return True #Too lazy to write code to check all the attrs atm
 
-  def save(self,mode="save"):
+  def save(self):
     members = inspect.getmembers(self)
     names = [name for name, val in members if (not '_' in name and not name=='_id') and
 		not inspect.isfunction(val) and not inspect.isclass(val) and
@@ -99,9 +100,6 @@ class User:
     Users = db.users
     print(dic)
     self._id = Users.insert(dic)
-    if mode=="save":
-      print("Users->insert: {} with id={}".format(str(dic),self._id))
-    else:
-      print("Users->update: {} with id={}".format(str(dic),self._id))
+    print("Users->insert: with id={}".format(self._id))
     return self._id
     
