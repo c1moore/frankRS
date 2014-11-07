@@ -56,9 +56,16 @@ class User:
   def decide(self,eventID,attending,recruiting,recruiter=None):
     statdict = {'event_id':eventID,'attending':attending,'recruiter':recruiting}
     self.status.append(statdict)
+    self.save()
     if attending and recruiter:
       attendeedict = {'user_id':self.id,'event_id':eventID}
       recruiter.attendeeList.append(attendeedict)
+      db = getPymongoDB()
+      Users = db.users
+      recWhoInvitedMe = Users.find({'inviteeList': {'user_id': self._id,'event_id':eventID}})
+      for recruiter in recWhoInvitedMe:
+        recruiter.almostList.append({'user_id':self._id,'event_id':eventID})
+        Users.insert(recruiter)
 
   def invite(self,userID,eventID):
     inviteedict = {'user_id':userID,'event_id':eventID}
@@ -67,9 +74,9 @@ class User:
   def valid(self):
     return True #Too lazy to write code to check all the attrs atm
 
-  def save(self):
+  def save(self,mode="save"):
     members = inspect.getMembers(self)
-    names = [name for name, val in members if not name.contains('_') and
+    names = [name for name, val in members if (not name.contains('_') and not name=='_id') and
 		not inspect.isfunction(val) and not inspect.isclass(val) and
 		not inspect.ismodule(val) and not inspect.ismethod(val) and
 		not inspect.isbuiltin(val)]
@@ -80,7 +87,10 @@ class User:
     for name in names:
       dic[name] = self.__dict__[name]
     Users = db.users
-    self.id = Users.insert(dic)
-    print("Users->insert: {} with id={}".format(str(dic),self.id))
-    return self.id
+    self._id = Users.insert(dic)
+    if mode=="save":
+      print("Users->insert: {} with id={}".format(str(dic),self._id))
+    else:
+      print("Users->update: {} with id={}".format(str(dic).self._id))
+    return self._id
     
