@@ -9,6 +9,7 @@ from Attendee import Attendee
 
 import random
 import inspect
+import calendar
 from datetime import datetime
 from datetime import date as Date
 from time import mktime
@@ -71,11 +72,11 @@ class User:
       Users = db.users
       recWhoInvitedMe = Users.find({'inviteeList': {'user_id': self._id,'event_id':eventID}})
       for rec in recWhoInvitedMe:
-        if rec._id is not recruiter._id:
-          recruiter.almostList.append({'user_id':self._id,'event_id':eventID})
-          Users.insert(recruiter)
+        if rec['_id'] is not recruiter._id:
+          rec['almostList'].append({'user_id':self._id,'event_id':eventID})
+          Users.save(rec)
     if attending:
-      Attendee(self._id,eventID,randomTimeInMS(mktime(self.updated.timetuple()))).save()
+      Attendee(self._id,eventID,randomTimeInMS(calendar.timegm(self.updated.timetuple()))).save()
 
   def invite(self,userID,eventID):
     userID = ensureID(userID)

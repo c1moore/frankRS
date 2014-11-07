@@ -13,7 +13,7 @@ class Attendee:
     self.time = regTimeMS
 
   def valid(self):
-    return (hasattr(self,attendee) and hasattr(self,eventid) and hasattr(self,time))
+    return (hasattr(self,'attendee') and hasattr(self,'eventid') and hasattr(self,'time'))
 
   def save(self):
     members = inspect.getmembers(self)
