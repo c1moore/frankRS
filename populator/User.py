@@ -3,10 +3,12 @@
 from Util import randomString
 from Util import WEBS
 from Util import getPymongoDB
+from Util import randomTimeInMS
 
 import random
 import inspect
 from datetime import date as Date
+from time import mktime
 
 ROLES = ['admin', 'recruiter', 'attendee']
 
@@ -56,20 +58,24 @@ class User:
   def decide(self,eventID,attending,recruiting,recruiter=None):
     statdict = {'event_id':eventID,'attending':attending,'recruiter':recruiting}
     self.status.append(statdict)
-    self.save()
+    self.save("update")
     if attending and recruiter:
       attendeedict = {'user_id':self.id,'event_id':eventID}
       recruiter.attendeeList.append(attendeedict)
+      recruiter.save("update")
       db = getPymongoDB()
       Users = db.users
       recWhoInvitedMe = Users.find({'inviteeList': {'user_id': self._id,'event_id':eventID}})
       for recruiter in recWhoInvitedMe:
         recruiter.almostList.append({'user_id':self._id,'event_id':eventID})
         Users.insert(recruiter)
+    if attending:
+      Attendee(self._id,eventID,randomTimeInMS(mktime(self.updated.timetuple()))).save()
 
   def invite(self,userID,eventID):
     inviteedict = {'user_id':userID,'event_id':eventID}
     self.inviteeList.append(inviteedict)
+    self.save("update")
 
   def valid(self):
     return True #Too lazy to write code to check all the attrs atm
