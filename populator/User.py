@@ -4,9 +4,12 @@ from Util import randomString
 from Util import WEBS
 from Util import getPymongoDB
 from Util import randomTimeInMS
+from Util import ensureID
+from Attendee import Attendee
 
 import random
 import inspect
+import calendar
 from datetime import datetime
 from datetime import date as Date
 from time import mktime
@@ -33,7 +36,7 @@ class User:
     self.password = ""
     self.salt = ""
     self.provider = "local"
-    self.roles = random.choice(ROLES)
+    self.roles = [random.choice(ROLES)]
     cday = random.randint(1,28)
     cmonth = random.randint(1,12)
     cyear = random.randint(1970,Date.today().year)
@@ -57,33 +60,37 @@ class User:
     self.templates = makeTemplates(0,5)
 
   def decide(self,eventID,attending,recruiting,recruiter=None):
+    eventID = ensureID(eventID)
     statdict = {'event_id':eventID,'attending':attending,'recruiter':recruiting}
     self.status.append(statdict)
-    self.save("update")
+    self.save()
     if attending and recruiter:
-      attendeedict = {'user_id':self.id,'event_id':eventID}
+      attendeedict = {'user_id':self._id,'event_id':eventID}
       recruiter.attendeeList.append(attendeedict)
-      recruiter.save("update")
+      recruiter.save()
       db = getPymongoDB()
       Users = db.users
       recWhoInvitedMe = Users.find({'inviteeList': {'user_id': self._id,'event_id':eventID}})
-      for recruiter in recWhoInvitedMe:
-        recruiter.almostList.append({'user_id':self._id,'event_id':eventID})
-        Users.insert(recruiter)
+      for rec in recWhoInvitedMe:
+        if rec['_id'] is not recruiter._id:
+          rec['almostList'].append({'user_id':self._id,'event_id':eventID})
+          Users.save(rec)
     if attending:
-      Attendee(self._id,eventID,randomTimeInMS(mktime(self.updated.timetuple()))).save()
+      Attendee(self._id,eventID,randomTimeInMS(calendar.timegm(self.updated.timetuple()))).save()
 
   def invite(self,userID,eventID):
+    userID = ensureID(userID)
+    eventID = ensureID(eventID)
     inviteedict = {'user_id':userID,'event_id':eventID}
     self.inviteeList.append(inviteedict)
-    self.save("update")
+    self.save()
 
   def valid(self):
     return True #Too lazy to write code to check all the attrs atm
 
-  def save(self,mode="save"):
+  def save(self):
     members = inspect.getmembers(self)
-    names = [name for name, val in members if (not '_' in name and not name=='_id') and
+    names = [name for name, val in members if (not '_' in name or name=='_id') and
 		not inspect.isfunction(val) and not inspect.isclass(val) and
 		not inspect.ismodule(val) and not inspect.ismethod(val) and
 		not inspect.isbuiltin(val)]
@@ -94,10 +101,7 @@ class User:
     for name in names:
       dic[name] = self.__dict__[name]
     Users = db.users
-    self._id = Users.insert(dic)
-    if mode=="save":
-      print("Users->insert: {} with id={}".format(str(dic),self._id))
-    else:
-      print("Users->update: {} with id={}".format(str(dic).self._id))
+    self._id = Users.save(dic)
+    print("Users->insert: with id={}".format(self._id))
     return self._id
     

@@ -128,7 +128,7 @@ def main():
     user.save()
     user2 = User()
     user2.randomize()
-    user.invite(user2,event._id)
+    user.invite(user2,event)
   except Exception as e:
     print("--FAILED to invite a user")
     raise e

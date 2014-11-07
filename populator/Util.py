@@ -20,6 +20,15 @@ def randomString(min,max,extras=""):
 def randomTimeInMS(minimum=TWENTY_YEARS):
   return random.randint(minimum,minimum+THIRTY_YEARS)
 
+def ensureID(refObj):
+  if type(refObj).__name__=='ObjectId':
+    return refObj
+  elif hasattr(refObj,'_id'):
+    return refObj._id
+  else:
+    refObj.save()
+    return refObj._id
+
 def resetMongo():
   os.system('{} --eval "db.dropDatabase();" frank-recruiter-system-test'.format(MONGO_PATH))
   os.system('{} --eval "db.dropDatabase();" {}'.format(MONGO_PATH,DATABASE))
