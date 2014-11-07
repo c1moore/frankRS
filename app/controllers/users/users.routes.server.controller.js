@@ -6,6 +6,7 @@
 var errorHandler = require('../errors'),
 	mongoose = require('mongoose'),
 	_ = require('lodash'),
+	nodemailer = require('nodemailer');
 	User = mongoose.model('User');
 
 /*
@@ -377,5 +378,20 @@ exports.getEmail = function(req, res) {
 				res.status(200).send({'email' : result.email});
 			}
 		});
+	}
+};
+
+exports.sendInvitation = function(req, res) {
+	if(req.body.fName === undefined || req.body.lName === undefined || req.body.email ==== undefined) {
+		res.status(400).send({'message' : ''});
+		return;
+	}
+
+	if(!req.isAuthenticated()) {
+		res.status(401).send({'message' : 'User is not logged in.'});
+	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
+		
+	} else {
+		res.status(401).send({'message' : 'User does not have permission.'});
 	}
 };
