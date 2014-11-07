@@ -7,6 +7,7 @@ from Util import randomTimeInMS
 
 import random
 import inspect
+from datetime import datetime
 from datetime import date as Date
 from time import mktime
 
@@ -35,9 +36,9 @@ class User:
     self.roles = random.choice(ROLES)
     cday = random.randint(1,28)
     cmonth = random.randint(1,12)
-    cyear = random.randint(1970,Date.today().year())
-    self.created = Date(cyear,cmonth,cday)
-    uyear = random.randint(cyear,Date.today().year()+1000)
+    cyear = random.randint(1970,Date.today().year)
+    self.created = datetime.combine(Date(cyear,cmonth,cday),datetime.min.time())
+    uyear = random.randint(cyear,Date.today().year+1000)
     if uyear==cyear:
       umonth = random.randint(cmonth,12)
     else:
@@ -46,14 +47,14 @@ class User:
       uday = random.randint(cday,28)
     else:
       uday = random.randint(1,28)
-    self.updated = Date(uyear,umonth,uday)
+    self.updated = datetime.combine(Date(uyear,umonth,uday),datetime.min.time())
     self.status = [] #Might have to adjust because it's a schema
     self.inviteeList = []
     self.attendeeList = []
     self.almostList = []
     self.rank = []
     self.login_enabled = True
-    self.templates = makeTemplates()
+    self.templates = makeTemplates(0,5)
 
   def decide(self,eventID,attending,recruiting,recruiter=None):
     statdict = {'event_id':eventID,'attending':attending,'recruiter':recruiting}
@@ -81,8 +82,8 @@ class User:
     return True #Too lazy to write code to check all the attrs atm
 
   def save(self,mode="save"):
-    members = inspect.getMembers(self)
-    names = [name for name, val in members if (not name.contains('_') and not name=='_id') and
+    members = inspect.getmembers(self)
+    names = [name for name, val in members if (not '_' in name and not name=='_id') and
 		not inspect.isfunction(val) and not inspect.isclass(val) and
 		not inspect.ismodule(val) and not inspect.ismethod(val) and
 		not inspect.isbuiltin(val)]
