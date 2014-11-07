@@ -33,7 +33,7 @@ class User:
     self.password = ""
     self.salt = ""
     self.provider = "local"
-    self.roles = random.choice(ROLES)
+    self.roles = [random.choice(ROLES)]
     cday = random.randint(1,28)
     cmonth = random.randint(1,12)
     cyear = random.randint(1970,Date.today().year)
@@ -57,6 +57,8 @@ class User:
     self.templates = makeTemplates(0,5)
 
   def decide(self,eventID,attending,recruiting,recruiter=None):
+    assert type(eventID).__name__=='ObjectId' and (not recruiter or 
+					type(recruiter).__name__=='ObjectId')
     statdict = {'event_id':eventID,'attending':attending,'recruiter':recruiting}
     self.status.append(statdict)
     self.save("update")
@@ -74,6 +76,7 @@ class User:
       Attendee(self._id,eventID,randomTimeInMS(mktime(self.updated.timetuple()))).save()
 
   def invite(self,userID,eventID):
+    assert type(userID).__name__=='ObjectId' and type(eventID).__name__=='ObjectId'
     inviteedict = {'user_id':userID,'event_id':eventID}
     self.inviteeList.append(inviteedict)
     self.save("update")
@@ -94,10 +97,11 @@ class User:
     for name in names:
       dic[name] = self.__dict__[name]
     Users = db.users
+    print(dic)
     self._id = Users.insert(dic)
     if mode=="save":
       print("Users->insert: {} with id={}".format(str(dic),self._id))
     else:
-      print("Users->update: {} with id={}".format(str(dic).self._id))
+      print("Users->update: {} with id={}".format(str(dic),self._id))
     return self._id
     

@@ -114,7 +114,7 @@ def main():
 
   try:
     candidate.fName = "SomethingElse"
-    candidate.save()
+    candidate.save("update")
   except Exception as e:
     print("--FAILED to update candidate in database")
     raise e
@@ -128,7 +128,8 @@ def main():
     user.save()
     user2 = User()
     user2.randomize()
-    user.invite(user2,event._id)
+    user2.save()
+    user.invite(user2._id,event._id)
   except Exception as e:
     print("--FAILED to invite a user")
     raise e

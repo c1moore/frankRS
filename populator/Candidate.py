@@ -25,11 +25,11 @@ class Candidate:
     self.note = ""
 
   def valid(self):
-    return (hasattr(self,fName) and hasattr(self,lName) and hasattr(self,email) and
-		hasattr(self,status) and hasattr(self,events) and hasattr(self,accept_key) and
-		hasattr(self,note))
+    return (hasattr(self,'fName') and hasattr(self,'lName') and hasattr(self,'email') and
+		hasattr(self,'status') and hasattr(self,'events') and hasattr(self,'accept_key') and
+		hasattr(self,'note'))
 
-  def save(self):
+  def save(self,mode="insert"):
     members = inspect.getmembers(self)
     names = [name for name, val in members if (not '_' in name and not name=='_id') and
 		not inspect.isfunction(val) and not inspect.isclass(val) and
@@ -43,5 +43,8 @@ class Candidate:
       dic[name] = self.__dict__[name]
     Candidates = db.candidates
     self._id = Candidates.insert(dic)
-    print("Candidates->insert: {} with id={}".format(str(dic),self._id))
+    if mode=="insert":
+      print("Candidates->insert: {} with id={}".format(str(dic),self._id))
+    else:
+      print("Candidates->update: {} with id={}".format(str(dic),self._id))
     return self._id
