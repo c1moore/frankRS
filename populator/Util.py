@@ -30,8 +30,8 @@ def ensureID(refObj):
     return refObj._id
 
 def resetMongo():
-  os.system('{} --eval "db.dropDatabase();" frank-recruiter-system-test'.format(MONGO_PATH))
-  os.system('{} --eval "db.dropDatabase();" {}'.format(MONGO_PATH,DATABASE))
+  os.system('{} --eval "db.dropDatabase();" frank-recruiter-system-test > /dev/null'.format(MONGO_PATH))
+  os.system('{} --eval "db.dropDatabase();" {} > /dev/null'.format(MONGO_PATH,DATABASE))
 
 def getPymongoDB():
   global PymongoDB

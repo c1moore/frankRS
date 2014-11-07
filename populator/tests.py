@@ -143,6 +143,9 @@ def main():
   else:
     print("--SUCCESS user accept an invitation")
 
+  print("\nDone! Resetting databases...\n")
+  resetMongo()
+
 if __name__=='__main__':
   main()
 
