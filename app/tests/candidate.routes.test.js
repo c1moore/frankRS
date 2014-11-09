@@ -115,15 +115,15 @@
 
 						});
 
-					attendee.save(function(err, res) {
+						attendee.save(function(err, res) {
 							attendee1 = agent.agent();
 							attendee1
 							.post('http://localhost:3001/auth/signin')
 							.send({'email': 'test1234@test.com', 'password': 'password'})
 							.end(function (err, res) {
 								
-								});
-						
+							});
+
 
 							user.save(function(err, res) {
 								user1 = superagent.agent();
@@ -139,9 +139,9 @@
 				});
 			});
 		});
-});
-
 	});
+
+});
 
  it("should save the user.", function(done) {
  	var query = User.findOne({"email" : user.email});
@@ -157,89 +157,94 @@
  	done();
  });
 
- it("admin should be able to get the candidate first name", function(done) {
- 	candidate1.save(function(err) {
- 		user1
- 		.get('http://localhost:3001/candidate/getfName')
- 		.send({candidateID: candidate1._id})
- 		.end(function(err,res) {
- 			if (err) throw err;
- 			res.status.should.equal(200);
- 			res.body.should.have.property('fName');
- 			res.body.fName.should.be.equal('Full');
- 			done();
+
+
+
+ describe('Admin route tests:', function() {
+
+ 	it("admin should be able to get the candidate first name", function(done) {
+ 		candidate1.save(function(err) {
+ 			user1
+ 			.get('http://localhost:3001/candidate/getfName')
+ 			.send({candidateID: candidate1._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+ 				res.status.should.equal(200);
+ 				res.body.should.have.property('fName');
+ 				res.body.fName.should.be.equal('Full');
+ 				done();
+ 			});
  		});
  	});
- });
 
 
- it("admin should be able to get the candidate last name", function(done) {
- 	candidate1.save(function(err) {
- 		user1
- 		.get('http://localhost:3001/candidate/getlName')
- 		.send({candidateID: candidate1._id})
- 		.end(function(err,res) {
- 			if (err) throw err;
- 			res.status.should.equal(200);
- 			res.body.should.have.property('lName');
- 			res.body.lName.should.be.equal('Name');
- 			done();
+ 	it("admin should be able to get the candidate last name", function(done) {
+ 		candidate1.save(function(err) {
+ 			user1
+ 			.get('http://localhost:3001/candidate/getlName')
+ 			.send({candidateID: candidate1._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+ 				res.status.should.equal(200);
+ 				res.body.should.have.property('lName');
+ 				res.body.lName.should.be.equal('Name');
+ 				done();
+ 			});
  		});
  	});
- });
 
 
- it("admin should be able to get the candidate email", function(done) {
- 	candidate1.save(function(err) {
- 		user1
- 		.get('http://localhost:3001/candidate/getEmail')
- 		.send({candidateID: candidate1._id})
- 		.end(function(err,res) {
- 			if (err) throw err;
- 			res.status.should.equal(200);
- 			res.body.should.have.property('email');
- 			res.body.email.should.be.equal('test@test.com');
- 			done();
+ 	it("admin should be able to get the candidate email", function(done) {
+ 		candidate1.save(function(err) {
+ 			user1
+ 			.get('http://localhost:3001/candidate/getEmail')
+ 			.send({candidateID: candidate1._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+ 				res.status.should.equal(200);
+ 				res.body.should.have.property('email');
+ 				res.body.email.should.be.equal('test@test.com');
+ 				done();
+ 			});
  		});
  	});
- });
- it("admin should be able to get the candidate status", function(done) {
- 	candidate1.save(function(err) {
- 		user1
- 		.get('http://localhost:3001/candidate/getStatus')
- 		.send({candidateID: candidate1._id})
- 		.end(function(err,res) {
- 			if (err) throw err;
- 			res.status.should.equal(200);
- 			res.body.should.have.property('status');
- 			res.body.status.should.be.equal('volunteer');
- 			done();
+ 	it("admin should be able to get the candidate status", function(done) {
+ 		candidate1.save(function(err) {
+ 			user1
+ 			.get('http://localhost:3001/candidate/getStatus')
+ 			.send({candidateID: candidate1._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+ 				res.status.should.equal(200);
+ 				res.body.should.have.property('status');
+ 				res.body.status.should.be.equal('volunteer');
+ 				done();
+ 			});
  		});
  	});
- });
 
 
- it("admin should be able to get the candidate accept_key", function(done) {
- 	candidate1.save(function(err) {
- 		user1
- 		.get('http://localhost:3001/candidate/getAccept_Key')
- 		.send({candidateID: candidate1._id})
- 		.end(function(err,res) {
- 			if (err) throw err;
- 			res.status.should.equal(200);
- 			res.body.should.have.property('accept_key');
- 			res.body.accept_key.should.be.equal('false');
- 			done();
+ 	it("admin should be able to get the candidate accept_key", function(done) {
+ 		candidate1.save(function(err) {
+ 			user1
+ 			.get('http://localhost:3001/candidate/getAccept_Key')
+ 			.send({candidateID: candidate1._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+ 				res.status.should.equal(200);
+ 				res.body.should.have.property('accept_key');
+ 				res.body.accept_key.should.be.equal('false');
+ 				done();
+ 			});
  		});
  	});
- });
- it("admin should be able to get the candidate EventsID", function(done) {
- 	candidate1.save(function(err) {
- 		user1
- 		.get('http://localhost:3001/candidate/getEvents')
- 		.send({candidateID: candidate1._id})
- 		.end(function(err,res) {
- 			if (err) throw err;
+ 	it("admin should be able to get the candidate EventsID", function(done) {
+ 		candidate1.save(function(err) {
+ 			user1
+ 			.get('http://localhost:3001/candidate/getEvents')
+ 			.send({candidateID: candidate1._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
  			//console.log(res.body);
  			res.status.should.equal(200);
  			res.body.should.have.property('events');
@@ -249,29 +254,29 @@
  			(res.body.events[1].accepted.toString()).should.be.equal('false');
  			done();
  		});
- 	});
- });
- it("admin should be able to get the candidate note", function(done) {
- 	candidate1.save(function(err) {
- 		user1
- 		.get('http://localhost:3001/candidate/getNote')
- 		.send({candidateID: candidate1._id})
- 		.end(function(err,res) {
- 			if (err) throw err;
- 			res.status.should.equal(200);
- 			res.body.should.have.property('note');
- 			res.body.note.should.be.equal('this is a test');
- 			done();
  		});
  	});
- });
+ 	it("admin should be able to get the candidate note", function(done) {
+ 		candidate1.save(function(err) {
+ 			user1
+ 			.get('http://localhost:3001/candidate/getNote')
+ 			.send({candidateID: candidate1._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+ 				res.status.should.equal(200);
+ 				res.body.should.have.property('note');
+ 				res.body.note.should.be.equal('this is a test');
+ 				done();
+ 			});
+ 		});
+ 	});
 
- it("admin should be able to set the candidate first name", function(done) {
- 	user1
- 	.get('http://localhost:3001/candidate/setfName')
- 	.send({candidateID: candidate1._id,newfName:'dan'})
- 	.end(function(err,res) {
- 		if (err) throw err;
+ 	it("admin should be able to set the candidate first name", function(done) {
+ 		user1
+ 		.get('http://localhost:3001/candidate/setfName')
+ 		.send({candidateID: candidate1._id,newfName:'dan'})
+ 		.end(function(err,res) {
+ 			if (err) throw err;
 			//console.log(res);
 			res.status.should.equal(200);
 			//res.body.should.have.property('fName');
@@ -294,13 +299,13 @@
 					});
 		});
 
- });
- it("admin should be able to set the candidate last name", function(done) {
- 	user1
- 	.get('http://localhost:3001/candidate/setlName')
- 	.send({candidateID: candidate1._id,newlName:'pickle'})
- 	.end(function(err,res) {
- 		if (err) throw err;
+ 	});
+ 	it("admin should be able to set the candidate last name", function(done) {
+ 		user1
+ 		.get('http://localhost:3001/candidate/setlName')
+ 		.send({candidateID: candidate1._id,newlName:'pickle'})
+ 		.end(function(err,res) {
+ 			if (err) throw err;
 			//console.log(res);
 			res.status.should.equal(200);
 			//res.body.should.have.property('fName');
@@ -323,14 +328,14 @@
 					});
 		});
 
- });
+ 	});
 
- it("admin should be able to set the candidate email", function(done) {
- 	user1
- 	.get('http://localhost:3001/candidate/setEmail')
- 	.send({candidateID: candidate1._id,newEmail:'DanP@test.com'})
- 	.end(function(err,res) {
- 		if (err) throw err;
+ 	it("admin should be able to set the candidate email", function(done) {
+ 		user1
+ 		.get('http://localhost:3001/candidate/setEmail')
+ 		.send({candidateID: candidate1._id,newEmail:'DanP@test.com'})
+ 		.end(function(err,res) {
+ 			if (err) throw err;
 			//console.log(res);
 			res.status.should.equal(200);
 			//res.body.should.have.property('fName');
@@ -353,13 +358,13 @@
 					});
 		});
 
- });
- it("admin should be able to set the candidate status", function(done) {
- 	user1
- 	.get('http://localhost:3001/candidate/setStatus')
- 	.send({candidateID: candidate1._id,newStatus:'accepted'})
- 	.end(function(err,res) {
- 		if (err) throw err;
+ 	});
+ 	it("admin should be able to set the candidate status", function(done) {
+ 		user1
+ 		.get('http://localhost:3001/candidate/setStatus')
+ 		.send({candidateID: candidate1._id,newStatus:'accepted'})
+ 		.end(function(err,res) {
+ 			if (err) throw err;
 			//console.log(res);
 			res.status.should.equal(200);
 			//res.body.should.have.property('fName');
@@ -382,37 +387,37 @@
 					});
 		});
 
- });
- 
- it("admin should be able to add(set) candidate event", function(done) {
- 	user1
- 	.get('http://localhost:3001/candidate/setEvent')
- 	.send({candidateID: candidate1._id,newEvent:{eventsID: event3._id, accepted: true}})
- 	.end(function(err,res) {
- 		if (err) throw err;
+ 	});
 
- 		res.status.should.equal(200);
-
+ 	it("admin should be able to add(set) candidate event", function(done) {
  		user1
- 		.get('http://localhost:3001/candidate/getEvents')
- 		.send({candidateID: candidate1._id})
+ 		.get('http://localhost:3001/candidate/setEvent')
+ 		.send({candidateID: candidate1._id,newEvent:{eventsID: event3._id, accepted: true}})
  		.end(function(err,res) {
  			if (err) throw err;
 
  			res.status.should.equal(200);
- 			res.body.should.have.property('events');
 
- 			(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
- 			(res.body.events[0].accepted.toString()).should.be.equal('false');
- 			(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
- 			(res.body.events[1].accepted.toString()).should.be.equal('false');
- 			(res.body.events[2].eventsID.name.toString()).should.be.equal(event3.name);
- 			(res.body.events[2].accepted.toString()).should.be.equal('true');
+ 			user1
+ 			.get('http://localhost:3001/candidate/getEvents')
+ 			.send({candidateID: candidate1._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
 
- 			done();
+ 				res.status.should.equal(200);
+ 				res.body.should.have.property('events');
+
+ 				(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
+ 				(res.body.events[0].accepted.toString()).should.be.equal('false');
+ 				(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
+ 				(res.body.events[1].accepted.toString()).should.be.equal('false');
+ 				(res.body.events[2].eventsID.name.toString()).should.be.equal(event3.name);
+ 				(res.body.events[2].accepted.toString()).should.be.equal('true');
+
+ 				done();
+ 			});
  		});
  	});
- });
 
  it("admin should be able to set candidate event accepted field", function(done) {
  	user1
@@ -509,13 +514,21 @@
  		done();
  	});
 
+
+
  });
+
+
+
 /* it("should save the attendee user.", function(done) {
  	var query = User.findOne({"email" : attendee.email});
  	query.exec(function(err, res) {
  		done(err);
  	});
 });*/
+
+  describe('Attendee route tests:', function() {
+
  it("attendee should be able to volunteer as a new candidate", function(done) {
  	attendee1
  	.get('http://localhost:3001/candidate/setCandidate')
@@ -553,7 +566,7 @@
 
  });
 
-it("attendees should NOT be able to get the candidate first name", function(done) {
+ it("attendees should NOT be able to get the candidate first name", function(done) {
  	candidate1.save(function(err) {
  		attendee1
  		.get('http://localhost:3001/candidate/getfName')
@@ -595,8 +608,8 @@ it("attendees should NOT be able to get the candidate first name", function(done
  			res.status.should.equal(401);
  			res.body.should.not.have.property('email');
  		//	res.body.email.should.be.equal('test@test.com');
- 			done();
- 		});
+ 		done();
+ 	});
  	});
  });
  it("attendees should NOT be able to get the candidate status", function(done) {
@@ -830,7 +843,7 @@ it("attendees should NOT be able to get the candidate first name", function(done
  				res.status.should.equal(200);
  				res.body.should.have.property('events');
 
-				(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
+ 				(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
  				(res.body.events[0].accepted.toString()).should.be.equal('false');
  				(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
  				(res.body.events[1].accepted.toString()).should.be.equal('true');
@@ -905,7 +918,10 @@ it("attendees should NOT be able to get the candidate first name", function(done
 
  });
 
-it("recruters should NOT be able to get the candidate first name", function(done) {
+  describe('Recruiter route tests:', function() {
+
+
+ it("recruters should NOT be able to get the candidate first name", function(done) {
  	candidate1.save(function(err) {
  		recruiter1
  		.get('http://localhost:3001/candidate/getfName')
@@ -947,8 +963,8 @@ it("recruters should NOT be able to get the candidate first name", function(done
  			res.status.should.equal(401);
  			res.body.should.not.have.property('email');
  		//	res.body.email.should.be.equal('test@test.com');
- 			done();
- 		});
+ 		done();
+ 	});
  	});
  });
  it("recruters should NOT be able to get the candidate status", function(done) {
@@ -1182,7 +1198,7 @@ it("recruters should NOT be able to get the candidate first name", function(done
  				res.status.should.equal(200);
  				res.body.should.have.property('events');
 
-				(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
+ 				(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
  				(res.body.events[0].accepted.toString()).should.be.equal('false');
  				(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
  				(res.body.events[1].accepted.toString()).should.be.equal('true');
@@ -1220,7 +1236,9 @@ it("recruters should NOT be able to get the candidate first name", function(done
  	});
 
  });
- it("attendee should be able to volunteer as a new candidate", function(done) {
+  describe('Guest route tests:', function() {
+
+ it("guests should NOT be able to volunteer as a new candidate", function(done) {
  	guest1
  	.get('http://localhost:3001/candidate/setCandidate')
  	.send({newfName:attendee.fName,newlName:attendee.lName,newEmail:attendee.email,newEvent: event1._id})
@@ -1252,13 +1270,13 @@ it("recruters should NOT be able to get the candidate first name", function(done
 							res.status.should.equal(200);			
 							done();
 						});				
-					});*/
- 			done();
-		});
+ });*/
+ 	done();
+ });
 
  });
 
-it("guest should NOT be able to get the candidate first name", function(done) {
+ it("guest should NOT be able to get the candidate first name", function(done) {
  	candidate1.save(function(err) {
  		guest1
  		.get('http://localhost:3001/candidate/getfName')
@@ -1300,8 +1318,8 @@ it("guest should NOT be able to get the candidate first name", function(done) {
  			res.status.should.equal(401);
  			res.body.should.not.have.property('email');
  		//	res.body.email.should.be.equal('test@test.com');
- 			done();
- 		});
+ 		done();
+ 	});
  	});
  });
  it("guest should NOT be able to get the candidate status", function(done) {
@@ -1535,7 +1553,7 @@ it("guest should NOT be able to get the candidate first name", function(done) {
  				res.status.should.equal(200);
  				res.body.should.have.property('events');
 
-				(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
+ 				(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
  				(res.body.events[0].accepted.toString()).should.be.equal('false');
  				(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
  				(res.body.events[1].accepted.toString()).should.be.equal('true');
@@ -1586,3 +1604,7 @@ it("guest should NOT be able to get the candidate first name", function(done) {
  	done();
  });
 }); 
+});
+});
+});
+});
