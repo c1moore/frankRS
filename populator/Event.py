@@ -6,6 +6,7 @@ from Util import WEBS
 from Util import getPymongoDB
 
 import inspect
+import random
 import time
 
 class Event:
@@ -17,16 +18,16 @@ class Event:
     self.name = randomString(3,20,' ')
     self.schedule = 'www.' + randomString(6,12) + random.choice(WEBS)
     self.location = randomString(2,10,' ')
-    self.start_date = randomTimeInMS()+time.time()*1000
+    self.start_date = randomTimeInMS()+round(time.time()*1000)
     self.end_date = randomTimeInMS(self.start_date)
 
   def valid(self):
-    return (hasattr(self,name) and hasattr(self,schedule) and hasattr(self,location) and
-		hasattr(self,start_date) and hasattr(self,end_date))
+    return (hasattr(self,'name') and hasattr(self,'schedule') and hasattr(self,'location') and
+		hasattr(self,'start_date') and hasattr(self,'end_date'))
 
   def save(self):
-    members = inspect.getMembers(self)
-    names = [name for name, val in members if not name.contains('_') and
+    members = inspect.getmembers(self)
+    names = [name for name, val in members if (not '_' in name or name=='_id') and
 		not inspect.isfunction(val) and not inspect.isclass(val) and
 		not inspect.ismodule(val) and not inspect.ismethod(val) and
 		not inspect.isbuiltin(val)]
@@ -36,8 +37,8 @@ class Event:
     dic = dict()
     for name in names:
       dic[name] = self.__dict__[name]
-    Events = db.events
-    self.id = Events.insert(dic)
-    print("Event->insert: {} with id={}".format(str(dic),self.id))
-    return self.id
+    Events = db.event
+    self._id = Events.save(dic)
+    print("Event->insert: with id={}".format(self._id))
+    return self._id
 

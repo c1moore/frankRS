@@ -1,12 +1,18 @@
 #User object
 
-from Util import randomString
+from Util import randomString, randomNameString
 from Util import WEBS
 from Util import getPymongoDB
+from Util import randomTimeInMS
+from Util import ensureID
+from Attendee import Attendee
 
 import random
 import inspect
+import calendar
+from datetime import datetime
 from datetime import date as Date
+from time import mktime
 
 ROLES = ['admin', 'recruiter', 'attendee']
 
@@ -22,20 +28,20 @@ class User:
     pass
 
   def randomize(self):
-    self.fName = randomString(2,16).capitalize()
-    self.lName = randomString(2,16).capitalize()
+    self.fName = randomNameString(2,16).capitalize()
+    self.lName = randomNameString(2,16).capitalize()
     self.displayName = randomString(2,16,' ')
     self.email = (randomString(4,35).lower()+'@'+randomString(4,35)+
 			random.choice(WEBS))
     self.password = ""
     self.salt = ""
     self.provider = "local"
-    self.roles = random.choice(ROLES)
+    self.roles = [random.choice(ROLES)]
     cday = random.randint(1,28)
     cmonth = random.randint(1,12)
-    cyear = random.randint(1970,Date.today().year())
-    self.created = Date(cyear,cmonth,cday)
-    uyear = random.randint(cyear,Date.today().year()+1000)
+    cyear = random.randint(1970,Date.today().year)
+    self.created = datetime.combine(Date(cyear,cmonth,cday),datetime.min.time())
+    uyear = random.randint(cyear,Date.today().year+1000)
     if uyear==cyear:
       umonth = random.randint(cmonth,12)
     else:
@@ -44,32 +50,49 @@ class User:
       uday = random.randint(cday,28)
     else:
       uday = random.randint(1,28)
-    self.updated = Date(uyear,umonth,uday)
+    self.updated = datetime.combine(Date(uyear,umonth,uday),datetime.min.time())
     self.status = [] #Might have to adjust because it's a schema
     self.inviteeList = []
     self.attendeeList = []
     self.almostList = []
     self.rank = []
     self.login_enabled = True
-    self.templates = makeTemplates()
+    self.templates = makeTemplates(0,5)
 
   def decide(self,eventID,attending,recruiting,recruiter=None):
+    eventID = ensureID(eventID)
     statdict = {'event_id':eventID,'attending':attending,'recruiter':recruiting}
     self.status.append(statdict)
+    self.save()
     if attending and recruiter:
-      attendeedict = {'user_id':self.id,'event_id':eventID}
+      attendeedict = {'user_id':self._id,'event_id':eventID}
       recruiter.attendeeList.append(attendeedict)
+      recruiter.inviteeList.remove(attendeedict)
+      recruiter.save()
+      db = getPymongoDB()
+      Users = db.users
+      recWhoInvitedMe = Users.find({'inviteeList': {'user_id': self._id,'event_id':eventID}})
+      for rec in recWhoInvitedMe:
+        if rec['_id'] is not recruiter._id:
+          rec['almostList'].append({'user_id':self._id,'event_id':eventID})
+          rec['inviteeList'].reomve({{'user_id':self._id,'event_id':eventID})
+          Users.save(rec)
+    if attending:
+      Attendee(self._id,eventID,randomTimeInMS(calendar.timegm(self.updated.timetuple()))).save()
 
   def invite(self,userID,eventID):
+    userID = ensureID(userID)
+    eventID = ensureID(eventID)
     inviteedict = {'user_id':userID,'event_id':eventID}
     self.inviteeList.append(inviteedict)
+    self.save()
 
   def valid(self):
     return True #Too lazy to write code to check all the attrs atm
 
   def save(self):
-    members = inspect.getMembers(self)
-    names = [name for name, val in members if not name.contains('_') and
+    members = inspect.getmembers(self)
+    names = [name for name, val in members if (not '_' in name or name=='_id') and
 		not inspect.isfunction(val) and not inspect.isclass(val) and
 		not inspect.ismodule(val) and not inspect.ismethod(val) and
 		not inspect.isbuiltin(val)]
@@ -79,8 +102,8 @@ class User:
     dic = dict()
     for name in names:
       dic[name] = self.__dict__[name]
-    Users = db.users
-    self.id = Users.insert(dic)
-    print("Users->insert: {} with id={}".format(str(dic),self.id))
-    return self.id
+    Users = db.user
+    self._id = Users.save(dic)
+    print("Users->insert: with id={}".format(self._id))
+    return self._id
     
