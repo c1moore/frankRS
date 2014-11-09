@@ -20,7 +20,7 @@
  /**
 	* Globals
 	*/
-	var candidate1, user, user1,attendee,attendee1,recruiter,recruiter1,event1,event2,event3,event4,newCandidate;
+	var candidate1, user, user1,attendee,attendee1,guest1,recruiter,recruiter1,event1,event2,event3,event4,newCandidate;
 
 	function arraysEqual(array0,array1) {
 		if (array0.length !== array1.length) return false;
@@ -104,6 +104,8 @@
 						events: [{eventsID: event1._id, accepted: false},{eventsID:event2._id,accepted:false}],
 						note : 'this is a test'
 					});
+
+					guest1=agent.agent();
 					recruiter.save(function(err,res){
 						recruiter1 = agent.agent();
 						recruiter1
@@ -1194,6 +1196,359 @@ it("recruters should NOT be able to get the candidate first name", function(done
 
  it("recruters should NOT be able to set the candidate's note", function(done) {
  	recruiter1
+ 	.get('http://localhost:3001/candidate/setNote')
+ 	.send({candidateID: candidate1._id,newNote:'blah'})
+ 	.end(function(err,res) {
+ 		if (err) throw err;
+ 		res.status.should.equal(401);
+
+ 		user1
+ 		.get('http://localhost:3001/candidate/getNote')
+ 		.send({candidateID: candidate1._id})
+ 		.end(function(err,res1) {
+ 			if (err) throw err;
+
+
+
+						//console.log(res1.body);
+						if (err) throw err;
+						res1.status.should.equal(200);
+						res1.body.should.have.property('note');
+						res1.body.note.should.be.equal('I have changed the candidate note');
+						done();
+					});
+ 	});
+
+ });
+ it("attendee should be able to volunteer as a new candidate", function(done) {
+ 	guest1
+ 	.get('http://localhost:3001/candidate/setCandidate')
+ 	.send({newfName:attendee.fName,newlName:attendee.lName,newEmail:attendee.email,newEvent: event1._id})
+ 	.end(function(err,res) {
+ 		if (err) throw err;
+ 		//console.log(err);
+ 		res.status.should.equal(401);
+ 		/*newCandidate=res.body;
+			//res.body.should.have.property('fName');
+			//res.body.fName.should.be.equal('Full');
+			//done();
+			user1
+			.get('http://localhost:3001/candidate/getfName')
+			.send({candidateID: newCandidate._id})
+			.end(function(err,res1) {
+				if (err) throw err;
+						//console.log(res1.body);
+						if (err) throw err;
+						res1.status.should.equal(200);
+						res1.body.should.have.property('fName');
+						res1.body.fName.should.be.equal('attendee');
+
+
+						user1
+						.get('http://localhost:3001/candidate/deleteCandidate')
+						.send({candidateID: newCandidate._id})
+						.end(function(err,res) {
+							if (err) throw err;
+							res.status.should.equal(200);			
+							done();
+						});				
+					});*/
+ 			done();
+		});
+
+ });
+
+it("guest should NOT be able to get the candidate first name", function(done) {
+ 	candidate1.save(function(err) {
+ 		guest1
+ 		.get('http://localhost:3001/candidate/getfName')
+ 		.send({candidateID: candidate1._id})
+ 		.end(function(err,res) {
+ 			if (err) throw err;
+ 			res.status.should.equal(401);
+ 			res.body.should.have.should.not.have.property('fName');
+ 			//res.body.fName.should.be.equal('Full');
+ 			done();
+ 		});
+ 	});
+ });
+
+
+ it("guest should NOT be able to get the candidate last name", function(done) {
+ 	candidate1.save(function(err) {
+ 		guest1
+ 		.get('http://localhost:3001/candidate/getlName')
+ 		.send({candidateID: candidate1._id})
+ 		.end(function(err,res) {
+ 			if (err) throw err;
+ 			res.status.should.equal(401);
+ 			res.body.should.not.have.property('lName');
+ 			//res.body.lName.should.be.equal('Name');
+ 			done();
+ 		});
+ 	});
+ });
+
+
+ it("guest should NOT be able to get the candidate email", function(done) {
+ 	candidate1.save(function(err) {
+ 		guest1
+ 		.get('http://localhost:3001/candidate/getEmail')
+ 		.send({candidateID: candidate1._id})
+ 		.end(function(err,res) {
+ 			if (err) throw err;
+ 			res.status.should.equal(401);
+ 			res.body.should.not.have.property('email');
+ 		//	res.body.email.should.be.equal('test@test.com');
+ 			done();
+ 		});
+ 	});
+ });
+ it("guest should NOT be able to get the candidate status", function(done) {
+ 	candidate1.save(function(err) {
+ 		guest1
+ 		.get('http://localhost:3001/candidate/getStatus')
+ 		.send({candidateID: candidate1._id})
+ 		.end(function(err,res) {
+ 			if (err) throw err;
+ 			res.status.should.equal(401);
+ 			res.body.should.not.have.property('status');
+ 			//res.body.status.should.be.equal('volunteer');
+ 			done();
+ 		});
+ 	});
+ });
+
+
+ it("guest should NOT be able to get the candidate accept_key", function(done) {
+ 	candidate1.save(function(err) {
+ 		guest1
+ 		.get('http://localhost:3001/candidate/getAccept_Key')
+ 		.send({candidateID: candidate1._id})
+ 		.end(function(err,res) {
+ 			if (err) throw err;
+ 			res.status.should.equal(401);
+ 			res.body.should.not.have.property('accept_key');
+ 			//res.body.accept_key.should.be.equal('false');
+ 			done();
+ 		});
+ 	});
+ });
+ it("guest should NOT be able to get the candidate EventsID", function(done) {
+ 	candidate1.save(function(err) {
+ 		guest1
+ 		.get('http://localhost:3001/candidate/getEvents')
+ 		.send({candidateID: candidate1._id})
+ 		.end(function(err,res) {
+ 			if (err) throw err;
+ 			//console.log(res.body);
+ 			res.status.should.equal(401);
+ 			res.body.should.not.have.property('events');
+ 			/*(res.body.events[0].eventsID.toString()).should.be.equal(event1._id.toString());
+ 			(res.body.events[0].accepted.toString()).should.be.equal('false');
+ 			(res.body.events[1].eventsID.toString()).should.be.equal(event2._id.toString());
+ 			(res.body.events[1].accepted.toString()).should.be.equal('false');*/
+ 			done();
+ 		});
+ 	});
+ });
+ it("guest should NOT be able to get the candidate note", function(done) {
+ 	candidate1.save(function(err) {
+ 		guest1
+ 		.get('http://localhost:3001/candidate/getNote')
+ 		.send({candidateID: candidate1._id})
+ 		.end(function(err,res) {
+ 			if (err) throw err;
+ 			res.status.should.equal(401);
+ 			res.body.should.not.have.property('note');
+ 			//res.body.note.should.be.equal('this is a test');
+ 			done();
+ 		});
+ 	});
+ });
+
+ it("guest should NOT be able to set the candidate first name", function(done) {
+ 	guest1
+ 	.get('http://localhost:3001/candidate/setfName')
+ 	.send({candidateID: candidate1._id,newfName:'blah'})
+ 	.end(function(err,res) {
+ 		if (err) throw err;
+			//console.log(res);
+			res.status.should.equal(401);
+			//res.body.should.not.exist('fName');
+			//res.body.fName.should.be.equal('Full');
+			//done();
+			user1
+			.get('http://localhost:3001/candidate/getfName')
+			.send({candidateID: candidate1._id})
+			.end(function(err,res1) {
+				if (err) throw err;
+
+
+
+						//console.log(res1.body);
+						if (err) throw err;
+						res1.status.should.equal(200);
+						res1.body.should.have.property('fName');
+						res1.body.fName.should.be.equal('dan');
+						done();
+					});
+		});
+
+ });
+ it("guest should NOT be able to set the candidate last name", function(done) {
+ 	guest1
+ 	.get('http://localhost:3001/candidate/setlName')
+ 	.send({candidateID: candidate1._id,newlName:'Blah'})
+ 	.end(function(err,res) {
+ 		if (err) throw err;
+			//console.log(res);
+			res.status.should.equal(401);
+			//res.body.should.not.exist('fName');
+			//res.body.fName.should.be.equal('Full');
+			//done();
+			user1
+			.get('http://localhost:3001/candidate/getlName')
+			.send({candidateID: candidate1._id})
+			.end(function(err,res1) {
+				if (err) throw err;
+
+
+
+						//console.log(res1.body);
+						if (err) throw err;
+						res1.status.should.equal(200);
+						res1.body.should.have.property('lName');
+						res1.body.lName.should.be.equal('pickle');
+						done();
+					});
+		});
+
+ });
+
+ it("guest should NOT be able to set the candidate email", function(done) {
+ 	guest1
+ 	.get('http://localhost:3001/candidate/setEmail')
+ 	.send({candidateID: candidate1._id,newEmail:'blah@test.com'})
+ 	.end(function(err,res) {
+ 		if (err) throw err;
+			//console.log(res);
+			res.status.should.equal(401);
+			//res.body.should.not.exist('fName');
+			//res.body.fName.should.be.equal('Full');
+			//done();
+			user1
+			.get('http://localhost:3001/candidate/getEmail')
+			.send({candidateID: candidate1._id})
+			.end(function(err,res1) {
+				if (err) throw err;
+
+
+
+						//console.log(res1.body);
+						if (err) throw err;
+						res1.status.should.equal(200);
+						res1.body.should.have.property('email');
+						res1.body.email.should.be.equal('DanP@test.com');
+						done();
+					});
+		});
+
+ });
+ it("guest should NOT be able to set the candidate status", function(done) {
+ 	guest1
+ 	.get('http://localhost:3001/candidate/setStatus')
+ 	.send({candidateID: candidate1._id,newStatus:'volunteer'})
+ 	.end(function(err,res) {
+ 		if (err) throw err;
+			//console.log(res);
+			res.status.should.equal(401);
+			//res.body.should.not.exist('fName');
+			//res.body.fName.should.be.equal('Full');
+			//done();
+			user1
+			.get('http://localhost:3001/candidate/getStatus')
+			.send({candidateID: candidate1._id})
+			.end(function(err,res1) {
+				if (err) throw err;
+
+
+
+						//console.log(res1.body);
+						if (err) throw err;
+						res1.status.should.equal(200);
+						res1.body.should.have.property('status');
+						res1.body.status.should.be.equal('accepted');
+						done();
+					});
+		});
+
+ });
+ 
+ it("guest should NOT be able to add(set) candidate event", function(done) {
+ 	guest1
+ 	.get('http://localhost:3001/candidate/setEvent')
+ 	.send({candidateID: candidate1._id,newEvent:{eventsID: event4._id, accepted: false}})
+ 	.end(function(err,res) {
+ 		if (err) throw err;
+
+ 		res.status.should.equal(401);
+
+ 		user1
+ 		.get('http://localhost:3001/candidate/getEvents')
+ 		.send({candidateID: candidate1._id})
+ 		.end(function(err,res) {
+ 			if (err) throw err;
+
+ 			res.status.should.equal(200);
+ 			res.body.should.have.property('events');
+
+ 			(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
+ 			(res.body.events[0].accepted.toString()).should.be.equal('false');
+ 			(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
+ 			(res.body.events[1].accepted.toString()).should.be.equal('true');
+ 			(res.body.events[2].eventsID.name.toString()).should.be.equal(event3.name);
+ 			(res.body.events[2].accepted.toString()).should.be.equal('true');
+ 			should.not.exist(res.body.events[3]);
+
+ 			done();
+ 		});
+ 	});
+ });
+
+ it("guest should NOT be able to set candidate event accepted field", function(done) {
+ 	guest1
+ 	.get('http://localhost:3001/candidate/setAccepted')
+ 	.send({'candidateID' : candidate1._id, 'eventsID': event2._id, 'accepted': false})
+ 	.end(function(err,res) {
+ 		if (err) throw err;
+
+ 		res.status.should.equal(401);
+
+ 		candidate1.save(function(err) {
+ 			user1
+ 			.get('http://localhost:3001/candidate/getEvents')
+ 			.send({candidateID: candidate1._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+
+ 				res.status.should.equal(200);
+ 				res.body.should.have.property('events');
+
+				(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
+ 				(res.body.events[0].accepted.toString()).should.be.equal('false');
+ 				(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
+ 				(res.body.events[1].accepted.toString()).should.be.equal('true');
+ 				(res.body.events[2].eventsID.name.toString()).should.be.equal(event3.name);
+ 				(res.body.events[2].accepted.toString()).should.be.equal('true');
+ 				done();	
+ 			});
+ 		});
+ 	});
+ });
+
+ it("guest should NOT be able to set the candidate's note", function(done) {
+ 	guest1
  	.get('http://localhost:3001/candidate/setNote')
  	.send({candidateID: candidate1._id,newNote:'blah'})
  	.end(function(err,res) {
