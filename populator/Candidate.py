@@ -1,6 +1,6 @@
 #Candidate object
 
-from Util import randomString
+from Util import randomString, randonNameString
 from Util import WEBS
 from Util import getPymongoDB
 
@@ -15,8 +15,8 @@ class Candidate:
     pass
 
   def randomize(self):
-    self.fName = randomString(2,16).capitalize()
-    self.lName = randomString(2,16).capitalize()
+    self.fName = randomNameString(2,16).capitalize()
+    self.lName = randomNameString(2,16).capitalize()
     self.email = (randomString(4,35).lower()+'@'+randomString(4,35)+
 			random.choice(WEBS))
     self.status = random.choice(STATUS)
@@ -41,7 +41,7 @@ class Candidate:
     dic = dict()
     for name in names:
       dic[name] = self.__dict__[name]
-    Candidates = db.candidates
+    Candidates = db.candidate
     self._id = Candidates.save(dic)
     print("Candidates->insert: with id={}".format(self._id))
     return self._id
