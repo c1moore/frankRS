@@ -1,6 +1,6 @@
 #Candidate object
 
-from Util import randomString, randonNameString
+from Util import randomString, randomNameString
 from Util import WEBS
 from Util import getPymongoDB
 
