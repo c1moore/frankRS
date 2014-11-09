@@ -992,7 +992,6 @@
  			if (err) throw err;
  			res.status.should.equal(401);
  			res.body.should.not.have.property('accept_key');
- 			//res.body.accept_key.should.be.equal('false');
  			done();
  		});
  	});
@@ -1004,13 +1003,8 @@
  		.send({candidateID: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
- 			//console.log(res.body);
  			res.status.should.equal(401);
  			res.body.should.not.have.property('events');
- 			/*(res.body.events[0].eventsID.toString()).should.be.equal(event1._id.toString());
- 			(res.body.events[0].accepted.toString()).should.be.equal('false');
- 			(res.body.events[1].eventsID.toString()).should.be.equal(event2._id.toString());
- 			(res.body.events[1].accepted.toString()).should.be.equal('false');*/
  			done();
  		});
  	});
@@ -1095,20 +1089,12 @@
  	.send({candidateID: candidate1._id,newEmail:'blah@test.com'})
  	.end(function(err,res) {
  		if (err) throw err;
-			//console.log(res);
 			res.status.should.equal(401);
-			//res.body.should.not.exist('fName');
-			//res.body.fName.should.be.equal('Full');
-			//done();
 			user1
 			.get('http://localhost:3001/candidate/getEmail')
 			.send({candidateID: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
-
-
-
-						//console.log(res1.body);
 						if (err) throw err;
 						res1.status.should.equal(200);
 						res1.body.should.have.property('email');
@@ -1124,20 +1110,12 @@
  	.send({candidateID: candidate1._id,newStatus:'volunteer'})
  	.end(function(err,res) {
  		if (err) throw err;
-			//console.log(res);
 			res.status.should.equal(401);
-			//res.body.should.not.exist('fName');
-			//res.body.fName.should.be.equal('Full');
-			//done();
 			user1
 			.get('http://localhost:3001/candidate/getStatus')
 			.send({candidateID: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
-
-
-
-						//console.log(res1.body);
 						if (err) throw err;
 						res1.status.should.equal(200);
 						res1.body.should.have.property('status');
@@ -1154,18 +1132,14 @@
  	.send({candidateID: candidate1._id,newEvent:{eventsID: event4._id, accepted: false}})
  	.end(function(err,res) {
  		if (err) throw err;
-
  		res.status.should.equal(401);
-
  		user1
  		.get('http://localhost:3001/candidate/getEvents')
  		.send({candidateID: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
-
  			res.status.should.equal(200);
  			res.body.should.have.property('events');
-
  			(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
  			(res.body.events[0].accepted.toString()).should.be.equal('false');
  			(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
@@ -1173,7 +1147,6 @@
  			(res.body.events[2].eventsID.name.toString()).should.be.equal(event3.name);
  			(res.body.events[2].accepted.toString()).should.be.equal('true');
  			should.not.exist(res.body.events[3]);
-
  			done();
  		});
  	});
@@ -1223,10 +1196,6 @@
  		.send({candidateID: candidate1._id})
  		.end(function(err,res1) {
  			if (err) throw err;
-
-
-
-						//console.log(res1.body);
 						if (err) throw err;
 						res1.status.should.equal(200);
 						res1.body.should.have.property('note');
@@ -1244,33 +1213,7 @@
  	.send({newfName:attendee.fName,newlName:attendee.lName,newEmail:attendee.email,newEvent: event1._id})
  	.end(function(err,res) {
  		if (err) throw err;
- 		//console.log(err);
  		res.status.should.equal(401);
- 		/*newCandidate=res.body;
-			//res.body.should.have.property('fName');
-			//res.body.fName.should.be.equal('Full');
-			//done();
-			user1
-			.get('http://localhost:3001/candidate/getfName')
-			.send({candidateID: newCandidate._id})
-			.end(function(err,res1) {
-				if (err) throw err;
-						//console.log(res1.body);
-						if (err) throw err;
-						res1.status.should.equal(200);
-						res1.body.should.have.property('fName');
-						res1.body.fName.should.be.equal('attendee');
-
-
-						user1
-						.get('http://localhost:3001/candidate/deleteCandidate')
-						.send({candidateID: newCandidate._id})
-						.end(function(err,res) {
-							if (err) throw err;
-							res.status.should.equal(200);			
-							done();
-						});				
- });*/
  	done();
  });
 
@@ -1285,7 +1228,6 @@
  			if (err) throw err;
  			res.status.should.equal(401);
  			res.body.should.have.should.not.have.property('fName');
- 			//res.body.fName.should.be.equal('Full');
  			done();
  		});
  	});
@@ -1301,7 +1243,6 @@
  			if (err) throw err;
  			res.status.should.equal(401);
  			res.body.should.not.have.property('lName');
- 			//res.body.lName.should.be.equal('Name');
  			done();
  		});
  	});
@@ -1317,7 +1258,6 @@
  			if (err) throw err;
  			res.status.should.equal(401);
  			res.body.should.not.have.property('email');
- 		//	res.body.email.should.be.equal('test@test.com');
  		done();
  	});
  	});
@@ -1347,7 +1287,6 @@
  			if (err) throw err;
  			res.status.should.equal(401);
  			res.body.should.not.have.property('accept_key');
- 			//res.body.accept_key.should.be.equal('false');
  			done();
  		});
  	});
@@ -1359,13 +1298,8 @@
  		.send({candidateID: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
- 			//console.log(res.body);
  			res.status.should.equal(401);
  			res.body.should.not.have.property('events');
- 			/*(res.body.events[0].eventsID.toString()).should.be.equal(event1._id.toString());
- 			(res.body.events[0].accepted.toString()).should.be.equal('false');
- 			(res.body.events[1].eventsID.toString()).should.be.equal(event2._id.toString());
- 			(res.body.events[1].accepted.toString()).should.be.equal('false');*/
  			done();
  		});
  	});
@@ -1379,7 +1313,6 @@
  			if (err) throw err;
  			res.status.should.equal(401);
  			res.body.should.not.have.property('note');
- 			//res.body.note.should.be.equal('this is a test');
  			done();
  		});
  	});
@@ -1391,21 +1324,12 @@
  	.send({candidateID: candidate1._id,newfName:'blah'})
  	.end(function(err,res) {
  		if (err) throw err;
-			//console.log(res);
 			res.status.should.equal(401);
-			//res.body.should.not.exist('fName');
-			//res.body.fName.should.be.equal('Full');
-			//done();
 			user1
 			.get('http://localhost:3001/candidate/getfName')
 			.send({candidateID: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
-
-
-
-						//console.log(res1.body);
-						if (err) throw err;
 						res1.status.should.equal(200);
 						res1.body.should.have.property('fName');
 						res1.body.fName.should.be.equal('dan');
@@ -1420,20 +1344,12 @@
  	.send({candidateID: candidate1._id,newlName:'Blah'})
  	.end(function(err,res) {
  		if (err) throw err;
-			//console.log(res);
 			res.status.should.equal(401);
-			//res.body.should.not.exist('fName');
-			//res.body.fName.should.be.equal('Full');
-			//done();
 			user1
 			.get('http://localhost:3001/candidate/getlName')
 			.send({candidateID: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
-
-
-
-						//console.log(res1.body);
 						if (err) throw err;
 						res1.status.should.equal(200);
 						res1.body.should.have.property('lName');
@@ -1450,20 +1366,12 @@
  	.send({candidateID: candidate1._id,newEmail:'blah@test.com'})
  	.end(function(err,res) {
  		if (err) throw err;
-			//console.log(res);
 			res.status.should.equal(401);
-			//res.body.should.not.exist('fName');
-			//res.body.fName.should.be.equal('Full');
-			//done();
 			user1
 			.get('http://localhost:3001/candidate/getEmail')
 			.send({candidateID: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
-
-
-
-						//console.log(res1.body);
 						if (err) throw err;
 						res1.status.should.equal(200);
 						res1.body.should.have.property('email');
@@ -1479,21 +1387,12 @@
  	.send({candidateID: candidate1._id,newStatus:'volunteer'})
  	.end(function(err,res) {
  		if (err) throw err;
-			//console.log(res);
 			res.status.should.equal(401);
-			//res.body.should.not.exist('fName');
-			//res.body.fName.should.be.equal('Full');
-			//done();
 			user1
 			.get('http://localhost:3001/candidate/getStatus')
 			.send({candidateID: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
-
-
-
-						//console.log(res1.body);
-						if (err) throw err;
 						res1.status.should.equal(200);
 						res1.body.should.have.property('status');
 						res1.body.status.should.be.equal('accepted');
@@ -1578,11 +1477,6 @@
  		.send({candidateID: candidate1._id})
  		.end(function(err,res1) {
  			if (err) throw err;
-
-
-
-						//console.log(res1.body);
-						if (err) throw err;
 						res1.status.should.equal(200);
 						res1.body.should.have.property('note');
 						res1.body.note.should.be.equal('I have changed the candidate note');
