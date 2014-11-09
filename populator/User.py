@@ -1,6 +1,6 @@
 #User object
 
-from Util import randomString
+from Util import randomString, randomNameString
 from Util import WEBS
 from Util import getPymongoDB
 from Util import randomTimeInMS
@@ -28,8 +28,8 @@ class User:
     pass
 
   def randomize(self):
-    self.fName = randomString(2,16).capitalize()
-    self.lName = randomString(2,16).capitalize()
+    self.fName = randomNameString(2,16).capitalize()
+    self.lName = randomNameString(2,16).capitalize()
     self.displayName = randomString(2,16,' ')
     self.email = (randomString(4,35).lower()+'@'+randomString(4,35)+
 			random.choice(WEBS))
@@ -67,6 +67,7 @@ class User:
     if attending and recruiter:
       attendeedict = {'user_id':self._id,'event_id':eventID}
       recruiter.attendeeList.append(attendeedict)
+      recruiter.inviteeList.remove(attendeedict)
       recruiter.save()
       db = getPymongoDB()
       Users = db.users
@@ -74,6 +75,7 @@ class User:
       for rec in recWhoInvitedMe:
         if rec['_id'] is not recruiter._id:
           rec['almostList'].append({'user_id':self._id,'event_id':eventID})
+          rec['inviteeList'].reomve({{'user_id':self._id,'event_id':eventID})
           Users.save(rec)
     if attending:
       Attendee(self._id,eventID,randomTimeInMS(calendar.timegm(self.updated.timetuple()))).save()
@@ -100,7 +102,7 @@ class User:
     dic = dict()
     for name in names:
       dic[name] = self.__dict__[name]
-    Users = db.users
+    Users = db.user
     self._id = Users.save(dic)
     print("Users->insert: with id={}".format(self._id))
     return self._id
