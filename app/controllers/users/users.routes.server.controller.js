@@ -411,16 +411,16 @@ exports.sendInvitation = function(req, res) {
 						var query2 = User.findOne({'email' : req.body.email, 'status.event_id' : req.body.event_id, 'status.attending' : true});
 						query2.exec(function(err, invitee) {
 							if(err) {
-								res.status(400).send('message' : err);
+								res.status(400).send({'message' : err});
 							} else if(!invitee) {
 								recruiter.inviteeList.push({'event_id' : req.body.event_id, 'attending' : false, 'recruiter' : false});
 								recruiter.save(function(err, result) {
-
+									//Rank may need to be updated, check and update if necessary.
 								});
 							} else {
-								recruiter.attendeeList.push({'event_id' : req.body.event_id, 'attending' : false, 'recruiter' : false});
+								recruiter.almostList.push({'event_id' : req.body.event_id, 'attending' : false, 'recruiter' : false});
 								recruiter.save(function(err, result) {
-
+									//almostList does not affect rank, just return.  
 								});
 							}
 						});
