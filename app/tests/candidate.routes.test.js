@@ -208,7 +208,7 @@
  			});
  		});
  	});
- 	it("admin should be able to get the candidate status", function(done) {
+/* 	it("admin should be able to get the candidate status", function(done) {
  		candidate1.save(function(err) {
  			user1
  			.get('http://localhost:3001/candidate/getStatus')
@@ -223,21 +223,7 @@
  		});
  	});
 
-
- 	it("admin should be able to get the candidate accept_key", function(done) {
- 		candidate1.save(function(err) {
- 			user1
- 			.get('http://localhost:3001/candidate/getAccept_Key')
- 			.send({candidateID: candidate1._id})
- 			.end(function(err,res) {
- 				if (err) throw err;
- 				res.status.should.equal(200);
- 				res.body.should.have.property('accept_key');
- 				res.body.accept_key.should.be.equal('false');
- 				done();
- 			});
- 		});
- 	});
+*/
  	it("admin should be able to get the candidate EventsID", function(done) {
  		candidate1.save(function(err) {
  			user1
@@ -250,8 +236,10 @@
  			res.body.should.have.property('events');
  			(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
  			(res.body.events[0].accepted.toString()).should.be.equal('false');
+ 			(res.body.events[0].status.toString()).should.be.equal('volunteer');
  			(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
  			(res.body.events[1].accepted.toString()).should.be.equal('false');
+ 			(res.body.events[1].status.toString()).should.be.equal('volunteer');
  			done();
  		});
  		});
@@ -361,33 +349,34 @@
  	});
  	it("admin should be able to set the candidate status", function(done) {
  		user1
- 		.get('http://localhost:3001/candidate/setStatus')
- 		.send({candidateID: candidate1._id,newStatus:'accepted'})
- 		.end(function(err,res) {
- 			if (err) throw err;
-			//console.log(res);
-			res.status.should.equal(200);
-			//res.body.should.have.property('fName');
-			//res.body.fName.should.be.equal('Full');
-			//done();
-			user1
-			.get('http://localhost:3001/candidate/getStatus')
-			.send({candidateID: candidate1._id})
-			.end(function(err,res1) {
-				if (err) throw err;
+ 	.get('http://localhost:3001/candidate/setAccepted')
+ 	.send({'candidateID' : candidate1._id, 'eventsID': event2._id, 'status': 'invited'})
+ 	.end(function(err,res) {
+ 		if (err) throw err;
 
+ 		res.status.should.equal(200);
 
+ 		candidate1.save(function(err) {
+ 			user1
+ 			.get('http://localhost:3001/candidate/getEvents')
+ 			.send({candidateID: candidate1._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
 
-						//console.log(res1.body);
-						if (err) throw err;
-						res1.status.should.equal(200);
-						res1.body.should.have.property('status');
-						res1.body.status.should.be.equal('accepted');
-						done();
-					});
-		});
+ 				res.status.should.equal(200);
+ 				res.body.should.have.property('events');
 
+ 				(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
+ 				(res.body.events[0].accepted.toString()).should.be.equal('false');
+ 				(res.body.events[0].status.toString()).should.be.equal('volunteer');
+ 				(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
+ 				(res.body.events[1].accepted.toString()).should.be.equal('false');
+ 				(res.body.events[1].status.toString()).should.be.equal('invited');
+ 				done();
+ 			});
+ 		});
  	});
+ });
 
  	it("admin should be able to add(set) candidate event", function(done) {
  		user1
@@ -612,7 +601,7 @@
  	});
  	});
  });
- it("attendees should NOT be able to get the candidate status", function(done) {
+ /*it("attendees should NOT be able to get the candidate status", function(done) {
  	candidate1.save(function(err) {
  		attendee1
  		.get('http://localhost:3001/candidate/getStatus')
@@ -626,22 +615,9 @@
  		});
  	});
  });
+*/
 
 
- it("attendees should NOT be able to get the candidate accept_key", function(done) {
- 	candidate1.save(function(err) {
- 		attendee1
- 		.get('http://localhost:3001/candidate/getAccept_Key')
- 		.send({candidateID: candidate1._id})
- 		.end(function(err,res) {
- 			if (err) throw err;
- 			res.status.should.equal(401);
- 			res.body.should.not.have.property('accept_key');
- 			//res.body.accept_key.should.be.equal('false');
- 			done();
- 		});
- 	});
- });
  it("attendees should NOT be able to get the candidate EventsID", function(done) {
  	candidate1.save(function(err) {
  		attendee1
@@ -967,7 +943,7 @@
  	});
  	});
  });
- it("recruters should NOT be able to get the candidate status", function(done) {
+ /*it("recruters should NOT be able to get the candidate status", function(done) {
  	candidate1.save(function(err) {
  		recruiter1
  		.get('http://localhost:3001/candidate/getStatus')
@@ -981,21 +957,9 @@
  		});
  	});
  });
+*/
 
 
- it("recruters should NOT be able to get the candidate accept_key", function(done) {
- 	candidate1.save(function(err) {
- 		recruiter1
- 		.get('http://localhost:3001/candidate/getAccept_Key')
- 		.send({candidateID: candidate1._id})
- 		.end(function(err,res) {
- 			if (err) throw err;
- 			res.status.should.equal(401);
- 			res.body.should.not.have.property('accept_key');
- 			done();
- 		});
- 	});
- });
  it("recruters should NOT be able to get the candidate EventsID", function(done) {
  	candidate1.save(function(err) {
  		recruiter1
@@ -1262,7 +1226,7 @@
  	});
  	});
  });
- it("guest should NOT be able to get the candidate status", function(done) {
+/* it("guest should NOT be able to get the candidate status", function(done) {
  	candidate1.save(function(err) {
  		guest1
  		.get('http://localhost:3001/candidate/getStatus')
@@ -1275,22 +1239,9 @@
  			done();
  		});
  	});
- });
+ });*/
 
 
- it("guest should NOT be able to get the candidate accept_key", function(done) {
- 	candidate1.save(function(err) {
- 		guest1
- 		.get('http://localhost:3001/candidate/getAccept_Key')
- 		.send({candidateID: candidate1._id})
- 		.end(function(err,res) {
- 			if (err) throw err;
- 			res.status.should.equal(401);
- 			res.body.should.not.have.property('accept_key');
- 			done();
- 		});
- 	});
- });
  it("guest should NOT be able to get the candidate EventsID", function(done) {
  	candidate1.save(function(err) {
  		guest1

@@ -73,7 +73,7 @@
  		return res.status(401).send("User not Authorized");
 
  };
- exports.getStatus= function(req, res) {
+/* exports.getStatus= function(req, res) {
  	if(!req.isAuthenticated())
  		return res.status(401).send("User is not logged in");
 
@@ -92,7 +92,7 @@
  	}
  	else
  		return res.status(401).send("User not Authorized");
- };
+ };*/
  exports.getEvents= function(req, res) {
  	if(!req.isAuthenticated())
  		return res.status(401).send("User is not logged in");
@@ -117,26 +117,6 @@
  		return res.status(401).send("User not Authorized");
  };
 
- exports.getAccept_Key= function(req, res) {
- 	if(!req.isAuthenticated())
- 		return res.status(401).send("User is not logged in");
-
- 	if (req.hasAuthorization(req.user, ["admin"])){
- 		var candidateID=req.body.candidateID;
- 		var query = Candidate.findOne({_id:candidateID });
- 		query.exec(function(err,result) {
- 			if(err) {
- 				res.status(400).send(err);
- 			} else if(!result) {
- 				res.status(400).json({accept_key: "No accept_key found!"});
- 			} else {
- 				res.status(200).json({accept_key : result.accept_key});
- 			}
- 		});
- 	}
- 	else
- 		return res.status(401).send("User not Authorized");
- };
  exports.getNote= function(req, res) {
  	if(!req.isAuthenticated())
  		return res.status(401).send("User is not logged in");
@@ -274,44 +254,38 @@
  		return res.status(401).send('User not Authorized');
 
  };
- exports.setStatus = function(req,res){
+ exports.setEventStatus = function(req,res){
  	if(!req.isAuthenticated())
- 		return res.status(401).send("User is not logged in");
- 	if (req.hasAuthorization(req.user, ["admin"])){
- 		var candidateID=req.body.candidateID;
- 		var query = Candidate.findOne({_id:candidateID });
- 		query.exec(function(err,result){
- 			if(err){
- 				res.status(400).send(err);
- 			}
- 			else if(!result){
- 				res.status(400).json("No candidate found!");
- 			}
- 			else{
- 				result.status = req.body.newStatus;
- 				result.save(function(err, result) {
- 					if(err) {
- 						res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
- 					} else {
- 						return res.status(200).send(result);
- 					}
+		return res.status(401).send("User is not logged in");
+	if (req.hasAuthorization(req.user, ["admin"])){
+		var candidateID = req.body.candidateID;
+		var query = Candidate.findOne({'_id' : candidateID });
+		query.exec(function(err,result){
+			if(err) {
+				res.status(400).send(err);
+			} else if(!result) {
+				res.status(400).json("No candidate found!");
+			} else {
+				for(var i=0; i<result.events.length; i++) {
+					if(result.events[i].eventsID.toString() === req.body.eventsID.toString() ){
+						result.events[i].status = req.body.status.toString();
+						break;
+					}
+				}
 
- 				});
- 				/*Candidate.findByIdAndUpdate(candidateID, { $set: { status: req.body.newStatus }}, function (err, cand) {
-  					if (err) {
-  						res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
-  					} else {
-  						return res.status(200).send(cand);
-  					}
-  				});*/
- 	}
+				result.save(function(err, result2) {
+					if(err) {
+		 				res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
+					} else {
+		 				return res.status(200).send(result2);
+					}
+				});
+			}
+		});
+	} else
+		return res.status(401).send('User not Authorized');
+};
 
- });
- 	}
- 	else
- 		return res.status(401).send('User not Authorized');
-
- };
  exports.setEvent = function(req,res){
  	if(!req.isAuthenticated())
  		return res.status(401).send("User is not logged in");
@@ -344,7 +318,7 @@
 
  };
 
-exports.setEventStatus = function(req,res){
+exports.setEventAccepted = function(req,res){
 	if(!req.isAuthenticated())
 		return res.status(401).send("User is not logged in");
 	if (req.hasAuthorization(req.user, ["admin"])){
