@@ -6,7 +6,9 @@
 var errorHandler = require('../errors'),
 	mongoose = require('mongoose'),
 	_ = require('lodash'),
-	User = mongoose.model('User');
+	nodemailer = require('nodemailer');
+	User = mongoose.model('User'),
+	config = require('../../../config/config');
 
 /*
 * Helper function to search through one of the lists (invitee, attendee, almost) and return only those users who are attending the
@@ -372,10 +374,64 @@ exports.getEmail = function(req, res) {
 			if(err) {
 				res.status(400).send(err);
 			} else if(!result) {
-				res.status(400).json({'message' : 'The impossible has occurred: no email found for user.', 'result' : result});
+				res.status(400).json({'message' : 'The impossible has occurred: no email found for user.'});
 			} else {
 				res.status(200).send({'email' : result.email});
 			}
 		});
+	}
+};
+
+exports.sendInvitation = function(req, res) {
+	if(req.body.fName === undefined || req.body.lName === undefined || req.body.email === undefined || req.body.event_id) {
+		res.status(400).send({'message' : ''});
+		return;
+	}
+
+	if(!req.isAuthenticated()) {
+		res.status(401).send({'message' : 'User is not logged in.'});
+	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
+		var smtpTransport = nodemailer.createTransport(config.mailer.options);
+		var mailOptions = {
+			to: req.body.email,
+			from: req.user.email,
+			replyTo: req.user.email,
+			subject: "You're Invied to frank!",
+			html: emailHTML
+		};
+		smtpTransport.sendMail(mailOptions, function(err) {
+			if (!err) {
+				var query = User.findOne({'_id' : req.user._id});
+				query.exec(function(err, recruiter) {
+					if(err) {
+						res.status(400).send(err);
+					} else if(!recruiter) {
+						res.status(400).send({'message' : 'Recruiter not found.'});
+					} else {
+						var query2 = User.findOne({'email' : req.body.email, 'status.event_id' : req.body.event_id, 'status.attending' : true});
+						query2.exec(function(err, invitee) {
+							if(err) {
+								res.status(400).send('message' : err);
+							} else if(!invitee) {
+								recruiter.inviteeList.push({'event_id' : req.body.event_id, 'attending' : false, 'recruiter' : false});
+								recruiter.save(function(err, result) {
+
+								});
+							} else {
+								recruiter.attendeeList.push({'event_id' : req.body.event_id, 'attending' : false, 'recruiter' : false});
+								recruiter.save(function(err, result) {
+
+								});
+							}
+						});
+					}
+				});
+				res.status(200).send({message: 'Invitation has been sent to ' + req.body.email + '!'});
+			} else {
+				res.status(400).send(err);
+			}
+		});
+	} else {
+		res.status(401).send({'message' : 'User does not have permission.'});
 	}
 };
