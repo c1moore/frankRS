@@ -538,6 +538,44 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 	});
 
+	describe('Send an invitation and update the db properly', function() {
+		it('should send an invitation and update the recruiter\'s rank and inviteeList accordingly when a user is already in the database without ading a new user.', function(done) {
+
+		});
+
+		it('should send an invitation, create a new user, and update the recruiter\'s rank and inviteeList accordingly when an invitee is not in the db yet.', function(done) {
+
+		});
+
+		it('should not send an invitation, but update the recruiter\'s almostList when that user is attending.', function(done) {
+
+		});
+
+		it('should not send an invitation when the user does not have the proper permissions.', function(done) {
+
+		});
+
+		it('should not send an invitation when the user is not signed in to their account.', function(done) {
+
+		});
+
+		it('should return an error when invitee first name is not specified.', function(done) {
+
+		});
+
+		it('should return an error when invitee last name is not specified.', function(done) {
+
+		});
+
+		it('should return an error when invitee email is not specified.', function(done) {
+
+		});
+
+		it('should return an error when the event ID is not specified.', function(done) {
+
+		});
+	});
+
 	describe('Obtain specific user information:', function() {
 		it('should return the user displayname, which should be in the format "Last, First"', function(done) {
 			useragent
