@@ -8,7 +8,9 @@ var errorHandler = require('../errors'),
 	_ = require('lodash'),
 	nodemailer = require('nodemailer'),
 	User = mongoose.model('User'),
-	config = require('../../../config/config');
+	config = require('../../../config/config'),
+	crypto = require('crypto'),
+	async = require('async');
 
 /*
 * Helper function to search through one of the lists (invitee, attendee, almost) and return only those users who are attending the
@@ -28,6 +30,53 @@ var searchByEvent = function(eventID, arr) {
 
 	return temp;
 };
+
+/*
+* Create a temporary password.  This password will not be seen by the invitee, but is just a placeholder for the required password field.
+*/
+var tempPass = function() {
+	temp = new Buffer(crypto.randomBytes(32).toString('base64'), 'base64');
+	var num = _.random(0, 7);
+	for(var i=0; i<num; i++) {
+		temp = temp.splice(_.random(0, temp.length), 1);
+	}
+
+	return temp;
+};
+
+/*
+* Update the rank of all recruiters for the specified event.
+*/
+var updateRanks = function(event_id) {
+	User.aggregate([
+		{$match : {'status.event_id' : req.body.event_id, 'status.recruiter' : true}},
+		{$unwind : {'attendeeList'}},
+		{$unwind : {'inviteeList'}},
+		{$unwind : {'rank'}},
+		{$match : {$or[{'attendeeList.event_id' : event_id}, {'inviteeList.event_id' : event_id}]}},
+		{$project : {'rank' : 1, 'attendeeLength' : this.attendeeList.length, 'inviteeLength' : this.inviteeList.length}},		//A better solution than this may be to add an additional field to the User schema and a presave method that will update this field everytime a user object is updated.
+		{$sort : {'attendeeLength' : -1, 'inviteeLength' : -1}},
+	], function(err, result) {
+		var aqueue = async.queue(function(recruiter, callback) {
+			User.findOne({'_id' : recruiter._id}, function(err, result) {
+				if(!err) {
+					for(var i=0; i<result.rank.length; i++) {
+						if(result.rank[i].event_id.toString() === event_id.toString()) {
+							result.rank.place = recruiter.place;
+							result.save(callback);
+							break;
+						}
+					}
+				}
+			})
+		}, 100000)
+		for(var i=0; i<result.length; i++) {
+			var recruiter = {'_id' : result[i]._id, 'place' : i};
+			aqueue.push(recruiter);
+		}
+	});
+}
+
 
 /*
 * Return the user's displayname (Last, First).
@@ -382,6 +431,14 @@ exports.getEmail = function(req, res) {
 	}
 };
 
+/*
+* This method sends an invitation to the invitee through the recruiter's email address.  If the invitee has not been invited before, the invitee is added to our database.  If the
+* invitee has been invited before, but is not attending, this invitee is simply added to the recruiter's inviteeList.  In either of these cases, the recruiter's rank may have changed
+* so their rank for this event must be updated.  However, if the user has been invited and is already attending the specified event, the invitee will be added to their almostList.
+* Since the almostList does not affect the recruiter's rank, their rank does not have to be updated.
+*
+* TODO: A much more efficient method for updating this information, especially the recruiter's rank, should be researched and used when time permits.
+*/
 exports.sendInvitation = function(req, res) {
 	if(req.body.fName === undefined || req.body.lName === undefined || req.body.email === undefined || req.body.event_id) {
 		res.status(400).send({'message' : ''});
@@ -399,38 +456,91 @@ exports.sendInvitation = function(req, res) {
 			subject: "You're Invied to frank!",
 			html: emailHTML
 		};
+
 		smtpTransport.sendMail(mailOptions, function(err) {
 			if (!err) {
 				var query = User.findOne({'_id' : req.user._id});
 				query.exec(function(err, recruiter) {
 					if(err) {
-						res.status(400).send(err);
+						res.status(400).send('message' : 'User is not logged in or does not have permissions.');
 					} else if(!recruiter) {
 						res.status(400).send({'message' : 'Recruiter not found.'});
 					} else {
 						var query2 = User.findOne({'email' : req.body.email, 'status.event_id' : req.body.event_id, 'status.attending' : true});
 						query2.exec(function(err, invitee) {
 							if(err) {
-								res.status(400).send({'message' : err});
+								res.status(400).send({'message' : 'Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.'});
+							
+							//Either the specified user is not attending the event yet or has not even been invited.
 							} else if(!invitee) {
-								recruiter.inviteeList.push({'event_id' : req.body.event_id, 'attending' : false, 'recruiter' : false});
-								recruiter.save(function(err, result) {
-									//Rank may need to be updated, check and update if necessary.
+								async.waterfall([
+									function(callback) {
+										User.findOne({'email' : req.body.email}, function(err, result) {
+											if(err) {
+												callback("Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.", null);//res.status(400).send({'message' : 'Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.'});
+											} else if(!result) {
+												//Invitee is not in the db yet.  Add the invitee to the db and send the new User object to the next function.
+												newUser = new User({
+													fName : req.body.fName,
+													lName : req.body.lName,
+													email : req.body.email,
+													roles : ['attendee'],
+													login_enabled : false,
+													displayName : req.body.lName + ', ' + req.body.fName,
+													password : tempPass()
+												});
+
+												newUser.save(function(err, result2) {
+													callback(err, result2);
+												});
+											} else {
+												//Invitee is already in the db, send the User object to the next function to be added to the recruiter's inviteeList.
+												callback(null, result);
+											}
+										});
+									},
+									function(invitee, callback) {
+										//Add the invitee to the recruiter's inviteeList.
+										recruiter.inviteeList.push({'event_id' : req.body.event_id, 'user_id' : invitee._id});
+										recruiter.save(function(err, result) {
+											if(err) {
+												callback("Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.", null);
+											} else {
+												callback(null, 1);
+											}
+										}
+									},
+									function(callback) {
+										updateRanks(req.body.event_id);
+
+										//Since it is unlikely that an error will occur in the function above and if there were an error the user could not (and probably would not) do anything about it, we can 'assume' no error will occur and continue.
+										//For debugging, we may want to add a few temporary methods to send errors to the frontend.
+										callback(null, 1);
+									}
+								], function(err, results) {
+									if(err) {
+										res.status(400).send({'message' : err});
+									} else {
+										res.status(200).send({message: 'Invitation has been sent to ' + req.body.email + '!'});
+									}
 								});
+							
+							//This user has already been invited and is attending this event.
 							} else {
-								recruiter.almostList.push({'event_id' : req.body.event_id, 'attending' : false, 'recruiter' : false});
+								recruiter.almostList.push({'event_id' : req.body.event_id, 'user_id' : invitee._id});
 								recruiter.save(function(err, result) {
-									//almostList does not affect rank, just return.  
+									//almostList does not affect rank and the user has been created, just return.
+									res.status(200).send({message: 'Invitation has been sent to ' + req.body.email + '!'});
 								});
 							}
 						});
 					}
 				});
-				res.status(200).send({message: 'Invitation has been sent to ' + req.body.email + '!'});
 			} else {
-				res.status(400).send(err);
+				res.status(400).send('message' : 'Invitation not sent.  Please try again.');
 			}
 		});
+
 	} else {
 		res.status(401).send({'message' : 'User does not have permission.'});
 	}
