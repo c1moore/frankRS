@@ -50,10 +50,10 @@ var tempPass = function() {
 var updateRanks = function(event_id) {
 	User.aggregate([
 		{$match : {'status.event_id' : req.body.event_id, 'status.recruiter' : true}},
-		{$unwind : {'attendeeList'}},
-		{$unwind : {'inviteeList'}},
-		{$unwind : {'rank'}},
-		{$match : {$or[{'attendeeList.event_id' : event_id}, {'inviteeList.event_id' : event_id}]}},
+		{$unwind : 'attendeeList'},
+		{$unwind : 'inviteeList'},
+		{$unwind : 'rank'},
+		{$match : {$or : [{'attendeeList.event_id' : event_id}, {'inviteeList.event_id' : event_id}]}},
 		{$project : {'rank' : 1, 'attendeeLength' : this.attendeeList.length, 'inviteeLength' : this.inviteeList.length}},		//A better solution than this may be to add an additional field to the User schema and a presave method that will update this field everytime a user object is updated.
 		{$sort : {'attendeeLength' : -1, 'inviteeLength' : -1}},
 	], function(err, result) {
@@ -441,7 +441,7 @@ exports.getEmail = function(req, res) {
 */
 exports.sendInvitation = function(req, res) {
 	if(req.body.fName === undefined || req.body.lName === undefined || req.body.email === undefined || req.body.event_id) {
-		res.status(400).send({'message' : ''});
+		res.status(400).send({'message' : 'Required fields not specified.'});
 		return;
 	}
 
@@ -457,89 +457,90 @@ exports.sendInvitation = function(req, res) {
 			html: emailHTML
 		};
 
-		smtpTransport.sendMail(mailOptions, function(err) {
-			if (!err) {
-				var query = User.findOne({'_id' : req.user._id});
-				query.exec(function(err, recruiter) {
+		//smtpTransport.sendMail(mailOptions, function(err) {
+		//	if (!err) {
+		var query = User.findOne({'_id' : req.user._id});
+		query.exec(function(err, recruiter) {
+			if(err) {
+				res.status(400).send({'message' : 'User is not logged in or does not have permissions.'});
+			} else if(!recruiter) {
+				res.status(400).send({'message' : 'Recruiter not found.'});
+			} else {
+				var query2 = User.findOne({'email' : req.body.email, 'status.event_id' : req.body.event_id, 'status.attending' : true});
+				query2.exec(function(err, invitee) {
 					if(err) {
-						res.status(400).send('message' : 'User is not logged in or does not have permissions.');
-					} else if(!recruiter) {
-						res.status(400).send({'message' : 'Recruiter not found.'});
-					} else {
-						var query2 = User.findOne({'email' : req.body.email, 'status.event_id' : req.body.event_id, 'status.attending' : true});
-						query2.exec(function(err, invitee) {
-							if(err) {
-								res.status(400).send({'message' : 'Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.'});
-							
-							//Either the specified user is not attending the event yet or has not even been invited.
-							} else if(!invitee) {
-								async.waterfall([
-									function(callback) {
-										User.findOne({'email' : req.body.email}, function(err, result) {
-											if(err) {
-												callback("Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.", null);//res.status(400).send({'message' : 'Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.'});
-											} else if(!result) {
-												//Invitee is not in the db yet.  Add the invitee to the db and send the new User object to the next function.
-												newUser = new User({
-													fName : req.body.fName,
-													lName : req.body.lName,
-													email : req.body.email,
-													roles : ['attendee'],
-													login_enabled : false,
-													displayName : req.body.lName + ', ' + req.body.fName,
-													password : tempPass()
-												});
-
-												newUser.save(function(err, result2) {
-													callback(err, result2);
-												});
-											} else {
-												//Invitee is already in the db, send the User object to the next function to be added to the recruiter's inviteeList.
-												callback(null, result);
-											}
+						res.status(400).send({'message' : 'Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.'});
+					
+					//Either the specified user is not attending the event yet or has not even been invited.
+					} else if(!invitee) {
+						async.waterfall([
+							function(callback) {
+								User.findOne({'email' : req.body.email}, function(err, result) {
+									if(err) {
+										callback("Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.", null);//res.status(400).send({'message' : 'Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.'});
+									} else if(!result) {
+										//Invitee is not in the db yet.  Add the invitee to the db and send the new User object to the next function.
+										newUser = new User({
+											fName : req.body.fName,
+											lName : req.body.lName,
+											email : req.body.email,
+											roles : ['attendee'],
+											login_enabled : false,
+											displayName : req.body.lName + ', ' + req.body.fName,
+											status : [{'event_id' : req.body.event_id, 'attending' : false, 'recruiter' : false}],
+											password : tempPass()
 										});
-									},
-									function(invitee, callback) {
-										//Add the invitee to the recruiter's inviteeList.
-										recruiter.inviteeList.push({'event_id' : req.body.event_id, 'user_id' : invitee._id});
-										recruiter.save(function(err, result) {
-											if(err) {
-												callback("Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.", null);
-											} else {
-												callback(null, 1);
-											}
-										}
-									},
-									function(callback) {
-										updateRanks(req.body.event_id);
 
-										//Since it is unlikely that an error will occur in the function above and if there were an error the user could not (and probably would not) do anything about it, we can 'assume' no error will occur and continue.
-										//For debugging, we may want to add a few temporary methods to send errors to the frontend.
+										newUser.save(function(err, result2) {
+											callback(err, result2);
+										});
+									} else {
+										//Invitee is already in the db, send the User object to the next function to be added to the recruiter's inviteeList.
+										callback(null, result);
+									}
+								});
+							},
+							function(invitee, callback) {
+								//Add the invitee to the recruiter's inviteeList.
+								recruiter.inviteeList.push({'event_id' : req.body.event_id, 'user_id' : invitee._id});
+								recruiter.save(function(err, result) {
+									if(err) {
+										callback("Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.", null);
+									} else {
 										callback(null, 1);
 									}
-								], function(err, results) {
+								});
+							}
+						], function(err, results) {
+							if(err) {
+								res.status(400).send({'message' : "Invitation was not sent.  We could not connect to the server, please try again later."});
+							} else {
+								smtpTransport.sendMail(mailOptions, function(err) {
 									if(err) {
-										res.status(400).send({'message' : err});
+										res.status(400).send({'message' : 'Invitation was not sent.  Please try again later.'});
 									} else {
+										updateRanks(req.body.event_id);
 										res.status(200).send({message: 'Invitation has been sent to ' + req.body.email + '!'});
 									}
 								});
-							
-							//This user has already been invited and is attending this event.
-							} else {
-								recruiter.almostList.push({'event_id' : req.body.event_id, 'user_id' : invitee._id});
-								recruiter.save(function(err, result) {
-									//almostList does not affect rank and the user has been created, just return.
-									res.status(200).send({message: 'Invitation has been sent to ' + req.body.email + '!'});
-								});
 							}
+						});
+					
+					//This user has already been invited and is attending this event.
+					} else {
+						recruiter.almostList.push({'event_id' : req.body.event_id, 'user_id' : invitee._id});
+						recruiter.save(function(err, result) {
+							//almostList does not affect rank and the user has been created, just return.
+							res.status(200).send({message: req.body.fName + ' ' + req.body.lName + ' is already attending frank.  You\'re thinking of the right people '});
 						});
 					}
 				});
-			} else {
-				res.status(400).send('message' : 'Invitation not sent.  Please try again.');
 			}
 		});
+		//	} else {
+		//		res.status(400).send('message' : 'Invitation not sent.  Please try again.');
+		//	}
+		//});
 
 	} else {
 		res.status(401).send({'message' : 'User does not have permission.'});
