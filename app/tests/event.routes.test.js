@@ -36,9 +36,9 @@ function arraysEqual(array0,array1) {
 describe('Express.js Event Route Integration Tests:', function() {
 	before(function(done) {
 		User.remove().exec(); //Prevent earlier failed tests from poisoning us
-		Event.remove.exec();
+		Event.remove().exec();
 		event1 = new Event({
-			name:  'testing123',
+			name:  'testing1231',
  			start_date: new Date(2140,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
  			end_date:  new Date(2150,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
  			location: 'UF',
@@ -46,7 +46,7 @@ describe('Express.js Event Route Integration Tests:', function() {
  		});
 
  		event2 = new Event({
- 			name:  'testing123',
+ 			name:  'testing1232',
  			start_date: new Date(2140,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
  			end_date:  new Date(2150,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
  			location: 'UF2',
