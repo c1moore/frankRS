@@ -470,7 +470,7 @@
  it("admin should be able to set a new candidate", function(done) {
  	user1
  	.get('http://localhost:3001/candidate/setCandidate')
- 	.send({newfName: 'John',newlName: 'Smith',newEmail:'JohnS@test.com',newStatus:'volunteer',newEvent: event1._id,newAccept_Key:false,newNote:'I Volunteer as Tribute!'})
+ 	.send({newfName: 'John',newlName: 'Smith',newEmail:'JohnS@test.com',newStatus:'volunteer',eventsID: event1._id,newAccept_Key:false,newNote:'I Volunteer as Tribute!'})
  	.end(function(err,res) {
  		if (err) throw err;
 			//console.log(res.body);
@@ -1469,3 +1469,4 @@
  });
 }); 
 });
+

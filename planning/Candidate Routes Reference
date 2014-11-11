@@ -6,11 +6,77 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 
 /candidate/getfName
-/candidate/getlName
-
-
-Expects 
-	.send({candidateID: candidate._id})
-
+	Expects 
+		.send({candidateID: candidate._id})
+	Returns
+		fName
 
 /candidate/getlName
+	Expects 
+		.send({candidateID: candidate._id})
+	Returns
+		lName
+
+/candidate/getEmail
+	Expects 
+		.send({candidateID: candidate._id})
+	Returns
+		email
+
+/candidate/getEvents
+	Expects 
+		.send({candidateID: candidate._id})
+	Returns
+		an array of objects.
+		events[i].eventsID to get eventID
+		events[i].accepted to get the accepted status
+		events[i].status to get the status of the candidate for that event
+		events[i].name to get the name of the event
+		events[i].start_date to get the start date of the event
+
+/candidate/getNote
+	Expects 
+		.send({candidateID: candidate._id})
+	Returns
+		note
+
+/candidate/setfName
+	Expects 
+		.send({candidateID: candidate._id,newfName:'x'})
+
+/candidate/setlName
+	Expects 
+		.send({candidateID: candidate._id,newlName:'x'})
+
+/candidate/setEmail
+	Expects 
+		.send({candidateID: candidate._id,newfName:'x@x.com'})
+
+
+/candidate/setStatus
+	Expects 
+		.send({candidateID: candidate._id,eventsID:'x',newStatus:'accepted/invited/volunteer'})
+/candidate/setEvent
+	Expects 
+		.send({candidateID: candidate._id,newEvent:{eventsID:event._id,accepted: true/false:'x',status:accepted/invited/volunteer'}})
+
+/candidate/setAccepted
+	Expects 
+		.send({candidateID: candidate._id,eventsID:event._id, newAccepted:true/false})
+
+/candidate/setNote
+	Expects 
+		.send({candidateID: candidate._id,newNote:'string'})_
+
+/candidate/setCandidate
+	Expects 
+		.send({newfName:'string',newlName:'string',newEmail:'string@string.string',newStatus:volunteer/invited/accepted, eventsID: event._id,newAccept_Key:true/false,newNote:'string'})
+
+	NOTE: this also works for recruiters/attendees.  It only requires their fname, lname, email, and newEvent.  The rest of the fields will be handled by the backend.
+
+	This is the only candidate route that works for recruites/attendees.  The rest are Admin only.
+
+
+/candidate/deleteCandidate
+	Expects 
+		.send({candidateID: candidate._id})

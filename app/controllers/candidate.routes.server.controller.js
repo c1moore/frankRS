@@ -388,7 +388,7 @@ exports.setNote = function(req,res){
  			lName: req.body.newlName,
  			email: req.body.newEmail,
  			status: req.body.newStatus,
- 			events: [{eventsID: req.body.newEvent._id,accepted: req.body.newAccept_Key}],
+ 			events: [{eventsID: req.body.eventsID._id,accepted: req.body.newAccept_Key}],
  			note: req.body.newNote
  		});
 
