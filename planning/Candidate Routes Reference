@@ -28,7 +28,7 @@ Recruiters and attendees can volunteer to be a recruiter.
 		.send({candidateID: candidate._id})
 	Returns
 		an array of objects.
-		events[i].eventsID to get eventID
+		events[i].event_id to get eventID
 		events[i].accepted to get the accepted status
 		events[i].status to get the status of the candidate for that event
 		events[i].name to get the name of the event
@@ -55,16 +55,16 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 /candidate/setStatus
 	Expects 
-		.send({candidateID: candidate._id,eventsID:'x',newStatus:'accepted/invited/volunteer'})
+		.send({candidateID: candidate._id,event_id:'x',newStatus:'accepted/invited/volunteer'})
 
 		
 /candidate/setEvent
 	Expects 
-		.send({candidateID: candidate._id,newEvent:{eventsID:event._id,accepted: true/false:'x',status:accepted/invited/volunteer'}})
+		.send({candidateID: candidate._id,newEvent:{event_id:event._id,accepted: true/false:'x',status:accepted/invited/volunteer'}})
 
 /candidate/setAccepted
 	Expects 
-		.send({candidateID: candidate._id,eventsID:event._id, newAccepted:true/false})
+		.send({candidateID: candidate._id,event_id:event._id, newAccepted:true/false})
 
 /candidate/setNote
 	Expects 
@@ -72,7 +72,7 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 /candidate/setCandidate
 	Expects 
-		.send({newfName:'string',newlName:'string',newEmail:'string@string.string',newStatus:volunteer/invited/accepted, eventsID: event._id,newAccept_Key:true/false,newNote:'string'})
+		.send({newfName:'string',newlName:'string',newEmail:'string@string.string',newStatus:volunteer/invited/accepted, event_id: event._id,newAccept_Key:true/false,newNote:'string'})
 
 	NOTE: this also works for recruiters/attendees.  It only requires their fname, lname, email, and newEvent.  The rest of the fields will be handled by the backend.
 

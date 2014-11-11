@@ -100,7 +100,7 @@
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidateID=req.body.candidateID;
  		var query = Candidate.findOne({_id:candidateID });
-		query.populate('events.eventsID', 'name start_date');
+		query.populate('events.event_id', 'name start_date');
  		query.exec(function(err,result) {
  			if(err) {
  				res.status(400).send(err);
@@ -267,7 +267,7 @@
 				return res.status(400).json("No candidate found!");
 			} else {
 				for(var i=0; i<result.events.length; i++) {
-					if(result.events[i].eventsID.toString() === req.body.eventsID.toString() ){
+					if(result.events[i].event_id.toString() === req.body.event_id.toString() ){
 						result.events[i].status = req.body.newStatus;
 						break;
 					}
@@ -330,7 +330,7 @@ exports.setEventAccepted = function(req,res){
 				return res.status(400).json("No candidate found!");
 			} else {
 				for(var i=0; i<result.events.length; i++) {
-					if(result.events[i].eventsID.toString() === req.body.eventsID.toString() ){
+					if(result.events[i].event_id.toString() === req.body.event_id.toString() ){
 						result.events[i].accepted = req.body.newAccepted;
 						break;
 					}
@@ -388,7 +388,7 @@ exports.setNote = function(req,res){
  			lName: req.body.newlName,
  			email: req.body.newEmail,
  			status: req.body.newStatus,
- 			events: [{eventsID: req.body.eventsID._id,accepted: req.body.newAccept_Key}],
+ 			events: [{event_id: req.body.event_id._id,accepted: req.body.newAccept_Key}],
  			note: req.body.newNote
  		});
 
@@ -408,7 +408,7 @@ exports.setNote = function(req,res){
  			lName: req.body.newlName,
  			email: req.body.newEmail,
  			status: "volunteer",
- 			events: [{eventsID: req.body.newEvent._id,accepted: false}],
+ 			events: [{event_id: req.body.newEvent._id,accepted: false}],
  			//note: req.body.newNote
  		});
 

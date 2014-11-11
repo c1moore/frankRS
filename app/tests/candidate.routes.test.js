@@ -93,7 +93,6 @@
 						email: 'test12@test.com',
 						password: 'password',
 						login_enable: true
-
 					});
 
 					candidate1 = new Candidate({
@@ -101,7 +100,7 @@
 						lName : 'Name',
 						email : 'test@test.com',
 						status : 'volunteer',
-						events: [{eventsID: event1._id, newAccepted: false},{eventsID:event2._id,accepted:false}],
+						events: [{event_id: event1._id, newAccepted: false},{event_id:event2._id,accepted:false}],
 						note : 'this is a test'
 					});
 
@@ -234,10 +233,10 @@
  			//console.log(res.body);
  			res.status.should.equal(200);
  			res.body.should.have.property('events');
- 			(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
+ 			(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
  			(res.body.events[0].accepted.toString()).should.be.equal('false');
  			(res.body.events[0].status.toString()).should.be.equal('volunteer');
- 			(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
+ 			(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
  			(res.body.events[1].accepted.toString()).should.be.equal('false');
  			(res.body.events[1].status.toString()).should.be.equal('volunteer');
  			done();
@@ -350,7 +349,7 @@
  	it("admin should be able to set the candidate status", function(done) {
  		user1
  	.get('http://localhost:3001/candidate/setStatus')
- 	.send({'candidateID' : candidate1._id, 'eventsID': event2._id, 'newStatus': 'invited'})
+ 	.send({'candidateID' : candidate1._id, 'event_id': event2._id, 'newStatus': 'invited'})
  	.end(function(err,res) {
  		if (err) throw err;
  		//console.log(res.body);
@@ -367,10 +366,10 @@
  				res.status.should.equal(200);
  				res.body.should.have.property('events');
 
- 				(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
+ 				(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
  				(res.body.events[0].accepted.toString()).should.be.equal('false');
  				(res.body.events[0].status.toString()).should.be.equal('volunteer');
- 				(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
+ 				(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
  				(res.body.events[1].accepted.toString()).should.be.equal('false');
  				(res.body.events[1].status.toString()).should.be.equal('invited');
  				done();
@@ -382,7 +381,7 @@
  	it("admin should be able to add(set) candidate event", function(done) {
  		user1
  		.get('http://localhost:3001/candidate/setEvent')
- 		.send({candidateID: candidate1._id,newEvent:{eventsID: event3._id, accepted: true}})
+ 		.send({candidateID: candidate1._id,newEvent:{event_id: event3._id, accepted: true}})
  		.end(function(err,res) {
  			if (err) throw err;
 
@@ -397,11 +396,11 @@
  				res.status.should.equal(200);
  				res.body.should.have.property('events');
 
- 				(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
+ 				(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
  				(res.body.events[0].accepted.toString()).should.be.equal('false');
- 				(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
+ 				(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
  				(res.body.events[1].accepted.toString()).should.be.equal('false');
- 				(res.body.events[2].eventsID.name.toString()).should.be.equal(event3.name);
+ 				(res.body.events[2].event_id.name.toString()).should.be.equal(event3.name);
  				(res.body.events[2].accepted.toString()).should.be.equal('true');
 
  				done();
@@ -412,7 +411,7 @@
  it("admin should be able to set candidate event accepted field", function(done) {
  	user1
  	.get('http://localhost:3001/candidate/setAccepted')
- 	.send({'candidateID' : candidate1._id, 'eventsID': event2._id, 'newAccepted': true})
+ 	.send({'candidateID' : candidate1._id, 'event_id': event2._id, 'newAccepted': true})
  	.end(function(err,res) {
  		if (err) throw err;
 
@@ -428,11 +427,11 @@
  				res.status.should.equal(200);
  				res.body.should.have.property('events');
 
- 				(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
+ 				(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
  				(res.body.events[0].accepted.toString()).should.be.equal('false');
- 				(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
+ 				(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
  				(res.body.events[1].accepted.toString()).should.be.equal('true');
- 				(res.body.events[2].eventsID.name.toString()).should.be.equal(event3.name);
+ 				(res.body.events[2].event_id.name.toString()).should.be.equal(event3.name);
  				(res.body.events[2].accepted.toString()).should.be.equal('true');
 
  				done();
@@ -453,7 +452,7 @@
  		.get('http://localhost:3001/candidate/getNote')
  		.send({candidateID: candidate1._id})
  		.end(function(err,res1) {
- 			if (err) throw err;
+ 			if (err) throw err;f
 
 
 
@@ -470,7 +469,7 @@
  it("admin should be able to set a new candidate", function(done) {
  	user1
  	.get('http://localhost:3001/candidate/setCandidate')
- 	.send({newfName: 'John',newlName: 'Smith',newEmail:'JohnS@test.com',newStatus:'volunteer',eventsID: event1._id,newAccept_Key:false,newNote:'I Volunteer as Tribute!'})
+ 	.send({newfName: 'John',newlName: 'Smith',newEmail:'JohnS@test.com',newStatus:'volunteer',event_id: event1._id,newAccept_Key:false,newNote:'I Volunteer as Tribute!'})
  	.end(function(err,res) {
  		if (err) throw err;
 			//console.log(res.body);
@@ -629,9 +628,9 @@
  			//console.log(res.body);
  			res.status.should.equal(401);
  			res.body.should.not.have.property('events');
- 			/*(res.body.events[0].eventsID.toString()).should.be.equal(event1._id.toString());
+ 			/*(res.body.events[0].event_id.toString()).should.be.equal(event1._id.toString());
  			(res.body.events[0].accepted.toString()).should.be.equal('false');
- 			(res.body.events[1].eventsID.toString()).should.be.equal(event2._id.toString());
+ 			(res.body.events[1].event_id.toString()).should.be.equal(event2._id.toString());
  			(res.body.events[1].accepted.toString()).should.be.equal('false');*/
  			done();
  		});
@@ -743,7 +742,7 @@
  it("attendees should NOT be able to set the candidate status", function(done) {
  	attendee1
  	.get('http://localhost:3001/candidate/setStatus')
- 	.send({candidateID: candidate1._id,'eventsID': event2._id, newStatus:'volunteer'})
+ 	.send({candidateID: candidate1._id,'event_id': event2._id, newStatus:'volunteer'})
  	.end(function(err,res) {
  		if (err) throw err;
 			//console.log(res);
@@ -773,7 +772,7 @@
  it("attendees should NOT be able to add(set) candidate event", function(done) {
  	attendee1
  	.get('http://localhost:3001/candidate/setEvent')
- 	.send({candidateID: candidate1._id,newEvent:{eventsID: event4._id, newAccepted: false}})
+ 	.send({candidateID: candidate1._id,newEvent:{event_id: event4._id, newAccepted: false}})
  	.end(function(err,res) {
  		if (err) throw err;
 
@@ -788,11 +787,11 @@
  			res.status.should.equal(200);
  			res.body.should.have.property('events');
 
- 			(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
+ 			(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
  			(res.body.events[0].accepted.toString()).should.be.equal('false');
- 			(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
+ 			(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
  			(res.body.events[1].accepted.toString()).should.be.equal('true');
- 			(res.body.events[2].eventsID.name.toString()).should.be.equal(event3.name);
+ 			(res.body.events[2].event_id.name.toString()).should.be.equal(event3.name);
  			(res.body.events[2].accepted.toString()).should.be.equal('true');
  			should.not.exist(res.body.events[3]);
 
@@ -804,7 +803,7 @@
  it("attendees should NOT be able to set candidate event accepted field", function(done) {
  	attendee1
  	.get('http://localhost:3001/candidate/setAccepted')
- 	.send({'candidateID' : candidate1._id, 'eventsID': event2._id, 'accepted': false})
+ 	.send({'candidateID' : candidate1._id, 'event_id': event2._id, 'accepted': false})
  	.end(function(err,res) {
  		if (err) throw err;
 
@@ -820,11 +819,11 @@
  				res.status.should.equal(200);
  				res.body.should.have.property('events');
 
- 				(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
+ 				(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
  				(res.body.events[0].accepted.toString()).should.be.equal('false');
- 				(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
+ 				(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
  				(res.body.events[1].accepted.toString()).should.be.equal('true');
- 				(res.body.events[2].eventsID.name.toString()).should.be.equal(event3.name);
+ 				(res.body.events[2].event_id.name.toString()).should.be.equal(event3.name);
  				(res.body.events[2].accepted.toString()).should.be.equal('true');
  				done();
  			});
@@ -1073,7 +1072,7 @@
  it("recruters should NOT be able to set the candidate status", function(done) {
  	recruiter1
  		.get('http://localhost:3001/candidate/setStatus')
- 	.send({candidateID: candidate1._id,'eventsID': event2._id, newStatus:'volunteer'})
+ 	.send({candidateID: candidate1._id,'event_id': event2._id, newStatus:'volunteer'})
  	.end(function(err,res) {
  		if (err) throw err;
 			//console.log(res);
@@ -1103,7 +1102,7 @@
  it("recruters should NOT be able to add(set) candidate event", function(done) {
  	recruiter1
  	.get('http://localhost:3001/candidate/setEvent')
- 	.send({candidateID: candidate1._id,newEvent:{eventsID: event4._id, newAccepted: false}})
+ 	.send({candidateID: candidate1._id,newEvent:{event_id: event4._id, newAccepted: false}})
  	.end(function(err,res) {
  		if (err) throw err;
  		res.status.should.equal(401);
@@ -1114,11 +1113,11 @@
  			if (err) throw err;
  			res.status.should.equal(200);
  			res.body.should.have.property('events');
- 			(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
+ 			(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
  			(res.body.events[0].accepted.toString()).should.be.equal('false');
- 			(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
+ 			(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
  			(res.body.events[1].accepted.toString()).should.be.equal('true');
- 			(res.body.events[2].eventsID.name.toString()).should.be.equal(event3.name);
+ 			(res.body.events[2].event_id.name.toString()).should.be.equal(event3.name);
  			(res.body.events[2].accepted.toString()).should.be.equal('true');
  			should.not.exist(res.body.events[3]);
  			done();
@@ -1129,7 +1128,7 @@
  it("recruters should NOT be able to set candidate event accepted field", function(done) {
  	recruiter1
  	.get('http://localhost:3001/candidate/setAccepted')
- 	.send({'candidateID' : candidate1._id, 'eventsID': event2._id, 'accepted': false})
+ 	.send({'candidateID' : candidate1._id, 'event_id': event2._id, 'accepted': false})
  	.end(function(err,res) {
  		if (err) throw err;
 
@@ -1145,11 +1144,11 @@
  				res.status.should.equal(200);
  				res.body.should.have.property('events');
 
- 				(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
+ 				(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
  				(res.body.events[0].accepted.toString()).should.be.equal('false');
- 				(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
+ 				(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
  				(res.body.events[1].accepted.toString()).should.be.equal('true');
- 				(res.body.events[2].eventsID.name.toString()).should.be.equal(event3.name);
+ 				(res.body.events[2].event_id.name.toString()).should.be.equal(event3.name);
  				(res.body.events[2].accepted.toString()).should.be.equal('true');
  				done();
  			});
@@ -1346,7 +1345,7 @@
  it("guest should NOT be able to set the candidate status", function(done) {
  	guest1
 	.get('http://localhost:3001/candidate/setStatus')
- 	.send({candidateID: candidate1._id,'eventsID': event2._id, newStatus:'volunteer'})
+ 	.send({candidateID: candidate1._id,'event_id': event2._id, newStatus:'volunteer'})
  	.end(function(err,res) {
  		if (err) throw err;
 			//console.log(res);
@@ -1375,7 +1374,7 @@
  it("guest should NOT be able to add(set) candidate event", function(done) {
  	guest1
  	.get('http://localhost:3001/candidate/setEvent')
- 	.send({candidateID: candidate1._id,newEvent:{eventsID: event4._id, newAccepted: false}})
+ 	.send({candidateID: candidate1._id,newEvent:{event_id: event4._id, newAccepted: false}})
  	.end(function(err,res) {
  		if (err) throw err;
 
@@ -1390,11 +1389,11 @@
  			res.status.should.equal(200);
  			res.body.should.have.property('events');
 
- 			(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
+ 			(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
  			(res.body.events[0].accepted.toString()).should.be.equal('false');
- 			(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
+ 			(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
  			(res.body.events[1].accepted.toString()).should.be.equal('true');
- 			(res.body.events[2].eventsID.name.toString()).should.be.equal(event3.name);
+ 			(res.body.events[2].event_id.name.toString()).should.be.equal(event3.name);
  			(res.body.events[2].accepted.toString()).should.be.equal('true');
  			should.not.exist(res.body.events[3]);
 
@@ -1406,7 +1405,7 @@
  it("guest should NOT be able to set candidate event accepted field", function(done) {
  	guest1
  	.get('http://localhost:3001/candidate/setAccepted')
- 	.send({'candidateID' : candidate1._id, 'eventsID': event2._id, 'accepted': false})
+ 	.send({'candidateID' : candidate1._id, 'event_id': event2._id, 'accepted': false})
  	.end(function(err,res) {
  		if (err) throw err;
 
@@ -1422,11 +1421,11 @@
  				res.status.should.equal(200);
  				res.body.should.have.property('events');
 
- 				(res.body.events[0].eventsID.name.toString()).should.be.equal(event1.name);
+ 				(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
  				(res.body.events[0].accepted.toString()).should.be.equal('false');
- 				(res.body.events[1].eventsID.name.toString()).should.be.equal(event2.name);
+ 				(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
  				(res.body.events[1].accepted.toString()).should.be.equal('true');
- 				(res.body.events[2].eventsID.name.toString()).should.be.equal(event3.name);
+ 				(res.body.events[2].event_id.name.toString()).should.be.equal(event3.name);
  				(res.body.events[2].accepted.toString()).should.be.equal('true');
  				done();	
  			});
