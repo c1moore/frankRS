@@ -116,6 +116,16 @@ describe('Express.js User Route Unit Tests:', function() {
 							login_enable : true
 						});
 
+						user5 = new User({
+							fName : 'My',
+							lName : 'Name',
+							displayName : 'Name, My',
+							email : 'myname@email.com',
+							roles : ['admin'],
+							password : 'password',
+							login_enable : true
+						});
+
 						user = new User({
 							fName : 'Calvin',
 							lName : 'Moore',
@@ -134,13 +144,15 @@ describe('Express.js User Route Unit Tests:', function() {
 						user2.save(function(err) {
 							user3.save(function(err) {
 								user4.save(function(err) {
-									user.save(function(err) {
-										useragent2
-											.post('http://localhost:3001/auth/signin')
-											.send({'email' : user2.email, 'password' : 'password'})
-											.end(function(err, res) {
-												done(err);
-											});
+									user5.save(function(err) {
+										user.save(function(err) {
+											useragent2
+												.post('http://localhost:3001/auth/signin')
+												.send({'email' : user2.email, 'password' : 'password'})
+												.end(function(err, res) {
+													done(err);
+												});
+										});
 									});
 								});
 							});
@@ -169,6 +181,29 @@ describe('Express.js User Route Unit Tests:', function() {
           		res.status.should.equal(200);
 				done();
 			});
+	});
+
+	it('should not be able to log in if login_enable is false.', function(done) {
+		var useragent3 = agent.agent();
+		var tempUser = new User({
+			fName : 'Temp',
+			lName : 'User',
+			email : 'tempuser123@gmail.com',
+			password : '123password',
+			login_enable : false,
+			roles : ['attendee']
+		});
+
+		tempUser.save(function() {
+			useragent3
+				.post('http://localhost:3001/auth/signin')
+				.send({'email' : tempUser.email, 'password' : '123password'})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(400);
+					res.message.should.equal("User cannot log into account yet.  You must sign up to attend the event to which you were invited.");
+				});
+		});
 	});
 
 	describe('Leaderboard routes:', function() {
@@ -538,6 +573,124 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 	});
 
+	describe('Sending an invitation', function() {
+		it('should send an invitation and update the recruiter\'s rank and inviteeList accordingly when an invitee is already in the database and has been invited, but not attending the event, without adding a new user.', function(done) {
+			useragent
+				.post('http://localhost:3001/invitation/send')
+				.send({'fName' : user5.fName, 'lName' : user5.lName, 'email' : user5.email, 'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(200);
+					done();
+				});
+		});
+
+		it('should send an invitation and update the recruiter\'s rank and inviteeList accordingly when an invitee is already in the database, but not not even invited the event, without adding a new user.', function(done) {
+			useragent
+				.post('http://localhost:3001/invitation/send')
+				.send({'fName' : user3.fName, 'lName' : user3.lName, 'email' : user3.email, 'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(200);
+					done();
+				});
+		});
+
+		it('should send an invitation, create a new user, and update the recruiter\'s rank and inviteeList accordingly when an invitee is not in the db yet.', function(done) {
+			useragent
+				.post('http://localhost:3001/invitation/send')
+				.send({'lName' : 'Moore', 'fName' : 'Calvin', 'email' : 'h.m.murdock95@gmail.com', 'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(200);
+					done();
+				});
+		});
+
+		it('should not send an invitation, but update the recruiter\'s almostList when that user is attending.', function(done) {
+			useragent
+				.post('http://localhost:3001/invitation/send')
+				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(200);
+					done();
+				});
+		});
+
+		it('should not send an invitation when the user does not have the proper permissions.', function(done) {
+			useragent2
+				.post('http://localhost:3001/invitation/send')
+				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal("User does not have permission.");
+					done();
+				});
+		});
+
+		it('should not send an invitation when the user is not signed in to their account.', function(done) {
+			var useragent3 = agent.agent();
+			useragent3
+				.post('http://localhost:3001/invitation/send')
+				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal("User is not logged in.");
+				});
+		});
+
+		it('should return an error when invitee first name is not specified.', function(done) {
+			useragent
+				.post('http://localhost:3001/invitation/send')
+				.send({'lName' : user2.lName, 'email' : user2.email, 'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(400);
+					res.body.message.should.equal("Required fields not specified.");
+					done();
+				});
+		});
+
+		it('should return an error when invitee last name is not specified.', function(done) {
+			useragent
+				.post('http://localhost:3001/invitation/send')
+				.send({'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(400);
+					res.body.message.should.equal("Required fields not specified.");
+					done();
+				});
+		});
+
+		it('should return an error when invitee email is not specified.', function(done) {
+			useragent
+				.post('http://localhost:3001/invitation/send')
+				.send({'lName' : user2.lName, 'fName' : user2.fName, 'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(400);
+					res.body.message.should.equal("Required fields not specified.");
+					done();
+				});
+		});
+
+		it('should return an error when the event ID is not specified.', function(done) {
+			useragent
+				.post('http://localhost:3001/invitation/send')
+				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(400);
+					res.body.message.should.equal("Required fields not specified.");
+					done();
+				});
+		});
+	});
+
 	describe('Obtain specific user information:', function() {
 		it('should return the user displayname, which should be in the format "Last, First"', function(done) {
 			useragent
@@ -587,14 +740,16 @@ describe('Express.js User Route Unit Tests:', function() {
 	});
 
 	after(function(done) {
-		event1.remove();
-		event2.remove();
-		event3.remove();
-		event4.remove();
-		user.remove();
-		user2.remove();
-		user3.remove();
-		user4.remove();
+		User.remove().exec();
+		Event.remove().exec();
+		//event1.remove();
+		//event2.remove();
+		//event3.remove();
+		//event4.remove();
+		//user.remove();
+		//user2.remove();
+		//user3.remove();
+		//user4.remove();
 		done();
 	});
 

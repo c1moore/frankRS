@@ -17,6 +17,10 @@ def randomString(min,max,extras=""):
   return ''.join(random.choice(list(set(string.ascii_uppercase+string.ascii_lowercase+
 			string.digits)|set(extras))) for _ in range(random.randint(min,max)))
 
+def randomNameString(min,max,extras=""):
+  return ''.join(random.choice(list(set(string.ascii_uppercase+string.ascii_lowercase)|
+				set(extras))) for _ in range(random.randint(min,max)))
+
 def randomTimeInMS(minimum=TWENTY_YEARS):
   return random.randint(minimum,minimum+THIRTY_YEARS)
 

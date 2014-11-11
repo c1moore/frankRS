@@ -75,6 +75,8 @@ var ListSchema = new Schema({
 	event_id: {type: mongoose.Schema.Types.ObjectId, ref:'Event'}
 }, {_id:false});
 
+ListSchema.index({user_id:1, event_id:1}, {unique:"User already a member of list for specified event."});
+
 /*
 * This schema is used for the status array in the User schema.  This list specifies all the events a certain user is invited to attend, whether or not
 * the user is attending, and whether or not the user is a recruiter for this event (as opposed to just an attendee).
