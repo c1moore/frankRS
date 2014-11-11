@@ -183,6 +183,29 @@ describe('Express.js User Route Unit Tests:', function() {
 			});
 	});
 
+	it('should not be able to log in if login_enable is false.', function(done) {
+		var useragent3 = agent.agent();
+		var tempUser = new User({
+			fName : 'Temp',
+			lName : 'User',
+			email : 'tempuser123@gmail.com',
+			password : '123password',
+			login_enable : false,
+			roles : ['attendee']
+		});
+
+		tempUser.save(function() {
+			useragent3
+				.post('http://localhost:3001/auth/signin')
+				.send({'email' : tempUser.email, 'password' : '123password'})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(400);
+					res.message.should.equal("User cannot log into account yet.  You must sign up to attend the event to which you were invited.");
+				});
+		});
+	});
+
 	describe('Leaderboard routes:', function() {
 		it('should be able to get leaderboard when they have the proper roles.', function(done) {
 			useragent
