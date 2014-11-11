@@ -7,25 +7,25 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 /candidate/getfName
 	Expects 
-		.send({candidateID: candidate._id})
+		.send({candidate_id: candidate._id})
 	Returns
 		fName
 
 /candidate/getlName
 	Expects 
-		.send({candidateID: candidate._id})
+		.send({candidate_id: candidate._id})
 	Returns
 		lName
 
 /candidate/getEmail
 	Expects 
-		.send({candidateID: candidate._id})
+		.send({candidate_id: candidate._id})
 	Returns
 		email
 
 /candidate/getEvents
 	Expects 
-		.send({candidateID: candidate._id})
+		.send({candidate_id: candidate._id})
 	Returns
 		an array of objects.
 		events[i].event_id to get eventID
@@ -36,39 +36,39 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 /candidate/getNote
 	Expects 
-		.send({candidateID: candidate._id})
+		.send({candidate_id: candidate._id})
 	Returns
 		note
 
 /candidate/setfName
 	Expects 
-		.send({candidateID: candidate._id,newfName:'x'})
+		.send({candidate_id: candidate._id,newfName:'x'})
 
 /candidate/setlName
 	Expects 
-		.send({candidateID: candidate._id,newlName:'x'})
+		.send({candidate_id: candidate._id,newlName:'x'})
 
 /candidate/setEmail
 	Expects 
-		.send({candidateID: candidate._id,newfName:'x@x.com'})
+		.send({candidate_id: candidate._id,newfName:'x@x.com'})
 
 
 /candidate/setStatus
 	Expects 
-		.send({candidateID: candidate._id,event_id:'x',newStatus:'accepted/invited/volunteer'})
+		.send({candidate_id: candidate._id,event_id:'x',newStatus:'accepted/invited/volunteer'})
 
 		
 /candidate/setEvent
 	Expects 
-		.send({candidateID: candidate._id,newEvent:{event_id:event._id,accepted: true/false:'x',status:accepted/invited/volunteer'}})
+		.send({candidate_id: candidate._id,newEvent:{event_id:event._id,accepted: true/false:'x',status:accepted/invited/volunteer'}})
 
 /candidate/setAccepted
 	Expects 
-		.send({candidateID: candidate._id,event_id:event._id, newAccepted:true/false})
+		.send({candidate_id: candidate._id,event_id:event._id, newAccepted:true/false})
 
 /candidate/setNote
 	Expects 
-		.send({candidateID: candidate._id,newNote:'string'})_
+		.send({candidate_id: candidate._id,newNote:'string'})_
 
 /candidate/setCandidate
 	Expects 
@@ -81,4 +81,4 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 /candidate/deleteCandidate
 	Expects 
-		.send({candidateID: candidate._id})
+		.send({candidate_id: candidate._id})
