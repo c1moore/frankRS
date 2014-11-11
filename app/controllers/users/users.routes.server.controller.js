@@ -530,7 +530,7 @@ exports.sendInvitation = function(req, res) {
 					} else {
 						recruiter.almostList.push({'event_id' : req.body.event_id, 'user_id' : invitee._id});
 						recruiter.save(function(err, result) {
-							//almostList does not affect rank and the user has been created, just return.
+							//almostList does not affect rank and the user has been created, just return.  If there is an error while saving, it is probably because the invitee is already in their almostList.
 							res.status(200).send({message: req.body.fName + ' ' + req.body.lName + ' is already attending frank.  You\'re thinking of the right people '});
 						});
 					}
