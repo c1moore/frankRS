@@ -39,7 +39,9 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 			$scope.postEventId = event._id;
 		}
 
-		var maxInvited, maxAttending;
+		$scope.returnInt = function(value) {
+			return Math.floor(value)
+		}
 
 		var mainApi = $resource('/leaderboard/maintable');
 		var attendingApi = $resource('/modules/leaderboard/tests/MOCK_ATTENDEE_DATA.json');
@@ -66,11 +68,12 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 	            		$filter('orderBy')(filteredData, params.orderBy()) : 
 	            		data;
 	           
+	           		//get the max invited and attending
 	            	var maxInvitedFilter = $filter('orderBy')(data,'inviteeList.length', 'reverse');
 	            	$scope.maxInvited = maxInvitedFilter[0].inviteeList.length;
 
 	            	var maxAttendingFilter = $filter('orderBy')(data,'attendeeList.length', 'reverse');
-	            	$scope.maxInvited = maxAttendingFilter[0].attendeeList.length;
+	            	$scope.maxAttending = maxAttendingFilter[0].attendeeList.length;
 
 	            	params.total(orderedData.length); //set total recalculation for paganation
 	            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
