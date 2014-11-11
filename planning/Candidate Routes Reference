@@ -1,0 +1,16 @@
+Candidate Routes Reference
+
+Only admins are able to get candidate data and/or change it.
+
+Recruiters and attendees can volunteer to be a recruiter.
+
+
+/candidate/getfName
+/candidate/getlName
+
+
+Expects 
+	.send({candidateID: candidate._id})
+
+
+/candidate/getlName
