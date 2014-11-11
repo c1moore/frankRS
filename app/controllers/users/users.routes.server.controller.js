@@ -546,3 +546,20 @@ exports.sendInvitation = function(req, res) {
 		res.status(401).send({'message' : 'User does not have permission.'});
 	}
 };
+
+/*
+* This method should only be triggered by Zapier.com.  This method will be used only when someobody signs up to attend
+* an event on Eventbrite.  Once this occurs, Zapier will send us a webhook with all the information we need to add the
+* attendee to the database.  If the attendee is not currently in the database (which suggests they were invited by
+* means other than the recruiter system), they will be added to the database with the recruiter they specified in the
+* Eventbrite form as the user that recruited them.  If they are in the database, their information will be updated and
+* all inviteeLists will have to be searched to update the information properly.
+*
+* If the attendee is not already an attendee for another event or if they are not a recruiter or admin (which can be
+* determined by checking the login_enable), they will need to be given permission to log into the system by setting
+* login_enable to true and resetting their password from the random one created when they were first invited.  This
+* new password will then be sent to them in an email telling them of their account on this website.
+*/
+exports.acceptInvitation = function(req, res) {
+
+};
