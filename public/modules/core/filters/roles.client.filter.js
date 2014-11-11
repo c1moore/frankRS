@@ -3,27 +3,21 @@
 angular.module("core").filter("roles", function(){
 	return function(data, rolesNeeded) {
 		//creates array function to find if an array contains an element
-		Array.prototype.contains = function(needle) {
-			for (i in this) {
-				if (this[i] == needle) return true;
+		var contains = function(array, needle) {
+			for (var x in array) {
+				if (array[x] === needle) return true;
 			}
 			return false;
 		}
 
-		var filtered = data.filter(containing);
-
 		//filters out data not containing the roles
 		var containing = function(element) {
-			var found = false;
 			for (var x in rolesNeeded) {
-				if(element.roles.contains(x)) {
-					found = true;
-					break;
-				}
+				if (contains(element.roles,rolesNeeded[x])) return true;
 			}
-			return found;
-		}
-
-		return filtered;
+			return false;
+		};
+		
+		return data.filter(containing);
 	};
 });

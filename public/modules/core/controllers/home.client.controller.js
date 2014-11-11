@@ -1,6 +1,5 @@
 'use strict';
 
-
 angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 	function($scope, Authentication) {
 		// This provides Authentication context.
@@ -11,8 +10,8 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 		// Temporary data for buttons
 		$scope.data = {
 			buttons: [
-				{name:"Leaderboard", description:"Description 1", link:'/#!/leaderboard', members:['recruiter','admin']},
-				{name:"Invites", description:"Description 2", link:'/#!/invite', members:['recruiter','admin']},
+				{name:"Leaderboard", description:"Description 1", link:'/#!/leaderboard', roles:['recruiter','admin']},
+				{name:"Invites", description:"Description 2", link:'/#!/invite', roles:['recruiter','admin']},
 				{name:"Button 3", description:"Description 3", link:'#'},
 				{name:"Button 4", description:"Description 4", link:'#'}
 			],
