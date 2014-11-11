@@ -56,6 +56,8 @@ Recruiters and attendees can volunteer to be a recruiter.
 /candidate/setStatus
 	Expects 
 		.send({candidateID: candidate._id,eventsID:'x',newStatus:'accepted/invited/volunteer'})
+
+		
 /candidate/setEvent
 	Expects 
 		.send({candidateID: candidate._id,newEvent:{eventsID:event._id,accepted: true/false:'x',status:accepted/invited/volunteer'}})
