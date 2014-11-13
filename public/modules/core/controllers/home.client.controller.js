@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('core').controller('HomeController', ['$scope', 'Authentication',
-	function($scope, Authentication) {
+angular.module('core').controller('HomeController', ['$scope', 'Authentication', '$filter',
+	function($scope, Authentication, $filter) {
 		// This provides Authentication context.
 		$scope.authentication = Authentication;
 		//The users roles
@@ -17,6 +17,9 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 			],
 			comments: ["Comment 1", "Comment 2"]
 		};
+
+		//changes button width based on the number of buttons the user can see
+		$scope.buttonsWidth = 100/($filter('roles')($scope.data.buttons,$scope.userRoles)).length
 
 		$scope.displayComments = true;
 		$scope.buttonsGrid = "col-md-10";
