@@ -35,7 +35,7 @@ class Candidate:
 
   def valid(self):
     return (hasattr(self,'fName') and hasattr(self,'lName') and hasattr(self,'email') and
-		hasattr(self,'status') and hasattr(self,'events') and hasattr(self,'accept_key') and
+		True and hasattr(self,'events') and hasattr(self,'accept_key') and
 		hasattr(self,'note'))
 
   def save(self):
