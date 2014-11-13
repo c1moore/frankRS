@@ -3,6 +3,7 @@
 from Util import randomString, randomNameString
 from Util import WEBS
 from Util import getPymongoDB
+from Util import ensureID
 
 import random
 import inspect
@@ -19,10 +20,18 @@ class Candidate:
     self.lName = randomNameString(2,16).capitalize()
     self.email = (randomString(4,35).lower()+'@'+randomString(4,35)+
 			random.choice(WEBS))
-    self.status = random.choice(STATUS)
     self.events = []
     self.accept_key = False
     self.note = ""
+
+  def addEvent(self,eventID,accepted=None,status=None):
+    eventID = ensureID(eventID)
+    if accepted is None:
+      accepted = random.choice([True,False])
+    if status is None:
+      status = random.choice(['volunteer','invited','accepted'])
+    statusdict = {'event_id':eventID,'accepted':accepted,'status':status}
+    self.events.append(statusdict)
 
   def valid(self):
     return (hasattr(self,'fName') and hasattr(self,'lName') and hasattr(self,'email') and
