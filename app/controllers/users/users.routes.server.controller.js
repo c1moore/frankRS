@@ -477,7 +477,7 @@ exports.sendInvitation = function(req, res) {
 							function(callback) {
 								User.findOne({'email' : req.body.email}, function(err, result) {
 									if(err) {
-										callback("Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.", null);//res.status(400).send({'message' : 'Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.'});
+										callback(true, null);//res.status(400).send({'message' : 'Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.'});
 									} else if(!result) {
 										//Invitee is not in the db yet.  Add the invitee to the db and send the new User object to the next function.
 										newUser = new User({
@@ -502,10 +502,10 @@ exports.sendInvitation = function(req, res) {
 							},
 							function(invitee, callback) {
 								//Add the invitee to the recruiter's inviteeList.
-								recruiter.inviteeList.push({'event_id' : req.body.event_id, 'user_id' : invitee._id});
+								recruiter.inviteeList.addToSet({'event_id' : req.body.event_id, 'user_id' : invitee._id});
 								recruiter.save(function(err, result) {
 									if(err) {
-										callback("Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.", null);
+										callback(true, null);
 									} else {
 										callback(null, 1);
 									}
@@ -528,9 +528,8 @@ exports.sendInvitation = function(req, res) {
 					
 					//This user has already been invited and is attending this event.
 					} else {
-						recruiter.almostList.push({'event_id' : req.body.event_id, 'user_id' : invitee._id});
+						recruiter.almostList.addToSet({'event_id' : req.body.event_id, 'user_id' : invitee._id});
 						recruiter.save(function(err, result) {
-							//almostList does not affect rank and the user has been created, just return.  If there is an error while saving, it is probably because the invitee is already in their almostList.
 							res.status(200).send({message: req.body.fName + ' ' + req.body.lName + ' is already attending frank.  You\'re thinking of the right people '});
 						});
 					}
@@ -561,5 +560,5 @@ exports.sendInvitation = function(req, res) {
 * new password will then be sent to them in an email telling them of their account on this website.
 */
 exports.acceptInvitation = function(req, res) {
-
+	
 };
