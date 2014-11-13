@@ -99,8 +99,8 @@
 						fName : 'Full',
 						lName : 'Name',
 						email : 'test@test.com',
-						status : 'volunteer',
-						events: [{event_id: event1._id, newAccepted: false},{event_id:event2._id,accepted:false}],
+						//status : 'volunteer',
+						events: [{event_id: event1._id, newAccepted: false,status: 'volunteer'},{event_id:event2._id,accepted:false,status:'volunteer'}],
 						note : 'this is a test'
 					});
 
