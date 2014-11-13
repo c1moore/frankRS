@@ -18,7 +18,7 @@ var should = require('should'),
 /**
  * Globals
  */
-var user, user2, user3, user4, event1, event2, event3, event4,
+var user, user2, user3, user4, user5, event1, event2, event3, event4,
 	useragent = agent.agent(), useragent2 = agent.agent();
 
 /*
