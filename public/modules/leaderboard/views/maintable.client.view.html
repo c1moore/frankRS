@@ -7,14 +7,14 @@
 			{{user.displayName}}
 		</td>
 		<td data-title="'Attending/Invited Count'">
-			<progress>
-				<bar class="attendingBar" value="user.attendeeList.length">
-					<span style="color:black; white-space:nowrap;">{{user.attendeeList.length}}</span>
-				</bar>
-				<bar class="invitedBar" value="user.inviteeList.length" type="success">
-					<span style="color:black; white-space:nowrap;">{{user.inviteeList.length}}</span>
-				</bar>
-			</progress>
+			<div class="progress">
+				<div class="progress-bar progress-bar-warning" ng-style="{'width':((user.attendeeList.length/maxAttending)*100) + '%'}">
+					{{user.attendeeList.length}}
+				</div>
+				<div class="progress-bar progress-bar-success" ng-style="{'width':((user.inviteeList.length/maxInvited)*100) + '%'}">
+					{{user.inviteeList.length}}
+				</div>
+			</div>
 		</td>
 	</tr>
 </table>

@@ -34,3 +34,15 @@ body {
 	width: 100%;
 	bottom: 0px;
 }
+
+.homeButtonContainer {
+	position:relative;
+	display:inline-block;
+	padding:10px;
+}
+
+.homeButton {
+	margin-left: auto;
+    margin-right: auto;
+    width: 70%;
+}

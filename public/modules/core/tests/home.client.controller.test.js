@@ -31,5 +31,9 @@
 			expect(scope.displayComments).not.toBeTruthy();
 			expect(scope.buttonsGrid).toEqual("col-md-12");
 		});
+
+		it('should return 50', function() {
+			expect(scope.buttonsWidth).toEqual('50');
+		})
 	});
 })();

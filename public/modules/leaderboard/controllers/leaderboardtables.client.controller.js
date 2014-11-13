@@ -21,6 +21,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		//the currently selected event defaulting to Select Event
 		$scope.selectedEvent = 'Select Event';
 
+		/*
 		$http.get('/recruiter/events').success(function(data) {
 			$scope.events = data;
 		}).error(function(error, status) {
@@ -30,11 +31,16 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 			}
 			console.log(error);
 		});
+		*/
 
 		//updates the table for the selected event
 		$scope.changeEvent = function(event) {
 			$scope.selectedEvent = event.name;
 			$scope.postEventId = event._id;
+		}
+
+		$scope.returnInt = function(value) {
+			return Math.floor(value)
 		}
 
 		var mainApi = $resource('/leaderboard/maintable');
@@ -62,8 +68,12 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 	            		$filter('orderBy')(filteredData, params.orderBy()) : 
 	            		data;
 	           
-	            	var maxFilter = ($filter('orderBy')(data,'inviteeList.length'));
-	            	$scope.maxInvited = maxFilter[0].inviteeList.length;
+	           		//get the max invited and attending
+	            	var maxInvitedFilter = $filter('orderBy')(data,'inviteeList.length', 'reverse');
+	            	$scope.maxInvited = maxInvitedFilter[0].inviteeList.length;
+
+	            	var maxAttendingFilter = $filter('orderBy')(data,'attendeeList.length', 'reverse');
+	            	$scope.maxAttending = maxAttendingFilter[0].attendeeList.length;
 
 	            	params.total(orderedData.length); //set total recalculation for paganation
 	            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
