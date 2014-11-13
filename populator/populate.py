@@ -10,7 +10,7 @@ from Util import resetMongo
 
 import random, time
 
-required = "You must specify an interger. This field is required."
+required = "Entry is invalid. This field is required."
 
 def welcome():
   msg = ("---Welcome to the populator script!---\n" +
@@ -28,7 +28,8 @@ def getNumAttendees():
   while True:
     try:
       numAttendees = int(input("How many attendees will there be?: "))
-    except ValueError:
+      assert (numAttendees >= 0)
+    except (ValueError, AssertionError):
       print(required)
     else:
       return numAttendees
@@ -37,7 +38,8 @@ def getNumRecruiters():
   while True:
     try:
       numRecruiters = int(input("How many recruiters will there be?: "))
-    except ValueError:
+      assert (numRecruiters >= 0)
+    except (ValueError, AssertionError):
       print(required)
     else:
       return numRecruiters
@@ -46,7 +48,8 @@ def getNumAdmins():
   while True:
     try:
       numAdmins = int(input("How many admins will there be?: "))
-    except ValueError:
+      assert (numAdmins >= 0)
+    except (ValueError, AssertionError):
       print(required)
     else:
       return numAdmins
@@ -55,7 +58,8 @@ def getNumCandidates():
   while True:
     try:
       numCandidates = int(input("How many candidates will there be?: "))
-    except ValueError:
+      assert (numCandidates >= 0)
+    except (ValueError, AssertionError):
       print(required)
     else:
       return numCandidates
@@ -65,7 +69,8 @@ def getAdminsUnionRecruiters(numRecruiters,numAdmins):
     try:
       unions = int(input(("Of the {} recruiters, how many of them should also be admins? \n" + 
 		"(up to {}, or -1 for don't care): ").format(numRecruiters,max(numAdmins,numRecruiters))))
-    except ValueError:
+      assert (unions == -1 or (unions>=0 and unions <=max(numAdmins,numRecruiters)))
+    except (ValueError, AssertionError):
       print(required)
     else:
       return unions
@@ -73,18 +78,20 @@ def getAdminsUnionRecruiters(numRecruiters,numAdmins):
 def getAttendeesUnionRecruiters(numRecruiters,numAttendees):
   while True:
     try:
-      union = int(input(("Of the {} recruiters, how many of them should also be attendees? \n" + 
+      unions = int(input(("Of the {} recruiters, how many of them should also be attendees? \n" + 
 		"(up to {}, or -1 for don't care): ").format(numRecruiters,max(numRecruiters,numAttendees))))
-    except ValueError:
+      assert (unions == -1 or (unions>=0 and unions <=max(numRecruiters,numAttendees)))
+    except (ValueError, AssertionError):
       print(required)
     else:
-      return union
+      return unions
 
 def getNumEvents():
   while True:
     try:
       numEvents = int(input("How many events will there be?: "))
-    except ValueError:
+      assert (numEvents >= 0)
+    except (ValueError, AssertionError):
       print(required)
     else:
       return numEvents
@@ -93,7 +100,8 @@ def getMaxEventsPerRecruiter():
   while True:
     try:
       maxEvents = int(input("How many events (maximum) does a recruiter recruit for?: "))
-    except ValueError:
+      assert (maxEvents >= 0)
+    except (ValueError, AssertionError):
       print(required)
     else:
       return maxEvents
@@ -102,7 +110,8 @@ def getNumInvitesPerRecruiter():
   while True:
     try:
       numInvites = int(input("How many invites should each recruiter send?: "))
-    except ValueError:
+      assert (numInvites >= 0)
+    except (ValueError, AssertionError):
       print(required)
     else:
       return numInvites
@@ -111,7 +120,8 @@ def getNumEventsPerCandidate():
   while True:
     try:
       numEvents = int(input("How many events should each candidate apply for?: "))
-    except ValueError:
+      assert (numEvents > 0)
+    except (ValueError, AssertionError):
       print(required)
     else:
       return numEvents
@@ -204,7 +214,10 @@ def main():
       while rec_user is recruiter:
         rec_user = random.choice(attendees)
       recruiter.invite(rec_user,rec_event_id)
-      
+
+  numObjs = len(set(recruiters)|set(attendees)|set(admins)|set(candidates)|set(events))
+  print("%s Objects injected." % numObjs)
+
 
 if __name__=='__main__':
   main()
