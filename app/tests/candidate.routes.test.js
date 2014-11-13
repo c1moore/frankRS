@@ -452,7 +452,7 @@
  		.get('http://localhost:3001/candidate/getNote')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res1) {
- 			if (err) throw err;f
+ 			if (err) throw err;
 
 
 
