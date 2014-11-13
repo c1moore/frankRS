@@ -74,7 +74,7 @@
 						roles: ['admin'],
 						email: 'test@test.com',
 						password: 'password',
-						login_enable: true
+						login_enabled: true
 
 					});
 					attendee = new User({
@@ -83,7 +83,7 @@
 						roles: ['attendee'],
 						email: 'test1234@test.com',
 						password: 'password',
-						login_enable: true
+						login_enabled: true
 
 					});
 					recruiter = new User({
@@ -92,7 +92,7 @@
 						roles: ['attendee'],
 						email: 'test12@test.com',
 						password: 'password',
-						login_enable: true
+						login_enabled: true
 					});
 
 					candidate1 = new Candidate({
