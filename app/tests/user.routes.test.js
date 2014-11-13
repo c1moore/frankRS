@@ -89,7 +89,7 @@ describe('Express.js User Route Unit Tests:', function() {
 							roles : ['attendee'],
 							status : [{'event_id':event1._id, 'attending':true, 'recruiter':true}, {'event_id':event2._id, 'attending':false, 'recruiter':true}, {'event_id':event3._id, 'attending':true, 'recruiter':true}, {'event_id':event4._id, 'attending':true, 'recruiter':false}],
 							password : 'password',
-							login_enable : true
+							login_enabled : true
 						});
 
 						user3 = new User({
@@ -100,7 +100,7 @@ describe('Express.js User Route Unit Tests:', function() {
 							roles : ['attendee'],
 							status : [],
 							password : 'password',
-							login_enable : true
+							login_enabled : true
 						});
 
 						user4 = new User({
@@ -113,7 +113,7 @@ describe('Express.js User Route Unit Tests:', function() {
 							attendeeList : [{'user_id' : user2._id, 'event_id' : event1._id}],
 							inviteeList : [{'user_id' : user3._id, 'event_id' : event1._id}, {'user_id' : user2._id, 'event_id' : event1._id}],
 							password : 'password',
-							login_enable : true
+							login_enabled : true
 						});
 
 						user5 = new User({
@@ -123,7 +123,7 @@ describe('Express.js User Route Unit Tests:', function() {
 							email : 'myname@email.com',
 							roles : ['admin'],
 							password : 'password',
-							login_enable : true
+							login_enabled : true
 						});
 
 						user = new User({
@@ -138,7 +138,7 @@ describe('Express.js User Route Unit Tests:', function() {
 							attendeeList : [{'user_id' : user2._id, 'event_id' : event1._id}, {'user_id' : user3._id, 'event_id' : event2._id}, {'user_id' : user4._id, 'event_id' : event1._id}],
 							inviteeList : [{'user_id' : user3._id, 'event_id' : event1._id}],
 							almostList : [{'user_id' : user4._id, 'event_id' : event2._id}, {'user_id' : user2._id, 'event_id' : event2._id}],
-							login_enable : true
+							login_enabled : true
 						});
 
 						user2.save(function(err) {
@@ -183,14 +183,14 @@ describe('Express.js User Route Unit Tests:', function() {
 			});
 	});
 
-	it('should not be able to log in if login_enable is false.', function(done) {
+	it('should not be able to log in if login_enabled is false.', function(done) {
 		var useragent3 = agent.agent();
 		var tempUser = new User({
 			fName : 'Temp',
 			lName : 'User',
 			email : 'tempuser123@gmail.com',
 			password : '123password',
-			login_enable : false,
+			login_enabled : false,
 			roles : ['attendee']
 		});
 
