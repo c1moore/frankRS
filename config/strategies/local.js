@@ -23,13 +23,11 @@ module.exports = function() {
 					return done(null, false, {
 						message: 'Email or password is unknown.'
 					});
+				} else if(!user.login_enabled) {
+					return done(null, false, {
+						message : 'User cannot log into account yet.  You must sign up to attend the event to which you were invited.'
+					});
 				} else {
-					/*if (!user.authenticate(password)) {
-						return done(null, false, {
-							message: 'Invalid password'
-						});
-					}*/
-
 					return done(null, user);
 				}
 			});

@@ -16,7 +16,7 @@ var validateLocalStrategyProperty = function(property) {
 };
 
 var eventsArray = new Schema({
-	eventsID: {type: mongoose.Schema.Types.ObjectId, ref: 'Event'},
+	event_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Event'},
 	accepted: {type: Boolean, default: 'false'},
 	status: {type: String, enum: ['volunteer','invited','accepted'], default: 'volunteer'}
 }, {_id:false});
