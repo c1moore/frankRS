@@ -470,7 +470,7 @@ exports.sendInvitation = function(req, res) {
 				query2.exec(function(err, invitee) {
 					if(err) {
 						res.status(400).send({'message' : 'Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.'});
-					
+		
 					//Either the specified user is not attending the event yet or has not even been invited.
 					} else if(!invitee) {
 						async.waterfall([

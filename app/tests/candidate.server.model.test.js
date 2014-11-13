@@ -98,7 +98,7 @@ describe('Candidate Model Unit Tests:', function() {
 		});
 
 		it('should fail to save when an objectid in the event array does not reference an event.', function(done) {
-			candidate1.events = [{eventsID: mongoose.Types.ObjectId(), accepted: false}];
+			candidate1.events = [{event_id: mongoose.Types.ObjectId(), accepted: false}];
 			candidate1.save(function(err, result) {
 				should.exist(err);
 				done();
@@ -115,7 +115,7 @@ describe('Candidate Model Unit Tests:', function() {
 			});
 
 			event1.save(function(err) {
-				candidate1.events = [{eventsID: event1._id, accepted: false}];
+				candidate1.events = [{event_id: event1._id, accepted: false}];
 				candidate1.save(function(err, result) {
 					should.exist(result);
 					event1.remove(function() {
