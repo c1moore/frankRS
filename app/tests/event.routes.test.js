@@ -38,7 +38,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 		User.remove().exec(); //Prevent earlier failed tests from poisoning us
 		Event.remove().exec();
 		event1 = new Event({
-			name:  'testing1231',
+			name:  'testing123',
  			start_date: new Date(2140,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
  			end_date:  new Date(2150,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
  			location: 'UF',
@@ -46,7 +46,7 @@ describe('Express.js Event Route Integration Tests:', function() {
  		});
 
  		event2 = new Event({
- 			name:  'testing1232',
+ 			name:  'testing123',
  			start_date: new Date(2140,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
  			end_date:  new Date(2150,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
  			location: 'UF2',
@@ -64,7 +64,7 @@ describe('Express.js Event Route Integration Tests:', function() {
  			salt: 'abc123',
  			rank: [],
  			provider: 'local',
- 			login_enabled: false
+ 			login_enabled: true
  		});
 
 		userAdmin = new User({
@@ -78,7 +78,7 @@ describe('Express.js Event Route Integration Tests:', function() {
  			salt: 'abc123',
  			rank: [],
  			provider: 'local',
- 			login_enabled: false
+ 			login_enabled: true
  		});
 
  		event1.save(function(err){
