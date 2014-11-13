@@ -125,7 +125,7 @@ def main():
   numCandidates = getNumCandidates()
   numEvents = getNumEvents()
   adminsUnionRecruiters = getAdminsUnionRecruiters(numRecruiters,numAdmins)
-  attendeesUnionRecruiters(numRecruiters,numAdmins)
+  attendeesUnionRecruiters = getAttendeesUnionRecruiters(numRecruiters,numAdmins)
   maxEventsPerRecruiter = getMaxEventsPerRecruiter()
   numInvitesPerRecruiter = getNumInvitesPerRecruiter()
   numEventsPerCandidate = getNumEventsPerCandidate()
@@ -135,43 +135,43 @@ def main():
     attendeesUnionRecruiters=random.randint(0,max(numRecruiters,numAttendees))
   print("Generating objects...")
   time.sleep(3) #Take a deep breath!
-  recruiters = set()
-  attendees = set()
-  admins = set()
-  candidates = set()
-  events = set()
+  recruiters = []
+  attendees = []
+  admins = []
+  candidates = []
+  events = []
   #Make events
   for i in range(numEvents):
     event = Event()
     event.randomize()
     event.save()
-    events.add(event)
+    events.append(event)
   #Make recruiters
   for i in range(numRecruiters):
     newUser = User()
     newUser.randomize()
     newUser.roles = ['recruiter']
-    for i in range(random.randint(0,maxEventsPerRecruiter)): #Make them recruit for some events
+    for i in range(random.randint(1,maxEventsPerRecruiter)): #Make them recruit for some events
       newUser.recruitFor(random.choice(events))
-    recruiters.add(newUser)
+    recruiters.append(newUser)
     newUser.save()
   count = 0
   #Make some recruiters attendees
   while count<attendeesUnionRecruiters:
     recruiter = random.choice(recruiters)
-    if recruiter.roles.contains('attendee'):
+    if 'attendee' in recruiter.roles:
       continue
     recruiter.roles.append('attendee')
-    attendees.add(recruiter)
+    attendees.append(recruiter)
     count += 1
   count = 0
   #Make some recruiters admins
   while count<adminsUnionRecruiters:
     recruiter = random.choice(recruiters)
-    if recruiter.roles.contains('admin'):
+    if 'admin' in recruiter.roles:
       continue
     recruiter.roles.append('admin')
-    admins.add(recruiter)
+    admins.append(recruiter)
     count += 1
   count = 0
   #Create the remaining attendees
@@ -179,20 +179,22 @@ def main():
     newUser = User()
     newUser.randomize()
     newUser.roles = ['attendee']
-    attendees.add(newUser)
+    attendees.append(newUser)
+    newUser.save()
   #Create the remaining admins
   while len(admins)<numAdmins:
     newUser = User()
     newUser.randomize()
     newUser.roles = ['admin']
-    admins.add(newUser)
+    admins.append(newUser)
+    newUser.save()
   #Create the remaining candidates
   while len(candidates)<numCandidates:
     newUser = Candidate()
     newUser.randomize()
     for i in range(numEventsPerCandidate):
       newUser.addEvent(random.choice(events))
-    candidates.add(newUser)
+    candidates.append(newUser)
   #Recruiters, invite users who are not me
   for recruiter in recruiters:
     recevents = recruiter.getEvents()
