@@ -17,7 +17,8 @@ var validateLocalStrategyProperty = function(property) {
 
 var eventsArray = new Schema({
 	eventsID: {type: mongoose.Schema.Types.ObjectId, ref: 'Event'},
-	accepted: {type: Boolean, default: 'false'}
+	accepted: {type: Boolean, default: 'false'},
+	status: {type: String, enum: ['volunteer','invited','accepted'], default: 'volunteer'}
 }, {_id:false});
 
 var CandidateSchema = new Schema({
@@ -40,17 +41,8 @@ var CandidateSchema = new Schema({
 		match: [/.+\@.+\..+/, 'Please fill a valid email address'],
 		unique: 'email is already registered'
 	},
-	status: {
-		type: String,
-		enum: ['volunteer','invited','accepted'],
-		default: 'volunteer'
-	},
 	events: {
 		type: [eventsArray]
-	},
-	accept_key: {
-		type: String,
-		default: 'false'
 	},
 	note: {
 		type: String,

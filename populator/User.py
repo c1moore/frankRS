@@ -75,7 +75,7 @@ class User:
       for rec in recWhoInvitedMe:
         if rec['_id'] is not recruiter._id:
           rec['almostList'].append({'user_id':self._id,'event_id':eventID})
-          rec['inviteeList'].reomve({{'user_id':self._id,'event_id':eventID})
+          rec['inviteeList'].remove({'user_id':self._id,'event_id':eventID})
           Users.save(rec)
     if attending:
       Attendee(self._id,eventID,randomTimeInMS(calendar.timegm(self.updated.timetuple()))).save()
@@ -86,6 +86,12 @@ class User:
     inviteedict = {'user_id':userID,'event_id':eventID}
     self.inviteeList.append(inviteedict)
     self.save()
+
+  def recruitFor(self,eventID):
+    eventID = ensureID(eventID)
+    if not self.roles.contains('recruiter'):
+      raise RuntimeError("User: Cant recruit unless recruiter")
+    self.status.append({'event_id':eventID,'attending':random.choice([True,False]),'recruiter':True})
 
   def valid(self):
     return True #Too lazy to write code to check all the attrs atm
