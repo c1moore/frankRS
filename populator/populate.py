@@ -2,8 +2,6 @@
 
 #Program to prepopulate mongo for integration testing and other purposes by James
 
-#TODO: Recruiters must invite some of the attendees. How to parameterize?
-
 from User import User
 from Candidate import Candidate
 from Attendee import Attendee
@@ -100,6 +98,23 @@ def getMaxEventsPerRecruiter():
     else:
       return maxEvents
 
+def getNumInvitesPerRecruiter():
+  while True:
+    try:
+      numInvites = int(input("How many invites should each recruiter send?: "))
+    except ValueError:
+      print(required)
+    else:
+      return numInvites
+
+def getNumEventsPerCandidate():
+  while True:
+    try:
+      numEvents = int(input("How many events should each candidate apply for?: "))
+    except ValueError:
+      print(required)
+    else:
+      return numEvents
 
 def main():
   welcome()
@@ -110,64 +125,86 @@ def main():
   numCandidates = getNumCandidates()
   numEvents = getNumEvents()
   adminsUnionRecruiters = getAdminsUnionRecruiters(numRecruiters,numAdmins)
-  attendeesUnionRecruiters(numRecruiters,numAdmins)
+  attendeesUnionRecruiters = getAttendeesUnionRecruiters(numRecruiters,numAdmins)
   maxEventsPerRecruiter = getMaxEventsPerRecruiter()
+  numInvitesPerRecruiter = getNumInvitesPerRecruiter()
+  numEventsPerCandidate = getNumEventsPerCandidate()
   if adminsUnionRecruiters==-1:
     adminsUnionRecruiters=random.randint(0,max(numAdmins,numRecruiters))
   if attendeesUnionRecruiters==-1:
     attendeesUnionRecruiters=random.randint(0,max(numRecruiters,numAttendees))
   print("Generating objects...")
   time.sleep(3) #Take a deep breath!
-  recruiters = set()
-  attendees = set()
-  admins = set()
-  candidates = set()
-  events = set()
+  recruiters = []
+  attendees = []
+  admins = []
+  candidates = []
+  events = []
+  #Make events
   for i in range(numEvents):
     event = Event()
     event.randomize()
     event.save()
-    events.add(event)
+    events.append(event)
+  #Make recruiters
   for i in range(numRecruiters):
     newUser = User()
     newUser.randomize()
     newUser.roles = ['recruiter']
-    for i in range(random.randint(0,maxEventsPerRecruiter)):
+    for i in range(random.randint(1,maxEventsPerRecruiter)): #Make them recruit for some events
       newUser.recruitFor(random.choice(events))
-    recruiters.add(newUser)
+    recruiters.append(newUser)
     newUser.save()
   count = 0
+  #Make some recruiters attendees
   while count<attendeesUnionRecruiters:
     recruiter = random.choice(recruiters)
-    if recruiter.roles.contains('attendee'):
+    if 'attendee' in recruiter.roles:
       continue
     recruiter.roles.append('attendee')
-    attendees.add(recruiter)
+    attendees.append(recruiter)
     count += 1
   count = 0
+  #Make some recruiters admins
   while count<adminsUnionRecruiters:
     recruiter = random.choice(recruiters)
-    if recruiter.roles.contains('admin'):
+    if 'admin' in recruiter.roles:
       continue
     recruiter.roles.append('admin')
-    admins.add(recruiter)
+    admins.append(recruiter)
     count += 1
   count = 0
+  #Create the remaining attendees
   while len(attendees)<numAttendees:
     newUser = User()
     newUser.randomize()
     newUser.roles = ['attendee']
-    attendees.add(newUser)
+    attendees.append(newUser)
+    newUser.save()
+  #Create the remaining admins
   while len(admins)<numAdmins:
     newUser = User()
     newUser.randomize()
     newUser.roles = ['admin']
-    admins.add(newUser)
+    admins.append(newUser)
+    newUser.save()
+  #Create the remaining candidates
   while len(candidates)<numCandidates:
-    newUser = User()
+    newUser = Candidate()
     newUser.randomize()
-    newUser.roles = [] #No special roles by default
-
+    for i in range(numEventsPerCandidate):
+      newUser.addEvent(random.choice(events))
+    candidates.append(newUser)
+  #Recruiters, invite users who are not me
+  for recruiter in recruiters:
+    recevents = recruiter.getEvents()
+    for i in range(numInvitesPerRecruiter):
+      rec_event_id = random.choice(recevents)
+      rec_user = random.choice(attendees)
+      while rec_user is recruiter:
+        rec_user = random.choice(attendees)
+      recruiter.invite(rec_user,rec_event_id)
+      
 
 if __name__=='__main__':
   main()

@@ -84,14 +84,22 @@ class User:
     userID = ensureID(userID)
     eventID = ensureID(eventID)
     inviteedict = {'user_id':userID,'event_id':eventID}
+    if inviteedict in self.inviteeList:
+      return
     self.inviteeList.append(inviteedict)
     self.save()
 
   def recruitFor(self,eventID):
     eventID = ensureID(eventID)
-    if not self.roles.contains('recruiter'):
+    if not 'recruiter' in self.roles:
       raise RuntimeError("User: Cant recruit unless recruiter")
     self.status.append({'event_id':eventID,'attending':random.choice([True,False]),'recruiter':True})
+
+  def getEvents(self):
+    events = []
+    for item in self.status:
+      events.append(item['event_id'])
+    return events
 
   def valid(self):
     return True #Too lazy to write code to check all the attrs atm
