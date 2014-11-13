@@ -154,7 +154,7 @@
  				res.status(400).json("No candidate found!");
  			}
  			else{
- 				result.fName = req.body.newfName;
+ 				result.fName = req.body.fName;
  				result.save(function(err, result) {
  					if(err) {
  						res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
@@ -163,7 +163,7 @@
  					}
 
  				});
- 				/*Candidate.findByIdAndUpdate(candidate_id, { $set: { fName: req.body.newfName }}, function (err, cand) {
+ 				/*Candidate.findByIdAndUpdate(candidate_id, { $set: { fName: req.body.fName }}, function (err, cand) {
   					if (err) {
   						res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
   					} else {
@@ -192,7 +192,7 @@
  				res.status(400).json("No candidate found!");
  			}
  			else{
- 				result.lName = req.body.newlName;
+ 				result.lName = req.body.lName;
  				result.save(function(err, result) {
  					if(err) {
  						res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
@@ -201,7 +201,7 @@
  					}
 
  				});
- 				/*Candidate.findByIdAndUpdate(candidate_id, { $set: { lName: req.body.newlName }}, function (err, cand) {
+ 				/*Candidate.findByIdAndUpdate(candidate_id, { $set: { lName: req.body.lName }}, function (err, cand) {
   					if (err) {
   						res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
   					} else {
@@ -230,7 +230,7 @@
  				res.status(400).json("No candidate found!");
  			}
  			else{
- 				result.email = req.body.newEmail;
+ 				result.email = req.body.email;
  				result.save(function(err, result) {
  					if(err) {
  						res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
@@ -239,7 +239,7 @@
  					}
 
  				});
- 				/*Candidate.findByIdAndUpdate(candidate_id, { $set: { email: req.body.newEmail }}, function (err, cand) {
+ 				/*Candidate.findByIdAndUpdate(candidate_id, { $set: { email: req.body.email }}, function (err, cand) {
   					if (err) {
   						res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
   					} else {
@@ -268,7 +268,7 @@
 			} else {
 				for(var i=0; i<result.events.length; i++) {
 					if(result.events[i].event_id.toString() === req.body.event_id.toString() ){
-						result.events[i].status = req.body.newStatus;
+						result.events[i].status = req.body.status;
 						break;
 					}
 				}
@@ -331,7 +331,7 @@ exports.setEventAccepted = function(req,res){
 			} else {
 				for(var i=0; i<result.events.length; i++) {
 					if(result.events[i].event_id.toString() === req.body.event_id.toString() ){
-						result.events[i].accepted = req.body.newAccepted;
+						result.events[i].accepted = req.body.accepted;
 						break;
 					}
 				}
@@ -362,7 +362,7 @@ exports.setNote = function(req,res){
  				res.status(400).json("No candidate found!");
  			}
  			else{
- 				result.note = req.body.newNote;
+ 				result.note = req.body.note;
 
  				result.save(function(err, result) {
  					if(err) {
@@ -384,12 +384,12 @@ exports.setNote = function(req,res){
  		return res.status(401).send("User is not logged in");
  	if (req.hasAuthorization(req.user, ["admin"])){
  	var	newCandidate = new Candidate({
- 			fName: req.body.newfName,
- 			lName: req.body.newlName,
- 			email: req.body.newEmail,
- 			status: req.body.newStatus,
- 			events: [{event_id: req.body.event_id._id,accepted: req.body.newAccept_Key}],
- 			note: req.body.newNote
+ 			fName: req.body.fName,
+ 			lName: req.body.lName,
+ 			email: req.body.email,
+ 			status: req.body.status,
+ 			events: [{event_id: req.body.event_id._id,accepted: req.body.accept_Key}],
+ 			note: req.body.note
  		});
 
  		newCandidate.save(function(err){
@@ -404,12 +404,12 @@ exports.setNote = function(req,res){
 
  	else{// if (req.hasAuthorization(req.user)){
  	var	newCandidate = new Candidate({
- 			fName: req.body.newfName,
- 			lName: req.body.newlName,
- 			email: req.body.newEmail,
+ 			fName: req.body.fName,
+ 			lName: req.body.lName,
+ 			email: req.body.email,
  			status: "volunteer",
  			events: [{event_id: req.body.newEvent._id,accepted: false}],
- 			//note: req.body.newNote
+ 			//note: req.body.note
  		});
 
  		newCandidate.save(function(err){
@@ -442,7 +442,7 @@ exports.setNote = function(req,res){
  				res.status(400).json("No candidate found!");
  			}
  			else{
- 				//result.note = req.body.newNote;
+ 				//result.note = req.body.note;
 
  				result.remove(function(err, result) {
  					if(err) {

@@ -42,20 +42,20 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 /candidate/setfName
 	Expects 
-		.send({candidate_id: candidate._id,newfName:'x'})
+		.send({candidate_id: candidate._id,fName:'x'})
 
 /candidate/setlName
 	Expects 
-		.send({candidate_id: candidate._id,newlName:'x'})
+		.send({candidate_id: candidate._id,lName:'x'})
 
 /candidate/setEmail
 	Expects 
-		.send({candidate_id: candidate._id,newfName:'x@x.com'})
+		.send({candidate_id: candidate._id,fName:'x@x.com'})
 
 
 /candidate/setStatus
 	Expects 
-		.send({candidate_id: candidate._id,event_id:'x',newStatus:'accepted/invited/volunteer'})
+		.send({candidate_id: candidate._id,event_id:'x',status:'accepted/invited/volunteer'})
 
 		
 /candidate/setEvent
@@ -64,17 +64,17 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 /candidate/setAccepted
 	Expects 
-		.send({candidate_id: candidate._id,event_id:event._id, newAccepted:true/false})
+		.send({candidate_id: candidate._id,event_id:event._id, accepted:true/false})
 
 /candidate/setNote
 	Expects 
-		.send({candidate_id: candidate._id,newNote:'string'})_
+		.send({candidate_id: candidate._id,note:'string'})_
 
 /candidate/setCandidate
 	Expects 
-		.send({newfName:'string',newlName:'string',newEmail:'string@string.string',newStatus:volunteer/invited/accepted, event_id: event._id,newAccept_Key:true/false,newNote:'string'})
+		.send({fName:'string',lName:'string',email:'string@string.string',status:volunteer/invited/accepted, event_id: event._id,accept_Key:true/false,note:'string'})
 
-	NOTE: this also works for recruiters/attendees.  It only requires their fname, lname, email, and newEvent.  The rest of the fields will be handled by the backend.
+	NOTE: this also works for recruiters/attendees.  It only requires their fName, lName, email, and newEvent.  The rest of the fields will be handled by the backend.
 
 	This is the only candidate route that works for recruites/attendees.  The rest are Admin only.
 
