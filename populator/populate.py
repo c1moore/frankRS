@@ -109,7 +109,7 @@ def getMaxEventsPerRecruiter():
 def getNumInvitesPerRecruiter():
   while True:
     try:
-      numInvites = int(input("How many invites should each recruiter send?: "))
+      numInvites = int(input("How many invites (maximum) should each recruiter send?: "))
       assert (numInvites >= 0)
     except (ValueError, AssertionError):
       print(required)
@@ -208,7 +208,7 @@ def main():
   #Recruiters, invite users who are not me
   for recruiter in recruiters:
     recevents = recruiter.getEvents()
-    for i in range(numInvitesPerRecruiter):
+    for i in range(random.randint(0,numInvitesPerRecruiter)):
       rec_event_id = random.choice(recevents)
       rec_user = random.choice(attendees)
       while rec_user is recruiter:
