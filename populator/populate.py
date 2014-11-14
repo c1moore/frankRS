@@ -68,8 +68,8 @@ def getAdminsUnionRecruiters(numRecruiters,numAdmins):
   while True:
     try:
       unions = int(input(("Of the {} recruiters, how many of them should also be admins? \n" + 
-		"(up to {}, or -1 for don't care): ").format(numRecruiters,max(numAdmins,numRecruiters))))
-      assert (unions == -1 or (unions>=0 and unions <=max(numAdmins,numRecruiters)))
+		"(up to {}, or -1 for don't care): ").format(numRecruiters,min(numAdmins,numRecruiters))))
+      assert (unions == -1 or (unions>=0 and unions <=min(numAdmins,numRecruiters)))
     except (ValueError, AssertionError):
       print(required)
     else:
@@ -79,8 +79,8 @@ def getAttendeesUnionRecruiters(numRecruiters,numAttendees):
   while True:
     try:
       unions = int(input(("Of the {} recruiters, how many of them should also be attendees? \n" + 
-		"(up to {}, or -1 for don't care): ").format(numRecruiters,max(numRecruiters,numAttendees))))
-      assert (unions == -1 or (unions>=0 and unions <=max(numRecruiters,numAttendees)))
+		"(up to {}, or -1 for don't care): ").format(numRecruiters,min(numRecruiters,numAttendees))))
+      assert (unions == -1 or (unions>=0 and unions <=min(numRecruiters,numAttendees)))
     except (ValueError, AssertionError):
       print(required)
     else:
