@@ -135,7 +135,7 @@ def main():
   numCandidates = getNumCandidates()
   numEvents = getNumEvents()
   adminsUnionRecruiters = getAdminsUnionRecruiters(numRecruiters,numAdmins)
-  attendeesUnionRecruiters = getAttendeesUnionRecruiters(numRecruiters,numAdmins)
+  attendeesUnionRecruiters = getAttendeesUnionRecruiters(numRecruiters,numAttendees)
   maxEventsPerRecruiter = getMaxEventsPerRecruiter()
   numInvitesPerRecruiter = getNumInvitesPerRecruiter()
   numEventsPerCandidate = getNumEventsPerCandidate()
