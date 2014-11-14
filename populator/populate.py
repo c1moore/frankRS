@@ -127,6 +127,7 @@ def getNumEventsPerCandidate():
       return numEvents
 
 def main():
+  resetMongo("The database has been reset.\n")
   welcome()
   random.seed(a=getRandomSeed())
   numAttendees = getNumAttendees()
@@ -143,7 +144,7 @@ def main():
     adminsUnionRecruiters=random.randint(0,max(numAdmins,numRecruiters))
   if attendeesUnionRecruiters==-1:
     attendeesUnionRecruiters=random.randint(0,max(numRecruiters,numAttendees))
-  print("Generating objects (this may take some time)...")
+  print("\nGenerating objects (this may take some time)...")
   recruiters = []
   attendees = []
   admins = []
