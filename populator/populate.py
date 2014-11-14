@@ -215,7 +215,7 @@ def main():
       recruiter.invite(rec_user,rec_event_id)
 
   numObjs = len(set(recruiters)|set(attendees)|set(admins)|set(candidates)|set(events))
-  print("%s Objects injected." % numObjs)
+  print("%s Objects Injected." % numObjs)
 
 
 if __name__=='__main__':
