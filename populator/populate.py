@@ -143,8 +143,7 @@ def main():
     adminsUnionRecruiters=random.randint(0,max(numAdmins,numRecruiters))
   if attendeesUnionRecruiters==-1:
     attendeesUnionRecruiters=random.randint(0,max(numRecruiters,numAttendees))
-  print("Generating objects...")
-  time.sleep(3) #Take a deep breath!
+  print("Generating objects (this may take some time)...")
   recruiters = []
   attendees = []
   admins = []

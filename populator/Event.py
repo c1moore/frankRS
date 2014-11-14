@@ -39,6 +39,6 @@ class Event:
       dic[name] = self.__dict__[name]
     Events = db.event
     self._id = Events.save(dic)
-    print("Event->insert: with id={}".format(self._id))
+    #print("Event->insert: with id={}".format(self._id))
     return self._id
 

@@ -52,5 +52,5 @@ class Candidate:
       dic[name] = self.__dict__[name]
     Candidates = db.candidate
     self._id = Candidates.save(dic)
-    print("Candidates->insert: with id={}".format(self._id))
+    #print("Candidates->insert: with id={}".format(self._id))
     return self._id

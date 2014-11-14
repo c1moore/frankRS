@@ -118,6 +118,6 @@ class User:
       dic[name] = self.__dict__[name]
     Users = db.user
     self._id = Users.save(dic)
-    print("Users->insert: with id={}".format(self._id))
+    #print("Users->insert: with id={}".format(self._id))
     return self._id
     
