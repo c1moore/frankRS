@@ -201,7 +201,8 @@ describe('Express.js User Route Unit Tests:', function() {
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(400);
-					res.message.should.equal("User cannot log into account yet.  You must sign up to attend the event to which you were invited.");
+					res.body.message.should.equal("User cannot log into account yet.  You must sign up to attend the event to which you were invited.");
+					done();
 				});
 		});
 	});
@@ -577,9 +578,10 @@ describe('Express.js User Route Unit Tests:', function() {
 		it('should send an invitation and update the recruiter\'s rank and inviteeList accordingly when an invitee is already in the database and has been invited, but not attending the event, without adding a new user.', function(done) {
 			useragent
 				.post('http://localhost:3001/invitation/send')
-				.send({'fName' : user5.fName, 'lName' : user5.lName, 'email' : user5.email, 'event_id' : event1._id})
+				.send({'fName' : user5.fName, 'lName' : user5.lName, 'email' : user5.email, 'event_id' : event1._id, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
+					console.log(res.body);
 					res.status.should.equal(200);
 					done();
 				});
@@ -588,7 +590,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		it('should send an invitation and update the recruiter\'s rank and inviteeList accordingly when an invitee is already in the database, but not not even invited the event, without adding a new user.', function(done) {
 			useragent
 				.post('http://localhost:3001/invitation/send')
-				.send({'fName' : user3.fName, 'lName' : user3.lName, 'email' : user3.email, 'event_id' : event1._id})
+				.send({'fName' : user3.fName, 'lName' : user3.lName, 'email' : user3.email, 'event_id' : event1._id, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(200);
@@ -599,7 +601,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		it('should send an invitation, create a new user, and update the recruiter\'s rank and inviteeList accordingly when an invitee is not in the db yet.', function(done) {
 			useragent
 				.post('http://localhost:3001/invitation/send')
-				.send({'lName' : 'Moore', 'fName' : 'Calvin', 'email' : 'h.m.murdock95@gmail.com', 'event_id' : event1._id})
+				.send({'lName' : 'Moore', 'fName' : 'Calvin', 'email' : 'h.m.murdock95@gmail.com', 'event_id' : event1._id, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(200);
@@ -610,7 +612,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		it('should not send an invitation, but update the recruiter\'s almostList when that user is attending.', function(done) {
 			useragent
 				.post('http://localhost:3001/invitation/send')
-				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id})
+				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(200);
@@ -621,7 +623,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		it('should not send an invitation when the user does not have the proper permissions.', function(done) {
 			useragent2
 				.post('http://localhost:3001/invitation/send')
-				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id})
+				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(401);
@@ -634,7 +636,7 @@ describe('Express.js User Route Unit Tests:', function() {
 			var useragent3 = agent.agent();
 			useragent3
 				.post('http://localhost:3001/invitation/send')
-				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id})
+				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(401);
@@ -645,7 +647,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		it('should return an error when invitee first name is not specified.', function(done) {
 			useragent
 				.post('http://localhost:3001/invitation/send')
-				.send({'lName' : user2.lName, 'email' : user2.email, 'event_id' : event1._id})
+				.send({'lName' : user2.lName, 'email' : user2.email, 'event_id' : event1._id, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(400);
@@ -657,7 +659,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		it('should return an error when invitee last name is not specified.', function(done) {
 			useragent
 				.post('http://localhost:3001/invitation/send')
-				.send({'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id})
+				.send({'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(400);
@@ -669,7 +671,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		it('should return an error when invitee email is not specified.', function(done) {
 			useragent
 				.post('http://localhost:3001/invitation/send')
-				.send({'lName' : user2.lName, 'fName' : user2.fName, 'event_id' : event1._id})
+				.send({'lName' : user2.lName, 'fName' : user2.fName, 'event_id' : event1._id, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(400);
@@ -681,7 +683,19 @@ describe('Express.js User Route Unit Tests:', function() {
 		it('should return an error when the event ID is not specified.', function(done) {
 			useragent
 				.post('http://localhost:3001/invitation/send')
-				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email})
+				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_name' : event1.name})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(400);
+					res.body.message.should.equal("Required fields not specified.");
+					done();
+				});
+		});
+
+		it('should return an error when the event name is not specified.', function(done) {
+			useragent
+				.post('http://localhost:3001/invitation/send')
+				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id})
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(400);
