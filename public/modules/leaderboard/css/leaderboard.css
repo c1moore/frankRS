@@ -43,6 +43,10 @@ a:hover {
 	background-color: rgba(25, 25, 25, .70);
 }
 
+.ng-table th.sortable.sort-desc div:after {
+	border-top: 4px solid #fff;
+}
+
 .table .progress {
 	margin-bottom:0;
 }
