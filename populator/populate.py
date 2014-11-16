@@ -4,7 +4,6 @@
 
 from User import User
 from Candidate import Candidate
-from Attendee import Attendee
 from Event import Event
 from Util import resetMongo
 
