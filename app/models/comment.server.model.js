@@ -8,7 +8,6 @@ var mongoose = require('mongoose'),
 	idvalidator = require('mongoose-id-validator');
 
 //Validation functions
-
 var validateRequired = function(property) {
 	return (property && property.length);
 };
