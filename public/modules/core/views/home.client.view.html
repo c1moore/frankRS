@@ -7,26 +7,30 @@
 		</div>
 	</div>
 
-	<button type="button" ng-click="toggleComments()" ng-show="!displayComments" class="btn btn-primary btn-md pull-right">
+
+	<button type="button" ng-click="toggleComments()" ng-show="!displayComments" class="btn btn-primary btn-md pull-right comments-sidebar">
     	<span class="glyphicon glyphicon-chevron-left"></span>
+    	<span class="sidebar-hidden-text">Comments</span>
     </button>
 
 	<div class="container-fluid">
 		<div class="row">
 			<!-- app launcher area -->
-			<div ng-class="buttonsGrid">
+			<div ng-class="buttonsGrid" id="frank-buttons-containter">
 					<!-- these divs col values will generatgoogle mapse dynamicaly through angular -->
-					<div ng-repeat="button in data.buttons | roles:userRoles" ng-style="{'width':buttonsWidth+'%'}" class="homeButtonContainer">
-						<div class="text-center homeButton">
-							<a href={{button.link}}><img src="/modules/core/img/temp/242.svg" alt="Place holder"></a>
-							<div class="caption">
-								<h3>{{button.name}}</h3>
-							</div>
+					<div ng-repeat="button in data.buttons | roles:userRoles" class="homeButtonContainer">
+						<div class="homeButton text-center">
+							<a href={{button.link}}>
+								<img src="{{button.image}}" class="homepage-nav-buttons" alt="Place holder">
+								<div class="caption">
+									<h3>{{button.name}}</h3>
+								</div>
+							</a>
 						</div>
 					</div>
 			</div>
 
-			<div ng-show='displayComments' class="panel panel-primary col-md-2">
+			<div ng-show='displayComments' class="panel panel-primary col-md-2 homepage-comments">
 				
 				<div class="panel-heading">
     				User Comments
@@ -41,6 +45,12 @@
   				
 			</div>
 
+			<!-- <div class="col-md-2"">
+				<button type="button" ng-click="toggleComments()" ng-show="!displayComments" class="btn btn-primary btn-md pull-right comments-sidebar">
+			    	<span class="glyphicon glyphicon-chevron-left"></span>
+			    	<span class="sidebar-hidden-text">Comments</span>
+			    </button>
+			</div> -->
 		</div>
 	</div>
 
