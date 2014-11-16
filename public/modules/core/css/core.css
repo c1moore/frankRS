@@ -1,11 +1,54 @@
 body {
 	font-family: "Helvetica", sans-serif;
+	background-image: url("http://frank.jou.ufl.edu/recruiters/Pictures/background.jpg");
+	background-size: cover;
+}
+.commentBar {
+	border: solid black 1px;
+}
+.comments-sidebar {
+	padding 7px;
+	height: 110px;
+	width: 26px;
+	position: absolute;
+	z-index: 1074;
+	right: 0;
 }
 .container {
 	width: initial;
 }
 .content {
 	margin-top: 50px;
+}
+.glyphicon.glyphicon-chevron-left {
+	top: -35px;
+	right: 5px;
+}
+.homeButtonContainer {
+	position:relative;
+	display:inline-block;
+	padding:10px;
+	border: 1px solid #333232;
+	margin: 10px;
+	background-color: white;
+}
+.homepage-comments {
+	float: right;
+	padding-right: 0;
+	padding-left: 0;
+}
+.homepage-nav-buttons {
+	height: 28vmin;
+	width: 35vmin;
+}
+.jumbotron {
+	padding:20px;
+	bottom-margin:20px;
+}
+.musicdiv{
+	position: fixed;
+	width: 100%;
+	bottom: -20px;
 }
 .undecorated-link:hover {
 	text-decoration: none;
@@ -19,24 +62,26 @@ body {
 .ng-valid.ng-dirty{
     border-color:#78FA89;
 }
-
-.commentBar {
-	border: solid black 1px;
+.sidebar-hidden-text {
+	writing-mode:tb-rl;
+	-webkit-transform:rotate(90deg);
+	-moz-transform:rotate(90deg);
+	-o-transform: rotate(90deg);
+	-ms-transform:rotate(90deg);
+	white-space:nowrap;
+	display:block;
+	bottom:0;
+	width:75px;
+	height:20px;
+	position: absolute;
+	top: 56px;
+	right: -28px;
 }
-
-.jumbotron {
-	padding:20px;
-	bottom-margin:20px;
-}
-
-.musicdiv{
-	position: fixed;
-	width: 100%;
-	bottom: 0px;
-}
-
-.homeButtonContainer {
-	position:relative;
-	display:inline-block;
-	padding:10px;
+#frank-buttons-containter {
+	background-color: #E8E9EB;
+	height: 55vh;
+	width: 75vw;
+	margin: 0 30px;
+	overflow: auto;
+	background-color: rgba(232, 233, 235, .8);
 }

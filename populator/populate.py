@@ -4,7 +4,6 @@
 
 from User import User
 from Candidate import Candidate
-from Attendee import Attendee
 from Event import Event
 from Util import resetMongo
 
@@ -18,11 +17,13 @@ def welcome():
   print(msg)
 
 def getRandomSeed():
-  read = input("Random seed value (any number, optional, allows repeatability): ")
-  if not read:
-    return time.time()
-  else:
-    return int(read)
+  while True:
+    try:
+      read = int(input("Random seed value (any number, optional, allows repeatability): "))
+    except ValueError:
+      print(required)
+    else:
+      return read
 
 def getNumAttendees():
   while True:
