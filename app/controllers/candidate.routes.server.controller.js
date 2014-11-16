@@ -289,6 +289,58 @@
  				for(var i=0; i<result.events.length; i++) {
  					if(result.events[i].event_id.toString() === req.body.event_id.toString() ){
  						result.events[i].status = req.body.status;
+ 						if (req.body.status ==='accepted'){
+ 						if(result.events[i].accepted==='true'){
+ 							
+
+ 							if(result.user_id){
+ 								var user_id = result.user_id;
+ 								var query2 = User.findOne({'_id' : user_id});
+ 								query2.exec(function(err,result3){
+ 									if(err)
+ 										return res.status(400).send(err);
+ 									else if(!result)
+ 										return res.status(400).json("no user with candidate.user_id is found");
+ 									else{
+ 										for (var j = 0; j<result3.status.length;j++){
+ 											if (result3.status[j].event_id.toString() === req.body.event_id.toString()){
+ 												result3.status[j].recruiter = true;
+
+ 												break;
+ 											}
+ 										}
+		 								result3.roles.push("recruiter");
+
+ 										result3.save(function(err,ress){
+ 											if (err)
+ 												res.status(400).send(err);
+ 										});
+ 									}
+
+
+ 								});
+
+ 							}
+ 							else{
+ 								var user = new User({
+ 									fName: result.fName,
+ 									lName: result.lName,
+ 									roles: ['recruiter'],
+ 									email: result.email,
+ 									status: [{event_id: result.events[i].event_id,attending: false,recruiter:true}],
+ 									password: result.fName + result.lName,
+ 									login_enabled: true
+ 								});
+
+ 								user.save(function(err,ress){
+ 									if (err)
+ 										return res.status(400).send(err)
+ 								});
+ 							}
+ 						}
+ 					}
+
+
  						break;
  					}
  				}
@@ -353,6 +405,7 @@
  				for(i; i<result.events.length; i++) {
  					if(result.events[i].event_id.toString() === req.body.event_id.toString() ){
  						result.events[i].accepted = req.body.accepted;
+ 						if(req.body.accepted === true){
  						if(result.events[i].status==='accepted'){
  							
 
@@ -368,11 +421,12 @@
  										for (var j = 0; j<result3.status.length;j++){
  											if (result3.status[j].event_id.toString() === req.body.event_id.toString()){
  												result3.status[j].recruiter = true;
-		 										result3.roles.addToSet('recruiter');
 
  												break;
  											}
  										}
+		 								result3.roles.push("recruiter");
+
  										result3.save(function(err,ress){
  											if (err)
  												res.status(400).send(err);
@@ -400,6 +454,7 @@
  								});
  							}
  						}
+ 					}
  						break;
  					}
  				}

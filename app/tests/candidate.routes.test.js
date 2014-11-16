@@ -481,7 +481,6 @@
   		if (err) throw err;
   		//console.log(res.body);
   		//console.log(err);
-
   		res.status.should.equal(200);
   		//res.body.should.have.property('event_id');
   		(res.body[0].recruiter.toString()).should.equal('true');
