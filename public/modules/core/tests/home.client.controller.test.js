@@ -33,7 +33,7 @@
 		});
 
 		it('should return a width of 50', function() {
-			scope.userRoles = ['recruiter','atendee'];
+			scope.userRoles = ['recruiter'];
 			expect(scope.buttonsWidth).toEqual(50);
 		})
 	});

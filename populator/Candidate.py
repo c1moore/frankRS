@@ -50,7 +50,7 @@ class Candidate:
     dic = dict()
     for name in names:
       dic[name] = self.__dict__[name]
-    Candidates = db.candidate
+    Candidates = db.candidates
     self._id = Candidates.save(dic)
     #print("Candidates->insert: with id={}".format(self._id))
     return self._id

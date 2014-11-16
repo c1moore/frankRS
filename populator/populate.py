@@ -1,10 +1,9 @@
-#!/usr/bin/python3
+#!/usr/bin/python3 -B
 
 #Program to prepopulate mongo for integration testing and other purposes by James
 
 from User import User
 from Candidate import Candidate
-from Attendee import Attendee
 from Event import Event
 from Util import resetMongo
 
@@ -18,11 +17,14 @@ def welcome():
   print(msg)
 
 def getRandomSeed():
-  read = input("Random seed value (any number, optional, allows repeatability): ")
-  if not read:
-    return time.time()
-  else:
-    return int(read)
+  while True:
+    try:
+      read = int(input("Random seed value (any number, optional, allows repeatability): "))
+    except ValueError:
+      print("Choosing random seed automatically.")
+      return None
+    else:
+      return read
 
 def getNumAttendees():
   while True:
@@ -96,11 +98,11 @@ def getNumEvents():
     else:
       return numEvents
 
-def getMaxEventsPerRecruiter():
+def getMaxEventsPerRecruiter(numEvents):
   while True:
     try:
       maxEvents = int(input("How many events (maximum) does a recruiter recruit for?: "))
-      assert (maxEvents >= 0)
+      assert (maxEvents >= 0 and maxEvents <= numEvents)
     except (ValueError, AssertionError):
       print(required)
     else:
@@ -126,6 +128,16 @@ def getNumEventsPerCandidate():
     else:
       return numEvents
 
+def dumpUserSummary(userList):
+  with open('user_summary.txt','w') as fd:
+    fd.write("User summary:\n")
+    for user in userList:
+      fd.write("fName: " + user.fName + '\n')
+      fd.write("lName: " + user.lName + '\n')
+      fd.write("email: " + user.email + '\n')
+      fd.write("password: " + user.password + '\n')
+      fd.write("roles: " + str(user.roles) + '\n\n')
+
 def main():
   resetMongo("The database has been reset.\n")
   welcome()
@@ -137,7 +149,7 @@ def main():
   numEvents = getNumEvents()
   adminsUnionRecruiters = getAdminsUnionRecruiters(numRecruiters,numAdmins)
   attendeesUnionRecruiters = getAttendeesUnionRecruiters(numRecruiters,numAttendees)
-  maxEventsPerRecruiter = getMaxEventsPerRecruiter()
+  maxEventsPerRecruiter = getMaxEventsPerRecruiter(numEvents)
   numInvitesPerRecruiter = getNumInvitesPerRecruiter()
   numEventsPerCandidate = getNumEventsPerCandidate()
   if adminsUnionRecruiters==-1:
@@ -205,6 +217,7 @@ def main():
     for i in range(numEventsPerCandidate):
       newUser.addEvent(random.choice(events))
     candidates.append(newUser)
+    newUser.save()
   #Recruiters, invite users who are not me
   for recruiter in recruiters:
     recevents = recruiter.getEvents()
@@ -214,6 +227,8 @@ def main():
       while rec_user is recruiter:
         rec_user = random.choice(attendees)
       recruiter.invite(rec_user,rec_event_id)
+
+  dumpUserSummary(list(set(recruiters)|set(attendees)|set(admins)))
 
   numObjs = len(set(recruiters)|set(attendees)|set(admins)|set(candidates)|set(events))
   print("%s Objects Injected." % numObjs)

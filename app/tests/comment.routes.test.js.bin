@@ -5,12 +5,13 @@
 /**
  * Module dependencies.
  */
-//TODO add POST setters
+
 var should = require('should'),
 	mongoose = require('mongoose'),
  	http = require('http'),
  	superagent = require('superagent'),
- 	Event = mongoose.model('Event'),
+ 	Comment = mongoose.model('Comment'),
+	Event = mongoose.model('Event'),
  	User = mongoose.model('User'),
  	config = require('../../config/config'),
  	request = require('supertest');
@@ -18,7 +19,7 @@ var should = require('should'),
 /**
  * Globals
  */
-var event1, event2, user, userAdmin;
+var comment1, event1, event2, user, userAdmin;
 var agent = superagent.agent();
 var agentAdmin = superagent.agent();
 
@@ -37,6 +38,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	before(function(done) {
 		User.remove().exec(); //Prevent earlier failed tests from poisoning us
 		Event.remove().exec();
+		Comment.remove().exec();
 		event1 = new Event({
 			name:  'testing123',
  			start_date: new Date(2140,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
@@ -53,10 +55,24 @@ describe('Express.js Event Route Integration Tests:', function() {
  			schedule: 'www.google.com'
  		});
 
+		recruiter = new User({
+ 			fName: 'Full',
+ 			lName: 'Name',
+ 			roles: ['attendee','recruiter'],
+ 			displayName: 'Full Name',
+ 			email: 'recruiter@test.com',
+ 			password: 'password',
+ 			status: [{event_id: event1._id, attending:false, recruiter:false}],
+ 			salt: 'abc123',
+ 			rank: [],
+ 			provider: 'local',
+ 			login_enabled: true
+ 		});
+
 		user = new User({
  			fName: 'Full',
  			lName: 'Name',
- 			roles: ['attendee'],
+ 			roles: ['attendee','recruiter'],
  			displayName: 'Full Name',
  			email: 'test@test.com',
  			password: 'password',
@@ -89,14 +105,23 @@ describe('Express.js Event Route Integration Tests:', function() {
 					if(err) throw err;
 					userAdmin.save(function(err){
 						if(err) throw err;
-						done();
+						comment1 = new Comment({
+							user_id: recruiter._id,
+							event_id: event1._id,
+							comment: "A comment",
+							stream: 'recruiter'
+						});
+						comment1.save(function(err){
+							if(err) throw err;
+							done();
+						});
 					});
 				});
 			});
 		});
 	});
 
- 	it("should be able to access the main page from the event route testing mechanism", function(done) {
+ 	it("should be able to access the main page from the testing mechanism", function(done) {
  		request('http://localhost:3001')
  			.get('/')
  			.expect(200,done);

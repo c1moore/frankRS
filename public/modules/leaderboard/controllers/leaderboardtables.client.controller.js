@@ -44,8 +44,10 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		}
 
 		var mainApi = $resource('/leaderboard/maintable');
-		var attendingApi = $resource('/modules/leaderboard/tests/MOCK_ATTENDEE_DATA.json');
-		var invitedApi = $resource('/modules/leaderboard/tests/MOCK_INVITEE_DATA.json');
+		var attendingApi = $resource('/leaderboard/attendees');
+		var invitedApi = $resource('/leaderboard/invitees');
+		// var attendingApi = $resource('/modules/leaderboard/tests/MOCK_ATTENDEE_DATA.json');
+		// var invitedApi = $resource('/modules/leaderboard/tests/MOCK_INVITEE_DATA.json');
 		var testApi = $resource('/modules/leaderboard/tests/MOCK_DATA.json');
 
 		$scope.mainTableParams = new ngTableParams({
@@ -60,7 +62,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
     		}, {
         	total: 0, // length of data
         	getData: function($defer, params) {
-        		testApi.query(params.url(), function(data){
+        		mainApi.query(params.url(), function(data){
 	            	var filteredData = params.filter() ?
 	            		$filter('filter')(data, params.filter()) :
 	            		data;
