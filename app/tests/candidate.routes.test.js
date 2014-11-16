@@ -20,7 +20,7 @@
  /**
 	* Globals
 	*/
-	var candidate1, user, user1,attendee,attendee1,guest1,recruiter,recruiter1,event1,event2,event3,event4,newCandidate;
+	var candidate1, user, user1,acceptedCandidate,attendee,attendee1,guest1,recruiter,recruiter1,event1,event2,event3,event4,newCandidate;
 
 	function arraysEqual(array0,array1) {
 		if (array0.length !== array1.length) return false;
@@ -82,10 +82,21 @@
 						lName: 'Testing',
 						roles: ['attendee'],
 						email: 'test1234@test.com',
+						status: [{event_id: event2._id, attending: false, recruiter: false}],
 						password: 'password',
 						login_enabled: true
 
 					});
+			/*		acceptedCandidate = new user({
+						fName: 'Jane',
+						lName: 'Doe',
+						roles: ['attendee'],
+						status: [{event_id: event1._id, attending: false, recruiter: false}],
+						email: 'yay@yay.com',
+						password: 'password',
+						login_enabled: true
+
+					});*/
 					recruiter = new User({
 						fName: 'attendee',
 						lName: 'Testing',
@@ -106,6 +117,8 @@
 					});
 
 					guest1=agent.agent();
+					/*acceptedCandidate.save(function(err,res){
+						if (err) throw err;*/
 					recruiter.save(function(err,res){
 						recruiter1 = agent.agent();
 						recruiter1
@@ -132,9 +145,10 @@
 								.send({'email': user.email, 'password': 'password'})
 								.end(function (err, res) {
 									done();
+									});
 								});
 							});
-						});
+					//	});
 					});
 				});
 			});
@@ -244,6 +258,7 @@
  		});
  		});
  	});
+
  	it("admin should be able to get the candidate note", function(done) {
  		candidate1.save(function(err) {
  			user1
@@ -340,6 +355,7 @@
  		.send({candidate_id: candidate1._id,email:'DanP@test.com'})
  		.end(function(err,res) {
  			if (err) throw err;
+ 			//console.log(res.body);
 			//console.log(res);
 			res.status.should.equal(200);
 			//res.body.should.have.property('fName');
@@ -366,7 +382,7 @@
  	it("admin should be able to set the candidate status", function(done) {
  		user1
  	.get('http://localhost:3001/candidate/setStatus')
- 	.send({'candidate_id' : candidate1._id, 'event_id': event2._id, 'status': 'invited'})
+ 	.send({'candidate_id' : candidate1._id, 'event_id': event2._id, 'status': 'accepted'})
  	.end(function(err,res) {
  		if (err) throw err;
  		//console.log(res.body);
@@ -388,7 +404,7 @@
  				(res.body.events[0].status.toString()).should.be.equal('volunteer');
  				(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
  				(res.body.events[1].accepted.toString()).should.be.equal('false');
- 				(res.body.events[1].status.toString()).should.be.equal('invited');
+ 				(res.body.events[1].status.toString()).should.be.equal('accepted');
  				done();
  			});
  		});
@@ -456,6 +472,24 @@
  		});
  	});
  });
+
+  it('Should have changed the attendee user to a recruiter for the roles and status fields',function(done){
+  	user1
+  	.get('http://localhost:3001/recruiter/events')
+  	.send({'user' : attendee._id})
+  	.end(function(err,res){
+  		if (err) throw err;
+  		console.log(res.body);
+  		console.log(err);
+
+  		res.status.should.equal(200);
+  		res.body.should.have.property('events');
+  		(res.body.events[0].recruiter.toString()).should.equal('true');
+
+  		done();
+  	});
+  });
+
 
  it("admin should be able to set the candidate's note", function(done) {
  	user1
@@ -794,7 +828,7 @@
 						if (err) throw err;
 						res1.status.should.equal(200);
 						(res1.body.events[1]).should.have.property('status');
-						(res1.body.events[1].status).should.be.equal('invited');
+						(res1.body.events[1].status).should.be.equal('accepted');
 						done();
 					});
 		});
@@ -1137,7 +1171,7 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
 						if (err) throw err;
 						res1.status.should.equal(200);
 						(res1.body.events[1]).should.have.property('status');
-						(res1.body.events[1].status).should.be.equal('invited');
+						(res1.body.events[1].status).should.be.equal('accepted');
 						done();
 					});
 		});
@@ -1423,7 +1457,7 @@ it("guest should NOT be able to get the candidate getUser_id", function(done) {
 						if (err) throw err;
 						res1.status.should.equal(200);
 						(res1.body.events[1]).should.have.property('status');
-						(res1.body.events[1].status).should.be.equal('invited');
+						(res1.body.events[1].status).should.be.equal('accepted');
 						done();
 					});
 		});

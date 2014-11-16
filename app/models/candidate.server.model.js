@@ -50,7 +50,6 @@ var CandidateSchema = new Schema({
 	},
 	user_id: {
 		type: String,
-		default:''
 	}
 
 

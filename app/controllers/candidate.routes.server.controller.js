@@ -100,7 +100,7 @@
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidate_id=req.body.candidate_id;
  		var query = Candidate.findOne({_id:candidate_id });
-		query.populate('events.event_id', 'name start_date');
+ 		query.populate('events.event_id', 'name start_date');
  		query.exec(function(err,result) {
  			if(err) {
  				res.status(400).send(err);
@@ -275,36 +275,36 @@
 
  };
  exports.setEventStatus = function(req,res){
- 		if(!req.isAuthenticated())
-		return res.status(401).send("User is not logged in");
-	if (req.hasAuthorization(req.user, ["admin"])){
-		var candidate_id = req.body.candidate_id;
-		var query = Candidate.findOne({'_id' : candidate_id });
-		query.exec(function(err,result){
-			if(err) {
-				return res.status(400).send(err);
-			} else if(!result) {
-				return res.status(400).json("No candidate found!");
-			} else {
-				for(var i=0; i<result.events.length; i++) {
-					if(result.events[i].event_id.toString() === req.body.event_id.toString() ){
-						result.events[i].status = req.body.status;
-						break;
-					}
-				}
+ 	if(!req.isAuthenticated())
+ 		return res.status(401).send("User is not logged in");
+ 	if (req.hasAuthorization(req.user, ["admin"])){
+ 		var candidate_id = req.body.candidate_id;
+ 		var query = Candidate.findOne({'_id' : candidate_id });
+ 		query.exec(function(err,result){
+ 			if(err) {
+ 				return res.status(400).send(err);
+ 			} else if(!result) {
+ 				return res.status(400).json("No candidate found!");
+ 			} else {
+ 				for(var i=0; i<result.events.length; i++) {
+ 					if(result.events[i].event_id.toString() === req.body.event_id.toString() ){
+ 						result.events[i].status = req.body.status;
+ 						break;
+ 					}
+ 				}
 
-				result.save(function(err, result2) {
-					if(err) {
-		 				return res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
-					} else {
-		 				return res.status(200).send(result2);
-					}
-				});
-			}
-		});
-	} else
-		return res.status(401).send('User not Authorized');
-};
+ 				result.save(function(err, result2) {
+ 					if(err) {
+ 						return res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
+ 					} else {
+ 						return res.status(200).send(result2);
+ 					}
+ 				});
+ 			}
+ 		});
+ 	} else
+ 	return res.status(401).send('User not Authorized');
+ };
  exports.setEvent = function(req,res){
  	if(!req.isAuthenticated())
  		return res.status(401).send("User is not logged in");
@@ -337,94 +337,152 @@
 
  };
 
-exports.setEventAccepted = function(req,res){
-	if(!req.isAuthenticated())
-		return res.status(401).send("User is not logged in");
-	if (req.hasAuthorization(req.user, ["admin"])){
-		var candidate_id = req.body.candidate_id;
-		var query = Candidate.findOne({'_id' : candidate_id });
-		query.exec(function(err,result){
-			if(err) {
-				return res.status(400).send(err);
-			} else if(!result) {
-				return res.status(400).json("No candidate found!");
-			} else {
-				for(var i=0; i<result.events.length; i++) {
-					if(result.events[i].event_id.toString() === req.body.event_id.toString() ){
-						result.events[i].accepted = req.body.accepted;
-						break;
-					}
-				}
-
-				result.save(function(err, result2) {
-					if(err) {
-		 				return res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
-					} else {
-		 				return res.status(200).send(result2);
-					}
-				});
-			}
-		});
-	} else
-		return res.status(401).send('User not Authorized');
-};
-exports.setNote = function(req,res){
+ exports.setEventAccepted = function(req,res){
  	if(!req.isAuthenticated())
  		return res.status(401).send("User is not logged in");
  	if (req.hasAuthorization(req.user, ["admin"])){
- 		var candidate_id=req.body.candidate_id;
- 		var query = Candidate.findOne({_id:candidate_id });
+ 		var candidate_id = req.body.candidate_id;
+ 		var query = Candidate.findOne({'_id' : candidate_id });
  		query.exec(function(err,result){
- 			if(err){
- 				res.status(400).send(err);
- 			}
- 			else if(!result){
- 				res.status(400).json("No candidate found!");
- 			}
- 			else{
- 				result.note = req.body.note;
+ 			if(err) {
+ 				return res.status(400).send(err);
+ 			} else if(!result) {
+ 				return res.status(400).json("No candidate found!");
+ 			} else {
+ 				var i =0;
+ 				for(i; i<result.events.length; i++) {
+ 					if(result.events[i].event_id.toString() === req.body.event_id.toString() ){
+ 						result.events[i].accepted = req.body.accepted;
+ 						if(result.events[i].status==='accepted'){
+ 							
 
- 				result.save(function(err, result) {
- 					if(err) {
- 						res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
- 					} else {
- 						return res.status(200).send(result);
+ 							if(result.user_id){
+ 								var user_id = result.user_id;
+ 								var query2 = User.findOne({'_id' : user_id});
+ 								query2.exec(function(err,result3){
+ 									if(err)
+ 										return res.status(400).send(err);
+ 									else if(!result)
+ 										return res.status(400).json("no user with candidate.user_id is found");
+ 									else{
+ 										for (var j = 0; j<result3.status.length;j++){
+ 											if (result3.status[j].event_id === req.body.event_id){
+ 												result3.status[j].recruiter = true;
+ 												break;
+ 											}
+ 										}
+ 										var k =0;
+ 										var tempStatusRecruiter = false;
+ 										for (k; k<result3.roles.length;k++){
+ 											if (result3.status[k] === 'recruiter'){
+ 												tempStatusRecruiter= true;
+ 												break;
+ 											}
+ 										}
+ 										if (tempStatusRecruiter===false)
+ 											result3.roles[k]='recruiter';
+
+
+ 										result3.save(function(err,res){
+ 											if (err)
+ 												result.status(400).send(err);
+ 										});
+ 									}
+
+
+ 								});
+
+ 							}
+ 							else{
+ 								var user = new User({
+ 									fName: result.fName,
+ 									lName: result.lName,
+ 									roles: ['recruiter'],
+ 									email: result.email,
+ 									status: [{event_id: result.events[i].event_id,attending: false,recruiter:true}],
+ 									password: result.fName + result.lName,
+ 									login_enabled: true
+ 								});
+
+ 								user.save(function(err,res){
+ 									if (err)
+ 										return res.status(400).send(err)
+ 								});
+ 							}
+ 						}
+ 						break;
  					}
+ 				}
 
+ 				result.save(function(err, result2) {
+ 					if(err) {
+ 						return res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
+ 					} else {
+ 						return res.status(200).send(result2);
+ 					}
  				});
  			}
  		});
- 	}
- 	else
- 		return res.status(401).send('User not Authorized');
+} else
+return res.status(401).send('User not Authorized');
+};
+exports.setNote = function(req,res){
+	if(!req.isAuthenticated())
+		return res.status(401).send("User is not logged in");
+	if (req.hasAuthorization(req.user, ["admin"])){
+		var candidate_id=req.body.candidate_id;
+		var query = Candidate.findOne({_id:candidate_id });
+		query.exec(function(err,result){
+			if(err){
+				res.status(400).send(err);
+			}
+			else if(!result){
+				res.status(400).json("No candidate found!");
+			}
+			else{
+				result.note = req.body.note;
 
- };
- exports.setCandidate = function(req,res){
- 	if(!req.isAuthenticated())
- 		return res.status(401).send("User is not logged in");
- 	if (req.hasAuthorization(req.user, ["admin"])){
- 	var	newCandidate = new Candidate({
- 			fName: req.body.fName,
- 			lName: req.body.lName,
- 			email: req.body.email,
- 			status: req.body.status,
- 			events: [{event_id: req.body.event_id._id,accepted: req.body.accept_Key}],
- 			note: req.body.note,
- 			user_id: req.body.user_id
- 		});
+				result.save(function(err, result) {
+					if(err) {
+						res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
+					} else {
+						return res.status(200).send(result);
+					}
 
- 		newCandidate.save(function(err){
- 			if(err)
- 				return res.status(400).send({'message': errorHandler.getErrorMessage(err)});
- 			else
- 				return res.status(200).send(newCandidate);
+				});
+			}
+		});
+	}
+	else
+		return res.status(401).send('User not Authorized');
 
- 		});
- 	}
- 	
+};
+exports.setCandidate = function(req,res){
+	if(!req.isAuthenticated())
+		return res.status(401).send("User is not logged in");
+	if (req.hasAuthorization(req.user, ["admin"])){
+		var	newCandidate = new Candidate({
+			fName: req.body.fName,
+			lName: req.body.lName,
+			email: req.body.email,
+			status: req.body.status,
+			events: [{event_id: req.body.event_id._id,accepted: req.body.accept_Key}],
+			note: req.body.note,
+			user_id: req.body.user_id
+		});
+
+		newCandidate.save(function(err){
+			if(err)
+				return res.status(400).send({'message': errorHandler.getErrorMessage(err)});
+			else
+				return res.status(200).send(newCandidate);
+
+		});
+	}
+	
 
  	else{// if (req.hasAuthorization(req.user)){
- 	var	newCandidate = new Candidate({
+ 		var	newCandidate = new Candidate({
  			fName: req.body.fName,
  			lName: req.body.lName,
  			email: req.body.email,
@@ -446,23 +504,23 @@ exports.setNote = function(req,res){
 
  	/*else
  		return res.status(401).send('User not Authorized');
-*/
- };
+ 		*/
+ 	};
 
- exports.deleteCandidate = function(req,res){
- 	if(!req.isAuthenticated())
- 		return res.status(401).send("User is not logged in");
- 	if (req.hasAuthorization(req.user, ["admin"])){
- 		var candidate_id=req.body.candidate_id;
- 		var query = Candidate.findOne({_id:candidate_id });
- 		query.exec(function(err,result){
- 			if(err){
- 				res.status(400).send(err);
- 			}
- 			else if(!result){
- 				res.status(400).json("No candidate found!");
- 			}
- 			else{
+ 	exports.deleteCandidate = function(req,res){
+ 		if(!req.isAuthenticated())
+ 			return res.status(401).send("User is not logged in");
+ 		if (req.hasAuthorization(req.user, ["admin"])){
+ 			var candidate_id=req.body.candidate_id;
+ 			var query = Candidate.findOne({_id:candidate_id });
+ 			query.exec(function(err,result){
+ 				if(err){
+ 					res.status(400).send(err);
+ 				}
+ 				else if(!result){
+ 					res.status(400).json("No candidate found!");
+ 				}
+ 				else{
  				//result.note = req.body.note;
 
  				result.remove(function(err, result) {
@@ -475,8 +533,8 @@ exports.setNote = function(req,res){
  				});
  			}
  		});
- 	}
- 	else
- 		return res.status(401).send('User not Authorized');
+ 		}
+ 		else
+ 			return res.status(401).send('User not Authorized');
 
- };
+ 	};
