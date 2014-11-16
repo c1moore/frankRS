@@ -1,8 +1,12 @@
 'use strict';
 
-angular.module('core').controller('HeaderController', ['$scope', 'Authentication', 'Menus',
-	function($scope, Authentication, Menus) {
+angular.module('core').controller('HeaderController', ['$scope', 'Authentication', 'Menus', '$filter',
+	function($scope, Authentication, Menus, $filter) {
 		$scope.authentication = Authentication;
+		$scope.userRoles = ['recruiter','admin'];
+		$scope.leaderboardRoles = ['recruiter','admin'];
+		$scope.inviteRoles = ['recruiter','admin'];
+		$scope.adminRoles = ['admin'];
 		$scope.isCollapsed = false;
 		$scope.menu = Menus.getMenu('topbar');
 
@@ -14,5 +18,14 @@ angular.module('core').controller('HeaderController', ['$scope', 'Authentication
 		$scope.$on('$stateChangeSuccess', function() {
 			$scope.isCollapsed = false;
 		});
+
+		$scope.hideLink = function(rolesNeeded) {
+			if (($filter('roles')($scope.userRoles,rolesNeeded)).length == 0) {
+				return true
+			}
+			else {
+				return false
+			}
+		};
 	}
 ]);

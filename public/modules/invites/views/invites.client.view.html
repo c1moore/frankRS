@@ -1,48 +1,58 @@
 <section ng-controller="invitesCtrl">
-    <div id="header">
-      <h1>Frank Recruit Control Room</h1>
-    </div>
-    <div class="preview" ng-show="livepreview">
-      <p>Hey {{firstName + " " + lastName}}, you have been officially invited to Frank!</p>
-        {{personalMessage}}
-    </div>
-    <div id="invite">
-      <div id="from">
-        <p><strong>From:</strong>example@gmail.com</p>
-      </div>
-      <div id="to">
-        <h3>To:<span style="margin-left:10%"></span></h3><br>
-        Email:<input type="text" ng-model="email" placeholder="example@gmail.com" /><br>
-        First Name:<input type="text" ng-model="firstName"/>
-        Last Name: <input type="text" ng-model="lastName"/><br>
-        Personal Message:<input type="text" ng-model="personalMessage"/><br>
-        <p>Probably going to include a button for newcomers or something of the like to generate an automated message that explains Frank</p>
-        <span style="margin-left:5%"></span><input type="submit" value="Send" class="btn btn-primary btn-lg"/>
-        <a id="previewbutton" class="btn btn-success" href="#" ng-click="livepreview = !livepreview" ng-class="{ active: livepreview }">Toggle Preview</a>
-      </div>
-    </div>
-    <div id="accepted">
-    {{friends.length}} people are attending.</br> They are: </br>
-                <input type="search" ng-model="q" placeholder="Search..." />
-      <ul class="animate-container">
-        <li class="animate-repeat"  ng-repeat="friend in friends | filter:q as results">
-         {{friend.name + " " + friend.email}}
-        </li>
-        <li class="animate-repeat" ng-if="results.length == 0">
-          <strong>No results found...</strong>
-        </li>
-      </ul>
-    </div>
-    <div id="invites">
-    {{invites.length}} people have been invited. </br> They are: </br>
-                <input type="search" ng-model="n" placeholder="Search..." />
-      <ul class="animate-container2">
-        <li class="animate-repeat2" ng-repeat="invite in invites | filter:n as resultstwo">
-         {{invite.name}} {{invite.email}}
-      </li>
-        <li class="animate-repeat2" ng-if="resultstwo.length == 0">
-          <strong>No results found...</strong>
-        </li>
-      </ul>
-    </div>
+	<div class="jumbotron text-center">
+		<div class="container-fluid">
+			<h2>Recruiter Control Room</h2>
+		</div>
+	</div>
+	<div class="preview" ng-show="livepreview">
+		<p>Hey {{firstName + " " + lastName}}, you have been officially invited to Frank!</p>
+			{{personalMessage}}
+	</div>
+	<div id="invite">
+		<div id="from" class="invitation_field">
+			<strong>From: </strong>
+			<p id="recruiter_email">{{recruiter_email}}</p>
+		</div>
+		<div id="to" class="invitation_field">
+			<strong>To: </strong>
+			<div id="to_fields">
+				<input type="text" class="to_field" ng-model="firstName" placeholder="First Name" />
+				<input type="text" class="to_field" ng-model="lastName" placeholder="Last Name" />
+				<input type="text" class="to_field" id="invitee_email" ng-model="email" placeholder="first.last@email.com" />
+			</div>
+		</div>
+		<div id="message">
+			<b>Personal Message:</b><br />
+			<textarea id="p_message" ng-model="personalMessage" rows="12" cols="50"></textarea>
+		</div>
+		<br>
+		<div id="invitation_buttons">
+			<a id="previewbutton" class="btn btn-success invitation-button" href="#" ng-click="livepreview = !livepreview" ng-class="{ active: livepreview }"><i class="fa fa-eye"></i> Preview</a>
+			<button type="submit" value="Send" class="btn btn-primary btn-lg invitation-button"/><i class="fa fa-envelope-o"></i> Send</button>
+		</div>
+	</div>
+	<div id="accepted">
+		{{friends.length}} people are attending.</br> They are: </br>
+		<input type="search" ng-model="q" placeholder="Search..." />
+		<ul class="animate-container">
+			<li class="animate-repeat"  ng-repeat="friend in friends | filter:q as results">
+			 {{friend.name + " " + friend.email}}
+			</li>
+			<li class="animate-repeat" ng-if="results.length == 0">
+				<strong>No results found...</strong>
+			</li>
+		</ul>
+	</div>
+	<div id="invites">
+	{{invites.length}} people have been invited. </br> They are: </br>
+							<input type="search" ng-model="n" placeholder="Search..." />
+		<ul class="animate-container2">
+			<li class="animate-repeat2" ng-repeat="invite in invites | filter:n as resultstwo">
+			 {{invite.name}} {{invite.email}}
+		</li>
+			<li class="animate-repeat2" ng-if="resultstwo.length == 0">
+				<strong>No results found...</strong>
+			</li>
+		</ul>
+	</div>
 </section>
