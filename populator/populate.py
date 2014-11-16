@@ -135,7 +135,7 @@ def dumpUserSummary(userList):
       fd.write("fName: " + user.fName + '\n')
       fd.write("lName: " + user.lName + '\n')
       fd.write("email: " + user.email + '\n')
-      fd.write("password: " + user.password + '\n')
+      fd.write("password: " + user._password + '\n')
       fd.write("roles: " + str(user.roles) + '\n\n')
 
 def main():
