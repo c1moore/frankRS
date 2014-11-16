@@ -1,4 +1,4 @@
-routerApp.controller('eventController', function($scope) {
+angular.module('admin').controller('adminCtrl', function($scope) {
         /* Preserving the state of the table, doesn't really work yet
         var service = {
             model: {
@@ -98,7 +98,7 @@ routerApp.controller('eventController', function($scope) {
             
 });
 
-
+/*
 routerApp.controller('applicationController', function($scope) {
   
           var ac = this; 
@@ -125,3 +125,4 @@ routerApp.controller('applicationController', function($scope) {
           }
   
 });
+*/
