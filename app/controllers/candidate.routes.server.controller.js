@@ -138,6 +138,26 @@
  		return res.status(401).send("User not Authorized");
  };
 
+ exports.getUser_id= function(req, res) {
+ 	if(!req.isAuthenticated())
+ 		return res.status(401).send("User is not logged in");
+
+ 	if (req.hasAuthorization(req.user, ["admin"])){
+ 		var candidate_id=req.body.candidate_id;
+ 		var query = Candidate.findOne({_id:candidate_id });
+ 		query.exec(function(err,result) {
+ 			if(err) {
+ 				res.status(400).send(err);
+ 			} else if(!result) {
+ 				res.status(400).json({user_id: "No user_id found!"});
+ 			} else {
+ 				res.status(200).json({user_id : result.user_id});
+ 			}
+ 		});
+ 	}
+ 	else
+ 		return res.status(401).send("User not Authorized");
+ };
 
  
  exports.setfName = function(req,res){
@@ -389,7 +409,8 @@ exports.setNote = function(req,res){
  			email: req.body.email,
  			status: req.body.status,
  			events: [{event_id: req.body.event_id._id,accepted: req.body.accept_Key}],
- 			note: req.body.note
+ 			note: req.body.note,
+ 			user_id: req.body.user_id
  		});
 
  		newCandidate.save(function(err){
