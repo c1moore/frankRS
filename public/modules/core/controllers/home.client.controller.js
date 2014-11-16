@@ -5,7 +5,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 		// This provides Authentication context.
 		$scope.authentication = Authentication;
 		//The users roles
-		$scope.userRoles = ['recruiter', 'admin'];
+		$scope.userRoles = ['recruiter'];
 
 		// Temporary data for buttons
 		$scope.data = {
