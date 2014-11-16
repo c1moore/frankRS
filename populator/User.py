@@ -1,6 +1,6 @@
 #User object
 
-from Util import randomString, randomNameString
+from Util import randomString, randomNameString, randomBytes
 from Util import WEBS
 from Util import getPymongoDB
 from Util import randomTimeInMS
@@ -12,6 +12,8 @@ import calendar
 from datetime import datetime
 from datetime import date as Date
 from time import mktime
+from base64 import b64encode
+from pbkdf2 import PBKDF2
 
 ROLES = ['admin', 'recruiter', 'attendee']
 
@@ -32,8 +34,10 @@ class User:
     self.displayName = randomString(2,16,' ')
     self.email = (randomString(4,35).lower()+'@'+randomString(4,35)+
 			random.choice(WEBS))
-    self.password = ""
-    self.salt = ""
+    self.salt = str(b64encode(randomBytes(16)))[2:-2]
+    self._password = randomString(6,64,"""~!@#$%^&*(")[]{}|\;:<>,.""")
+    self.password = str(PBKDF2(self._password,self.salt,
+			iterations=10000).hexread(64))
     self.provider = "local"
     self.roles = [random.choice(ROLES)]
     cday = random.randint(1,28)
