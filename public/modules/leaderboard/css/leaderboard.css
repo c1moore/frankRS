@@ -1,3 +1,48 @@
+a {
+	color: mediumvioletred;
+	cursor: pointer;
+}
+
+a:hover {
+	color: rgb(197, 78, 144);
+}
+
+.dropdown-menu {
+	float: left;
+}
+
+.frank-event-select {
+	background-image: -webkit-linear-gradient(top, #f0ad4e 0%, #ec971f 100%);
+	background-image: -o-linear-gradient(top, #f0ad4e 0%, #ec971f 100%);
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#f0ad4e), to(#ec971f));
+	background-image: linear-gradient(to bottom, #f0ad4e 0%, #ec971f 100%);
+	background-repeat: repeat-x;
+	border-color: #eea236;
+}
+
+.leaderboard-container {
+	background-color: #F5F5F5;
+	margin-top: 10px;
+	margin-left: 10px;
+	height: 575px;
+}
+
+.ng-table-counts {
+	display: none;
+}
+
+.ng-table th.sortable div:after, .ng-table th.sortable div:before {
+	border-color: #fff transparent;
+}
+
+.ng-table th.sortable div:before {
+	border-top: 4px solid #fff;
+}
+
+.ng-table th.sortable.sort-desc, .ng-table th.sortable.sort-asc {
+	background-color: rgba(25, 25, 25, .70);
+}
+
 .table .progress {
 	margin-bottom:0;
 }
@@ -5,6 +50,11 @@
 .table {
 	margin-bottom:0;
 	border-collapse: separate;
+}
+
+th.header {
+	background-color: #333232;
+	color: white;
 }
 
 .pagination {
