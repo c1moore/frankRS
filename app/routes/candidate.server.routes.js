@@ -16,6 +16,8 @@ app.route('/candidate/getEmail').get(dan_candidate_routes.getEmail);
 app.route('/candidate/getEvents').get(dan_candidate_routes.getEvents);
 //app.route('/candidate/getAccept_Key').get(dan_candidate_routes.getAccept_Key);
 app.route('/candidate/getNote').get(dan_candidate_routes.getNote);
+app.route('/candidate/getUser_id').get(dan_candidate_routes.getUser_id);
+
 
 app.route('/candidate/setfName').get(dan_candidate_routes.setfName);
 app.route('/candidate/setlName').get(dan_candidate_routes.setlName);

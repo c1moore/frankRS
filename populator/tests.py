@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 from Candidate import Candidate
-from Attendee import Attendee
 from Event import Event
 from User import User
 from Util import resetMongo
@@ -143,7 +142,7 @@ def main():
   else:
     print("--SUCCESS user accept an invitation")
 
-  print("\nDone! Resetting databases...\n")
+  print("\nDone with no errors! Resetting databases...\n")
   resetMongo()
 
 if __name__=='__main__':

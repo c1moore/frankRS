@@ -40,41 +40,69 @@ Recruiters and attendees can volunteer to be a recruiter.
 	Returns
 		note
 
+
+/candidate/getUser_id
+	Expects
+		.send({candidate_id: candidate._id})
+	Returns
+		user_id
+
+	String field that holds the user ID of the candidate.
+
 /candidate/setfName
 	Expects 
-		.send({candidate_id: candidate._id,newfName:'x'})
+		.send({candidate_id: candidate._id,fName:'string x'})
+
+	Changes the candidate fname to x if the user is an admin
+
 
 /candidate/setlName
 	Expects 
-		.send({candidate_id: candidate._id,newlName:'x'})
+		.send({candidate_id: candidate._id,lName:'string x'})
+
+		Changes the candidate lname to x if the user is an admin
+
 
 /candidate/setEmail
 	Expects 
-		.send({candidate_id: candidate._id,newfName:'x@x.com'})
+		.send({candidate_id: candidate._id,fName:'string x@x.com'})
+
+	Changes the candidate email to x@x.com if the user is an admin
+
 
 
 /candidate/setStatus
 	Expects 
-		.send({candidate_id: candidate._id,event_id:'x',newStatus:'accepted/invited/volunteer'})
+		.send({candidate_id: candidate._id,event_id:'x',status:string 'accepted/invited/volunteer'})
+
+	Changes status to a specific event in the candidate file to accepted or invited or volunteer.  Those are the only choices to change it to.
 
 		
 /candidate/setEvent
 	Expects 
-		.send({candidate_id: candidate._id,newEvent:{event_id:event._id,accepted: true/false:'x',status:accepted/invited/volunteer'}})
+		.send({candidate_id: candidate._id,newEvent:{event_id:event._id,accepted: boolean true/false,status:accepted/invited/volunteer'}})
+
+	Adds a new event to the candidate.  Lets you set the accepted and status field manually.  Default for accepted is false and default for status is volunteer.
+
 
 /candidate/setAccepted
 	Expects 
-		.send({candidate_id: candidate._id,event_id:event._id, newAccepted:true/false})
+		.send({candidate_id: candidate._id,event_id:event._id, accepted:string true/false})
+
+	Changes the accepted field in a specific event for a candidate to boolean true or false. 
+
 
 /candidate/setNote
 	Expects 
-		.send({candidate_id: candidate._id,newNote:'string'})_
+		.send({candidate_id: candidate._id,note:'string'})_
+
+	Changes the candidate note to string.  Have to be an admin.
 
 /candidate/setCandidate
 	Expects 
-		.send({newfName:'string',newlName:'string',newEmail:'string@string.string',newStatus:volunteer/invited/accepted, event_id: event._id,newAccept_Key:true/false,newNote:'string'})
+		.send({fName:'string',lName:'string',email:'string@string.string',status:volunteer/invited/accepted, event_id: event._id,accept_Key:true/false,note:'string', user_id:  user._id})
 
-	NOTE: this also works for recruiters/attendees.  It only requires their fname, lname, email, and newEvent.  The rest of the fields will be handled by the backend.
+	NOTE: this also works for recruiters/attendees.  It only requires their fName, lName, email, and newEvent.  The rest of the fields will be handled by the backend.  If the other items are included they will be ignored.  (So that an attendee can not set them selves as accepted to be a recruiter for a specific event)
 
 	This is the only candidate route that works for recruites/attendees.  The rest are Admin only.
 
@@ -82,3 +110,5 @@ Recruiters and attendees can volunteer to be a recruiter.
 /candidate/deleteCandidate
 	Expects 
 		.send({candidate_id: candidate._id})
+
+	deletes candidate from the database.

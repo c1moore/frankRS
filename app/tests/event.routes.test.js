@@ -829,8 +829,30 @@ describe('Express.js Event Route Integration Tests:', function() {
 			});
 	});
 
+	it("should not be able to delete an event as a normal user", function(done) {
+		agent
+			.post('http://localhost:3001/events/delete')
+			.send({eventID: event1._id})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(401);
+				done();
+			});
+	});
+
+	it("should be able to delete an event as an admin", function(done) {
+		agentAdmin
+			.post('http://localhost:3001/events/delete')
+			.send({eventID: event1._id})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(200);
+				done();
+			});
+	});
+
 	after(function(done) {
-		event1.remove()
+		//event1.remove() Deleted in a test
 		event2.remove();
 		user.remove();
 		userAdmin.remove();

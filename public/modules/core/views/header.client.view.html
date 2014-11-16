@@ -12,11 +12,14 @@
 	<!--Collection of links-->
 	<nav class="collapse navbar-collapse" collapse="!isCollapsed" role="navigation">
 		<ul class="nav navbar-nav">
-				<li ui-route="/invite" ng-class="{active: $uiRoute}">
+				<li ui-route="/invite" ng-class="{active: $uiRoute}" ng-hide="hideLink(inviteRoles)">
 					<a href="/#!/invite">Invitations</a>
 				</li>
-				<li ui-route="/leaderboard" ng-class="{active: $uiRoute}">
+				<li ui-route="/leaderboard" ng-class="{active: $uiRoute}" ng-hide="hideLink(leaderboardRoles)">
 					<a href="/#!/leaderboard">Leaderboard</a>
+				</li>
+				<li ui-route="/admin" ng-class="{active: $uiRoute}" ng-hide="hideLink(adminRoles)">
+					<a href="/#!/admin">Admin</a>
 				</li>
 		</ul>
 

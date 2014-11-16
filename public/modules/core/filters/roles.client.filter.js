@@ -10,14 +10,25 @@ angular.module("core").filter("roles", function(){
 			return false;
 		}
 
-		//filters out data not containing the roles
-		var containing = function(element) {
+		//filters out data for arrays of objects
+		var objectContaining = function(element) {
 			for (var x in rolesNeeded) {
 				if (contains(element.roles,rolesNeeded[x])) return true;
 			}
 			return false;
 		};
-		
-		return data.filter(containing);
+
+		//filters out data for arrays of strings
+		var arrayContaining = function(element) {
+			return contains(rolesNeeded,element);
+		}
+
+		//check if array of objects
+		if (typeof(data[0]) === 'object') {
+			return data.filter(objectContaining);
+		}
+		else {
+			return data.filter(arrayContaining);
+		}
 	};
 });
