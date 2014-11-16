@@ -34,7 +34,7 @@ class User:
     self.displayName = randomString(2,16,' ')
     self.email = (randomString(4,35).lower()+'@'+randomString(4,35)+
 			random.choice(WEBS))
-    self.salt = str(b64encode(randomBytes(16)))[2:-2]
+    self.salt = randomBytes(16)
     self._password = randomString(6,22,"""~!@#$%^&*(")[]{}|\;:<>,.""")
     self.password = str(PBKDF2(self._password,self.salt,
 			iterations=10000).hexread(64))
