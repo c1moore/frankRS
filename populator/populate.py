@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3 -B
 
 #Program to prepopulate mongo for integration testing and other purposes by James
 
@@ -21,7 +21,8 @@ def getRandomSeed():
     try:
       read = int(input("Random seed value (any number, optional, allows repeatability): "))
     except ValueError:
-      print(required)
+      print("Choosing random seed automatically.")
+      return None
     else:
       return read
 
@@ -97,11 +98,11 @@ def getNumEvents():
     else:
       return numEvents
 
-def getMaxEventsPerRecruiter():
+def getMaxEventsPerRecruiter(numEvents):
   while True:
     try:
       maxEvents = int(input("How many events (maximum) does a recruiter recruit for?: "))
-      assert (maxEvents >= 0)
+      assert (maxEvents >= 0 and maxEvents <= numEvents)
     except (ValueError, AssertionError):
       print(required)
     else:
@@ -206,6 +207,7 @@ def main():
     for i in range(numEventsPerCandidate):
       newUser.addEvent(random.choice(events))
     candidates.append(newUser)
+    newYser.save()
   #Recruiters, invite users who are not me
   for recruiter in recruiters:
     recevents = recruiter.getEvents()

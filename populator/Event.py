@@ -37,7 +37,7 @@ class Event:
     dic = dict()
     for name in names:
       dic[name] = self.__dict__[name]
-    Events = db.event
+    Events = db.events
     self._id = Events.save(dic)
     #print("Event->insert: with id={}".format(self._id))
     return self._id
