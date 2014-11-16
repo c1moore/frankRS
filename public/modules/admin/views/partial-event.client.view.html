@@ -1,0 +1,21 @@
+<div class="jumbotron text-center">
+  <h2>The Event Page </h2>
+</div>
+<div class="row" ng-controller="eventController as ec">
+
+  <div class="col-sm-6">
+    <div ui-view="columnOne"></div>
+    <form ng-submit="ec.addEvent()"></form>
+    <input value="" type="text" placeholder="Name of Event" ng-model="eventName"><br>
+    <input value="" type="text" placeholder="Start Date" ng-model="startDate"><br>
+    <input value="" type="text" placeholder="End Date" ng-model="endDate"><br>
+    <input value="" type="text" placeholder="Location" ng-model="locationid"><br>
+    <input type="submit" class="btn btn-primary" value="Add Event">
+   <!--- <button class="btn btn-primary" textasdaskmkasdck asdsad;="Add Event" ng-click="ec.addEvent()"></button>--->
+  </div>
+  
+
+  <div class="col-sm-6">
+    <div ui-view="columnTwo"></div>
+  </div>
+</div>
