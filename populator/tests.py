@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 from Candidate import Candidate
-from Attendee import Attendee
 from Event import Event
 from User import User
 from Util import resetMongo

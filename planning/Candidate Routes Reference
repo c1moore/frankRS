@@ -40,11 +40,21 @@ Recruiters and attendees can volunteer to be a recruiter.
 	Returns
 		note
 
+
+/candidate/getUser_id
+	Expects
+		.send({candidate_id: candidate._id})
+	Returns
+		user_id
+
+	String field that holds the user ID of the candidate.
+
 /candidate/setfName
 	Expects 
 		.send({candidate_id: candidate._id,fName:'string x'})
 
 	Changes the candidate fname to x if the user is an admin
+
 
 /candidate/setlName
 	Expects 
@@ -90,7 +100,7 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 /candidate/setCandidate
 	Expects 
-		.send({fName:'string',lName:'string',email:'string@string.string',status:volunteer/invited/accepted, event_id: event._id,accept_Key:true/false,note:'string'})
+		.send({fName:'string',lName:'string',email:'string@string.string',status:volunteer/invited/accepted, event_id: event._id,accept_Key:true/false,note:'string', user_id:  user._id})
 
 	NOTE: this also works for recruiters/attendees.  It only requires their fName, lName, email, and newEvent.  The rest of the fields will be handled by the backend.  If the other items are included they will be ignored.  (So that an attendee can not set them selves as accepted to be a recruiter for a specific event)
 

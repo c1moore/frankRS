@@ -394,3 +394,27 @@ exports.setName = function(req, res) {
 		}
 	});
 };
+
+exports.delete = function(req, res) {
+	if (!req.isAuthenticated()) { //Must be logged in
+		res.status(401).json({message: "You are not logged in"});
+		return;
+	//Must be an admin
+	} else if (!req.hasAuthorization(req.user,["admin"])) {
+		res.status(401).json({message: "Access denied"});
+		return;
+	}
+	var id = req.session.id;
+	var eventID = req.body.eventID;
+	var query = Event.findOne({_id: eventID});
+	var theResult;
+	query.exec(function(err,result) {
+		theResult = result;
+		if (err) res.status(400).send(err);
+		else if (!theResult) res.status(400).json({message: "No event object with that ID"});
+		else {
+			result.remove();
+			res.status(200).send();
+		}
+	});
+};

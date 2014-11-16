@@ -20,5 +20,6 @@ module.exports = function(app) {
 	app.route('/events/setLocation').post(james_event_routes.setLocation);
 	app.route('/events/setEventObj').post(james_event_routes.setEventObj);
 	app.route('/events/setSchedule').post(james_event_routes.setSchedule);
+	app.route('/events/delete').post(james_event_routes.delete);
 
 };

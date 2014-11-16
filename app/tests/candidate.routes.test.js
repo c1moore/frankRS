@@ -101,7 +101,8 @@
 						email : 'test@test.com',
 						//status : 'volunteer',
 						events: [{event_id: event1._id, accepted: false,status: 'volunteer'},{event_id:event2._id,accepted:false,status:'volunteer'}],
-						note : 'this is a test'
+						note : 'this is a test',
+						user_id: attendee._id
 					});
 
 					guest1=agent.agent();
@@ -257,6 +258,22 @@
  			});
  		});
  	});
+
+ 	it("admin should be able to get the candidate getUser_id", function(done) {
+ 		candidate1.save(function(err) {
+ 			user1
+ 			.get('http://localhost:3001/candidate/getUser_id')
+ 			.send({candidate_id: candidate1._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+ 				res.status.should.equal(200);
+ 				res.body.should.have.property('user_id');
+ 				res.body.user_id.should.be.equal((attendee._id).toString());
+ 				done();
+ 			});
+ 		});
+ 	});
+
 
  	it("admin should be able to set the candidate first name", function(done) {
  		user1
@@ -651,6 +668,21 @@
  	});
  });
 
+ it("attendees should NOT be able to get the candidate getUser_id", function(done) {
+ 		candidate1.save(function(err) {
+ 			attendee1
+ 			.get('http://localhost:3001/candidate/getUser_id')
+ 			.send({candidate_id: candidate1._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+ 				res.status.should.equal(401);
+ 				res.body.should.not.have.property('user_id');
+ 				//res.body.user_id.should.be.equal((attendee._id).toString());
+ 				done();
+ 			});
+ 		});
+ 	});
+
  it("attendees should NOT be able to set the candidate first name", function(done) {
  	attendee1
  	.get('http://localhost:3001/candidate/setfName')
@@ -898,7 +930,7 @@
   describe('Recruiter route tests:', function() {
 
 
- it("recruters should NOT be able to get the candidate first name", function(done) {
+ it("recruiters should NOT be able to get the candidate first name", function(done) {
  	candidate1.save(function(err) {
  		recruiter1
  		.get('http://localhost:3001/candidate/getfName')
@@ -914,7 +946,7 @@
  });
 
 
- it("recruters should NOT be able to get the candidate last name", function(done) {
+ it("recruiters should NOT be able to get the candidate last name", function(done) {
  	candidate1.save(function(err) {
  		recruiter1
  		.get('http://localhost:3001/candidate/getlName')
@@ -930,7 +962,7 @@
  });
 
 
- it("recruters should NOT be able to get the candidate email", function(done) {
+ it("recruiters should NOT be able to get the candidate email", function(done) {
  	candidate1.save(function(err) {
  		recruiter1
  		.get('http://localhost:3001/candidate/getEmail')
@@ -944,7 +976,7 @@
  	});
  	});
  });
- /*it("recruters should NOT be able to get the candidate status", function(done) {
+ /*it("recruiters should NOT be able to get the candidate status", function(done) {
  	candidate1.save(function(err) {
  		recruiter1
  		.get('http://localhost:3001/candidate/getStatus')
@@ -961,7 +993,7 @@
 */
 
 
- it("recruters should NOT be able to get the candidate EventsID", function(done) {
+ it("recruiters should NOT be able to get the candidate EventsID", function(done) {
  	candidate1.save(function(err) {
  		recruiter1
  		.get('http://localhost:3001/candidate/getEvents')
@@ -974,7 +1006,7 @@
  		});
  	});
  });
- it("recruters should NOT be able to get the candidate note", function(done) {
+ it("recruiters should NOT be able to get the candidate note", function(done) {
  	candidate1.save(function(err) {
  		recruiter1
  		.get('http://localhost:3001/candidate/getNote')
@@ -988,8 +1020,21 @@
  		});
  	});
  });
-
- it("recruters should NOT be able to set the candidate first name", function(done) {
+it("recruiters should NOT be able to get the candidate getUser_id", function(done) {
+ 		candidate1.save(function(err) {
+ 			recruiter1
+ 			.get('http://localhost:3001/candidate/getUser_id')
+ 			.send({candidate_id: candidate1._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+ 				res.status.should.equal(401);
+ 				res.body.should.not.have.property('user_id');
+ 				//res.body.user_id.should.be.equal((attendee._id).toString());
+ 				done();
+ 			});
+ 		});
+ 	});
+ it("recruiters should NOT be able to set the candidate first name", function(done) {
  	recruiter1
  	.get('http://localhost:3001/candidate/setfName')
  	.send({candidate_id: candidate1._id,fName:'blah'})
@@ -1018,7 +1063,7 @@
 		});
 
  });
- it("recruters should NOT be able to set the candidate last name", function(done) {
+ it("recruiters should NOT be able to set the candidate last name", function(done) {
  	recruiter1
  	.get('http://localhost:3001/candidate/setlName')
  	.send({candidate_id: candidate1._id,lName:'Blah'})
@@ -1048,7 +1093,7 @@
 
  });
 
- it("recruters should NOT be able to set the candidate email", function(done) {
+ it("recruiters should NOT be able to set the candidate email", function(done) {
  	recruiter1
  	.get('http://localhost:3001/candidate/setEmail')
  	.send({candidate_id: candidate1._id,email:'blah@test.com'})
@@ -1069,7 +1114,7 @@
 		});
 
  });
- it("recruters should NOT be able to set the candidate status", function(done) {
+ it("recruiters should NOT be able to set the candidate status", function(done) {
  	recruiter1
  		.get('http://localhost:3001/candidate/setStatus')
  	.send({candidate_id: candidate1._id,'event_id': event2._id, status:'volunteer'})
@@ -1099,7 +1144,7 @@
 
  });
  
- it("recruters should NOT be able to add(set) candidate event", function(done) {
+ it("recruiters should NOT be able to add(set) candidate event", function(done) {
  	recruiter1
  	.get('http://localhost:3001/candidate/setEvent')
  	.send({candidate_id: candidate1._id,newEvent:{event_id: event4._id, accepted: false}})
@@ -1125,7 +1170,7 @@
  	});
  });
 
- it("recruters should NOT be able to set candidate event accepted field", function(done) {
+ it("recruiters should NOT be able to set candidate event accepted field", function(done) {
  	recruiter1
  	.get('http://localhost:3001/candidate/setAccepted')
  	.send({'candidate_id' : candidate1._id, 'event_id': event2._id, 'accepted': false})
@@ -1156,7 +1201,7 @@
  	});
  });
 
- it("recruters should NOT be able to set the candidate's note", function(done) {
+ it("recruiters should NOT be able to set the candidate's note", function(done) {
  	recruiter1
  	.get('http://localhost:3001/candidate/setNote')
  	.send({candidate_id: candidate1._id,note:'blah'})
@@ -1278,7 +1323,20 @@
  		});
  	});
  });
-
+it("guest should NOT be able to get the candidate getUser_id", function(done) {
+ 		candidate1.save(function(err) {
+ 			guest1
+ 			.get('http://localhost:3001/candidate/getUser_id')
+ 			.send({candidate_id: candidate1._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+ 				res.status.should.equal(401);
+ 				res.body.should.not.have.property('user_id');
+ 				//res.body.user_id.should.be.equal((attendee._id).toString());
+ 				done();
+ 			});
+ 		});
+ 	});
  it("guest should NOT be able to set the candidate first name", function(done) {
  	guest1
  	.get('http://localhost:3001/candidate/setfName')
