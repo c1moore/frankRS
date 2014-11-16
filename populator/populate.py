@@ -21,7 +21,8 @@ def getRandomSeed():
     try:
       read = int(input("Random seed value (any number, optional, allows repeatability): "))
     except ValueError:
-      print(required)
+      print("Choosing random seed automatically.")
+      return None
     else:
       return read
 
