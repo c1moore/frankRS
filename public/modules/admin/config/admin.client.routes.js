@@ -10,10 +10,10 @@ routerApp.config(function($stateProvider, $urlRouterProvider) {
             .state('application', {
                 url: '/application',
                 views: {
-                  '': { templateUrl: 'partial-application.html'},
+                  '': { templateUrl: 'partial-application.client.view.html'},
                   // 'columnUno@application': 
                   'columnDos@application': {
-                      templateUrl: 'tabletwo-data.html',
+                      templateUrl: 'tabletwo-data.client.view.html',
                       controller:'applicationController'
                       
                   }
@@ -23,10 +23,10 @@ routerApp.config(function($stateProvider, $urlRouterProvider) {
             .state('event', {
                 url:'/event',
                 views: {
-                    '': { templateUrl: 'partial-event.html'},
+                    '': { templateUrl: 'partial-event.client.view.html'},
                    // 'columnOne@event': { template:'Add an event!' },
                     'columnTwo@event': {
-                        templateUrl:'table-data.html',
+                        templateUrl:'table-data.client.view.html',
                         controller:'eventController'
                     }
                 }
