@@ -17,7 +17,7 @@
 			<div ng-class="buttonsGrid">
 					<!-- these divs col values will generatgoogle mapse dynamicaly through angular -->
 					<div ng-repeat="button in data.buttons | roles:userRoles" ng-style="{'width':buttonsWidth+'%'}" class="homeButtonContainer">
-						<div class="homeButton text-center">
+						<div class="text-center homeButton">
 							<a href={{button.link}}><img src="/modules/core/img/temp/242.svg" alt="Place holder"></a>
 							<div class="caption">
 								<h3>{{button.name}}</h3>
