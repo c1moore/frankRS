@@ -32,8 +32,9 @@
 			expect(scope.buttonsGrid).toEqual("col-md-12");
 		});
 
-		it('should return 50', function() {
-			expect(scope.buttonsWidth).toEqual('50');
+		it('should return a width of 50', function() {
+			scope.userRoles = ['recruiter','atendee'];
+			expect(scope.buttonsWidth).toEqual(50);
 		})
 	});
 })();
