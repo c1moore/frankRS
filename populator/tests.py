@@ -141,7 +141,7 @@ def main():
     print("--FAILED to invite a user")
     raise e
   else:
-    print("--SUCCESS in in inviting a user")
+    print("--SUCCESS in inviting a user")
 
   try:
     user2.decide(event._id,True,False,user)
