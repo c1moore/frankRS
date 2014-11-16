@@ -366,26 +366,16 @@
  										return res.status(400).json("no user with candidate.user_id is found");
  									else{
  										for (var j = 0; j<result3.status.length;j++){
- 											if (result3.status[j].event_id === req.body.event_id){
+ 											if (result3.status[j].event_id.toString() === req.body.event_id.toString()){
  												result3.status[j].recruiter = true;
+		 										result3.roles.addToSet('recruiter');
+
  												break;
  											}
  										}
- 										var k =0;
- 										var tempStatusRecruiter = false;
- 										for (k; k<result3.roles.length;k++){
- 											if (result3.status[k] === 'recruiter'){
- 												tempStatusRecruiter= true;
- 												break;
- 											}
- 										}
- 										if (tempStatusRecruiter===false)
- 											result3.roles[k]='recruiter';
-
-
- 										result3.save(function(err,res){
+ 										result3.save(function(err,ress){
  											if (err)
- 												result.status(400).send(err);
+ 												res.status(400).send(err);
  										});
  									}
 
@@ -404,7 +394,7 @@
  									login_enabled: true
  								});
 
- 								user.save(function(err,res){
+ 								user.save(function(err,ress){
  									if (err)
  										return res.status(400).send(err)
  								});

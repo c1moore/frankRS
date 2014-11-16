@@ -474,17 +474,18 @@
  });
 
   it('Should have changed the attendee user to a recruiter for the roles and status fields',function(done){
-  	user1
+  	attendee1
   	.get('http://localhost:3001/recruiter/events')
-  	.send({'user' : attendee._id})
+  	//.send({'user' : attendee._id})
   	.end(function(err,res){
   		if (err) throw err;
-  		console.log(res.body);
-  		console.log(err);
+  		//console.log(res.body);
+  		//console.log(err);
 
   		res.status.should.equal(200);
-  		res.body.should.have.property('events');
-  		(res.body.events[0].recruiter.toString()).should.equal('true');
+  		//res.body.should.have.property('event_id');
+  		(res.body[0].recruiter.toString()).should.equal('true');
+  		(res.body[0].event_id._id.toString()).should.equal(event2._id.toString());
 
   		done();
   	});
