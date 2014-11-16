@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3 -B
 
 from Candidate import Candidate
 from Event import Event

@@ -7,4 +7,3 @@ public/lib
 app/tests/coverage/
 .bower-*/
 .idea/
-/populator/__pycache__/

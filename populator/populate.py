@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3 -B
 
 #Program to prepopulate mongo for integration testing and other purposes by James
 
