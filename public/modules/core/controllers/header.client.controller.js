@@ -6,6 +6,7 @@ angular.module('core').controller('HeaderController', ['$scope', 'Authentication
 		$scope.userRoles = ['recruiter','admin'];
 		$scope.leaderboardRoles = ['recruiter','admin'];
 		$scope.inviteRoles = ['recruiter','admin'];
+		$scope.adminRoles = ['admin'];
 		$scope.isCollapsed = false;
 		$scope.menu = Menus.getMenu('topbar');
 

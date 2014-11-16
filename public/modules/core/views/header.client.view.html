@@ -18,6 +18,9 @@
 				<li ui-route="/leaderboard" ng-class="{active: $uiRoute}" ng-hide="hideLink(leaderboardRoles)">
 					<a href="/#!/leaderboard">Leaderboard</a>
 				</li>
+				<li ui-route="/admin" ng-class="{active: $uiRoute}" ng-hide="hideLink(adminRoles)">
+					<a href="/#!/admin">Admin</a>
+				</li>
 		</ul>
 
 		<ul class="nav navbar-nav" data-ng-if="menu.shouldRender(authentication.user);">
