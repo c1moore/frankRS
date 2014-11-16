@@ -43,7 +43,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 			return Math.floor(value)
 		}
 
-		var mainApi = $resource('/leaderboard/maintable');
+		var mainApi = $resource('/leaderboard/maintable',null, {'getTable':{method:'POST'}});
 		var attendingApi = $resource('/leaderboard/attendees');
 		var invitedApi = $resource('/leaderboard/invitees');
 		// var attendingApi = $resource('/modules/leaderboard/tests/MOCK_ATTENDEE_DATA.json');
@@ -62,7 +62,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
     		}, {
         	total: 0, // length of data
         	getData: function($defer, params) {
-        		mainApi.query(params.url(), function(data){
+        		mainApi.getTable(params.url(), function(data){
 	            	var filteredData = params.filter() ?
 	            		$filter('filter')(data, params.filter()) :
 	            		data;
