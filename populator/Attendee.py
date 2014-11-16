@@ -29,5 +29,5 @@ class Attendee:
       dic[name] = self.__dict__[name]
     Attendees = db.attendees
     self._id = Attendees.save(dic)
-    print("Attendees->insert: with id={}".format(self._id))
+    #print("Attendees->insert: with id={}".format(self._id))
     return self._id

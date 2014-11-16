@@ -8,6 +8,7 @@ var errorHandler = require('../errors'),
 	_ = require('lodash'),
 	nodemailer = require('nodemailer'),
 	User = mongoose.model('User'),
+	Event = mongoose.model('Event'),
 	config = require('../../../config/config'),
 	crypto = require('crypto'),
 	async = require('async');
@@ -440,7 +441,7 @@ exports.getEmail = function(req, res) {
 * TODO: A much more efficient method for updating this information, especially the recruiter's rank, should be researched and used when time permits.
 */
 exports.sendInvitation = function(req, res) {
-	if(req.body.fName === undefined || req.body.lName === undefined || req.body.email === undefined || req.body.event_id) {
+	if(req.body.fName === undefined || req.body.lName === undefined || req.body.email === undefined || req.body.event_id === undefined || req.body.event_name === undefined) {
 		res.status(400).send({'message' : 'Required fields not specified.'});
 		return;
 	}
@@ -453,12 +454,8 @@ exports.sendInvitation = function(req, res) {
 			to: req.body.email,
 			from: req.user.email,
 			replyTo: req.user.email,
-			subject: "You're Invied to frank!",
-			html: emailHTML
+			subject: "You're Invied to frank!"
 		};
-
-		//smtpTransport.sendMail(mailOptions, function(err) {
-		//	if (!err) {
 		var query = User.findOne({'_id' : req.user._id});
 		query.exec(function(err, recruiter) {
 			if(err) {
@@ -507,17 +504,26 @@ exports.sendInvitation = function(req, res) {
 									if(err) {
 										callback(true, null);
 									} else {
-										callback(null, 1);
+										callback(null, invitee);
 									}
 								});
+							},
+							function(invitee, callback) {
+								res.render('templates/reset-password-email', {
+									name: req.body.fName,
+									event: req.body.event_name
+								}, function(err, emailHTML) {
+									mailOptions.html = emailHTML;
+									callback(err, invitee);
+								});
 							}
-						], function(err, results) {
+						], function(err, invitee) {
 							if(err) {
 								res.status(400).send({'message' : "Invitation was not sent.  We could not connect to the server, please try again later."});
 							} else {
 								smtpTransport.sendMail(mailOptions, function(err) {
 									if(err) {
-										res.status(400).send({'message' : 'Invitation was not sent.  Please try again later.'});
+										res.status(400).send({'message' : 'Invitation was not sent.  Please try again later.', 'error' : err});
 									} else {
 										updateRanks(req.body.event_id);
 										res.status(200).send({message: 'Invitation has been sent to ' + req.body.email + '!'});
@@ -536,10 +542,6 @@ exports.sendInvitation = function(req, res) {
 				});
 			}
 		});
-		//	} else {
-		//		res.status(400).send('message' : 'Invitation not sent.  Please try again.');
-		//	}
-		//});
 
 	} else {
 		res.status(401).send({'message' : 'User does not have permission.'});
