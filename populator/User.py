@@ -5,7 +5,6 @@ from Util import WEBS
 from Util import getPymongoDB
 from Util import randomTimeInMS
 from Util import ensureID
-from Attendee import Attendee
 
 import random
 import inspect
@@ -77,8 +76,6 @@ class User:
           rec['almostList'].append({'user_id':self._id,'event_id':eventID})
           rec['inviteeList'].remove({'user_id':self._id,'event_id':eventID})
           Users.save(rec)
-    if attending:
-      Attendee(self._id,eventID,randomTimeInMS(calendar.timegm(self.updated.timetuple()))).save()
 
   def invite(self,userID,eventID):
     userID = ensureID(userID)
