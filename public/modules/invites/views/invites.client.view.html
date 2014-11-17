@@ -31,28 +31,77 @@
 			<button type="submit" value="Send" class="btn btn-primary btn-lg invitation-button"/><i class="fa fa-envelope-o"></i> Send</button>
 		</div>
 	</div>
-	<div id="accepted">
-		{{friends.length}} people are attending.</br> They are: </br>
-		<input type="search" ng-model="q" placeholder="Search..." />
-		<ul class="animate-container">
-			<li class="animate-repeat"  ng-repeat="friend in friends | filter:q as results">
-			 {{friend.name + " " + friend.email}}
-			</li>
-			<li class="animate-repeat" ng-if="results.length == 0">
-				<strong>No results found...</strong>
-			</li>
-		</ul>
+	<div id="accepted" class="frank-invite-sidebar">
+		<div class="frank-invite-sidebar-title">
+			<b>Awesome People Attending</b>
+		</div>
+		<!-- {{friends.length}} people are attending.</br> They are: </br> -->
+		<input type="search" class="frank-invite-sidebar-search" ng-model="q" placeholder="Search..." />
+		<hr class="frank-invite-hr" />
+		<div class="frank-invite-table-container">
+			<table class="animate-container">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Email</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="animate-repeat"  ng-repeat="friend in (results = (friends | filter:q))">
+						<td>
+					 		{{friend.name}}
+					 	</td>
+					 	<td>
+					 		{{friend.email}}
+					 	</td>
+					</tr>
+					<tr class="animate-repeat" ng-if="results.length == 0">
+						<td>
+							<strong>No results found...</strong>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="frank-invite-sidebar-total" id="accepted-total">
+			<hr class="frank-invite-hr"/>
+			<b>Total: {{friends.length}}</b>
+		</div>
 	</div>
-	<div id="invites">
-	{{invites.length}} people have been invited. </br> They are: </br>
-							<input type="search" ng-model="n" placeholder="Search..." />
-		<ul class="animate-container2">
-			<li class="animate-repeat2" ng-repeat="invite in invites | filter:n as resultstwo">
-			 {{invite.name}} {{invite.email}}
-		</li>
-			<li class="animate-repeat2" ng-if="resultstwo.length == 0">
-				<strong>No results found...</strong>
-			</li>
-		</ul>
+	<div id="invites" class="frank-invite-sidebar">
+		<div class="frank-invite-sidebar-title">
+			<b>People You Invited</b>
+		</div>
+		<input type="search" class="frank-invite-sidebar-search" ng-model="q" placeholder="Search..." />
+		<hr class="frank-invite-hr"/>
+		<div class="frank-invite-table-container">
+			<table class="animate-container">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Email</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="animate-repeat"  ng-repeat="invite in (results = (invites | filter:q))">
+						<td>
+					 		{{invite.name}}
+					 	</td>
+					 	<td>
+					 		{{invite.email}}
+					 	</td>
+					</tr>
+					<tr class="animate-repeat" ng-if="results.length == 0">
+						<td>
+							<strong>No results found...</strong>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="frank-invite-sidebar-total" id="invited-total">
+			<hr class="frank-invite-hr"/>
+			<b>Total: {{invites.length}}</b>
+		</div>
 	</div>
 </section>
