@@ -130,12 +130,13 @@ def getNumEventsPerCandidate():
 
 def dumpUserSummary(userList):
   with open('user_summary.txt','w') as fd:
-    fd.write("User summary:\n")
+    fd.write("User summary:\n\n")
     for user in userList:
       fd.write("fName: " + user.fName + '\n')
       fd.write("lName: " + user.lName + '\n')
       fd.write("email: " + user.email + '\n')
       fd.write("password: " + user._password + '\n')
+      fd.write("hashedpw: " + str(user.password) + '\n')
       fd.write("roles: " + str(user.roles) + '\n\n')
 
 def main():
