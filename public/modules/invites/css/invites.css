@@ -1,3 +1,41 @@
+.animate-container {
+  width: 100%;
+}
+.frank-invite-hr {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.frank-invite-sidebar{
+  position: relative;
+  overflow: auto;
+  height: 200px;
+  width: 325px;
+  float: right;
+  margin-right: 10px;
+  background-color: white;
+}
+.frank-invite-sidebar-search {
+  width: 90%;
+  margin-left: 16px;
+  margin-top: 5px;
+}
+.frank-invite-sidebar-title {
+  color: white;
+  background-color: #333232;
+  width: 100%;
+  text-align: center;
+  vertical-align: middle;
+  height: 25px;
+  font-size: 18px;
+}
+.frank-invite-sidebar-total {
+  position: absolute;
+  width: 100%;
+}
+.frank-invite-table-container {
+  height: 100px;
+  overflow: auto;
+}
 .invitation-button {
   height: 45px;
   width: 120px;
@@ -221,22 +259,10 @@ animation:0.5s flipInX ease;
 } */
 
 #invites {
-  margin-left:70%;
-  margin-top:50%;
-  position:absolute;
-  margin-right:5%;
-  height:200px;
-  overflow:auto;
-  width:250px;
+  top: 220px;
+  right:-335px;
 }
 #accepted {
-  position:absolute;
-  margin-left:70%;
-  margin-right:5%;
-  margin-top:10%;
-  overflow:auto;
-  height:200px;
-  width:250px;
 }
 #from {
   margin-top: 15px;
