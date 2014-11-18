@@ -1,5 +1,5 @@
-angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Authentication', '$http', 'ngTableParams', '$filter', '$resource', '$location',
-	function($scope, Authentication, $http, ngTableParams, $filter, $resource, $location) {
+angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Authentication', '$http', 'ngTableParams', '$filter', '$resource', '$location', 'eventSelector',
+	function($scope, Authentication, $http, ngTableParams, $filter, $resource, $location, eventSelector) {
 
 		$scope.authentication = Authentication;
 
@@ -14,15 +14,12 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		else if(($filter('roles')($scope.authentication.user.roles,['admin','recruiter'])).length === 0) {
 			$location.path('/');
 		}
-
-		//lets the score tab be the first active tab
-		$scope.initialTab = true;
 		
 		$scope.returnInt = function(value) {
 			return Math.floor(value)
 		}
 
-		var mainApi = $resource('/leaderboard/maintable',null, {'getTable':{method:'POST'}});
+		var mainApi = $resource('/leaderboard/maintable',eventSelector.postEventId, {'getTable':{method:'POST'}});
 		var attendingApi = $resource('/leaderboard/attendees');
 		var invitedApi = $resource('/leaderboard/invitees');
 		// var attendingApi = $resource('/modules/leaderboard/tests/MOCK_ATTENDEE_DATA.json');

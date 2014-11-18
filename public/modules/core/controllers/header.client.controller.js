@@ -21,7 +21,10 @@ angular.module('core').controller('HeaderController', ['$scope', 'Authentication
 		});
 
 		$scope.hideLink = function(rolesNeeded) {
-			if (($filter('roles')($scope.userRoles,rolesNeeded)).length == 0) {
+			if (!$scope.authentication.user) {
+				return true
+			}
+			else if (($filter('roles')($scope.authentication.user.roles,rolesNeeded)).length === 0) {
 				return true
 			}
 			else {
