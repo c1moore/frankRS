@@ -1,9 +1,9 @@
 'use strict';
 
 //Menu service used for managing  menus
-angular.module('core').service('eventSelector', ['$http',
+angular.module('core').service('eventSelector', ['$http', '$location',
 
-	function($http) {
+	function($http, $location) {
 		var thisService = this;
 		this.events = [];
 		this.selectedEvent = "Select Event";
@@ -37,6 +37,10 @@ angular.module('core').service('eventSelector', ['$http',
 
 		this.toggleDisabledEvents = function() {
 			thisService.nresDisabled = !thisService.nresDisabled;
+		}
+
+		this.hideEventSelector = function() {
+			return ($location.path() === '/signin');
 		}
 	}
 ]);
