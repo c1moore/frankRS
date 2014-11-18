@@ -46,7 +46,7 @@
 		<ul class="nav navbar-nav navbar-right" data-ng-show="authentication.user">
 			<li class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-					<span data-ng-bind="authentication.user.displayName"></span> <b class="caret"></b>
+					<span data-ng-bind="authentication.user.fName"></span> <b class="caret"></b>
 				</a>
 				<ul class="dropdown-menu">
 					<li>
@@ -68,18 +68,18 @@
 		<ul class="nav navbar-nav navbar-right">
 			<li class="dropdown">
 				<a href='#' class="dropdown-toggle" data-toggle="dropdown">
-					<span data-ng-bind=""></span><b class="caret"></b>
+					<span data-ng-bind="eventSelector.selectedEvent"></span> <b class="caret"></b>
 				</a>
 				<ul class="dropdown-menu">
-						
+						<li ng-repeat="event in eventSelector.events" ng-if="eventSelector.numRecruiting > 0">
+							<a href="#" ng-click="eventSelector.changeEvent(event)" ng-if="event.recruiter">{{event.event_id.name}}</a>
+						</li>
+						<li class="divider" ng-if="eventSelector.showDivider()"></li>
+						<li ng-repeat="event in eventSelector.events" ng-class="{disabled : eventSelector.nresDisabled}">
+							<a href="#" ng-click="eventSelector.changeEvent(event)" ng-if="!event.recruiter">{{event.event_id.name}}</a>
+						</li>
 				</ul>
 			</li>
-			<!-- <button type="button" class="btn btn-danger frank-event-select" ng-disabled="disabled">{{selectedEvent}}</button>
-			<button type="button" class="btn btn-danger dropdown-toggle frank-event-select" ng-disabled="disabled">
-				Select Event
-				<span class="caret"></span>
-				<span class="sr-only">Split button!</span>
-			</button> -->
 		</ul>
 	</nav>
 </div>
