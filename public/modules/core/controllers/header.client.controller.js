@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('core').controller('HeaderController', ['$scope', 'Authentication', 'Menus', '$filter',
+angular.module('core').controller('HeaderController', ['$scope', 'Authentication', 'Menus', '$filter', 'Event-Selector',
 	function($scope, Authentication, Menus, $filter) {
 		$scope.authentication = Authentication;
 		$scope.userRoles = ['recruiter','admin'];
