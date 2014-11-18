@@ -10,7 +10,8 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		*/
 		if(!$scope.authentication.user) {
 			$location.path('/signin');
-		} else if(($filter('roles')($scope.authentication.user.roles,['admin','recruiter']).length === 0) {
+		} 
+		else if(($filter('roles')($scope.authentication.user.roles,['admin','recruiter'])).length === 0) {
 			$location.path('/');
 		}
 
