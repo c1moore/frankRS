@@ -36,8 +36,9 @@ class User:
 			random.choice(WEBS))
     self.salt = randomBytes(16)
     self._password = randomString(6,22,"""~!@#$%^&*(")[]{}|\;:<>,.""")
-    self.password = str(PBKDF2(self._password,self.salt,
-			iterations=10000).hexread(64))
+    self.password = b64encode(PBKDF2(self._password,self.salt,
+			iterations=10000).read(64))
+    self.salt = b64encode(self.salt)
     self.provider = "local"
     self.roles = [random.choice(ROLES)]
     cday = random.randint(1,28)
