@@ -3,42 +3,20 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 
 		$scope.authentication = Authentication;
 
-		//sends person to home page if not logged in
 		/*
-		if($scope.authentication.user != true) {
+		* If the user is not logged in, they should be redirected to the sigin page.  If the
+		* user is logged in, but does not have the proper permissions they should be
+		* redirected to the homepage.
+		*/
+		if(!$scope.authentication.user) {
+			$location.path('/signin');
+		} else if(!(_.intersection($scope.authentication.user.roles, ['recruiter', 'admin']).length)) {
 			$location.path('/');
 		}
-		*/
 
 		//lets the score tab be the first active tab
 		$scope.initialTab = true;
-
-		//the model for the list of events a recruiter is recruiting for
-		$scope.events = [
-			{event_id:{_id:1,name:'frank',end_date:12,start_date:10,location:'UF',schedule:'stuff'}},
-			{event_id:{_id:1,name:'Pizza Convention',end_date:12,start_date:10,location:'UF',schedule:'stuff'}}
-		];
-		//the currently selected event defaulting to Select Event
-		$scope.selectedEvent = 'Select Event';
-
-		/*
-		$http.get('/recruiter/events').success(function(data) {
-			$scope.events = data;
-		}).error(function(error, status) {
-			if(status === 401) {
-				$scope.selectedEvent = "Error";
-				disabled = !disabled;
-			}
-			console.log(error);
-		});
-		*/
-
-		//updates the table for the selected event
-		$scope.changeEvent = function(event) {
-			$scope.selectedEvent = event.name;
-			$scope.postEventId = event._id;
-		}
-
+		
 		$scope.returnInt = function(value) {
 			return Math.floor(value)
 		}

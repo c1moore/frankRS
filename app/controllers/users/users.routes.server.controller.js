@@ -180,6 +180,33 @@ exports.getRecruiterEvents = function(req, res) {
 };
 
 /*
+* Get a list of events for the currently logged in user.  This list will be obtained through the user's status array.  Information about
+* whether or not the user is a recruiter for this event will be retained so that the front-end can differentiate between events this user
+* is attending vs. ones for which they are recruiting.
+*/
+exports.getUserEvents = function(req, res) {
+	if(!req.isAuthenticated()) {
+		res.status(401).send({'message' : 'User is not logged in.'});
+	} else if(req.hasAuthorization(req.user, ["recruiter", "admin", "attendee"])) {
+		var id = req.user._id;
+		var query = User.findOne({'_id' : id});
+		query.select('status');
+		query.populate('status.event_id');
+		query.exec(function(err, result) {
+			if(err) {
+				res.status(400).send(err);
+			} else if(!result) {
+				res.status(400).json({message : 'User not found or is not associated with any events!'});
+			} else {
+				res.status(200).send(result);
+			}
+		});
+	} else {
+		res.status(401).send({'message' : 'User does not have permission.'});
+	}
+};
+
+/*
 * Get the list of attendees for the event specified and the recruiter that is currently logged in.
 */
 /*This method will need to be modified so it will return only the attendees for the specified event.  This should be simple,

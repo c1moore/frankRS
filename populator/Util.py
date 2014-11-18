@@ -24,6 +24,9 @@ def randomNameString(min,max,extras=""):
 def randomTimeInMS(minimum=TWENTY_YEARS):
   return random.randint(minimum,minimum+THIRTY_YEARS)
 
+def randomBytes(n):
+    return bytes(random.getrandbits(8) for i in range(n))
+
 def ensureID(refObj):
   if type(refObj).__name__=='ObjectId':
     return refObj
