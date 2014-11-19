@@ -1,9 +1,9 @@
 'use strict';
 
 //Menu service used for managing  menus
-angular.module('core').service('eventSelector', ['$http', '$location', '$cacheFactory',
+angular.module('core').service('eventSelector', ['$http', '$location', 'cacheService',
 
-	function($http, $location, $cacheFactory) {
+	function($http, $location, cacheService) {
 		var thisService = this;
 		this.events = [];
 		this.selectedEvent = "Select Event";
@@ -13,14 +13,14 @@ angular.module('core').service('eventSelector', ['$http', '$location', '$cacheFa
 		this.nresDisabled = false;
 		this.recruiterEvent = true;
 
-		var cache = $cacheFactory('cacheID');
+		var cache = cacheService;
 		var keys = [];
 		var put = function(key, value) {
-			if (cache.get(key) === undefined) {
-				keys.push(key);
-			}
-			cache.put(key,value === undefined ? null : value);
+			cache.setData(key,value);
 		}
+
+		console.log(cache);
+
 
 		$http.get('/users/events').success(function(data) {
 			thisService.events = data.status;
@@ -28,9 +28,9 @@ angular.module('core').service('eventSelector', ['$http', '$location', '$cacheFa
 				if(thisService.events[i].recruiter)
 					thisService.numRecruiting++;
 			}
-			if(cache.get('selectedEvent') != null && cache.get('eventId') != null) {
-				thisService.selectedEvent = cache.get('selectedEvent');
-				thisService.postEventId = cache.get('eventId');
+			if(cache.getData('selectedEvent') != null && cache.getData('eventId') != null) {
+				thisService.selectedEvent = cache.getData('selectedEvent');
+				thisService.postEventId = cache.getData('eventId');
 			}
 		}).error(function(error, status) {
 			if(status === 401) {
