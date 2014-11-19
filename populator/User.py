@@ -78,6 +78,7 @@ class User:
       for rec in recWhoInvitedMe:
         if rec['_id'] is not recruiter._id:
           rec['almostList'].append({'user_id':self._id,'event_id':eventID})
+          rec['inviteeList'].remove({'user_id':self._id,'event_id':eventID})
           Users.save(rec)
 
   def invite(self,userID,eventID):
@@ -85,9 +86,10 @@ class User:
     eventID = ensureID(eventID)
     inviteedict = {'user_id':userID,'event_id':eventID}
     if inviteedict in self.inviteeList:
-      return
+      return False
     self.inviteeList.append(inviteedict)
     self.save()
+    return True
 
   def recruitFor(self,eventID):
     eventID = ensureID(eventID)
