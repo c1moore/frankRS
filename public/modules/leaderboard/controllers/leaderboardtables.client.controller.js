@@ -14,6 +14,15 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		else if(($filter('roles')($scope.authentication.user.roles,['admin','recruiter'])).length === 0) {
 			$location.path('/');
 		}
+		if(!eventSelector.nresDisabled) {
+			eventSelector.toggleDisabledEvents();
+			if(!eventSelector.recruiterEvent) {
+				eventSelector.selectedEvent = "Select Event";
+				eventSelector.recruiterEvent = true;
+				eventSelector.postEventId = null;
+			}
+		}
+
 		
 		$scope.returnInt = function(value) {
 			return Math.floor(value)
@@ -111,5 +120,18 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 	            });
         	}
 		});
+
+
+
+		$scope.$watch(
+			function() {
+				return eventSelector.selectedEvent;
+			},
+			function() {
+				$scope.mainTableParams.reload();
+				$scope.attendingTableParams.reload();
+				$scope.invitedTableParams.reload();
+			}
+		);
 	}
 ]); 

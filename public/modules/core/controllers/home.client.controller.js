@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('core').controller('HomeController', ['$scope', 'Authentication', '$filter', '$location',
-	function($scope, Authentication, $filter, $location) {
+angular.module('core').controller('HomeController', ['$scope', 'Authentication', '$filter', '$location', 'eventSelector',
+	function($scope, Authentication, $filter, $location, eventSelector) {
 		// This provides Authentication context.
 		$scope.authentication = Authentication;
 		
@@ -12,6 +12,10 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 		if(!$scope.authentication.user) {
 			$location.path('/signin');
 			return;
+		}
+
+		if(eventSelector.nresDisabled) {
+			eventSelector.toggleDisabledEvents();
 		}
 
 		/*
