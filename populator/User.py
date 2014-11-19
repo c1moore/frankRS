@@ -78,7 +78,6 @@ class User:
       for rec in recWhoInvitedMe:
         if rec['_id'] is not recruiter._id:
           rec['almostList'].append({'user_id':self._id,'event_id':eventID})
-          rec['inviteeList'].remove({'user_id':self._id,'event_id':eventID})
           Users.save(rec)
 
   def invite(self,userID,eventID):
