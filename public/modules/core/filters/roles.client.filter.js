@@ -23,8 +23,12 @@ angular.module("core").filter("roles", function(){
 			return contains(rolesNeeded,element);
 		}
 
+		//handles the case when data or rolesNeeded don't exist 
+		if (data === null || rolesNeeded === null) {
+			return []
+		}
 		//check if array of objects
-		if (typeof(data[0]) === 'object') {
+		else if (typeof(data[0]) === 'object') {
 			return data.filter(objectContaining);
 		}
 		else {

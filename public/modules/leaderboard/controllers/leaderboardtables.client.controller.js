@@ -1,5 +1,5 @@
-angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Authentication', '$http', 'ngTableParams', '$filter', '$resource', '$location',
-	function($scope, Authentication, $http, ngTableParams, $filter, $resource, $location) {
+angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Authentication', '$http', 'ngTableParams', '$filter', '$resource', '$location', 'eventSelector',
+	function($scope, Authentication, $http, ngTableParams, $filter, $resource, $location, eventSelector) {
 
 		$scope.authentication = Authentication;
 
@@ -10,20 +10,18 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		*/
 		if(!$scope.authentication.user) {
 			$location.path('/signin');
-		} else if(!(_.intersection($scope.authentication.user.roles, ['recruiter', 'admin']).length)) {
+		} 
+		else if(($filter('roles')($scope.authentication.user.roles,['admin','recruiter'])).length === 0) {
 			$location.path('/');
 		}
-
-		//lets the score tab be the first active tab
-		$scope.initialTab = true;
 		
 		$scope.returnInt = function(value) {
 			return Math.floor(value)
 		}
 
-		var mainApi = $resource('/leaderboard/maintable');
-		var attendingApi = $resource('/leaderboard/attendees');
-		var invitedApi = $resource('/leaderboard/invitees');
+		var mainApi = $resource('/leaderboard/maintable',{event_id: eventSelector.postEventId}, {'getTable':{method:'POST', isArray:true}});
+		var attendingApi = $resource('/leaderboard/attendees',{event_id: eventSelector.postEventId}, {'getTable':{method:'POST', isArray:true}});
+		var invitedApi = $resource('/leaderboard/invitees',{event_id: eventSelector.postEventId}, {'getTable':{method:'POST', isArray:true}});
 		// var attendingApi = $resource('/modules/leaderboard/tests/MOCK_ATTENDEE_DATA.json');
 		// var invitedApi = $resource('/modules/leaderboard/tests/MOCK_INVITEE_DATA.json');
 		var testApi = $resource('/modules/leaderboard/tests/MOCK_DATA.json');
@@ -40,7 +38,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
     		}, {
         	total: 0, // length of data
         	getData: function($defer, params) {
-        		mainApi.query(params.url(), function(data){
+        		mainApi.getTable({event_id:eventSelector.postEventId}, function(data) {
 	            	var filteredData = params.filter() ?
 	            		$filter('filter')(data, params.filter()) :
 	            		data;
@@ -65,15 +63,27 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
         	page: 1,            // show first page
         	count: 10,           // count per page
         	filter: {
-        		displayName:''	//set the initial filter to nothing for name
+        		lname:''	//set the initial filter to nothing for name
         	},
         	sorting: {
-        		displayName:'asc'		// set the initial sorting to be displayName asc
+        		lname:'asc'		// set the initial sorting to be displayName asc
         	}
     		}, {
         	total: 0, // length of data
         	getData: function($defer, params) {
-            	attendingApi.query(params.url(), function(data){
+        		$http.post('/leaderboard/attendees',{event_id: eventSelector.postEventId}).success(function(data) {
+        			var filteredData = params.filter() ?
+	            		$filter('filter')(data, params.filter()) :
+	            		data;
+	            	var orderedData = params.sorting() ? 
+	            		$filter('orderBy')(filteredData, params.orderBy()) : 
+	            		data;
+
+	            	params.total(orderedData.length); //set total recalculation for paganation
+	            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+        		})
+
+            	/*attendingApi.getTable({event_id:eventSelector.postEventId}, function(data){
 	            	var filteredData = params.filter() ?
 	            		$filter('filter')(data, params.filter()) :
 	            		data;
@@ -83,7 +93,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 
 	            	params.total(orderedData.length); //set total recalculation for paganation
 	            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
-	            });
+	            });*/
         	}
 		});
 
