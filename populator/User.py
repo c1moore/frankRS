@@ -84,6 +84,7 @@ class User:
   def invite(self,userID,eventID):
     userID = ensureID(userID)
     eventID = ensureID(eventID)
+    assert 'recruiter' in self.roles, 'Not a recruiter'
     inviteedict = {'user_id':userID,'event_id':eventID}
     if inviteedict in self.inviteeList:
       return False
