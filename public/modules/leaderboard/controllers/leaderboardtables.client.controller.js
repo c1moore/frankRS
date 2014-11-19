@@ -19,9 +19,9 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 			return Math.floor(value)
 		}
 
-		var mainApi = $resource('/leaderboard/maintable',eventSelector.postEventId, {'getTable':{method:'POST'}});
-		var attendingApi = $resource('/leaderboard/attendees');
-		var invitedApi = $resource('/leaderboard/invitees');
+		var mainApi = $resource('/leaderboard/maintable',{event_id: eventSelector.postEventId}, {'getTable':{method:'POST', isArray:true}});
+		var attendingApi = $resource('/leaderboard/attendees',{event_id: eventSelector.postEventId}, {'getTable':{method:'POST', isArray:true}});
+		var invitedApi = $resource('/leaderboard/invitees',{event_id: eventSelector.postEventId}, {'getTable':{method:'POST', isArray:true}});
 		// var attendingApi = $resource('/modules/leaderboard/tests/MOCK_ATTENDEE_DATA.json');
 		// var invitedApi = $resource('/modules/leaderboard/tests/MOCK_INVITEE_DATA.json');
 		var testApi = $resource('/modules/leaderboard/tests/MOCK_DATA.json');
@@ -30,7 +30,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
         	page: 1,            // show first page
         	count: 10,           // count per page
         	filter: {
-        		displayName:''	//set the initial filter to nothing for name
+        		lName:''	//set the initial filter to nothing for name
         	},
         	sorting: {
         		rank:'asc'		// set the initial sorting to be rank asc
@@ -38,7 +38,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
     		}, {
         	total: 0, // length of data
         	getData: function($defer, params) {
-        		mainApi.getTable(params.url(), function(data){
+        		mainApi.getTable({event_id:eventSelector.postEventId}, function(data) {
 	            	var filteredData = params.filter() ?
 	            		$filter('filter')(data, params.filter()) :
 	            		data;
@@ -63,15 +63,15 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
         	page: 1,            // show first page
         	count: 10,           // count per page
         	filter: {
-        		displayName:''	//set the initial filter to nothing for name
+        		lname:''	//set the initial filter to nothing for name
         	},
         	sorting: {
-        		displayName:'asc'		// set the initial sorting to be displayName asc
+        		lname:'asc'		// set the initial sorting to be displayName asc
         	}
     		}, {
         	total: 0, // length of data
         	getData: function($defer, params) {
-            	attendingApi.query(params.url(), function(data){
+            	attendingApi.getTable({event_id:eventSelector.postEventId}, function(data){
 	            	var filteredData = params.filter() ?
 	            		$filter('filter')(data, params.filter()) :
 	            		data;
@@ -97,7 +97,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
     		}, {
         	total: 0, // length of data
         	getData: function($defer, params) {
-            	invitedApi.query(params.url(), function(data){
+            	invitedApi.getTable(params.url,{event_id: eventSelector.postEventId}, function(data){
 	            	var filteredData = params.filter() ?
 	            		$filter('filter')(data, params.filter()) :
 	            		data;

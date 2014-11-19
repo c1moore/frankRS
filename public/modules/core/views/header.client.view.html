@@ -67,16 +67,16 @@
 		</ul>
 		<ul class="nav navbar-nav navbar-right" ng-hide="eventSelector.hideEventSelector()">
 			<li class="dropdown">
-				<a href='#' class="dropdown-toggle" data-toggle="dropdown">
+				<a href='' class="dropdown-toggle" data-toggle="dropdown">
 					<span data-ng-bind="eventSelector.selectedEvent"></span> <b class="caret"></b>
 				</a>
 				<ul class="dropdown-menu">
 						<li ng-repeat="event in eventSelector.events" ng-if="eventSelector.numRecruiting > 0">
-							<a href="#" ng-click="eventSelector.changeEvent(event)" ng-if="event.recruiter">{{event.event_id.name}}</a>
+							<a href="" ng-click="eventSelector.changeEvent(event)" ng-if="event.recruiter">{{event.event_id.name}}</a>
 						</li>
 						<li class="divider" ng-if="eventSelector.showDivider()"></li>
 						<li ng-repeat="event in eventSelector.events" ng-class="{disabled : eventSelector.nresDisabled}">
-							<a href="#" ng-click="eventSelector.changeEvent(event)" ng-if="!event.recruiter">{{event.event_id.name}}</a>
+							<a href="" ng-click="eventSelector.changeEvent(event)" ng-if="!event.recruiter">{{event.event_id.name}}</a>
 						</li>
 				</ul>
 			</li>
