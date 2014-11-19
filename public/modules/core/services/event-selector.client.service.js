@@ -11,6 +11,7 @@ angular.module('core').service('eventSelector', ['$http', '$location',
 		this.numRecruiting = 0;
 		this.postEventId = null;
 		this.nresDisabled = false;
+		this.recruiterEvent = true;
 
 		$http.get('/users/events').success(function(data) {
 			thisService.events = data.status;
@@ -29,6 +30,7 @@ angular.module('core').service('eventSelector', ['$http', '$location',
 		this.changeEvent = function(event) {
 			thisService.selectedEvent = event.event_id.name;
 			thisService.postEventId = event.event_id._id;
+			thisService.recruiterEvent = event.recruiter;
 		};
 
 		this.showDivider = function() {
@@ -40,7 +42,9 @@ angular.module('core').service('eventSelector', ['$http', '$location',
 		}
 
 		this.hideEventSelector = function() {
-			return ($location.path() === '/signin');
+			var path = $location.path();
+
+			return (path === '/signin' || path === '/settings/profile' || path === '/settings/password');
 		}
 	}
 ]);

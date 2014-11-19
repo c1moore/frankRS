@@ -1,7 +1,7 @@
 'use strict'; // :)
 
-angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication', '$location',
-	function($scope, Authentication, $location) {
+angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication', '$location', 'eventSelector',
+	function($scope, Authentication, $location, eventSelector) {
 		$scope.authentication = Authentication;
 
 		/*
@@ -15,6 +15,10 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 		  $location.path('/');
 		}
 		
+		if(!eventSelector.nresDisabled) {
+			eventSelector.toggleDisabledEvents();
+		}
+
 		$scope.friends = [{name:'Dom',email:'dom@hotmail.com'},
 		  {name:'Dan', email:'dan@gmail.com'},
 		  {name:'Dalton', email:'dalton@gmail.com'},
