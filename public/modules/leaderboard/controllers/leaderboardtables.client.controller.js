@@ -30,7 +30,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
         	page: 1,            // show first page
         	count: 10,           // count per page
         	filter: {
-        		displayName:''	//set the initial filter to nothing for name
+        		lName:''	//set the initial filter to nothing for name
         	},
         	sorting: {
         		rank:'asc'		// set the initial sorting to be rank asc
@@ -71,19 +71,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
     		}, {
         	total: 0, // length of data
         	getData: function($defer, params) {
-        		$http.post('/leaderboard/attendees',{event_id: eventSelector.postEventId}).success(function(data) {
-        			var filteredData = params.filter() ?
-	            		$filter('filter')(data, params.filter()) :
-	            		data;
-	            	var orderedData = params.sorting() ? 
-	            		$filter('orderBy')(filteredData, params.orderBy()) : 
-	            		data;
-
-	            	params.total(orderedData.length); //set total recalculation for paganation
-	            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
-        		})
-
-            	/*attendingApi.getTable({event_id:eventSelector.postEventId}, function(data){
+            	attendingApi.getTable({event_id:eventSelector.postEventId}, function(data){
 	            	var filteredData = params.filter() ?
 	            		$filter('filter')(data, params.filter()) :
 	            		data;
@@ -93,7 +81,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 
 	            	params.total(orderedData.length); //set total recalculation for paganation
 	            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
-	            });*/
+	            });
         	}
 		});
 
@@ -109,7 +97,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
     		}, {
         	total: 0, // length of data
         	getData: function($defer, params) {
-            	invitedApi.query(params.url(), function(data){
+            	invitedApi.getTable(params.url,{event_id: eventSelector.postEventId}, function(data){
 	            	var filteredData = params.filter() ?
 	            		$filter('filter')(data, params.filter()) :
 	            		data;
