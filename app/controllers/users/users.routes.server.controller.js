@@ -36,7 +36,7 @@ var searchByEvent = function(eventID, arr) {
 * Create a temporary password.  This password will not be seen by the invitee, but is just a placeholder for the required password field.
 */
 var tempPass = function() {
-	temp = new Buffer(crypto.randomBytes(32).toString('base64'), 'base64');
+	var temp = new Buffer(crypto.randomBytes(32).toString('base64'), 'base64');
 	var num = _.random(0, 7);
 	for(var i=0; i<num; i++) {
 		temp = temp.splice(_.random(0, temp.length), 1);
@@ -50,12 +50,12 @@ var tempPass = function() {
 */
 var updateRanks = function(event_id) {
 	User.aggregate([
-		{$match : {'status.event_id' : req.body.event_id, 'status.recruiter' : true}},
+		{$match : {'status.event_id' : event_id, 'status.recruiter' : true}},
 		{$unwind : 'attendeeList'},
 		{$unwind : 'inviteeList'},
 		{$unwind : 'rank'},
 		{$match : {$or : [{'attendeeList.event_id' : event_id}, {'inviteeList.event_id' : event_id}]}},
-		{$project : {'rank' : 1, 'attendeeLength' : this.attendeeList.length, 'inviteeLength' : this.inviteeList.length}},		//A better solution than this may be to add an additional field to the User schema and a presave method that will update this field everytime a user object is updated.
+		{$project : {'rank' : 1, '_id' : 1, 'attendeeLength' : this.attendeeList.length, 'inviteeLength' : this.inviteeList.length}},		//A better solution than this may be to add an additional field to the User schema and a presave method that will update this field everytime a user object is updated.
 		{$sort : {'attendeeLength' : -1, 'inviteeLength' : -1}},
 	], function(err, result) {
 		var aqueue = async.queue(function(recruiter, callback) {
@@ -69,14 +69,15 @@ var updateRanks = function(event_id) {
 						}
 					}
 				}
-			})
-		}, 100000)
+			});
+		}, 10000);
+
 		for(var i=0; i<result.length; i++) {
 			var recruiter = {'_id' : result[i]._id, 'place' : i};
 			aqueue.push(recruiter);
 		}
 	});
-}
+};
 
 
 /*
@@ -504,7 +505,7 @@ exports.sendInvitation = function(req, res) {
 										callback(true, null);//res.status(400).send({'message' : 'Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.'});
 									} else if(!result) {
 										//Invitee is not in the db yet.  Add the invitee to the db and send the new User object to the next function.
-										newUser = new User({
+										var newUser = new User({
 											fName : req.body.fName,
 											lName : req.body.lName,
 											email : req.body.email,
