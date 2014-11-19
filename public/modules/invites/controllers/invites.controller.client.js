@@ -17,6 +17,11 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 		
 		if(!eventSelector.nresDisabled) {
 			eventSelector.toggleDisabledEvents();
+			if(!eventSelector.recruiterEvent) {
+				eventSelector.selectedEvent = "Select Event";
+				eventSelector.recruiterEvent = true;
+				eventSelector.postEventId = null;
+			}
 		}
 
 		$scope.friends = [{name:'Dom',email:'dom@hotmail.com'},

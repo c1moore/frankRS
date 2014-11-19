@@ -1,5 +1,5 @@
-angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Authentication', '$http', 'ngTableParams', '$filter', '$resource', '$location', 'eventSelector',
-	function($scope, Authentication, $http, ngTableParams, $filter, $resource, $location, eventSelector) {
+angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Authentication', '$http', 'ngTableParams', '$filter', '$resource', '$location', 'eventSelector', '$timeout',
+	function($scope, Authentication, $http, ngTableParams, $filter, $resource, $location, eventSelector, $timeout) {
 
 		$scope.authentication = Authentication;
 
@@ -128,9 +128,15 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 				return eventSelector.selectedEvent;
 			},
 			function() {
-				$scope.mainTableParams.reload();
-				$scope.attendingTableParams.reload();
-				$scope.invitedTableParams.reload();
+				$timeout(function() {
+        			// $scope.mainTableParams.settings().$scope = $scope;
+        			// $scope.attendingTableParams.settings().$scope = $scope;
+        			// $scope.invitedTableParams.settings().$scope = $scope;
+
+					$scope.mainTableParams.reload();
+					$scope.attendingTableParams.reload();
+					$scope.invitedTableParams.reload();
+				});
 			}
 		);
 	}
