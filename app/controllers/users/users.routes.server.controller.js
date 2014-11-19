@@ -536,9 +536,10 @@ exports.sendInvitation = function(req, res) {
 								});
 							},
 							function(invitee, callback) {
-								res.render('templates/reset-password-email', {
+								res.render('templates/invitation-email', {
 									name: req.body.fName,
-									event: req.body.event_name
+									event: req.body.event_name,
+									message: req.body.message
 								}, function(err, emailHTML) {
 									mailOptions.html = emailHTML;
 									callback(err, invitee);
