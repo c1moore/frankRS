@@ -13,7 +13,7 @@ from datetime import datetime
 from datetime import date as Date
 from time import mktime
 from base64 import b64encode
-from pbkdf2 import PBKDF2
+import hashlib
 
 ROLES = ['admin', 'recruiter', 'attendee']
 
@@ -35,9 +35,8 @@ class User:
     self.email = (randomString(4,35).lower()+'@'+randomString(4,35)+
 			random.choice(WEBS))
     self.salt = randomBytes(16)
-    self._password = randomString(6,22,"""~!@#$%^&*(")[]{}|\;:<>,.""")
-    self.password = b64encode(PBKDF2(self._password,self.salt,
-			iterations=10000).read(64))
+    self._password = ''#randomString(6,22,"""~!@#$%^&*(")[]{}|\;:<>,.""")
+    self.password = ''#b64encode(hashlib.pbkdf2_hmac('sha1',bytes(self._password,'utf-16'),self.salt,10000,64*32))
     self.salt = b64encode(self.salt)
     self.provider = "local"
     self.roles = [random.choice(ROLES)]
