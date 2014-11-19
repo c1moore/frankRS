@@ -6,7 +6,7 @@
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
 		</button>
-		<a href="/#!/" class="navbar-brand">frank Recruiter System</a>
+		<a href="/#!/" class="navbar-brand"><img src="/modules/core/img/brand/logo_header.png" /> Recruiter System</a>
 	</div>
 
 	<!--Collection of links-->
@@ -37,22 +37,6 @@
 				<a ng-switch-default href="/#!/{{item.link}}" data-ng-bind="item.title"></a>
 			</li>
 		</ul>
-		<ul class="nav navbar-nav navbar-right">
-			<li class="dropdown">
-				<a href='#' class="dropdown-toggle" data-toggle="dropdown">
-					<span data-ng-bind=""></span><b class="caret"></b>
-				</a>
-				<ul class="dropdown-menu">
-						
-				</ul>
-			</li>
-			<!-- <button type="button" class="btn btn-danger frank-event-select" ng-disabled="disabled">{{selectedEvent}}</button>
-			<button type="button" class="btn btn-danger dropdown-toggle frank-event-select" ng-disabled="disabled">
-				Select Event
-				<span class="caret"></span>
-				<span class="sr-only">Split button!</span>
-			</button> -->
-		</ul>
 		<ul class="nav navbar-nav navbar-right" data-ng-hide="authentication.user">
 			<li class="divider-vertical"></li>
 			<li ui-route="/signin" ng-class="{active: $uiRoute}">
@@ -62,7 +46,7 @@
 		<ul class="nav navbar-nav navbar-right" data-ng-show="authentication.user">
 			<li class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-					<span data-ng-bind="authentication.user.displayName"></span> <b class="caret"></b>
+					<span data-ng-bind="authentication.user.fName"></span> <b class="caret"></b>
 				</a>
 				<ul class="dropdown-menu">
 					<li>
@@ -78,6 +62,22 @@
 					<li>
 						<a href="/auth/signout">Signout</a>
 					</li>
+				</ul>
+			</li>
+		</ul>
+		<ul class="nav navbar-nav navbar-right" ng-hide="eventSelector.hideEventSelector()">
+			<li class="dropdown">
+				<a href='' class="dropdown-toggle" data-toggle="dropdown">
+					<span data-ng-bind="eventSelector.selectedEvent"></span> <b class="caret"></b>
+				</a>
+				<ul class="dropdown-menu">
+						<li ng-repeat="event in eventSelector.events" ng-if="eventSelector.numRecruiting > 0">
+							<a href="" ng-click="eventSelector.changeEvent(event)" ng-if="event.recruiter">{{event.event_id.name}}</a>
+						</li>
+						<li class="divider" ng-if="eventSelector.showDivider()"></li>
+						<li ng-repeat="event in eventSelector.events" ng-class="{disabled : eventSelector.nresDisabled}">
+							<a href="" ng-click="eventSelector.changeEvent(event)" ng-if="!event.recruiter">{{event.event_id.name}}</a>
+						</li>
 				</ul>
 			</li>
 		</ul>

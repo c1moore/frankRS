@@ -1,14 +1,15 @@
 'use strict';
 
-angular.module('core').controller('HeaderController', ['$scope', 'Authentication', 'Menus', '$filter',
-	function($scope, Authentication, Menus, $filter) {
+angular.module('core').controller('HeaderController', ['$scope', 'Authentication', 'Menus', '$filter', 'eventSelector',
+	function($scope, Authentication, Menus, $filter, eventSelector) {
 		$scope.authentication = Authentication;
 		$scope.userRoles = ['recruiter','admin'];
 		$scope.leaderboardRoles = ['recruiter','admin'];
 		$scope.inviteRoles = ['recruiter','admin'];
 		$scope.adminRoles = ['admin'];
 		$scope.isCollapsed = false;
-		$scope.menu = Menus.getMenu('topbar');
+		$scope.menu = Menus.getMenu('topbar')
+		$scope.eventSelector = eventSelector;
 
 		$scope.toggleCollapsibleMenu = function() {
 			$scope.isCollapsed = !$scope.isCollapsed;
@@ -20,7 +21,10 @@ angular.module('core').controller('HeaderController', ['$scope', 'Authentication
 		});
 
 		$scope.hideLink = function(rolesNeeded) {
-			if (($filter('roles')($scope.userRoles,rolesNeeded)).length == 0) {
+			if (!$scope.authentication.user) {
+				return true
+			}
+			else if (($filter('roles')($scope.authentication.user.roles,rolesNeeded)).length === 0) {
 				return true
 			}
 			else {

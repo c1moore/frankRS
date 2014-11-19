@@ -18,6 +18,7 @@ module.exports = function(app) {
 	app.route('/users/email').get(users.getEmail);
 	app.route('/users').get(users.requiresLogin);
 	app.route('/users/auth').post(users.hasAuthorization);
+	app.route('/users/events').get(users.getUserEvents);
 
 	// Setting up the users password api
 	app.route('/users/password').post(users.changePassword);

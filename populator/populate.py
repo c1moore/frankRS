@@ -128,14 +128,24 @@ def getNumEventsPerCandidate():
     else:
       return numEvents
 
+def getInviteProbability():
+  while True:
+    try:
+      p = float(input("What is the probability that a user accepts an invitation?: "))
+      assert (p>=0 and p<=1)
+    except (ValueError, AssertionError):
+      print(required)
+    else:
+      return p
+
 def dumpUserSummary(userList):
   with open('user_summary.txt','w') as fd:
-    fd.write("User summary:\n")
+    fd.write("User summary:\n\n")
     for user in userList:
       fd.write("fName: " + user.fName + '\n')
       fd.write("lName: " + user.lName + '\n')
       fd.write("email: " + user.email + '\n')
-      fd.write("password: " + user.password + '\n')
+      #fd.write("password: " + user._password + '\n')
       fd.write("roles: " + str(user.roles) + '\n\n')
 
 def main():
@@ -152,6 +162,7 @@ def main():
   maxEventsPerRecruiter = getMaxEventsPerRecruiter(numEvents)
   numInvitesPerRecruiter = getNumInvitesPerRecruiter()
   numEventsPerCandidate = getNumEventsPerCandidate()
+  p = getInviteProbability()
   if adminsUnionRecruiters==-1:
     adminsUnionRecruiters=random.randint(0,max(numAdmins,numRecruiters))
   if attendeesUnionRecruiters==-1:
@@ -219,6 +230,7 @@ def main():
     candidates.append(newUser)
     newUser.save()
   #Recruiters, invite users who are not me
+  invitations = []
   for recruiter in recruiters:
     recevents = recruiter.getEvents()
     for i in range(random.randint(0,numInvitesPerRecruiter)):
@@ -226,7 +238,11 @@ def main():
       rec_user = random.choice(attendees)
       while rec_user is recruiter:
         rec_user = random.choice(attendees)
-      recruiter.invite(rec_user,rec_event_id)
+      if recruiter.invite(rec_user,rec_event_id):
+        invitations.append((rec_user,rec_event_id,recruiter))
+  #Users, accept invitations
+  for invitee,event,recruiter in invitations:
+    invitee.decide(event,random.random()<p,'recruiter' in invitee.roles,recruiter)
 
   dumpUserSummary(list(set(recruiters)|set(attendees)|set(admins)))
 

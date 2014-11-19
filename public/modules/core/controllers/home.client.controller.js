@@ -1,19 +1,38 @@
 'use strict';
 
-angular.module('core').controller('HomeController', ['$scope', 'Authentication', '$filter',
-	function($scope, Authentication, $filter) {
+angular.module('core').controller('HomeController', ['$scope', 'Authentication', '$filter', '$location', 'eventSelector',
+	function($scope, Authentication, $filter, $location, eventSelector) {
 		// This provides Authentication context.
 		$scope.authentication = Authentication;
-		//The users roles
-		$scope.userRoles = ['recruiter'];
+		
+		/*
+		* If the user is not logged in they should be sent directly to
+		* the login page.  Only authorized users should see this page.
+		*/
+		if(!$scope.authentication.user) {
+			$location.path('/signin');
+			return;
+		}
+
+		if(eventSelector.nresDisabled) {
+			eventSelector.toggleDisabledEvents();
+		}
+
+		/*
+		* Save the user roles so we can determine the proper buttons to
+		* display to the user.
+		*/
+		$scope.userRoles = $scope.authentication.user.roles;
+
+		//$scope.userRoles = ['recruiter'];
 
 		// Temporary data for buttons
 		$scope.data = {
 			buttons: [
+				{name:"Admin Page", description:"Description 3", link:'#', roles:['admin']},
 				{name:"Leaderboard", description:"Description 1", link:'/#!/leaderboard', roles:['recruiter','admin']},
 				{name:"Invites", description:"Description 2", link:'/#!/invite', roles:['recruiter','admin']},
-				{name:"Button 3", description:"Description 3", link:'#', roles:['admin']},
-				{name:"Button 4", description:"Description 4", link:'#', roles:['admin']}
+				{name:"Volunteer to be a Recruiter", description:"Description 4", link:'#', roles:['admin', 'recruiter', 'attendee']}
 			],
 			comments: ["Comment 1", "Comment 2"]
 		};

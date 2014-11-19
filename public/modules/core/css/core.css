@@ -56,6 +56,13 @@ body {
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
 	display: none !important;
 }
+.navbar-brand {
+	padding: 0;
+}
+.navbar-brand img {
+	height: 50px;
+	display: inline-block;
+}
 .ng-invalid.ng-dirty{
     border-color:#FA787E;
 }

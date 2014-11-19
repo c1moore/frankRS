@@ -25,6 +25,15 @@ def main():
   else:
     print("--SUCCESS when importing pymongo")
 
+  try:
+    import pbkdf2
+  except Exception as e:
+    print("--FAILED to import pbkdf2. Dependencies not satisfied?")
+    raise e
+  else:
+    print("--SUCCESS when importing pbkdf2")
+
+
   print("\nTesting User object functionality\n")
 
   try:
@@ -132,7 +141,7 @@ def main():
     print("--FAILED to invite a user")
     raise e
   else:
-    print("--SUCCESS in in inviting a user")
+    print("--SUCCESS in inviting a user")
 
   try:
     user2.decide(event._id,True,False,user)
