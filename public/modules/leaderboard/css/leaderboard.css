@@ -91,14 +91,22 @@ th.header {
 	padding-top:0px;
 }
 
-.rank-container {
+.score-section  {
 	margin-top:20px;
+}
+
+.score-section h1 {
+	margin:0px;
+}
+
+.rank-container {
 	width:200px;
 	height:200px;
 	background-color:#93c63d;
 }
 
 .rank-container h1 {
+	margin:0px;
 	font-size:150px;
 	text-align:center;
 	line-height:180px;
