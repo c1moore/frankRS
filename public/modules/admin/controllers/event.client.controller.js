@@ -1,4 +1,4 @@
-app.controller ('eventController', ['$scope',
+angular.module('admin').controller ('eventController', ['$scope',
 function($scope) {
   $scope.events = [
           
