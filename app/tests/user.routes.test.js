@@ -305,6 +305,43 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 	});
 
+	describe('User events routes:', function() {
+		it('should return an array of events for which the user is associated', function(done) {
+			useragent
+				.get('http://localhost:3001/users/events')
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(200);
+					console.log(res.body);
+					res.body.status.length.should.equal(4);
+					done();
+				});
+		});
+
+		it('should return an array of events for the user even if they are not a recruiter', function(done) {
+			useragent2
+				.get('http://localhost:3001/users/events')
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(200);
+					res.body.status.length.should.equal(4);
+					done();
+				});
+		});
+
+		it('should return the proper error when the user is not logged in.', function(done) {
+			var useragent3 = agent.agent();
+			useragent3
+				.get('http://localhost:3001/users/events')
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal('User is not logged in.');
+					done();
+				});
+		});
+	});
+
 	describe("Recruiter's attendeeList routes:", function() {
 		it("should return a recruiter's attendeeList for a specific event.", function(done) {
 			useragent

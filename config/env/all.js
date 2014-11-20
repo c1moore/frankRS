@@ -28,7 +28,8 @@ module.exports = {
 				'public/lib/angular-ui-router/release/angular-ui-router.js',
 				'public/lib/angular-ui-utils/ui-utils.js',
 				'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
-				'public/lib/ng-table/ng-table.js'
+				'public/lib/ng-table/ng-table.js',
+				'public/lib/lodash/dist/lodash.js'
 			]
 		},
 		css: [

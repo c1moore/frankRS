@@ -24,6 +24,9 @@ exports.signup = function(req, res) {
 	user.provider = 'local';
 	user.displayName = user.lName + ', ' + user.fName;
 
+	//Create an admin role from user
+	user.roles = ["admin"];
+
 	// Then save the user 
 	user.save(function(err) {
 		if (err) {
