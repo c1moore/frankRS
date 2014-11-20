@@ -1,0 +1,41 @@
+<div class="row" ng-controller="eventController">
+
+  <div class="col-sm-6">
+    <!---<form ng-submit="addEvent()"></form>--->
+    <input value="" type="text" placeholder="Name of Event" ng-model="eventName">
+    <br>
+    <input value="" type="text" placeholder="Start Date" ng-model="startDate">
+    <br>
+    <input value="" type="text" placeholder="End Date" ng-model="endDate">
+    <br>
+    <input value="" type="text" placeholder="Location" ng-model="locationid">
+    <br>
+    <button ng-click="addEvent()">Add to Event List</button>
+    <!---<input type="submit" class="btn btn-primary" value="Add Event">--->
+  </div>
+  <div class="col-sm-6">
+    <h2>Event List</h2>
+    <table class="table table-hover table-striped table-bordered">
+      <thead>
+        <tr>
+          <td>Name</td>
+          <td>Start Date</td>
+          <td>End Date</td>
+          <td>Location</td>
+          <!---<td>Event Link</td>--->
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="event in events">
+          <td>{{ event.name }}</td>
+          <td>{{ event.start }}</td>
+          <td>{{ event.end }}</td>
+          <td>{{ event.location }}</td>
+          <td>
+            <input type="button" value="Remove" class="btn btn-primary" ng-click="deleteRow($index)" />
+          </td>
+          <!---<td>{{ event.link }}</td>--->
+        </tr>
+      </tbody>
+  </div>
+</div>
