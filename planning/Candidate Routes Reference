@@ -77,6 +77,10 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 	Changes status to a specific event in the candidate file to accepted or invited or volunteer.  Those are the only choices to change it to.
 
+	If the candidate's accepted field is 'true' then it will change their role to recruiter for the event and their roles.
+
+	If the candidate is not already a user, then it will create a new user with the information from the candidate fields. The default password is their fName + lName.
+
 		
 /candidate/setEvent
 	Expects 
@@ -90,6 +94,10 @@ Recruiters and attendees can volunteer to be a recruiter.
 		.send({candidate_id: candidate._id,event_id:event._id, accepted:string true/false})
 
 	Changes the accepted field in a specific event for a candidate to boolean true or false. 
+
+	If the candidate's status field is set to 'accepted' then it will change their role to recruiter for the event and their roles.
+
+	If the candidate is not already a user, then it will create a new user with the information from the candidate fields. The default password is their fName + lName.
 
 
 /candidate/setNote
