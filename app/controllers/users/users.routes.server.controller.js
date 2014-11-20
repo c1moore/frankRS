@@ -36,13 +36,14 @@ var searchByEvent = function(eventID, arr) {
 * Create a temporary password.  This password will not be seen by the invitee, but is just a placeholder for the required password field.
 */
 var tempPass = function() {
-	temp = new Buffer(crypto.randomBytes(32).toString('base64'), 'base64');
+	var temp = new Buffer(crypto.randomBytes(32).toString('base64'), 'base64');
 	var num = _.random(0, 7);
 	for(var i=0; i<num; i++) {
-		temp = temp.splice(_.random(0, temp.length), 1);
+		var tempran = _.random(0, temp.length);
+		temp = temp.slice(tempran, tempran + 1);
 	}
 
-	return temp;
+	return temp.toString();
 };
 
 /*
@@ -50,13 +51,13 @@ var tempPass = function() {
 */
 var updateRanks = function(event_id) {
 	User.aggregate([
-		{$match : {'status.event_id' : req.body.event_id, 'status.recruiter' : true}},
-		{$unwind : 'attendeeList'},
-		{$unwind : 'inviteeList'},
-		{$unwind : 'rank'},
-		{$match : {$or : [{'attendeeList.event_id' : event_id}, {'inviteeList.event_id' : event_id}]}},
-		{$project : {'rank' : 1, 'attendeeLength' : this.attendeeList.length, 'inviteeLength' : this.inviteeList.length}},		//A better solution than this may be to add an additional field to the User schema and a presave method that will update this field everytime a user object is updated.
-		{$sort : {'attendeeLength' : -1, 'inviteeLength' : -1}},
+		{$match : {'status' : {'event_id' : event_id, 'recruiter' : true}}},
+		//{$unwind : 'attendeeList'},
+		//{$unwind : 'inviteeList'},
+		//{$unwind : 'rank'},
+		{$match : {$or : [{'attendeeList' : {'event_id' : event_id}}, {'inviteeList' : {'event_id' : event_id}}]}},
+		{$project : {'_id' : 1, 'rank' : 1, 'attendeeLength' : {$size : "$attendeeList"}, 'inviteeLength' : {$size : "$inviteeList"}}},		//A better solution than this may be to add an additional field to the User schema and a presave method that will update this field everytime a user object is updated.
+		{$sort : {'attendeeLength' : -1, 'inviteeLength' : -1}}
 	], function(err, result) {
 		var aqueue = async.queue(function(recruiter, callback) {
 			User.findOne({'_id' : recruiter._id}, function(err, result) {
@@ -69,14 +70,15 @@ var updateRanks = function(event_id) {
 						}
 					}
 				}
-			})
-		}, 100000)
+			});
+		}, 10000);
+
 		for(var i=0; i<result.length; i++) {
 			var recruiter = {'_id' : result[i]._id, 'place' : i};
 			aqueue.push(recruiter);
 		}
 	});
-}
+};
 
 
 /*
@@ -493,7 +495,7 @@ exports.sendInvitation = function(req, res) {
 				var query2 = User.findOne({'email' : req.body.email, 'status.event_id' : req.body.event_id, 'status.attending' : true});
 				query2.exec(function(err, invitee) {
 					if(err) {
-						res.status(400).send({'message' : 'Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.'});
+						res.status(400).send({'message' : 'Invitation could not be sent.  Please contact frank about this issue.'});
 		
 					//Either the specified user is not attending the event yet or has not even been invited.
 					} else if(!invitee) {
@@ -504,7 +506,7 @@ exports.sendInvitation = function(req, res) {
 										callback(true, null);//res.status(400).send({'message' : 'Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.'});
 									} else if(!result) {
 										//Invitee is not in the db yet.  Add the invitee to the db and send the new User object to the next function.
-										newUser = new User({
+										var newUser = new User({
 											fName : req.body.fName,
 											lName : req.body.lName,
 											email : req.body.email,
@@ -536,9 +538,10 @@ exports.sendInvitation = function(req, res) {
 								});
 							},
 							function(invitee, callback) {
-								res.render('templates/reset-password-email', {
+								res.render('templates/invitation-email', {
 									name: req.body.fName,
-									event: req.body.event_name
+									event: req.body.event_name,
+									message: req.body.message
 								}, function(err, emailHTML) {
 									mailOptions.html = emailHTML;
 									callback(err, invitee);
@@ -552,8 +555,59 @@ exports.sendInvitation = function(req, res) {
 									if(err) {
 										res.status(400).send({'message' : 'Invitation was not sent.  Please try again later.', 'error' : err});
 									} else {
-										updateRanks(req.body.event_id);
-										res.status(200).send({message: 'Invitation has been sent to ' + req.body.email + '!'});
+										//updateRanks(req.body.event_id);
+										async.waterfall([
+											function(next) {
+												User.aggregate([
+													{$match : {'status.event_id' : new mongoose.Types.ObjectId(req.body.event_id), 'status.recruiter' : true}},
+													{$match : {$or : [{'attendeeList.event_id' : new mongoose.Types.ObjectId(req.body.event_id)}, {'inviteeList.event_id' : new mongoose.Types.ObjectId(req.body.event_id)}]}},
+													{$project : {'_id' : 1, 'rank' : 1, 'attendeeLength' : {$size : "$attendeeList"}, 'inviteeLength' : {$size : "$inviteeList"}}},
+													{$sort : {'attendeeLength' : -1, 'inviteeLength' : -1}}
+												], function(err, result) {
+													var aqueue = async.queue(function(recruiter, callback) {
+														User.findOne({'_id' : recruiter._id}, function(err, result) {
+															if(!err) {
+																for(var i=0; i<result.rank.length; i++) {
+																	if(result.rank[i].event_id.toString() === req.body.event_id.toString()) {
+																		result.rank.place = recruiter.place;
+																		result.save(function() {
+																			callback();
+																		});
+																		break;
+																	}
+																}
+
+																if(i===result.rank.length) {
+																	result.rank.push({event_id : new mongoose.Types.ObjectId(req.body.event_id), place : recruiter.place});
+																	result.save(function() {
+																		callback();
+																	});
+																}
+															}
+														});
+													}, 20);
+
+													var i=0;
+
+													aqueue.drain = function() {
+														if(i===result.length)
+															next(null, true);
+													};
+
+													for(; i<result.length; i++) {
+														var recruiter = {'_id' : result[i]._id, 'place' : i};
+														aqueue.push(recruiter);
+													}
+												});
+											}],
+											function(err, results) {
+												if(err) {
+													res.status(400).send({message: 'Invitation has been sent to ' + req.body.fName + ', but an error occurred.  Please contact frank about this error.'});
+												} else {
+													res.status(200).send({message: 'Invitation has been sent to ' + req.body.fName + '!'});
+												}
+											}
+										);
 									}
 								});
 							}

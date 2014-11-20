@@ -1,7 +1,7 @@
 'use strict'; // :)
 
-angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication', '$location', 'eventSelector',
-	function($scope, Authentication, $location, eventSelector) {
+angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication', '$location', 'eventSelector', '$http', '$window',
+	function($scope, Authentication, $location, eventSelector, $http, $window) {
 		$scope.authentication = Authentication;
 
 		/*
@@ -23,6 +23,52 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 				eventSelector.postEventId = null;
 			}
 		}
+
+		$scope.recruiter_email = $scope.authentication.user.email;
+
+		$scope.invite = new Object();
+		$scope.invite.event_name = eventSelector.selectedEvent;
+		$scope.invite.event_id = eventSelector.postEventId;
+
+		$scope.$watch (
+			function() {
+				return eventSelector.selectedEvent;
+			},
+			function() {
+				$scope.invite.event_name = eventSelector.selectedEvent;
+			}
+		);
+
+		$scope.$watch (
+			function() {
+				return eventSelector.postEventId;
+			},
+			function() {
+				$scope.invite.event_id = eventSelector.postEventId;
+			}
+		);
+
+		$scope.send = function() {
+			angular.element("#invitation-submit-button").addClass("disabled");
+			$http.post('/invitation/send', $scope.invite).success(function(response) {
+				$window.alert(response.message);
+
+				//Set all form fields to blank so the user can send another invitation.
+				$scope.invite.fName = "";
+				$scope.invite.lName = "";
+				$scope.invite.email = "";
+				$scope.invite.message = "";
+
+				//TODO: Refresh sidebars with new data after sending invitation.
+
+				angular.element("#invitation-submit-button").removeClass("disabled");
+			}).error(function(response) {
+				$window.alert(response.message);
+				console.log(response.message);
+
+				angular.element("#invitation-submit-button").removeClass("disabled");
+			});
+		};
 
 		$scope.friends = [{name:'Dom',email:'dom@hotmail.com'},
 		  {name:'Dan', email:'dan@gmail.com'},

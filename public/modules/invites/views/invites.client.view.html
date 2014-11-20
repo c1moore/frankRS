@@ -8,7 +8,7 @@
 		<p>Hey {{firstName + " " + lastName}}, you have been officially invited to Frank!</p>
 			{{personalMessage}}
 	</div>
-	<div id="invite">
+	<form id="invite" data-ng-submit="send()">
 		<div id="from" class="invitation_field">
 			<strong>From: </strong>
 			<p id="recruiter_email">{{recruiter_email}}</p>
@@ -16,21 +16,21 @@
 		<div id="to" class="invitation_field">
 			<strong>To: </strong>
 			<div id="to_fields">
-				<input type="text" class="to_field" ng-model="firstName" placeholder="First Name" />
-				<input type="text" class="to_field" ng-model="lastName" placeholder="Last Name" />
-				<input type="text" class="to_field" id="invitee_email" ng-model="email" placeholder="first.last@email.com" />
+				<input type="text" class="to_field" ng-model="invite.fName" placeholder="Frank" />
+				<input type="text" class="to_field" ng-model="invite.lName" placeholder="Karel" />
+				<input type="text" class="to_field" id="invitee_email" ng-model="invite.email" placeholder="frankis@wesome.edu" />
 			</div>
 		</div>
 		<div id="message">
 			<b>Personal Message:</b><br />
-			<textarea id="p_message" ng-model="personalMessage" rows="12" cols="50"></textarea>
+			<textarea id="p_message" ng-model="invite.message" rows="12" cols="50"></textarea>
 		</div>
 		<br>
 		<div id="invitation_buttons">
 			<a id="previewbutton" class="btn btn-success invitation-button" href="#" ng-click="livepreview = !livepreview" ng-class="{ active: livepreview }"><i class="fa fa-eye"></i> Preview</a>
-			<button type="submit" value="Send" class="btn btn-primary btn-lg invitation-button"/><i class="fa fa-envelope-o"></i> Send</button>
+			<button type="submit" value="Send" class="btn btn-primary btn-lg invitation-button" id="invitation-submit-button"><i class="fa fa-envelope-o"></i> Send</button>
 		</div>
-	</div>
+	</form>
 	<div id="accepted" class="frank-invite-sidebar">
 		<div class="frank-invite-sidebar-title">
 			<b>Awesome People Attending</b>

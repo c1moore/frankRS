@@ -30,8 +30,8 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 		$scope.data = {
 			buttons: [
 				{name:"Admin Page", description:"Description 3", link:'#', roles:['admin']},
-				{name:"Leaderboard", description:"Description 1", link:'/#!/leaderboard', roles:['recruiter','admin']},
-				{name:"Invites", description:"Description 2", link:'/#!/invite', roles:['recruiter','admin']},
+				{name:"Leaderboard", description:"Description 1", link:'/#!/leaderboard', roles:['recruiter','admin'], image: "http://frank.jou.ufl.edu/recruiters/Pictures/but4.jpg"},
+				{name:"Invites", description:"Description 2", link:'/#!/invite', roles:['recruiter','admin'], image: "http://frank.jou.ufl.edu/recruiters/Pictures/but3.jpg"},
 				{name:"Volunteer to be a Recruiter", description:"Description 4", link:'#', roles:['admin', 'recruiter', 'attendee']}
 			],
 			comments: ["Comment 1", "Comment 2"]

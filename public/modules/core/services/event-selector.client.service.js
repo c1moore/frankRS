@@ -31,6 +31,7 @@ angular.module('core').service('eventSelector', ['$http', '$location', 'cacheSer
 			if(cache.getData('selectedEvent') != null && cache.getData('eventId') != null) {
 				thisService.selectedEvent = cache.getData('selectedEvent');
 				thisService.postEventId = cache.getData('eventId');
+				thisService.recruiterEvent = cache.getData('recruiterEvent');
 			}
 		}).error(function(error, status) {
 			if(status === 401) {
@@ -43,9 +44,10 @@ angular.module('core').service('eventSelector', ['$http', '$location', 'cacheSer
 		this.changeEvent = function(event) {
 			thisService.selectedEvent = event.event_id.name;
 			thisService.postEventId = event.event_id._id;
+			thisService.recruiterEvent = event.recruiter;
 			put('selectedEvent',event.event_id.name);
 			put('eventId',event.event_id._id);
-			thisService.recruiterEvent = event.recruiter;
+			put('recruiterEvent', thisService.recruiterEvent);
 		};
 
 		this.showDivider = function() {

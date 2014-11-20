@@ -20,7 +20,7 @@
 					<!-- these divs col values will generatgoogle mapse dynamicaly through angular -->
 					<div ng-repeat="button in data.buttons | roles:userRoles" class="homeButtonContainer">
 						<div class="homeButton text-center">
-							<a href={{button.link}}>
+							<a href="{{button.link}}">
 								<img src="{{button.image}}" class="homepage-nav-buttons" alt="Place holder">
 								<div class="caption">
 									<h3>{{button.name}}</h3>
