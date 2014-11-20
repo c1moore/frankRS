@@ -100,6 +100,8 @@ th.header {
 }
 
 .rank-container {
+	margin-left:auto;
+	margin-right:auto;
 	width:200px;
 	height:200px;
 	background-color:#93c63d;
@@ -112,4 +114,8 @@ th.header {
 	line-height:180px;
 	font-weight:bold;
 	color:#ffffff;
+}
+
+#stats {
+	font-size:3em;
 }

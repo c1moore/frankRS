@@ -4,9 +4,11 @@
 			<div class="rank-container"><h1>{{authentication.user.rank}}</h1></div>
 		</div>
 		<div class="col-md-8">
-			<h1>Score</h1>
-			<p>Number Invited: {{authentication.user.inviteeList.length}}</p>
-			<p>Number Attending: {{authentication.user.attendeeList.length}}</p>
+			<h1 id="stats">Stats</h1>
+			<div class="well">
+				<p>Number Invited: {{authentication.user.inviteeList.length}}</p>
+				<p>Number Attending: {{authentication.user.attendeeList.length}}</p>
+			</div>
 		</div>
 	</div>
 </section>
