@@ -1,4 +1,5 @@
-app.controller ('eventController', function($scope) {
+app.controller ('eventController', ['$scope',
+function($scope) {
   $scope.events = [
           
           //These were just some test events to see if table worked
@@ -64,4 +65,4 @@ app.controller ('eventController', function($scope) {
           $scope.deleteRow = function(index) {
           $scope.events.splice(index,1);
           }
-})
+}])
