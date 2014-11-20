@@ -9,8 +9,8 @@ angular.module('admin').controller("mainController", function($rootScope, $scope
 		};
 
 		$scope.tabs = [
-			{ heading: "Application", route:"application.view.client.html", active:false },
-			{ heading: "Event", route:"event.view.client.html", active:false },
+			{ heading: "Application", route:"admin.application", active:false },
+			{ heading: "Event", route:"admin.event", active:false },
 		];
 
 		$scope.$on("$stateChangeSuccess", function() {
