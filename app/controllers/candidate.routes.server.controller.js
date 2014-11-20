@@ -290,8 +290,7 @@
  					if(result.events[i].event_id.toString() === req.body.event_id.toString() ){
  						result.events[i].status = req.body.status;
  						if (req.body.status ==='accepted'){
- 						if(result.events[i].accepted==='true'){
- 							
+ 							if(result.events[i].accepted ===true){	
 
  							if(result.user_id){
  								var user_id = result.user_id;

@@ -20,7 +20,7 @@
  /**
 	* Globals
 	*/
-	var candidate1, user, user1,acceptedCandidate,attendee,attendee1,guest1,recruiter,recruiter1,event1,event2,event3,event4,newCandidate;
+	var candidate1,candidate3, user, user1,acceptedCandidate,attendee,attendee1,attendee3,attendee4,guest1,recruiter,recruiter1,event1,event2,event3,event4,newCandidate;
 
 	function arraysEqual(array0,array1) {
 		if (array0.length !== array1.length) return false;
@@ -77,6 +77,8 @@
 						login_enabled: true
 
 					});
+
+
 					attendee = new User({
 						fName: 'attendee',
 						lName: 'Testing',
@@ -87,16 +89,35 @@
 						login_enabled: true
 
 					});
-			/*		acceptedCandidate = new user({
-						fName: 'Jane',
+
+					attendee3 = new User({
+						fName: 'John',
 						lName: 'Doe',
 						roles: ['attendee'],
-						status: [{event_id: event1._id, attending: false, recruiter: false}],
-						email: 'yay@yay.com',
+						email: 'test321@test.com',
+						status: [{event_id: event2._id, attending: false, recruiter: false}],
 						password: 'password',
 						login_enabled: true
 
-					});*/
+					});
+
+					candidate3 = new Candidate({
+						fName : 'John',
+						lName : 'Doe',
+						email : 'test321@test.com',
+						//status : 'volunteer',
+						events: [{event_id:event2._id,accepted:true,status:'volunteer'}],
+						note : 'this is a test',
+						user_id: attendee3._id
+					});
+					acceptedCandidate = new Candidate({
+						fName : 'Jane',
+						lName : 'Doe',
+						email : 'jDoe@test.com',
+						events: [{event_id:event2._id,accepted:true,status:'volunteer'}],
+						note : 'this is a test'
+
+					});
 					recruiter = new User({
 						fName: 'attendee',
 						lName: 'Testing',
@@ -117,8 +138,22 @@
 					});
 
 					guest1=agent.agent();
-					/*acceptedCandidate.save(function(err,res){
-						if (err) throw err;*/
+					acceptedCandidate.save(function(err,res){
+
+
+					candidate3.save(function(err,res){
+						//console.log(err);
+			
+							attendee3.save(function(err,res){
+							attendee4 = agent.agent();
+							attendee4
+							.post('http://localhost:3001/auth/signin')
+							.send({'email': 'test321@test.com', 'password': 'password'})
+							.end(function (err, res) {
+
+							});
+
+
 					recruiter.save(function(err,res){
 						recruiter1 = agent.agent();
 						recruiter1
@@ -148,7 +183,9 @@
 									});
 								});
 							});
-					//	});
+							});
+					});
+						});
 					});
 				});
 			});
@@ -491,6 +528,91 @@
   });
 
 
+it("admin should be able to set candidate event status field", function(done) {
+ 	user1
+ 	.get('http://localhost:3001/candidate/setStatus')
+ 	.send({'candidate_id' : candidate3._id, 'event_id': event2._id, 'status': 'accepted'})
+ 	.end(function(err,res) {
+ 		if (err) throw err;
+ 		//console.log(res.body);
+ 		res.status.should.equal(200);
+
+ 		candidate3.save(function(err) {
+ 			user1
+ 			.get('http://localhost:3001/candidate/getEvents')
+ 			.send({candidate_id: candidate3._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+ 				//console.log(res.body);
+
+ 				res.status.should.equal(200);
+ 				res.body.should.have.property('events');
+
+ 				(res.body.events[0].event_id.name.toString()).should.be.equal(event2.name);
+ 				(res.body.events[0].accepted.toString()).should.be.equal('true');
+ 				 (res.body.events[0].status.toString()).should.be.equal('accepted');
+
+ 				 				done();
+ 			});
+ 		});
+ 	});
+ });
+
+  it('Should have changed the attendee user to a recruiter for the whan status is the last to be changed to accepted',function(done){
+  	attendee4
+  	.get('http://localhost:3001/recruiter/events')
+  	//.send({'user' : attendee._id})
+  	.end(function(err,res){
+  		if (err) throw err;
+  		//console.log(err);
+  		//console.log(res.body);
+		//console.log(res.body);
+  		//console.log(err);
+  		res.status.should.equal(200);
+  		//res.body.should.have.property('event_id');
+  		(res.body[0].recruiter.toString()).should.equal('true');
+  		(res.body[0].event_id._id.toString()).should.equal(event2._id.toString());
+
+  		done();
+  	});
+  });
+
+
+   it("Should automatically create a new user when a candidate accepts and is accepted to become a recruiter if they are not already a user", function(done) {
+ 	user1
+ 	.get('http://localhost:3001/candidate/setStatus')
+ 	.send({'candidate_id' : acceptedCandidate._id, 'event_id': event2._id, 'status': 'accepted'})
+ 	.end(function(err,res) {
+ 		if (err) throw err;
+
+ 		res.status.should.equal(200);
+
+ 		acceptedCandidate.save(function(err) {
+ 			user1
+ 			.get('http://localhost:3001/candidate/getEvents')
+ 			.send({candidate_id: acceptedCandidate._id})
+ 			.end(function(err,res) {
+ 				if (err) throw err;
+
+ 				res.status.should.equal(200);
+ 				res.body.should.have.property('events');
+
+ 				(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
+ 				(res.body.events[0].accepted.toString()).should.be.equal('true');
+ 				(res.body.events[0].status.toString()).should.be.equal('accepted');
+
+ 				var query = Candidate.findOne({'email': acceptedCandidate.email});;
+ 				query.exec(function(err,result){
+ 					(result.email === undefined).should.be.false;
+ 					result.email.should.equal(acceptedCandidate.email);
+ 					done();
+ 				});
+  			});
+ 		});
+ 	});
+ });
+
+
  it("admin should be able to set the candidate's note", function(done) {
  	user1
  	.get('http://localhost:3001/candidate/setNote')
@@ -557,6 +679,7 @@
 
 
  });
+
 });
 
 
@@ -1552,6 +1675,9 @@ it("guest should NOT be able to get the candidate getUser_id", function(done) {
  	user.remove();
  	attendee.remove();
  	recruiter.remove();
+ 	attendee3.remove();
+ 	candidate3.remove();
+ 	acceptedCandidate.remove();
  	event1.remove();
  	event2.remove();
  	event3.remove();
