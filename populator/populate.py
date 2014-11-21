@@ -243,6 +243,10 @@ def main():
   #Users, accept invitations
   for invitee,event,recruiter in invitations:
     invitee.decide(event,random.random()<p,'recruiter' in invitee.roles,recruiter)
+  #Attach ranks
+  sortedRecruiters = sorted(recruiters,key=lambda r:-(len(r.attendeeList)*100000+len(r.almostList)))
+  for i in range(len(sortedRecruiters)):
+    sortedRecruiters[i].rank=i+1
 
   dumpUserSummary(list(set(recruiters)|set(attendees)|set(admins)))
 
