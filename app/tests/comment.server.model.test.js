@@ -121,6 +121,14 @@ describe('Comment Model Unit Tests:', function() {
 		});
 	});
 
+	it('should be able to save to the social comment stream',function(done) {
+		comment1.stream = 'social';
+		comment1.save(function(err) {
+			if (err) throw err;
+			done();
+		});
+	});
+
 	afterEach(function(done) {
 		event1.remove();
 		recruiter.remove();
