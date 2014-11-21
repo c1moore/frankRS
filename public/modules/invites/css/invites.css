@@ -5,14 +5,13 @@
   margin-top: 5px;
   margin-bottom: 5px;
 }
-.frank-invite-sidebar{
-  position: relative;
-  overflow: auto;
-  height: 200px;
+.frank-invites-sidebar{
+  position: fixed;
+  height: 100vh;
   width: 325px;
-  float: right;
-  margin-right: 10px;
-  background-color: white;
+  right: 0;
+  margin-top: -30px;
+  background-color: #E8E9EB;
 }
 .frank-invite-sidebar-search {
   width: 90%;
@@ -29,7 +28,6 @@
   font-size: 18px;
 }
 .frank-invite-sidebar-total {
-  position: absolute;
   width: 100%;
 }
 .frank-invite-table-container {
@@ -273,7 +271,9 @@ animation:0.5s flipInX ease;
 }
 #invite {
   border:1px solid #ffc174;
-  height: 475px;
+  max-height: 475px;
+  min-height: 375px;
+  height: 60vh;
   position: absolute;
   margin-left: 5%;
   width: 60vw;
@@ -313,7 +313,9 @@ animation:0.5s flipInX ease;
 }
 #p_message {
   width: 45vw;
-  height: 250px;
+  max-height: 250px;
+  min-height: 185px;
+  height: 30vh;
   resize: none;
   margin-left: 43px;
   border-radius: 5px;
@@ -331,4 +333,21 @@ animation:0.5s flipInX ease;
 body {
   background-color:#F5F5F5;
   overflow:hidden;
+}
+
+
+/*Overwritten Angular-Bootstrap*/
+.panel-group .panel + .panel{
+  margin-top: 0;
+}
+
+.panel-default > .panel-heading {
+  background-image: -webkit-linear-gradient(top, #3c3c3c 0%, #222 100%);
+  background-image: -o-linear-gradient(top, #3c3c3c 0%, #222 100%);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#3c3c3c), to(#222));
+  background-image: linear-gradient(to bottom, #3c3c3c 0%, #222 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff3c3c3c', endColorstr='#ff222222', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+  background-repeat: repeat-x;
+  color: #E8E9EB;
 }
