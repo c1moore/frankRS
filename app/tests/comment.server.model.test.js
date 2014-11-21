@@ -113,6 +113,14 @@ describe('Comment Model Unit Tests:', function() {
 		});
 	});
 
+	it('should not be able to save a comment where the event id is undefined',function(done) {
+		comment1.event_id = undefined;
+		comment1.save(function(err) {
+			should.exist(err);
+			done();
+		});
+	});
+
 	afterEach(function(done) {
 		event1.remove();
 		recruiter.remove();
