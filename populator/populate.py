@@ -5,7 +5,7 @@
 from User import User
 from Candidate import Candidate
 from Event import Event
-from Util import resetMongo
+from Util import resetMongo, ensureID
 
 import random, time
 
@@ -244,9 +244,23 @@ def main():
   for invitee,event,recruiter in invitations:
     invitee.decide(event,random.random()<p,'recruiter' in invitee.roles,recruiter)
   #Attach ranks
-  sortedRecruiters = sorted(recruiters,key=lambda r:-(len(r.attendeeList)*100000+len(r.almostList)))
-  for i in range(len(sortedRecruiters)):
-    sortedRecruiters[i].rank=i+1
+  eventBins = [[]]
+  eventOrder = []
+  insertionPoint = 0
+  for event in events:
+    eventOrder.append(ensureID(event))
+    for recruiter in recruiters:
+      for statusDict in recruiter.status:
+        eventID = statusDict['event_id']
+        if ensureID(eventID) == ensureID(event):
+          eventBins[insertionPoint].append(recruiter)
+    insertionPoint += 1
+    eventBins.append([])
+  eventBins.pop()
+  for bin in eventBins:
+    sortedBin = sorted(bin,key=lambda r:-(len(r.attendeeList)*100000+len(r.almostList)))
+    for i in range(len(sortedBin)):
+      sortedBin[i].rank={'event_id':eventOrder[eventBins.index(bin)],'place':i+1}
 
   dumpUserSummary(list(set(recruiters)|set(attendees)|set(admins)))
 
