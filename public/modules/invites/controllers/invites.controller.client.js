@@ -1,7 +1,7 @@
 'use strict'; // :)
 
-angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication', '$location', 'eventSelector', '$http', '$window',
-	function($scope, Authentication, $location, eventSelector, $http, $window) {
+angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication', '$location', 'eventSelector', '$http', '$window', '$modal',
+	function($scope, Authentication, $location, eventSelector, $http, $window, $modal) {
 		$scope.authentication = Authentication;
 
 		/*
@@ -21,6 +21,23 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 				angular.element("#invitation-submit-button").addClass("disabled");
 				angular.element("#invitation-preview-button").addClass("disabled");
 			}
+		}
+
+		var tempEvent = eventSelector.selectedEvent;
+
+		if(!tempEvent || tempEvent === "Select Event") {
+			var eventWarning = $modal.open({
+				template : "<div class='modal-header'>" +
+								"<h3 class='modal-title'>Select Event</h3>" +
+							"</div>" +
+							"<div class='modal-body'>" +
+								"<p>It looks like you do not have an event selected or you did not have an event for which you are recruiting selected.  That's alright, just select the event for which you want to send an invitation before proceeding.</p>" +
+								"<p>(The event selector is in the top right-hand corner by your name.)</p>" +
+							"</div>" +
+							"<div class='modal-footer'>" +
+								"<button class='btn btn-primary' ng-click='ok()'>OK</button>" +
+							"</div>"
+			});
 		}
 
 		$scope.recruiter_email = $scope.authentication.user.email;
@@ -77,6 +94,8 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 	*/
 
 	$scope.firstSelected = true;
+	$scope.secondSelected = false;
+	$scope.thirdSelected = false;
 	$scope.attendees = {}, $scope.attendees.list = [];
 	$scope.invitees = {}, $scope.invitees.list = [];
 	$scope.almosts = {}, $scope.almosts.list = [];

@@ -35,7 +35,7 @@
 		<accordion close-others="true">
 			<accordion-group is-open="firstSelected">
 				<accordion-heading>
-					Awesome People Attending <i class="pull-right fa" ng-class="{'fa-chevron-right' : !status.open, 'fa-chevron-down' : status.open}"></i>
+					Awesome People Attending <i class="pull-right fa" ng-class="{'fa-chevron-right' : !firstSelected, 'fa-chevron-down' : firstSelected}"></i>
 				</accordion-heading>
 				<input type="search" class="frank-invite-sidebar-search" ng-model="q" placeholder="Search..." />
 				<hr class="frank-invite-hr" />
@@ -72,9 +72,9 @@
 					<b>Total: {{attendees.list.length}}</b>
 				</div>
 			</accordion-group>
-			<accordion-group>
+			<accordion-group is-open="secondSelected">
 				<accordion-heading>
-					People Invited <i class="pull-right fa" ng-class="{'fa-chevron-right' : !status.open, 'fa-chevron-down' : status.open}"></i>
+					People Invited <i class="pull-right fa" ng-class="{'fa-chevron-right' : !secondSelected, 'fa-chevron-down' : secondSelected}"></i>
 				</accordion-heading>
 				<input type="search" class="frank-invite-sidebar-search" ng-model="q" placeholder="Search..." />
 				<hr class="frank-invite-hr"/>
@@ -111,9 +111,9 @@
 					<b>Total: {{invitees.list.length}}</b>
 				</div>
 			</accordion-group>
-			<accordion-group>
+			<accordion-group is-open="thirdSelected">
 				<accordion-heading>
-					Accepted Another's Invitation <i class="pull-right fa" ng-class="{'fa-chevron-right' : !status.open, 'fa-chevron-down' : status.open}"></i>
+					Accepted Another's Invitation <i class="pull-right fa" ng-class="{'fa-chevron-right' : !thirdSelected, 'fa-chevron-down' : thirdSelected}"></i>
 				</accordion-heading>
 				<input type="search" class="frank-invite-sidebar-search" ng-model="q" placeholder="Search..." />
 				<hr class="frank-invite-hr"/>

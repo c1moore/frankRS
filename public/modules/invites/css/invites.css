@@ -351,3 +351,7 @@ body {
   background-repeat: repeat-x;
   color: #E8E9EB;
 }
+
+.modal-dialog {
+  margin-top: 30vh;
+}
