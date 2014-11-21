@@ -24,8 +24,8 @@ var comment1, event1, recruiter;
 /**
  * Unit tests
  */
-describe('Express.js Event Route Integration Tests:', function() {
-	before(function(done) {
+describe('Comment Model Unit Tests:', function() {
+	beforeEach(function(done) {
 		User.remove().exec(); //Prevent earlier failed tests from poisoning us
 		Event.remove().exec();
 		Comment.remove().exec();
@@ -51,26 +51,69 @@ describe('Express.js Event Route Integration Tests:', function() {
  			login_enabled: true
  		});
 
+		comment1 = new Comment({
+			user_id: recruiter._id,
+			event_id: event1._id,
+			comment: "A comment",
+			stream: 'recruiter'
+		});
+
  		event1.save(function(err){
 			if(err) throw err;
-			user.save(function(err){
+			recruiter.save(function(err){
 				if(err) throw err;
-				comment1 = new Comment({
-					user_id: recruiter._id,
-					event_id: event1._id,
-					comment: "A comment",
-					stream: 'recruiter'
-				});
-				comment1.save(function(err){
-					if(err) throw err;
-					done();
-				});
+				done();
 			});
 		});
 	});
 
+	it('should be able to save a comment',function(done) {
+		comment1.save(function(err) {
+			if (err) throw err;
+ 			done();
+		});
+	});
 
-	after(function(done) {
+	it('should not be able to save a comment that is empty',function(done) {
+		comment1.comment = '';
+		comment1.save(function(err) {
+ 			should.exist(err);
+			done();
+		});
+	});
+
+	it('should not be able to save a comment without a valid stream',function(done) {
+		comment1.stream = 'santa';
+		comment1.save(function(err) {
+			should.exist(err);
+			done();
+		});
+	});
+
+	it('should still be able to save a valid comment despite earlier tests',function(done) {
+		comment1.save(function(err) {
+			if (err) throw err;
+			done();
+		});
+	});
+
+	it('should not be able to save a comment where the user id is the wrong type',function(done) {
+		comment1.user_id = "Wrong type";
+		comment1.save(function(err) {
+			should.exist(err);
+			done();
+		});
+	});
+
+	it('should not be able to save a comment where the user id is undefined',function(done) {
+		comment1.user_id = undefined;
+		comment1.save(function(err) {
+			should.exist(err);
+			done();
+		});
+	});
+
+	afterEach(function(done) {
 		event1.remove();
 		recruiter.remove();
 		comment1.remove();
