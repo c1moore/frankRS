@@ -107,7 +107,7 @@ exports.getDisplayName = function(req, res) {
 * and the inviteeList and attendeeList, properly populated with the displayName of each user in one of these lists.
 */
 exports.getLeaderboard = function(req, res) {
-	if(req.body.event_id === undefined) {
+	if(req.body.event_id == undefined) {
 		res.status(400).send({'message' : 'Event not specified.'});
 		return;
 	}
@@ -215,7 +215,7 @@ exports.getUserEvents = function(req, res) {
 simply replace the the definition of query with the following line:
 	var query = User.findOne({'_id' : id, 'attendeeList.event_id' : req.});*/
 exports.getRecruiterAttendees = function(req, res) {
-	if(req.body.event_id === undefined) {
+	if(req.body.event_id == undefined) {
 		res.status(400).send({'message' : 'Event not specified.'});
 		return;
 	}
@@ -251,7 +251,7 @@ exports.getRecruiterAttendees = function(req, res) {
 * Get the invitee list of the currently logged in recruiter for the event specified.
 */
 exports.getRecruiterInvitees = function(req, res) {
-	if(req.body.event_id === undefined) {
+	if(req.body.event_id == undefined) {
 		res.status(400).send({'message' : 'Event not specified.'});
 		return;
 	}
@@ -287,7 +287,7 @@ exports.getRecruiterInvitees = function(req, res) {
 * Get the almost list of the currently logged in recruiter for the event specified.
 */
 exports.getRecruiterAlmosts = function(req, res) {
-	if(req.body.event_id === undefined) {
+	if(req.body.event_id == undefined) {
 		res.status(400).send({'message' : 'Event not specified.'});
 		return;
 	}
@@ -323,7 +323,7 @@ exports.getRecruiterAlmosts = function(req, res) {
 * Retrieve the list of all people who are signed up to attend the event.
 */
 exports.getAttendees = function(req, res) {
-	if(req.body.event_id === undefined) {
+	if(req.body.event_id == undefined) {
 		res.status(400).send({'message' : 'Event not specified.'});
 		return;
 	}
@@ -362,7 +362,7 @@ exports.getAttendees = function(req, res) {
 * Retrieve the list of all people who are invited to attend the specified event.
 */
 exports.getInvitees = function(req, res) {
-	if(req.body.event_id === undefined) {
+	if(req.body.event_id == undefined) {
 		res.status(400).send({'message' : 'Event not specified.'});
 		return;
 	}
@@ -470,7 +470,7 @@ exports.getEmail = function(req, res) {
 * TODO: A much more efficient method for updating this information, especially the recruiter's rank, should be researched and used when time permits.
 */
 exports.sendInvitation = function(req, res) {
-	if(req.body.fName === undefined || req.body.lName === undefined || req.body.email === undefined || req.body.event_id === undefined || req.body.event_name === undefined) {
+	if(req.body.fName == undefined || req.body.lName == undefined || req.body.email == undefined || req.body.event_id == undefined || req.body.event_name == undefined) {
 		res.status(400).send({'message' : 'Required fields not specified.'});
 		return;
 	}
