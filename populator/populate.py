@@ -250,6 +250,7 @@ def main():
   for event in events:
     eventOrder.append(ensureID(event))
     for recruiter in recruiters:
+      assert 'recruiter' in recruiter.roles, "Bug! Recruiter does not have the proper role!"
       for statusDict in recruiter.status:
         if statusDict['recruiter'] == False:
           continue #I'm just attending
