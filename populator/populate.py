@@ -251,6 +251,8 @@ def main():
     eventOrder.append(ensureID(event))
     for recruiter in recruiters:
       for statusDict in recruiter.status:
+        if statusDict['recruiter'] == False:
+          continue #I'm just attending
         eventID = statusDict['event_id']
         if ensureID(eventID) == ensureID(event):
           eventBins[insertionPoint].append(recruiter)
