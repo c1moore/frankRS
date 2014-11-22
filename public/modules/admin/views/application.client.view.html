@@ -20,25 +20,18 @@
 
 		<div class="col-md-8">
 			<h2>Pending Applications</h2>
-			<table class="table table-hover table-striped table-bordered">
-				<thead>
-					<tr>
-						<td>Name</td>
-						<td>Accept</td>
-						<td>Deny</td>
-					</tr>
-				</thead>
-
-				<tbody>
-					<tr ng-repeat="application in applications">
-						<td>{{ application.name }}</td>
-						<td>
-							<button class="btn btn-success" ng-click="addApplicant($index)">Accept</button>
-						</td>
-						<td>
-							<button class="btn btn-danger" ng-click="removeApplicant($index)">Deny</button>
-					</tr>
-				</tbody>
+			<table ng-table="tableParams" class="table table-bordered">
+				<tr ng-repeat="candidate in $data">
+					<td data-title="'Name'">
+						{{candidate.name}}
+					</td>
+					<td data-title="'Accept'">
+						<button class="btn btn-success" ng-click="addApplicant($index)">Accept</button>
+					</td>
+					<td data-title="'Deny'">
+						<button class="btn btn-danger" ng-click="removeApplicant($index)">Deny</button>
+					</td>
+				</tr>
 			</table>
 		</div>
 	</div>
