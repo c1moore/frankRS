@@ -124,7 +124,14 @@ exports.postCommentSocial = function(req, res) {
 	var event_id = req.body.event_id;
 	var query = Comment.findOne({_id: id});
 	var user = req.user;
-	Comment.insert({user_id: user._id,event_id: event_id,comment:comment,stream:'social'});
+	var newComment = new Comment({user_id: user._id,event_id: event_id,comment:comment,stream:'social'});
+	newComment.save(function(err) {
+		if (err) {
+			res.send(400).json(err);
+		} else {
+			res.send(200).json({comment_id: newComment._id});
+		}
+	});
 };
 
 exports.postCommentRecruiter = function(req, res) {
@@ -140,7 +147,14 @@ exports.postCommentRecruiter = function(req, res) {
 	if (!canViewComment(user,req.hasAuthorization,commentObj)) {
 		req.status(401).json({message: 'You do not have permissions to post that comment'});
 	} else {
-		Comment.insert(commentObj);
+		var newComment = new Comment(commentObj);
+		newComment.save(function(err) {
+			if (err) {
+				res.send(400).json(err);
+			} else {
+				res.send(200).json({comment_id: newComment._id});
+			}
+		});
 	}
 };
 
