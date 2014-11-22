@@ -111,7 +111,7 @@ describe('Express.js Event Route Integration Tests:', function() {
  	it("should not be able to get the event start date when not signed in", function(done) {
  		request('http://localhost:3001')
  			.get('/events/getStartDate')
- 			.send({eventID: event1._id})
+ 			.query({eventID: event1._id.toString()})
  			.expect(401,done);
 
  	});
@@ -119,7 +119,7 @@ describe('Express.js Event Route Integration Tests:', function() {
  	it("should not be able to get the event name when not signed in", function(done) {
  		request('http://localhost:3001')
  			.get('/events/getName')
- 			.send({eventID: event1._id})
+ 			.query({eventID: event1._id.toString()})
  			.expect(401,done);
 
  	});
@@ -127,14 +127,14 @@ describe('Express.js Event Route Integration Tests:', function() {
  	it("should not be able to get the event end date when not signed in", function(done) {
  		request('http://localhost:3001')
  			.get('/events/getEndDate')
- 			.send({eventID: event1._id})
+ 			.query({eventID: event1._id.toString()})
  			.expect(401,done);
  	});
 
 	it("should not be able to get the event location when not signed in", function(done) {
  		request('http://localhost:3001')
  			.get('/events/getLocation')
- 			.send({eventID: event1._id})
+ 			.query({eventID: event1._id.toString()})
  			.expect(401)
  			.end(function(err,res) {
  				if (err) throw err;
@@ -147,14 +147,14 @@ describe('Express.js Event Route Integration Tests:', function() {
  	it("should not be able to get the event schedule when not signed in", function(done) {
  		request('http://localhost:3001')
  			.get('/events/getSchedule')
- 			.send({eventID: event1._id})
+ 			.query({eventID: event1._id.toString()})
  			.expect(401,done);
  	});
 
  	it("should not be able to get the event object when not signed in", function(done) {
  		request('http://localhost:3001')
  			.get('/events/getEventObj')
- 			.send({eventID: event1._id})
+ 			.query({eventID: event1._id.toString()})
  			.expect(401)
  			.end(function(err,res) {
  				if (err) throw err;
@@ -192,7 +192,7 @@ describe('Express.js Event Route Integration Tests:', function() {
  	it("should now be able to get the event name when signed in", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getName')
- 			.send({eventID: event1._id})
+ 			.query({eventID: event1._id.toString()})
  			.end(function(err,res) {
 				if (err) throw erro;
 				res.status.should.be.equal(200);
@@ -205,7 +205,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	 it("should now be able to get the event start date when signed in", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getStartDate')
- 			.send({eventID: event1._id})
+ 			.query({eventID: event1._id.toString()})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(200);
@@ -217,7 +217,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	 it("should now be able to get the event end date when signed in", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getEndDate')
- 			.send({eventID: event1._id})
+ 			.query({eventID: event1._id.toString()})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(200);
@@ -230,7 +230,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should now be able to get the event location when signed in", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getLocation')
- 			.send({eventID: event1._id})
+ 			.query({eventID: event1._id.toString()})
  			.end(function(err,res) {
  				if (err) throw err;
 				res.status.should.be.equal(200);
@@ -242,7 +242,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should now be able to get the event schedule when signed in", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getSchedule')
- 			.send({eventID: event1._id})
+ 			.query({eventID: event1._id.toString()})
  			.end(function(err,res) {
  				if (err) throw err;
 				res.status.should.be.equal(200);
@@ -254,7 +254,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should now be able to get the event object when signed in", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getEventObj')
- 			.send({eventID: event1._id})
+ 			.query({eventID: event1._id.toString()})
  			.end(function(err,res) {
  				if (err) throw err;
 				res.status.should.be.equal(200);
@@ -282,7 +282,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to access an eventObj by ID if the user shouldn't know about it", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getEventObj')
-			.send({eventID: event2._id})
+			.query({eventID: event2._id.toString()})
  			.end(function(err,res) {
  				if (err) throw err;
 				res.status.should.be.equal(401);
@@ -294,7 +294,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to access start_date if the user shouldn't know about that event", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getStartDate')
-			.send({eventID: event2._id})
+			.query({eventID: event2._id.toString()})
  			.end(function(err,res) {
  				if (err) throw err;
 				res.status.should.be.equal(401);
@@ -306,7 +306,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to access end_date if the user shouldn't know about that event", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getEndDate')
-			.send({eventID: event2._id})
+			.query({eventID: event2._id.toString()})
  			.end(function(err,res) {
  				if (err) throw err;
 				res.status.should.be.equal(401);
@@ -318,7 +318,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to access location if the user shouldn't know about that event", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getLocation')
-			.send({eventID: event2._id})
+			.query({eventID: event2._id.toString()})
  			.end(function(err,res) {
  				if (err) throw err;
 				res.status.should.be.equal(401);
@@ -330,7 +330,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to access schedule if the user shouldn't know about that event", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getSchedule')
-			.send({eventID: event2._id})
+			.query({eventID: event2._id.toString()})
  			.end(function(err,res) {
  				if (err) throw err;
 				res.status.should.be.equal(401);
@@ -342,7 +342,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to access event name if the user shouldn't know about that event", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getName')
-			.send({eventID: event2._id})
+			.query({eventID: event2._id.toString()})
  			.end(function(err,res) {
  				if (err) throw err;
 				res.status.should.be.equal(401);
@@ -378,7 +378,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to access any event by ID if admin", function(done) {
  		agentAdmin //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getEventObj')
-			.send({eventID: event2._id})
+			.query({eventID: event2._id.toString()})
  			.end(function(err,res) {
  				if (err) throw err;
 				res.status.should.be.equal(200);
@@ -389,7 +389,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to access start_date of any event if admin", function(done) {
  		agentAdmin //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getStartDate')
-			.send({eventID: event2._id})
+			.query({eventID: event2._id.toString()})
  			.end(function(err,res) {
  				if (err) throw err;
 				res.status.should.be.equal(200);
@@ -401,7 +401,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to access any end_date if admin", function(done) {
  		agentAdmin //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getEndDate')
-			.send({eventID: event2._id})
+			.query({eventID: event2._id.toString()})
  			.end(function(err,res) {
  				if (err) throw err;
 				res.status.should.be.equal(200);
@@ -413,7 +413,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to access any location if admin", function(done) {
  		agentAdmin //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getLocation')
-			.send({eventID: event2._id})
+			.query({eventID: event2._id.toString()})
  			.end(function(err,res) {
  				if (err) throw err;
 				res.status.should.be.equal(200);
@@ -425,7 +425,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to access any schedule if admin", function(done) {
  		agentAdmin //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getSchedule')
-			.send({eventID: event2._id})
+			.query({eventID: event2._id.toString()})
  			.end(function(err,res) {
  				if (err) throw err;
 				res.status.should.be.equal(200);
@@ -437,7 +437,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to access any event name if admin", function(done) {
  		agentAdmin //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getName')
-			.send({eventID: event2._id})
+			.query({eventID: event2._id.toString()})
  			.end(function(err,res) {
  				if (err) throw err;
 				res.status.should.be.equal(200);
@@ -457,7 +457,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 				res.status.should.be.equal(200);
 				agentAdmin
 					.get('http://localhost:3001/events/getName')
-					.send({eventID: event2._id})
+					.query({eventID: event2._id.toString()})
 					.end(function(err,res) {
 						if (err) throw err;
 						res.status.should.be.equal(200);
@@ -477,7 +477,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 				res.status.should.be.equal(400);
 				agentAdmin
 					.get('http://localhost:3001/events/getName')
-					.send({eventID: event2._id})
+					.query({eventID: event2._id.toString()})
 					.end(function(err,res) {
 						if (err) throw err;
 						res.status.should.be.equal(200);
@@ -497,7 +497,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 				res.status.should.be.equal(401);
 				agentAdmin
 					.get('http://localhost:3001/events/getName')
-					.send({eventID: event1._id})
+					.query({eventID: event1._id.toString()})
 					.end(function(err,res) {
 						if (err) throw err;
 						res.status.should.be.equal(200);
@@ -517,7 +517,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 				res.status.should.be.equal(400);
 				agentAdmin
 					.get('http://localhost:3001/events/getStartDate')
-					.send({eventID: event2._id})
+					.query({eventID: event2._id.toString()})
 					.end(function(err,res) {
 						if (err) throw err;
 						res.status.should.be.equal(200);
@@ -538,7 +538,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 				res.status.should.be.equal(200);
 				agentAdmin
 					.get('http://localhost:3001/events/getStartDate')
-					.send({eventID: event2._id})
+					.query({eventID: event2._id.toString()})
 					.end(function(err,res) {
 						if (err) throw err;
 						res.status.should.be.equal(200);
@@ -559,7 +559,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 				res.status.should.be.equal(401);
 				agentAdmin
 					.get('http://localhost:3001/events/getStartDate')
-					.send({eventID: event1._id})
+					.query({eventID: event1._id.toString()})
 					.end(function(err,res) {
 						if (err) throw err;
 						res.status.should.be.equal(200);
@@ -580,7 +580,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 				res.status.should.be.equal(200);
 				agentAdmin
 					.get('http://localhost:3001/events/getEndDate')
-					.send({eventID: event2._id})
+					.query({eventID: event2._id.toString()})
 					.end(function(err,res) {
 						if (err) throw err;
 						res.status.should.be.equal(200);
@@ -601,7 +601,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 				res.status.should.be.equal(400);
 				agentAdmin
 					.get('http://localhost:3001/events/getEndDate')
-					.send({eventID: event2._id})
+					.query({eventID: event2._id.toString()})
 					.end(function(err,res) {
 						if (err) throw err;
 						res.status.should.be.equal(200);
@@ -622,7 +622,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 				res.status.should.be.equal(401);
 				agent
 					.get('http://localhost:3001/events/getEndDate')
-					.send({eventID: event1._id})
+					.query({eventID: event1._id.toString()})
 					.end(function(err,res) {
 						if (err) throw err;
 						res.status.should.be.equal(200);
@@ -644,7 +644,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 				res.status.should.be.equal(200);
 				agentAdmin
 					.get('http://localhost:3001/events/getLocation')
-					.send({eventID: event2._id})
+					.query({eventID: event2._id.toString()})
 					.end(function(err,res) {
 						if (err) throw err;
 						res.status.should.be.equal(200);
@@ -665,7 +665,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 				res.status.should.be.equal(400);
 				agentAdmin
 					.get('http://localhost:3001/events/getLocation')
-					.send({eventID: event2._id})
+					.query({eventID: event2._id.toString()})
 					.end(function(err,res) {
 						if (err) throw err;
 						res.status.should.be.equal(200);
@@ -686,7 +686,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 				res.status.should.be.equal(401);
 				agent
 					.get('http://localhost:3001/events/getLocation')
-					.send({eventID: event1._id})
+					.query({eventID: event1._id.toString()})
 					.end(function(err,res) {
 						if (err) throw err;
 						res.status.should.be.equal(200);
@@ -707,7 +707,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 				res.status.should.be.equal(200);
 				agentAdmin
 					.get('http://localhost:3001/events/getSchedule')
-					.send({eventID: event2._id})
+					.query({eventID: event2._id.toString()})
 					.end(function(err,res) {
 						if (err) throw err;
 						res.status.should.be.equal(200);
@@ -728,7 +728,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 				res.status.should.be.equal(200);
 				agentAdmin
 					.get('http://localhost:3001/events/getSchedule')
-					.send({eventID: event2._id})
+					.query({eventID: event2._id.toString()})
 					.end(function(err,res) {
 						if (err) throw err;
 						res.status.should.be.equal(200);
@@ -749,7 +749,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 				res.status.should.be.equal(401);
 				agentAdmin
 					.get('http://localhost:3001/events/getSchedule')
-					.send({eventID: event2._id})
+					.query({eventID: event2._id.toString()})
 					.end(function(err,res) {
 						if (err) throw err;
 						res.status.should.be.equal(200);
@@ -770,7 +770,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 				res.status.should.be.equal(401);
 				agent
 					.get('http://localhost:3001/events/getSchedule')
-					.send({eventID: event1._id})
+					.query({eventID: event1._id.toString()})
 					.end(function(err,res) {
 						if (err) throw err;
 						res.status.should.be.equal(200);
@@ -792,7 +792,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 				res.status.should.be.equal(200);
 				agentAdmin
 					.get('http://localhost:3001/events/getName')
-					.send({eventID: event2._id})
+					.query({eventID: event2._id.toString()})
 					.end(function(err,res) {
 						if (err) throw err;
 						res.status.should.be.equal(200);
@@ -817,7 +817,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 				res.status.should.be.equal(401);
 				agent
 					.get('http://localhost:3001/events/getName')
-					.send({eventID: event1._id})
+					.query({eventID: event1._id.toString()})
 					.end(function(err,res) {
 						if (err) throw err;
 						res.status.should.be.equal(200);
