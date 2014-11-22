@@ -7,24 +7,28 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 /candidate/getfName
 	Expects 
+		.post(~//candidate/getfNamel)
 		.send({candidate_id: candidate._id})
 	Returns
 		fName
 
 /candidate/getlName
 	Expects 
+		.post(~//candidate/getlName)
 		.send({candidate_id: candidate._id})
 	Returns
 		lName
 
 /candidate/getEmail
 	Expects 
+		.post(~//candidate/getEmail)
 		.send({candidate_id: candidate._id})
 	Returns
 		email
 
 /candidate/getEvents
 	Expects 
+		.post(~//candidate/getEvents)
 		.send({candidate_id: candidate._id})
 	Returns
 		an array of objects.
@@ -36,6 +40,7 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 /candidate/getNote
 	Expects 
+		.post(~//candidate/getNote)
 		.send({candidate_id: candidate._id})
 	Returns
 		note
@@ -43,6 +48,7 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 /candidate/getUser_id
 	Expects
+		.post(~//candidate/getUser_id)
 		.send({candidate_id: candidate._id})
 	Returns
 		user_id
@@ -51,6 +57,7 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 /candidate/setfName
 	Expects 
+		.post(~//candidate/setfName)
 		.send({candidate_id: candidate._id,fName:'string x'})
 
 	Changes the candidate fname to x if the user is an admin
@@ -58,6 +65,7 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 /candidate/setlName
 	Expects 
+		.post(~//candidate/setlName)
 		.send({candidate_id: candidate._id,lName:'string x'})
 
 		Changes the candidate lname to x if the user is an admin
@@ -65,6 +73,7 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 /candidate/setEmail
 	Expects 
+		.post(~//candidate/setEmail)
 		.send({candidate_id: candidate._id,fName:'string x@x.com'})
 
 	Changes the candidate email to x@x.com if the user is an admin
@@ -73,6 +82,7 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 /candidate/setStatus
 	Expects 
+		.post(~//candidate/setStatus)
 		.send({candidate_id: candidate._id,event_id:'x',status:string 'accepted/invited/volunteer'})
 
 	Changes status to a specific event in the candidate file to accepted or invited or volunteer.  Those are the only choices to change it to.
@@ -84,6 +94,7 @@ Recruiters and attendees can volunteer to be a recruiter.
 		
 /candidate/setEvent
 	Expects 
+		.post(~//candidate/setEvent)
 		.send({candidate_id: candidate._id,newEvent:{event_id:event._id,accepted: boolean true/false,status:accepted/invited/volunteer'}})
 
 	Adds a new event to the candidate.  Lets you set the accepted and status field manually.  Default for accepted is false and default for status is volunteer.
@@ -91,6 +102,7 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 /candidate/setAccepted
 	Expects 
+		.post(~//candidate/setAccepted)
 		.send({candidate_id: candidate._id,event_id:event._id, accepted:string true/false})
 
 	Changes the accepted field in a specific event for a candidate to boolean true or false. 
@@ -102,12 +114,14 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 /candidate/setNote
 	Expects 
+		.post(~//candidate/setNote)
 		.send({candidate_id: candidate._id,note:'string'})_
 
 	Changes the candidate note to string.  Have to be an admin.
 
 /candidate/setCandidate
 	Expects 
+		.post(~//candidate/setCandidate)
 		.send({fName:'string',lName:'string',email:'string@string.string',status:volunteer/invited/accepted, event_id: event._id,accept_Key:true/false,note:'string', user_id:  user._id})
 
 	NOTE: this also works for recruiters/attendees.  It only requires their fName, lName, email, and newEvent.  The rest of the fields will be handled by the backend.  If the other items are included they will be ignored.  (So that an attendee can not set them selves as accepted to be a recruiter for a specific event)
@@ -117,6 +131,7 @@ Recruiters and attendees can volunteer to be a recruiter.
 
 /candidate/deleteCandidate
 	Expects 
+		.post(~//candidate/deleteCandidate)
 		.send({candidate_id: candidate._id})
 
 	deletes candidate from the database.

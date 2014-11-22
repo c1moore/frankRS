@@ -331,6 +331,13 @@
  									login_enabled: true
  								});
 
+
+ 								result.user_id=user._id;
+ 								result.save(function(err,resss){
+ 									if (err)
+ 										return res.status(400).send(err)
+ 								});
+
  								user.save(function(err,ress){
  									if (err)
  										return res.status(400).send(err)
@@ -446,7 +453,11 @@
  									password: result.fName + result.lName,
  									login_enabled: true
  								});
-
+ 								result.user_id=user._id;
+ 								result.save(function(err,resss){
+ 									if (err)
+ 										return res.status(400).send(err)
+ 								});
  								user.save(function(err,ress){
  									if (err)
  										return res.status(400).send(err)
