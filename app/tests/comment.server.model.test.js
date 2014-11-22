@@ -55,6 +55,7 @@ describe('Comment Model Unit Tests:', function() {
 			user_id: recruiter._id,
 			event_id: event1._id,
 			comment: "A comment",
+			interests: ['big','green','eggs'],
 			stream: 'recruiter'
 		});
 

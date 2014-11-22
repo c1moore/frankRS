@@ -12,7 +12,7 @@ var errorHandler = require('./errors'),
 var canViewEvent = function(user,eventID,hasAuthorization) {
 	var statusArray = user.status;
 	for (var i = 0; i<statusArray.length;i++) {
-		if(statusArray[i].event_id==eventID) {
+		if(statusArray[i].event_id.toString()==eventID.toString()) {
 			return true;
 		}
 	}
@@ -65,13 +65,13 @@ exports.getStartDate = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
+	} else if (!canViewEvent(req.user,req.query.eventID,req.hasAuthorization)) {
 		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
 	//Retrieve the requested field
 	var id = req.session.id;
-	var eventID = mongoose.Types.ObjectId(req.body.eventID);
+	var eventID = mongoose.Types.ObjectId(req.query.eventID);
 	var query = Event.findOne({_id: eventID});
 	var theResult;
 	query.exec(function(err,result) {
@@ -87,12 +87,12 @@ exports.getEndDate = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
+	} else if (!canViewEvent(req.user,req.query.eventID,req.hasAuthorization)) {
 		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
 	var id = req.session.id;
-	var eventID = mongoose.Types.ObjectId(req.body.eventID);
+	var eventID = mongoose.Types.ObjectId(req.query.eventID);
 	var query = Event.findOne({_id: eventID});
 	var theResult;
 	query.exec(function(err,result) {
@@ -108,12 +108,12 @@ exports.getLocation = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
+	} else if (!canViewEvent(req.user,req.query.eventID,req.hasAuthorization)) {
 		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
 	var id = req.user._id;
-	var eventID = mongoose.Types.ObjectId(req.body.eventID);
+	var eventID = mongoose.Types.ObjectId(req.query.eventID);
 	var query = Event.findOne({_id: eventID});
 	var theResult;
 	query.exec(function(err,result) {
@@ -129,12 +129,12 @@ exports.getEventObj = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
+	} else if (!canViewEvent(req.user,req.query.eventID,req.hasAuthorization)) {
 		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
 	var id = req.session.id;
-	var eventID = mongoose.Types.ObjectId(req.body.eventID);
+	var eventID = mongoose.Types.ObjectId(req.query.eventID);
 	var query = Event.findOne({_id: eventID});
 	var theResult;
 	query.exec(function(err,result) {
@@ -150,12 +150,12 @@ exports.getSchedule = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
+	} else if (!canViewEvent(req.user,req.query.eventID,req.hasAuthorization)) {
 		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
 	var id = req.session.id;
-	var eventID = mongoose.Types.ObjectId(req.body.eventID);
+	var eventID = mongoose.Types.ObjectId(req.query.eventID);
 	var query = Event.findOne({_id: eventID});
 	var theResult;
 	query.exec(function(err,result) {
@@ -171,12 +171,12 @@ exports.getName = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.body.eventID,req.hasAuthorization)) {
+	} else if (!canViewEvent(req.user,req.query.eventID,req.hasAuthorization)) {
 		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
 	var id = req.session.id;
-	var eventID = mongoose.Types.ObjectId(req.body.eventID);
+	var eventID = mongoose.Types.ObjectId(req.query.eventID);
 	var query = Event.findOne({_id: eventID});
 	var theResult;
 	query.exec(function(err,result) {
