@@ -1,7 +1,7 @@
 <table ng-table="mainTableParams" show-filter="true" class="table table-bordered leaderboard">
 	<tr ng-repeat="user in $data">
-		<td data-title="'Rank'" sortable="'rank'">
-			{{user.rank}}
+		<td data-title="'Rank'" sortable="'place'">
+			{{user.place}}
 		</td>
 		<td data-title="'Name'" sortable="'lName'" filter="{'lName':'text'}">
 			{{user.lName}}

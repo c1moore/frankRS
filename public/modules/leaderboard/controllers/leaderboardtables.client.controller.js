@@ -42,7 +42,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
         		lName:''	//set the initial filter to nothing for name
         	},
         	sorting: {
-        		rank:'asc'		// set the initial sorting to be rank asc
+        		place:'asc'		// set the initial sorting to be place asc
         	}
     		}, {
         	total: 0, // length of data
