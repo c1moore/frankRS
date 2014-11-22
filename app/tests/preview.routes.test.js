@@ -72,7 +72,7 @@ describe('Functional tests for preview controllers/routes:', function() {
 	it('should return the contents of template invitation when user has proper permissions.', function(done) {
 		useragent
 			.get('http://localhost:3001/preview/invitation')
-			.send({event_name : event1.name, event_id : event1._id})
+			.query({event_name : event1.name, event_id : event1._id.toString()})
 			.end(function(err, res) {
 				should.not.exist(err);
 				res.status.should.equal(200);
@@ -86,7 +86,7 @@ describe('Functional tests for preview controllers/routes:', function() {
 		event1.save(function() {
 			useragent
 				.get('http://localhost:3001/preview/invitation')
-				.send({event_name : event1.name, event_id : event1._id})
+				.query({event_name : event1.name, event_id : event1._id.toString()})
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(200);
@@ -99,7 +99,7 @@ describe('Functional tests for preview controllers/routes:', function() {
 	it('should return an error message when the event_id and event_name does not match.', function(done) {
 		useragent
 			.get('http://localhost:3001/preview/invitation')
-			.send({event_name : "Test Event", event_id : event1._id})
+			.query({event_name : "Test Event", event_id : event1._id.toString()})
 			.end(function(err, res) {
 				should.not.exist(err);
 				res.status.should.equal(401);
@@ -111,7 +111,7 @@ describe('Functional tests for preview controllers/routes:', function() {
 	it('should return an error message when the user does not have permissions.', function(done) {
 		useragent2
 			.get('http://localhost:3001/preview/invitation')
-			.send({event_name : event1.name, event_id : event1._id})
+			.query({event_name : event1.name, event_id : event1._id.toString()})
 			.end(function(err, res) {
 				should.not.exist(err);
 				res.status.should.equal(401);
@@ -123,7 +123,7 @@ describe('Functional tests for preview controllers/routes:', function() {
 	it('should return an error message when the user is a recruiter but does not have permission to view this template.', function(done) {
 		useragent
 			.get('http://localhost:3001/preview/invitation')
-			.send({event_name : event1.name, event_id : mongoose.Types.ObjectId()})
+			.query({event_name : event1.name, event_id : mongoose.Types.ObjectId()})
 			.end(function(err, res) {
 				should.not.exist(err);
 				res.status.should.equal(401);
@@ -136,7 +136,7 @@ describe('Functional tests for preview controllers/routes:', function() {
 		var useragent3 = agent.agent();
 		useragent3
 			.get('http://localhost:3001/preview/invitation')
-			.send({event_name : event1.name, event_id : event1._id})
+			.query({event_name : event1.name, event_id : event1._id.toString()})
 			.end(function(err, res) {
 				should.not.exist(err);
 				res.status.should.equal(401);
@@ -148,7 +148,7 @@ describe('Functional tests for preview controllers/routes:', function() {
 	it('should return an error message when an event_name is not specified.', function(done) {
 		useragent
 			.get('http://localhost:3001/preview/invitation')
-			.send({event_id : event1._id})
+			.query({event_id : event1._id.toString()})
 			.end(function(err, res) {
 				should.not.exist(err);
 				res.status.should.equal(400);
@@ -160,7 +160,7 @@ describe('Functional tests for preview controllers/routes:', function() {
 	it('should return an error message when an event_id is not specified.', function(done) {
 		useragent
 			.get('http://localhost:3001/preview/invitation')
-			.send({event_name : event1.name})
+			.query({event_name : event1.name})
 			.end(function(err, res) {
 				should.not.exist(err);
 				res.status.should.equal(400);

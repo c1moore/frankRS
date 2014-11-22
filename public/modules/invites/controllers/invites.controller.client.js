@@ -1,7 +1,7 @@
 'use strict'; // :)
 
-angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication', '$location', 'eventSelector', '$http', '$window', '$modal',
-	function($scope, Authentication, $location, eventSelector, $http, $window, $modal) {
+angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication', '$location', 'eventSelector', '$http', '$window', '$modal', 'cacheService', 'previewService',
+	function($scope, Authentication, $location, eventSelector, $http, $window, $modal, cacheService, previewService) {
 		$scope.authentication = Authentication;
 
 		/*
@@ -10,9 +10,9 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 		* redirected to the homepage.
 		*/
 		if(!$scope.authentication.user) {
-		  $location.path('/signin');
+			$location.path('/signin');
 		} else if(!(_.intersection($scope.authentication.user.roles, ['recruiter', 'admin']).length)) {
-		  $location.path('/');
+			$location.path('/');
 		}
 		
 		if(!eventSelector.nresDisabled) {
@@ -23,10 +23,14 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 			}
 		}
 
-		var tempEvent = eventSelector.selectedEvent;
+		var tempEvent = cacheService.getData('selectedEvent');
 
 		if(!tempEvent || tempEvent === "Select Event") {
-			var eventWarning = $modal.open({
+			angular.element("#invitation-submit-button").addClass("disabled");
+			angular.element("#invitation-preview-button").addClass("disabled");
+
+			$scope.eventWarning = $modal.open({
+				controller : 'modalCtrl',
 				template : "<div class='modal-header'>" +
 								"<h3 class='modal-title'>Select Event</h3>" +
 							"</div>" +
@@ -35,7 +39,7 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 								"<p>(The event selector is in the top right-hand corner by your name.)</p>" +
 							"</div>" +
 							"<div class='modal-footer'>" +
-								"<button class='btn btn-primary' ng-click='ok()'>OK</button>" +
+								"<button class='btn btn-primary' ng-click='closeWarning()'>OK</button>" +
 							"</div>"
 			});
 		}
@@ -54,6 +58,7 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 				angular.element("#invitation-submit-button").removeClass("disabled");
 				angular.element("#invitation-preview-button").removeClass("disabled");
 				$scope.invite.event_name = eventSelector.selectedEvent;
+				getPreview();
 			}
 		);
 
@@ -110,7 +115,7 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 				$scope.attendees.list = [];
 				if(status === 401) {
 					if(response.message === "User is not logged in.") {
-						$location.path('/signing');
+						$location.path('/signin');
 					} else {
 						$location.path('/');
 					}
@@ -126,7 +131,7 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 				$scope.invitees.list = [];
 				if(status === 401) {
 					if(response.message === "User is not logged in.") {
-						$location.path('/signing');
+						$location.path('/signin');
 					} else {
 						$location.path('/');
 					}
@@ -142,7 +147,7 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 				$scope.almosts.list = [];
 				if(status === 401) {
 					if(response.message === "User is not logged in.") {
-						$location.path('/signing');
+						$location.path('/signin');
 					} else {
 						$location.path('/');
 					}
@@ -151,34 +156,117 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 				}
 			});
 		} else {
-			console.log("No sending blank requests.");
+			$scope.attendees.error = "You have not selected an event.  You can do so in the top right-hand corner.";
+			$scope.invitees.error = "You have not selected an event.  You can do so in the top right-hand corner.";
+			$scope.almosts.error = "You have not selected an event.  You can do so in the top right-hand corner.";
 		}
 	};
 
 	getSideTables();
 
+	/*
+	* Logic for preview.
+	*/
 
-	/*$scope.friends = [{name:'Dom',email:'dom@hotmail.com'},
-	  {name:'Dan', email:'dan@gmail.com'},
-	  {name:'Dalton', email:'dalton@gmail.com'},
-	  {name:'Calvin', email:'calvin@gmail.com'},
-	  {name:'James', email:'james@gmail.com'},
-	  {name:'James', email:'james@gmail.com'}];
-	$scope.attendingLimit = 5;
-	$scope.invites = [{name:'Dom',email:'dom@gmail.com'},
-	  {name:'Dan', email:'dan@gmail.com'},
-	  {name:'Dalton', email:'dalton@gmail.com'},
-	  {name:'Calvin', email:'calvin@gmail.com'},
-	  {name:'James', email:'james@gmail.com'},
-	  {name:'James', email:'james@gmail.com'},
-	  {name:'Dom',email:'dom@gmail.com'},
-	  {name:'Dan', email:'dan@gmail.com'},
-	  {name:'Dalton', email:'dalton@gmail.com'},
-	  {name:'Calvin', email:'calvin@gmail.com'},
-	  {name:'James', email:'james@gmail.com'},
-	  {name:'James', email:'james@gmail.com'}];
-	$scope.inviteLimit = 5;
-	$scope.livepreview = false;*/
+	var previewOptions = {};
 
+
+	previewService.preview.sender_email = $scope.authentication.user.email;
+	previewService.preview.event_name = $scope.invite.event_name;
+	previewService.preview.receiver_email = $scope.invite.invitee_email;
+	previewService.preview.receiver_fname = $scope.invite.fName;
+	previewService.preview.receiver_lname = $scope.invite.lName;
+	previewService.preview.message = $scope.invite.message;
+
+	$scope.$watchCollection('invite', function() {
+		previewService.preview.sender_email = $scope.authentication.user.email;
+		previewService.preview.event_name = $scope.invite.event_name;
+		previewService.preview.receiver_email = $scope.invite.invitee_email;
+		previewService.preview.receiver_fname = $scope.invite.fName;
+		previewService.preview.receiver_lname = $scope.invite.lName;
+		previewService.preview.message = $scope.invite.message;
+	});
+
+	var getPreview = function() {
+		var request = {event_id : eventSelector.postEventId, event_name : eventSelector.selectedEvent};
+		$http.get('/preview/invitation', {params : request}).success(function(response) {
+			previewOptions.template = response.preview;
+			
+			previewOptions.template = "<div class='modal-header'>" +
+											"<h3 class='modal-title'>{{eventSelector.selectedEvent}} Invitation Preview</h3>" +
+										"</div>" +
+										"<div class='modal-body'>" +
+											previewOptions.template +
+										"</div>" +
+										"<div class='modal-footer'>" +
+											"<button class='btn btn-primary' ng-click='closePreview()'>Got it!</button>" +
+										"</div>";
+		}).error(function(response, status) {
+			previewOptions = {};
+			if(status === 401) {
+				if(response.message === "User is not logged in.") {
+					$location.path('/signin');
+				} else {
+					$location.path('/');
+				}
+			} else if(status === 400) {
+				previewOptions.template = response.message;//"There was an error getting the template.  Please try refreshing the page or selecting an event in the top right-hand corner.";
+				
+				previewOptions.template = "<div class='modal-header'>" +
+												"<h3 class='modal-title'>{{eventSelector.selectedEvent}} Invitation Preview</h3>" +
+											"</div>" +
+											"<div class='modal-body' style='overflow: auto;'>" +
+												previewOptions.template +
+											"</div>" +
+											"<div class='modal-footer'>" +
+												"<button class='btn btn-primary' ng-click='closePreview()'>Got it!</button>" +
+											"</div>";
+			}
+		});
+	};
+
+	$scope.togglePreview = function() {
+		if(!previewService.preview.modalInstance) {
+			previewOptions.controller = 'modalCtrl';
+			previewOptions.backdrop = false;
+			previewOptions.windowClass = 'frank-invite-preview-modal';
+			previewOptions.modalDraggable = true;
+			previewOptions.keyboard = false;
+			previewService.preview.modalInstance = $modal.open(previewOptions);
+		}
+	};
   }
+]);
+
+
+angular.module('invites').controller('modalCtrl', ['$scope', '$modalInstance', 'eventSelector', 'previewService',
+	function($scope, $modalInstance, eventSelector, previewService) {
+		$scope.closeWarning = function() {
+			$modalInstance.dismiss('done');
+		};
+
+		$scope.previewService = previewService;
+		$scope.event_name = previewService.preview.event_name;
+		$scope.receiver_fname = previewService.preview.receiver_fname;
+		$scope.receiver_lname = previewService.preview.receiver_lname;
+		$scope.receiver_email = previewService.preview.receiver_email;
+		$scope.sender_email = previewService.preview.sender_email;
+		$scope.message = previewService.preview.message;
+		$scope.modalInstance = previewService.preview.modalInstance;
+
+		$scope.$watchCollection('previewService.preview', function() {
+			$scope.event_name = previewService.preview.event_name;
+			$scope.receiver_fname = previewService.preview.receiver_fname;
+			$scope.receiver_lname = previewService.preview.receiver_lname;
+			$scope.receiver_email = previewService.preview.receiver_email;
+			$scope.sender_email = previewService.preview.sender_email;
+			$scope.message = previewService.preview.message;
+			$scope.modalInstance = previewService.preview.modalInstance;
+		});
+
+		$scope.closePreview = function() {
+			$modalInstance.close();
+			previewService.preview.modalInstance = null;
+		};
+	}
 ]);
