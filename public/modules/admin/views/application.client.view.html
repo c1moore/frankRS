@@ -1,36 +1,45 @@
-<div class="row" ng-controller="applicationController">    
-  <div class="col-sm-6">
-    <input value="" type="text" placeholder="First Name" ng-model="firstName">
-    <br>
-    <input value="" type="text" placeholder="Last Name" ng-model="lastName">
-    <br>
-    <input value="" type="text" placeholder="Email Address" ng-model="emailAddress">
-    <br>
-    <button class="btn btn-primary" ng-click="addCandidate()">+ Candidate</button>
-  </div>
+<section class="admin-application"	
+	<div class="row" ng-controller="applicationController">    
+		<div class="col-md-4">
+			<div class="well">
+				<div class="form-group row">
+					<label for="fName">First Name:</label>
+					<input id="fName" class="form-control" ng-model="firstName">
+				</div>
+				<div class="form-group row">
+					<label for="lName">Last Name:</label>
+					<input id="lName" class="form-control" ng-model="lastName">
+				</div>
+				<div class="form-group row">
+					<label for="email">Email Address:</label>
+					<input id="email" class="form-control" ng-model="emailAddress">
+				</div>
+				<button class="btn btn-primary" ng-click="addCandidate()">+ Candidate</button>
+			</div>
+		</div>
 
-  <div class="col-sm-6">
-    <h2>Pending Applications</h2>
-    <table class="table table-hover table-striped table-bordered">
-      <thead>
-        <tr>
-          <td>Name</td>
-          <td>Accept</td>
-          <td>Deny</td>
-        </tr>
-      </thead>
-      
-      <tbody>
-        <tr ng-repeat="application in applications">
-          <td>{{ application.name }}</td>
-          <td>
-            <button class="btn btn-success" ng-click="addApplicant($index)">Accept</button>
-          </td>
-          <td>
-            <button class="btn btn-danger" ng-click="removeApplicant($index)">Deny</button>
-          </tr>
-      </tbody>
-    </table>
-    
-  </div>
-</div>
+		<div class="col-md-8">
+			<h2>Pending Applications</h2>
+			<table class="table table-hover table-striped table-bordered">
+				<thead>
+					<tr>
+						<td>Name</td>
+						<td>Accept</td>
+						<td>Deny</td>
+					</tr>
+				</thead>
+
+				<tbody>
+					<tr ng-repeat="application in applications">
+						<td>{{ application.name }}</td>
+						<td>
+							<button class="btn btn-success" ng-click="addApplicant($index)">Accept</button>
+						</td>
+						<td>
+							<button class="btn btn-danger" ng-click="removeApplicant($index)">Deny</button>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section>

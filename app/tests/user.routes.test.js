@@ -342,6 +342,59 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 	});
 
+	describe("Recruiter's leaderboard status information:", function() {
+		it("should return a recruiter's information.", function(done) {
+			useragent
+				.get('http://localhost:3001/leaderboard/recruiterinfo')
+				.query({'event_id' : event1._id.toString()})
+				.end(function(err, res) {
+					should.not.exist(err);
+					console.log(res.body);
+					res.status.should.equal(200);
+					res.body.attending.should.equal(2);
+					res.body.invited.should.equal(1);
+					res.body.place.should.equal(1);
+					done();
+				});
+		});
+
+		it("should return an error when the event_id is not specified.", function(done) {
+			useragent
+				.get('http://localhost:3001/leaderboard/recruiterinfo')
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(400);
+					res.body.message.should.equal("Event not specified.");
+					done();
+				});
+		});
+
+		it('should return the proper error when the user does not have the proper permissions.', function(done) {
+			useragent2
+				.get('http://localhost:3001/leaderboard/recruiterinfo')
+				.query({'event_id' : event1._id.toString()})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal('User does not have permission.');
+					done();
+				});
+		});
+
+		it('should return the proper error when the user is not logged in.', function(done) {
+			var useragent3 = agent.agent();
+			useragent3
+				.get('http://localhost:3001/leaderboard/recruiterinfo')
+				.query({'event_id' : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal('User is not logged in.');
+					done();
+				});
+		});
+	});
+
 	describe("Recruiter's attendeeList routes:", function() {
 		it("should return a recruiter's attendeeList for a specific event.", function(done) {
 			useragent
