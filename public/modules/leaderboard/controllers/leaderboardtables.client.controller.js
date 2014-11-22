@@ -78,10 +78,10 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
         	page: 1,            // show first page
         	count: 10,           // count per page
         	filter: {
-        		displayName:''	//set the initial filter to nothing for name
+        		lName:''	//set the initial filter to nothing for name
         	},
         	sorting: {
-        		displayName:'asc'		// set the initial sorting to be displayName asc
+        		lName:'asc'		// set the initial sorting to be displayName asc
         	}
     		}, {
         	total: 0, // length of data
