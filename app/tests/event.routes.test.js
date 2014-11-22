@@ -851,11 +851,35 @@ describe('Express.js Event Route Integration Tests:', function() {
 			});
 	});
 
+	it("should be able to create an event using the event creation route as admin",function(done) {
+		agentAdmin
+			.post('http://localhost:3001/events/create')
+			.send({name: "NewName",start_date: new Date().getTime()+100000,end_date:
+				new Date().getTime()+1000000,location: "asdf",schedule: "asdf"})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(200);
+				res.body.should.have.property('event_id');
+				done();
+			});
+	});
+
+	it("should not be able to create an event using the event creation route as a user",function(done) {
+		agent
+			.post('http://localhost:3001/events/create')
+			.send({name: "NewName",start_date: new Date().getTime()+100000,end_date:
+				new Date().getTime()+1000000,location: "asdf",schedule: "asdf"})
+			.end(function(err,res) {
+				if (err) throw err;
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
+				done();
+			});
+	});
+
 	after(function(done) {
-		//event1.remove() Deleted in a test
-		event2.remove();
-		user.remove();
-		userAdmin.remove();
+		Event.remove().exec();
+		User.remove().exec();
  		done();
 	});
 });
