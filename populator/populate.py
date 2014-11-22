@@ -5,7 +5,7 @@
 from User import User
 from Candidate import Candidate
 from Event import Event
-from Util import resetMongo
+from Util import resetMongo, ensureID
 
 import random, time
 
@@ -128,6 +128,16 @@ def getNumEventsPerCandidate():
     else:
       return numEvents
 
+def getInviteProbability():
+  while True:
+    try:
+      p = float(input("What is the probability that a user accepts an invitation?: "))
+      assert (p>=0 and p<=1)
+    except (ValueError, AssertionError):
+      print(required)
+    else:
+      return p
+
 def dumpUserSummary(userList):
   with open('user_summary.txt','w') as fd:
     fd.write("User summary:\n\n")
@@ -135,8 +145,7 @@ def dumpUserSummary(userList):
       fd.write("fName: " + user.fName + '\n')
       fd.write("lName: " + user.lName + '\n')
       fd.write("email: " + user.email + '\n')
-      fd.write("password: " + user._password + '\n')
-      fd.write("hashedpw: " + str(user.password) + '\n')
+      #fd.write("password: " + user._password + '\n')
       fd.write("roles: " + str(user.roles) + '\n\n')
 
 def main():
@@ -153,10 +162,11 @@ def main():
   maxEventsPerRecruiter = getMaxEventsPerRecruiter(numEvents)
   numInvitesPerRecruiter = getNumInvitesPerRecruiter()
   numEventsPerCandidate = getNumEventsPerCandidate()
+  p = getInviteProbability()
   if adminsUnionRecruiters==-1:
-    adminsUnionRecruiters=random.randint(0,max(numAdmins,numRecruiters))
+    adminsUnionRecruiters=random.randint(0,min(numAdmins,numRecruiters))
   if attendeesUnionRecruiters==-1:
-    attendeesUnionRecruiters=random.randint(0,max(numRecruiters,numAttendees))
+    attendeesUnionRecruiters=random.randint(0,min(numRecruiters,numAttendees))
   print("\nGenerating objects (this may take some time)...")
   recruiters = []
   attendees = []
@@ -220,6 +230,7 @@ def main():
     candidates.append(newUser)
     newUser.save()
   #Recruiters, invite users who are not me
+  invitations = []
   for recruiter in recruiters:
     recevents = recruiter.getEvents()
     for i in range(random.randint(0,numInvitesPerRecruiter)):
@@ -227,7 +238,33 @@ def main():
       rec_user = random.choice(attendees)
       while rec_user is recruiter:
         rec_user = random.choice(attendees)
-      recruiter.invite(rec_user,rec_event_id)
+      if recruiter.invite(rec_user,rec_event_id):
+        invitations.append((rec_user,rec_event_id,recruiter))
+  #Users, accept invitations
+  for invitee,event,recruiter in invitations:
+    invitee.decide(event,random.random()<p,'recruiter' in invitee.roles,recruiter)
+  #Attach ranks
+  eventBins = [[]]
+  eventOrder = []
+  insertionPoint = 0
+  for event in events:
+    eventOrder.append(ensureID(event))
+    for recruiter in recruiters:
+      assert 'recruiter' in recruiter.roles, "Bug! Recruiter does not have the proper role!"
+      for statusDict in recruiter.status:
+        if statusDict['recruiter'] == False:
+          continue #I'm just attending
+        eventID = statusDict['event_id']
+        if ensureID(eventID) == ensureID(event):
+          eventBins[insertionPoint].append(recruiter)
+    insertionPoint += 1
+    eventBins.append([])
+  eventBins.pop()
+  for bin in eventBins:
+    sortedBin = sorted(bin,key=lambda r:-(len(r.attendeeList)*100000+len(r.almostList)))
+    for i in range(len(sortedBin)):
+      sortedBin[i].rank.append({'event_id':eventOrder[eventBins.index(bin)],'place':i+1})
+      sortedBin[i].save()
 
   dumpUserSummary(list(set(recruiters)|set(attendees)|set(admins)))
 

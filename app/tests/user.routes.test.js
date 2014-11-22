@@ -678,6 +678,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					should.not.exist(err);
 					res.status.should.equal(401);
 					res.body.message.should.equal("User is not logged in.");
+					done();
 				});
 		});
 

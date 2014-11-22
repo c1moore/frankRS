@@ -5,7 +5,7 @@
 /**
  * Module dependencies.
  */
-//TODO add POST setters
+
 var should = require('should'),
 	mongoose = require('mongoose'),
  	http = require('http'),
