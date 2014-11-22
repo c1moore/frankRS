@@ -19,9 +19,6 @@ angular.module('core').service('eventSelector', ['$http', '$location', 'cacheSer
 			cache.setData(key,value);
 		}
 
-		console.log(cache);
-
-
 		$http.get('/users/events').success(function(data) {
 			thisService.events = data.status;
 			for(var i=0; i<thisService.events.length; i++) {

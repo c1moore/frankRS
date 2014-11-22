@@ -2,6 +2,9 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 	function($scope, Authentication, $http, ngTableParams, $filter, $resource, $location, eventSelector, $timeout) {
 
 		$scope.authentication = Authentication;
+		$scope.userScore = 0;
+		$scope.userInvites = 0;
+		$scope.userAttendees = 0;
 
 		/*
 		* If the user is not logged in, they should be redirected to the sigin page.  If the
@@ -22,13 +25,6 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 				eventSelector.postEventId = null;
 			}
 		}
-
-		$scope.userScore = 0;
-		$http.get('/leaderboard/recruiterinfo')
-			.success(function() {
-				
-			})
-
 		
 		$scope.returnInt = function(value) {
 			return Math.floor(value)
