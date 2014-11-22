@@ -1,26 +1,32 @@
 angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams',
-function($scope, ngTableParams) {
-    $scope.applications = [
+	function($scope, ngTableParams) {
+		$scope.applications = [
       // testing table
       {
-        name: 'Nostra Dom',
+      	name: 'Nostra Dom',
       }, {
-        name: 'Bob the Builder',
+      	name: 'Bob the Builder',
       }, {
-        name: 'Clive',
+      	name: 'Clive',
       }
-    ];
+      ];
 
-    $scope.addApplicant = function(index) {
+      $scope.addApplicant = function(index) {
 
-      $scope.applications.splice(index, 1);
-    }
+      	$scope.applications.splice(index, 1);
+      }
 
-    $scope.removeApplicant = function(index) {
-      $scope.applications.splice(index, 1);
-    }
+      $scope.removeApplicant = function(index) {
+      	$scope.applications.splice(index, 1);
+      }
 
-
-
+      $scope.tableParams = new ngTableParams({
+      	page: 1,
+      	count: 10,
+      	}, {
+      	getData: function($defer, params) {
+      		$defer.resolve($scope.applications.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+      	}
+      });
 
   }])
