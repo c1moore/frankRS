@@ -23,6 +23,12 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 			}
 		}
 
+		$scope.userScore = 0;
+		$http.get('/leaderboard/recruiterinfo')
+			.success(function() {
+				
+			})
+
 		
 		$scope.returnInt = function(value) {
 			return Math.floor(value)
