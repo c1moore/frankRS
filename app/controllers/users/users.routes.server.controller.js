@@ -482,6 +482,7 @@ exports.sendInvitation = function(req, res) {
 		var mailOptions = {
 			to: req.body.email,
 			from: req.user.email,
+			sender: req.user.email,
 			replyTo: req.user.email,
 			subject: "You're Invied to frank!"
 		};
