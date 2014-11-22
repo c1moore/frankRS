@@ -71,7 +71,7 @@ exports.getStartDate = function(req, res) {
 	}
 	//Retrieve the requested field
 	var id = req.session.id;
-	var eventID = req.body.eventID;
+	var eventID = mongoose.Types.ObjectId(req.body.eventID);
 	var query = Event.findOne({_id: eventID});
 	var theResult;
 	query.exec(function(err,result) {
@@ -92,7 +92,7 @@ exports.getEndDate = function(req, res) {
 		return;
 	}
 	var id = req.session.id;
-	var eventID = req.body.eventID;
+	var eventID = mongoose.Types.ObjectId(req.body.eventID);
 	var query = Event.findOne({_id: eventID});
 	var theResult;
 	query.exec(function(err,result) {
@@ -113,7 +113,7 @@ exports.getLocation = function(req, res) {
 		return;
 	}
 	var id = req.user._id;
-	var eventID = req.body.eventID;
+	var eventID = mongoose.Types.ObjectId(req.body.eventID);
 	var query = Event.findOne({_id: eventID});
 	var theResult;
 	query.exec(function(err,result) {
@@ -134,7 +134,7 @@ exports.getEventObj = function(req, res) {
 		return;
 	}
 	var id = req.session.id;
-	var eventID = req.body.eventID;
+	var eventID = mongoose.Types.ObjectId(req.body.eventID);
 	var query = Event.findOne({_id: eventID});
 	var theResult;
 	query.exec(function(err,result) {
@@ -155,7 +155,7 @@ exports.getSchedule = function(req, res) {
 		return;
 	}
 	var id = req.session.id;
-	var eventID = req.body.eventID;
+	var eventID = mongoose.Types.ObjectId(req.body.eventID);
 	var query = Event.findOne({_id: eventID});
 	var theResult;
 	query.exec(function(err,result) {
@@ -176,7 +176,7 @@ exports.getName = function(req, res) {
 		return;
 	}
 	var id = req.session.id;
-	var eventID = req.body.eventID;
+	var eventID = mongoose.Types.ObjectId(req.body.eventID);
 	var query = Event.findOne({_id: eventID});
 	var theResult;
 	query.exec(function(err,result) {
@@ -200,7 +200,7 @@ exports.setStartDate = function(req, res) {
 	}
 	//Retrieve the requested field
 	var id = req.session.id;
-	var eventID = req.body.eventID;
+	var eventID = mongoose.Types.ObjectId(req.body.eventID);
 	var new_start_date = req.body.start_date;
 	var query = Event.findOne({_id: eventID});
 	var theResult;
@@ -293,7 +293,7 @@ exports.setEventObj = function(req, res) {
 		return;
 	}
 	var id = req.session.id;
-	var eventID = req.body.eventID;
+	var eventID = mongoose.Types.ObjectId(req.body.eventID);
 	var new_event = req.body.event;
 	if (new_event==undefined) {
 		res.status(400).json({message: "No event provided"});
@@ -343,7 +343,7 @@ exports.setSchedule = function(req, res) {
 		return;
 	}
 	var id = req.session.id;
-	var eventID = req.body.eventID;
+	var eventID = mongoose.Types.ObjectId(req.body.eventID);
 	var new_schedule = req.body.schedule;
 	var query = Event.findOne({_id: eventID});
 	var theResult;
@@ -374,7 +374,7 @@ exports.setName = function(req, res) {
 		return;
 	}
 	var id = req.session.id;
-	var eventID = req.body.eventID;
+	var eventID = mongoose.Types.ObjectId(req.body.eventID);
 	var new_name = req.body.name;
 	var query = Event.findOne({_id: eventID});
 	var theResult;
@@ -405,7 +405,7 @@ exports.delete = function(req, res) {
 		return;
 	}
 	var id = req.session.id;
-	var eventID = req.body.eventID;
+	var eventID = mongoose.Types.ObjectId(req.body.eventID);
 	var query = Event.findOne({_id: eventID});
 	var theResult;
 	query.exec(function(err,result) {

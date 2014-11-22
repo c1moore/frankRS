@@ -4,11 +4,7 @@
 			<h2>Recruiter Control Room</h2>
 		</div>
 	</div>
-	<div class="preview" ng-show="livepreview">
-		<p>Hey {{firstName + " " + lastName}}, you have been officially invited to Frank!</p>
-			{{personalMessage}}
-	</div>
-	<div id="invite">
+	<form id="invite" data-ng-submit="send()">
 		<div id="from" class="invitation_field">
 			<strong>From: </strong>
 			<p id="recruiter_email">{{recruiter_email}}</p>
@@ -16,26 +12,146 @@
 		<div id="to" class="invitation_field">
 			<strong>To: </strong>
 			<div id="to_fields">
-				<input type="text" class="to_field" ng-model="firstName" placeholder="First Name" />
-				<input type="text" class="to_field" ng-model="lastName" placeholder="Last Name" />
-				<input type="text" class="to_field" id="invitee_email" ng-model="email" placeholder="first.last@email.com" />
+				<input type="text" class="to_field" ng-model="invite.fName" placeholder="Frank" />
+				<input type="text" class="to_field" ng-model="invite.lName" placeholder="Karel" />
+				<input type="text" class="to_field" id="invitee_email" ng-model="invite.email" placeholder="frankis@wesome.edu" />
 			</div>
 		</div>
 		<div id="message">
 			<b>Personal Message:</b><br />
-			<textarea id="p_message" ng-model="personalMessage" rows="12" cols="50"></textarea>
+			<textarea id="p_message" ng-model="invite.message" rows="12" cols="50"></textarea>
 		</div>
 		<br>
 		<div id="invitation_buttons">
-			<a id="previewbutton" class="btn btn-success invitation-button" href="#" ng-click="livepreview = !livepreview" ng-class="{ active: livepreview }"><i class="fa fa-eye"></i> Preview</a>
-			<button type="submit" value="Send" class="btn btn-primary btn-lg invitation-button"/><i class="fa fa-envelope-o"></i> Send</button>
+			<a id="previewbutton" class="btn btn-success invitation-button" id="invitation-preview-button" href="#" ng-click="togglePreview()"><i class="fa fa-eye"></i> Preview</a>
+			<button type="submit" value="Send" class="btn btn-primary btn-lg invitation-button" id="invitation-submit-button"><i class="fa fa-envelope-o"></i> Send</button>
 		</div>
+	</form>
+	<div class="frank-invites-sidebar">
+		<accordion close-others="true">
+			<accordion-group is-open="firstSelected">
+				<accordion-heading>
+					Awesome People Attending <i class="pull-right fa" ng-class="{'fa-chevron-right' : !firstSelected, 'fa-chevron-down' : firstSelected}"></i>
+				</accordion-heading>
+				<input type="search" class="frank-invite-sidebar-search" ng-model="q" placeholder="Search..." />
+				<hr class="frank-invite-hr" />
+				<div class="frank-invite-table-container">
+					<table class="animate-container" ng-if="attendees.list.length">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Email</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="animate-repeat"  ng-repeat="attendee in (results = (attendees.list | filter:q))">
+								<td>
+							 		{{attendee.user_id.displayName}}
+							 	</td>
+							 	<td>
+							 		{{attendee.user_id.email}}
+							 	</td>
+							</tr>
+							<tr class="animate-repeat" ng-if="results.length == 0">
+								<td>
+									<strong>No results found...</strong>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<span ng-if="!attendees.list.length">
+						{{attendees.error}}
+					</span>
+				</div>
+				<div class="frank-invite-sidebar-total" id="accepted-total">
+					<hr class="frank-invite-hr"/>
+					<b>Total: {{attendees.list.length}}</b>
+				</div>
+			</accordion-group>
+			<accordion-group is-open="secondSelected">
+				<accordion-heading>
+					People Invited <i class="pull-right fa" ng-class="{'fa-chevron-right' : !secondSelected, 'fa-chevron-down' : secondSelected}"></i>
+				</accordion-heading>
+				<input type="search" class="frank-invite-sidebar-search" ng-model="q" placeholder="Search..." />
+				<hr class="frank-invite-hr"/>
+				<div class="frank-invite-table-container">
+					<table class="animate-container" ng-if="invitees.list.length">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Email</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="animate-repeat"  ng-repeat="invitee in (results = (invitees.list | filter:q))">
+								<td>
+							 		{{invitee.user_id.displayName}}
+							 	</td>
+							 	<td>
+							 		{{invitee.user_id.email}}
+							 	</td>
+							</tr>
+							<tr class="animate-repeat" ng-if="results.length == 0">
+								<td>
+									<strong>No results found...</strong>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<span ng-if="!invitees.list.length">
+						{{invitees.error}}
+					</span>
+				</div>
+				<div class="frank-invite-sidebar-total" id="invited-total">
+					<hr class="frank-invite-hr"/>
+					<b>Total: {{invitees.list.length}}</b>
+				</div>
+			</accordion-group>
+			<accordion-group is-open="thirdSelected">
+				<accordion-heading>
+					Accepted Another's Invitation <i class="pull-right fa" ng-class="{'fa-chevron-right' : !thirdSelected, 'fa-chevron-down' : thirdSelected}"></i>
+				</accordion-heading>
+				<input type="search" class="frank-invite-sidebar-search" ng-model="q" placeholder="Search..." />
+				<hr class="frank-invite-hr"/>
+				<div class="frank-invite-table-container">
+					<table class="animate-container" ng-if="almosts.list.length">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Email</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="animate-repeat"  ng-repeat="almost in (results = (almosts.list | filter:q))">
+								<td>
+							 		{{almost.user_id.displayName}}
+							 	</td>
+							 	<td>
+							 		{{almost.user_id.email}}
+							 	</td>
+							</tr>
+							<tr class="animate-repeat" ng-if="results.length == 0">
+								<td>
+									<strong>No results found...</strong>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<span ng-if="!almosts.list.length">
+						{{almosts.error}}
+					</span>
+				</div>
+				<div class="frank-invite-sidebar-total" id="invited-total">
+					<hr class="frank-invite-hr"/>
+					<b>Total: {{almosts.list.length}}</b>
+				</div>
+			</accordion-group>
+		</accordion>
 	</div>
-	<div id="accepted" class="frank-invite-sidebar">
+	<!-- <div id="accepted" class="frank-invite-sidebar">
 		<div class="frank-invite-sidebar-title">
 			<b>Awesome People Attending</b>
 		</div>
-		<!-- {{friends.length}} people are attending.</br> They are: </br> -->
 		<input type="search" class="frank-invite-sidebar-search" ng-model="q" placeholder="Search..." />
 		<hr class="frank-invite-hr" />
 		<div class="frank-invite-table-container">
@@ -103,5 +219,5 @@
 			<hr class="frank-invite-hr"/>
 			<b>Total: {{invites.length}}</b>
 		</div>
-	</div>
+	</div> -->
 </section>

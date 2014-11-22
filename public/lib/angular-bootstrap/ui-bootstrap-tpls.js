@@ -1869,6 +1869,16 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
         element.addClass(attrs.windowClass || '');
         scope.size = attrs.size;
 
+        /**
+        * Code added by Calvin Moore.  Makes the modal draggable if the modal has class
+        * modalDraggable attribute is set to true.
+        */
+        if(attrs.modalDraggable) {
+          element.draggable({
+            handle : ".modal-header"
+          });
+        }
+
         $timeout(function () {
           // trigger CSS transitions
           scope.animate = true;
@@ -2037,7 +2047,8 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
           'window-class': modal.windowClass,
           'size': modal.size,
           'index': openedWindows.length() - 1,
-          'animate': 'animate'
+          'animate': 'animate',
+          'modal-draggable' : modal.modalDraggable    //Add modalDraggable to the attributes
         }).html(modal.content);
 
         var modalDomEl = $compile(angularDomEl)(modal.scope);
@@ -2169,7 +2180,8 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
                 backdropClass: modalOptions.backdropClass,
                 windowClass: modalOptions.windowClass,
                 windowTemplateUrl: modalOptions.windowTemplateUrl,
-                size: modalOptions.size
+                size: modalOptions.size,
+                modalDraggable: modalOptions.modalDraggable     //Add modalDraggable to modalStack
               });
 
             }, function resolveError(reason) {

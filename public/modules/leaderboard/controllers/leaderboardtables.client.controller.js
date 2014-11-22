@@ -23,6 +23,12 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 			}
 		}
 
+		$scope.userScore = 0;
+		$http.get('/leaderboard/recruiterinfo')
+			.success(function() {
+				
+			})
+
 		
 		$scope.returnInt = function(value) {
 			return Math.floor(value)
@@ -42,7 +48,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
         		lName:''	//set the initial filter to nothing for name
         	},
         	sorting: {
-        		rank:'asc'		// set the initial sorting to be rank asc
+        		place:'asc'		// set the initial sorting to be place asc
         	}
     		}, {
         	total: 0, // length of data
@@ -72,10 +78,10 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
         	page: 1,            // show first page
         	count: 10,           // count per page
         	filter: {
-        		lname:''	//set the initial filter to nothing for name
+        		lName:''	//set the initial filter to nothing for name
         	},
         	sorting: {
-        		lname:'asc'		// set the initial sorting to be displayName asc
+        		lName:'asc'		// set the initial sorting to be displayName asc
         	}
     		}, {
         	total: 0, // length of data

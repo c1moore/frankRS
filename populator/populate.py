@@ -5,7 +5,7 @@
 from User import User
 from Candidate import Candidate
 from Event import Event
-from Util import resetMongo
+from Util import resetMongo, ensureID
 
 import random, time
 
@@ -164,9 +164,9 @@ def main():
   numEventsPerCandidate = getNumEventsPerCandidate()
   p = getInviteProbability()
   if adminsUnionRecruiters==-1:
-    adminsUnionRecruiters=random.randint(0,max(numAdmins,numRecruiters))
+    adminsUnionRecruiters=random.randint(0,min(numAdmins,numRecruiters))
   if attendeesUnionRecruiters==-1:
-    attendeesUnionRecruiters=random.randint(0,max(numRecruiters,numAttendees))
+    attendeesUnionRecruiters=random.randint(0,min(numRecruiters,numAttendees))
   print("\nGenerating objects (this may take some time)...")
   recruiters = []
   attendees = []
@@ -243,6 +243,28 @@ def main():
   #Users, accept invitations
   for invitee,event,recruiter in invitations:
     invitee.decide(event,random.random()<p,'recruiter' in invitee.roles,recruiter)
+  #Attach ranks
+  eventBins = [[]]
+  eventOrder = []
+  insertionPoint = 0
+  for event in events:
+    eventOrder.append(ensureID(event))
+    for recruiter in recruiters:
+      assert 'recruiter' in recruiter.roles, "Bug! Recruiter does not have the proper role!"
+      for statusDict in recruiter.status:
+        if statusDict['recruiter'] == False:
+          continue #I'm just attending
+        eventID = statusDict['event_id']
+        if ensureID(eventID) == ensureID(event):
+          eventBins[insertionPoint].append(recruiter)
+    insertionPoint += 1
+    eventBins.append([])
+  eventBins.pop()
+  for bin in eventBins:
+    sortedBin = sorted(bin,key=lambda r:-(len(r.attendeeList)*100000+len(r.almostList)))
+    for i in range(len(sortedBin)):
+      sortedBin[i].rank.append({'event_id':eventOrder[eventBins.index(bin)],'place':i+1})
+      sortedBin[i].save()
 
   dumpUserSummary(list(set(recruiters)|set(attendees)|set(admins)))
 

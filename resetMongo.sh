@@ -3,4 +3,4 @@
 mongo --eval "db.dropDatabase();" frank-recruiter-system-test > /dev/null
 mongo --eval "db.dropDatabase();" frank-recruiter-system-dev > /dev/null
 
-echo "Database has been reset."
+echo "Databases have been reset."
