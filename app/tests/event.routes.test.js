@@ -451,7 +451,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to set the name if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setName')
-			.send({eventID: event2._id, name:"ItsANewNameDog"})
+			.send({eventID: event2._id.toString(), name:"ItsANewNameDog"})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(200);
@@ -471,7 +471,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set invalid name if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setName')
-			.send({eventID: event2._id, name:""})
+			.send({eventID: event2._id.toString(), name:""})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(400);
@@ -491,7 +491,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set name if user", function(done) {
 		agent
 			.post('http://localhost:3001/events/setName')
-			.send({eventID: event1._id, name:"UserName"})
+			.send({eventID: event1._id.toString(), name:"UserName"})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(401);
@@ -511,7 +511,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set invalid start_date if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setStartDate')
-			.send({eventID: event2._id, start_date:new Date(2004,11,30,10,0,0).getTime()})
+			.send({eventID: event2._id.toString(), start_date:new Date(2004,11,30,10,0,0).getTime()})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(400);
@@ -532,7 +532,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to set start_date if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setStartDate')
-			.send({eventID: event2._id, start_date:new Date(2145,11,30,10,0,0).getTime()})
+			.send({eventID: event2._id.toString(), start_date:new Date(2145,11,30,10,0,0).getTime()})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(200);
@@ -553,7 +553,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set start_date if user", function(done) {
 		agent
 			.post('http://localhost:3001/events/setStartDate')
-			.send({eventID: event1._id, start_date:new Date(2146,11,30,10,0,0).getTime()})
+			.send({eventID: event1._id.toString(), start_date:new Date(2146,11,30,10,0,0).getTime()})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(401);
@@ -574,7 +574,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to set end_date if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setEndDate')
-			.send({eventID: event2._id, end_date:new Date(2155,11,30,10,0,0).getTime()})
+			.send({eventID: event2._id.toString(), end_date:new Date(2155,11,30,10,0,0).getTime()})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(200);
@@ -595,7 +595,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set invalid end_date if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setEndDate')
-			.send({eventID: event2._id, end_date:new Date(2105,11,30,10,0,0).getTime()})
+			.send({eventID: event2._id.toString(), end_date:new Date(2105,11,30,10,0,0).getTime()})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(400);
@@ -616,7 +616,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set end_date if user", function(done) {
 		agent
 			.post('http://localhost:3001/events/setEndDate')
-			.send({eventID: event1._id, end_date:new Date(2146,11,30,10,0,0).getTime()})
+			.send({eventID: event1._id.toString(), end_date:new Date(2146,11,30,10,0,0).getTime()})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(401);
@@ -638,7 +638,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to set location if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setLocation')
-			.send({eventID: event2._id, location:"Rainbow2"})
+			.send({eventID: event2._id.toString(), location:"Rainbow2"})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(200);
@@ -659,7 +659,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set invalid location if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setLocation')
-			.send({eventID: event2._id, location:""})
+			.send({eventID: event2._id.toString(), location:""})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(400);
@@ -680,7 +680,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set location if user", function(done) {
 		agent
 			.post('http://localhost:3001/events/setLocation')
-			.send({eventID: event1._id, location:"UserLocation"})
+			.send({eventID: event1._id.toString(), location:"UserLocation"})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(401);
@@ -701,7 +701,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to set schedule if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setSchedule')
-			.send({eventID: event2._id, schedule:"BoBoBo"})
+			.send({eventID: event2._id.toString(), schedule:"BoBoBo"})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(200);
@@ -722,7 +722,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to set schedule to empty string if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setSchedule')
-			.send({eventID: event2._id, schedule:""})
+			.send({eventID: event2._id.toString(), schedule:""})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(200);
@@ -743,7 +743,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set schedule if user for event I don't know about", function(done) {
 		agent
 			.post('http://localhost:3001/events/setSchedule')
-			.send({eventID: event2._id, schedule:"UserSchedule"})
+			.send({eventID: event2._id.toString(), schedule:"UserSchedule"})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(401);
@@ -764,7 +764,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set schedule if user in general", function(done) {
 		agent
 			.post('http://localhost:3001/events/setSchedule')
-			.send({eventID: event1._id, schedule:"UserSchedule"})
+			.send({eventID: event1._id.toString(), schedule:"UserSchedule"})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(401);
@@ -786,7 +786,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 		event2.name = "ReallyNewName";
 		agentAdmin
 			.post('http://localhost:3001/events/setEventObj')
-			.send({eventID: event2._id, event:event2})
+			.send({eventID: event2._id.toString(), event:event2})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(200);
@@ -811,7 +811,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 		event1.name = "ReallyNewName2";
 		agent
 			.post('http://localhost:3001/events/setEventObj')
-			.send({eventID: event1._id, event:event1})
+			.send({eventID: event1._id.toString(), event:event1})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(401);
@@ -832,7 +832,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to delete an event as a normal user", function(done) {
 		agent
 			.post('http://localhost:3001/events/delete')
-			.send({eventID: event1._id})
+			.send({eventID: event1._id.toString()})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(401);
@@ -843,7 +843,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to delete an event as an admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/delete')
-			.send({eventID: event1._id})
+			.send({eventID: event1._id.toString()})
 			.end(function(err,res) {
 				if (err) throw err;
 				res.status.should.be.equal(200);
