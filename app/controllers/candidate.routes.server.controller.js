@@ -19,7 +19,7 @@
  		return res.status(401).send("User is not logged in");
 
  	if (req.hasAuthorization(req.user, ["admin"])){
- 		var candidate_id = req.body.candidate_id;
+ 		var candidate_id = mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id: candidate_id});
  		var theResult;
  		query.exec(function(err,result) {
@@ -39,7 +39,7 @@
  		return res.status(401).send("User is not logged in");
 
  	if (req.hasAuthorization(req.user, ["admin"])){
- 		var candidate_id = req.body.candidate_id;
+ 		var candidate_id = mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id: candidate_id});
  		var theResult;
  		query.exec(function(err,result) {
@@ -57,7 +57,7 @@
  		return res.status(401).send("User is not logged in");
 
  	if (req.hasAuthorization(req.user, ["admin"])){
- 		var candidate_id=req.body.candidate_id;
+ 		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id:candidate_id });
  		query.exec(function(err,result) {
  			if(err) {
@@ -78,7 +78,7 @@
  		return res.status(401).send("User is not logged in");
 
  	if (req.hasAuthorization(req.user, ["admin"])){
- 		var candidate_id=req.body.candidate_id;
+ 		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id:candidate_id });
  		query.exec(function(err,result) {
  			if(err) {
@@ -98,7 +98,7 @@
  		return res.status(401).send("User is not logged in");
 
  	if (req.hasAuthorization(req.user, ["admin"])){
- 		var candidate_id=req.body.candidate_id;
+ 		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id:candidate_id });
  		query.populate('events.event_id', 'name start_date');
  		query.exec(function(err,result) {
@@ -122,7 +122,7 @@
  		return res.status(401).send("User is not logged in");
 
  	if (req.hasAuthorization(req.user, ["admin"])){
- 		var candidate_id=req.body.candidate_id;
+ 		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id:candidate_id });
  		query.exec(function(err,result) {
  			if(err) {
@@ -143,7 +143,7 @@
  		return res.status(401).send("User is not logged in");
 
  	if (req.hasAuthorization(req.user, ["admin"])){
- 		var candidate_id=req.body.candidate_id;
+ 		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id:candidate_id });
  		query.exec(function(err,result) {
  			if(err) {
@@ -164,7 +164,7 @@
  	if(!req.isAuthenticated())
  		return res.status(401).send("User is not logged in");
  	if (req.hasAuthorization(req.user, ["admin"])){
- 		var candidate_id=req.body.candidate_id;
+ 		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id:candidate_id });
  		query.exec(function(err,result){
  			if(err){
@@ -202,7 +202,7 @@
  	if(!req.isAuthenticated())
  		return res.status(401).send("User is not logged in");
  	if (req.hasAuthorization(req.user, ["admin"])){
- 		var candidate_id=req.body.candidate_id;
+ 		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id:candidate_id });
  		query.exec(function(err,result){
  			if(err){
@@ -240,7 +240,7 @@
  	if(!req.isAuthenticated())
  		return res.status(401).send("User is not logged in");
  	if (req.hasAuthorization(req.user, ["admin"])){
- 		var candidate_id=req.body.candidate_id;
+ 		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id:candidate_id });
  		query.exec(function(err,result){
  			if(err){
@@ -278,7 +278,7 @@
  	if(!req.isAuthenticated())
  		return res.status(401).send("User is not logged in");
  	if (req.hasAuthorization(req.user, ["admin"])){
- 		var candidate_id = req.body.candidate_id;
+ 		var candidate_id = mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({'_id' : candidate_id });
  		query.exec(function(err,result){
  			if(err) {
@@ -360,7 +360,7 @@
  	if(!req.isAuthenticated())
  		return res.status(401).send("User is not logged in");
  	if (req.hasAuthorization(req.user, ["admin"])){
- 		var candidate_id=req.body.candidate_id;
+ 		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id:candidate_id });
  		query.exec(function(err,result){
  			if(err){
@@ -392,7 +392,7 @@
  	if(!req.isAuthenticated())
  		return res.status(401).send("User is not logged in");
  	if (req.hasAuthorization(req.user, ["admin"])){
- 		var candidate_id = req.body.candidate_id;
+ 		var candidate_id = mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({'_id' : candidate_id });
  		query.exec(function(err,result){
  			if(err) {
@@ -474,7 +474,7 @@ exports.setNote = function(req,res){
 	if(!req.isAuthenticated())
 		return res.status(401).send("User is not logged in");
 	if (req.hasAuthorization(req.user, ["admin"])){
-		var candidate_id=req.body.candidate_id;
+		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
 		var query = Candidate.findOne({_id:candidate_id });
 		query.exec(function(err,result){
 			if(err){
@@ -555,7 +555,7 @@ exports.setCandidate = function(req,res){
  		if(!req.isAuthenticated())
  			return res.status(401).send("User is not logged in");
  		if (req.hasAuthorization(req.user, ["admin"])){
- 			var candidate_id=req.body.candidate_id;
+ 			var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
  			var query = Candidate.findOne({_id:candidate_id });
  			query.exec(function(err,result){
  				if(err){
