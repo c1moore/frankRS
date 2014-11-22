@@ -19,7 +19,7 @@ var should = require('should'),
 /**
  * Globals
  */
-var comment1, event1, event2, user, userAdmin;
+var comment1, event1, event2, recruiter, userAdmin;
 var agent = superagent.agent();
 var agentAdmin = superagent.agent();
 
@@ -62,21 +62,7 @@ describe('Express.js Comment Route Integration Tests:', function() {
  			displayName: 'Full Name',
  			email: 'recruiter@test.com',
  			password: 'password',
- 			status: [{event_id: event1._id, attending:false, recruiter:false}],
- 			salt: 'abc123',
- 			rank: [],
- 			provider: 'local',
- 			login_enabled: true
- 		});
-
-		user = new User({
- 			fName: 'Full',
- 			lName: 'Name',
- 			roles: ['attendee','recruiter'],
- 			displayName: 'Full Name',
- 			email: 'test@test.com',
- 			password: 'password',
- 			status: [{event_id: event1._id, attending:false, recruiter:false}],
+ 			status: [{event_id: event1._id, attending:false, recruiter:true}],
  			salt: 'abc123',
  			rank: [],
  			provider: 'local',
@@ -101,7 +87,7 @@ describe('Express.js Comment Route Integration Tests:', function() {
 			if(err) throw err;
 			event2.save(function(err){
 				if(err) throw err;
-				user.save(function(err){
+				recruiter.save(function(err){
 					if(err) throw err;
 					userAdmin.save(function(err){
 						if(err) throw err;
@@ -133,7 +119,7 @@ describe('Express.js Comment Route Integration Tests:', function() {
 		event1.remove();
 		event2.remove();
 		comment1.remove();
-		user.remove();
+		recruiter.remove();
 		userAdmin.remove();
  		done();
 	});
