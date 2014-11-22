@@ -404,7 +404,6 @@ exports.delete = function(req, res) {
 		res.status(401).json({message: "Access denied"});
 		return;
 	}
-	var id = req.session.id;
 	var eventID = mongoose.Types.ObjectId(req.body.eventID);
 	var query = Event.findOne({_id: eventID});
 	var theResult;
@@ -418,3 +417,25 @@ exports.delete = function(req, res) {
 		}
 	});
 };
+
+exports.create = function(req, res) {
+	if (!req.isAuthenticated()) { //Must be logged in
+		res.status(401).json({message: "You are not logged in"});
+		return;
+	//Must be an admin
+	} else if (!req.hasAuthorization(req.user,["admin"])) {
+		res.status(401).json({message: "Access denied"});
+		return;
+	}
+	var eventObj = {name: req.body.name,start_date: req.body.start_date,end_date: req.body.end_date,
+				location: req.body.location,schedule: req.body.schedule};
+	var newEvent = new Event(eventObj);
+	newEvent.save(function (err) {
+		if (err) {
+			res.status(400).json(err);
+		} else {
+			res.status(200).json({event_id: newEvent._id});
+		}
+	});
+};
+
