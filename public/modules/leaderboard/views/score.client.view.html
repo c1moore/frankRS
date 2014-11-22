@@ -6,8 +6,9 @@
 		<div class="col-md-8">
 			<h1 id="stats">Stats</h1>
 			<div class="well">
-				<p>Number Invited: {{authentication.user.inviteeList.length}}</p>
-				<p>Number Attending: {{authentication.user.attendeeList.length}}</p>
+				<p>Number Invited: {{userInvites}}</p>
+				<p>Number Attending: {{userAttendees}}</p>
+				<p>Ratio of Attending to Invited: {{userAttendees/userInvites}}</p>
 			</div>
 		</div>
 	</div>
