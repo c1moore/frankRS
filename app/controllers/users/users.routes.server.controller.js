@@ -393,25 +393,57 @@ exports.getInvitees = function(req, res) {
 /*Send the information that will be displayed in the first tab of the leaderboard.  This
 will include the recruiter's name, rank, and the number of people invited and attendding.*/
 exports.getRecruiterInfo = function(req, res) {
-	var id = req.user._id;
-	var query = User.findOne({'_id' : id});
-	query.select('fName lName rank attendeeList inviteeList');
-	query.exec(function (err, result) {
-		if(err) {
-			res.status(400).send(err);
-		} else if(!result || !result.length) {
-			res.status(400).json({'message' : 'User not found!'});
+	if(!req.isAuthenticated()) {
+		return res.status(401).send({message : "User is not logged in."});
+	} else if(!req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
+		return res.status(401).send({message : 'User does not have permission.'});
+	} else {
+		if(req.query.event_id == undefined) {
+			return res.status(400).send({message : 'Event not specified.'});
 		} else {
-			result.attending = result.attendeeList.length;
-			result.invited = result.inviteeList.length;
+			var id = req.user._id;
+			var query = User.findOne({'_id' : id});
+			query.select('fName lName rank attendeeList inviteeList');
+			query.exec(function (err, result) {
+				if(err) {
+					res.status(400).send(err);
+				} else if(!result) {
+					res.status(400).json({'message' : 'User not found!'});
+				} else {
+					result = result.toObject();
+					result.attending = 0;
+					result.invited = 0;
+					result.place = null;
 
-			//Delete lists, no need to send them since we have the count.
-			delete result.attendeeList;
-			delete result.inviteeList;
+					for(var i=0; i<result.attendeeList.length; i++) {
+						if(result.attendeeList[i].event_id.toString() === req.query.event_id.toString()) {
+							result.attending++;
+						}
+					}
 
-			res.status(200).send(result);
+					for(var i=0; i<result.inviteeList.length; i++) {
+						if(result.inviteeList[i].event_id.toString() === req.query.event_id.toString()) {
+							result.invited++;
+						}
+					}
+
+					for(var i=0; i<result.rank.length; i++) {
+						if(result.rank[i].event_id.toString() === req.query.event_id.toString()) {
+							result.place = result.rank[i].place;
+							break;
+						}
+					}
+
+					//Delete lists, no need to send them since we have the count.
+					delete result.attendeeList;
+					delete result.inviteeList;
+					delete result.rank;
+
+					res.status(200).send(result);
+				}
+			});
 		}
-	});
+	}
 };
 
 /*
