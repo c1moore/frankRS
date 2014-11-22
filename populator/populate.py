@@ -164,9 +164,9 @@ def main():
   numEventsPerCandidate = getNumEventsPerCandidate()
   p = getInviteProbability()
   if adminsUnionRecruiters==-1:
-    adminsUnionRecruiters=random.randint(0,max(numAdmins,numRecruiters))
+    adminsUnionRecruiters=random.randint(0,min(numAdmins,numRecruiters))
   if attendeesUnionRecruiters==-1:
-    attendeesUnionRecruiters=random.randint(0,max(numRecruiters,numAttendees))
+    attendeesUnionRecruiters=random.randint(0,min(numRecruiters,numAttendees))
   print("\nGenerating objects (this may take some time)...")
   recruiters = []
   attendees = []
