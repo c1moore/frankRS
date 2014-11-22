@@ -1,5 +1,5 @@
-angular.module('admin').controller('applicationController', ['$scope',
-function($scope) {
+angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams',
+function($scope, ngTableParams) {
     $scope.applications = [
       // testing table
       {
@@ -19,6 +19,8 @@ function($scope) {
     $scope.removeApplicant = function(index) {
       $scope.applications.splice(index, 1);
     }
+
+
 
 
   }])
