@@ -203,7 +203,7 @@
 
  it("should be able to access the main page from the candidate route testing mechanism", function(done) {
  	request('http://localhost:3001')
- 	.get('/')
+ 	.post('/')
  	.expect(200);
  	done();
  });
@@ -216,7 +216,7 @@
  	it("admin should be able to get the candidate first name", function(done) {
  		candidate1.save(function(err) {
  			user1
- 			.get('http://localhost:3001/candidate/getfName')
+ 			.post('http://localhost:3001/candidate/getfName')
  			.send({candidate_id: candidate1._id})
  			.end(function(err,res) {
  				if (err) throw err;
@@ -232,7 +232,7 @@
  	it("admin should be able to get the candidate last name", function(done) {
  		candidate1.save(function(err) {
  			user1
- 			.get('http://localhost:3001/candidate/getlName')
+ 			.post('http://localhost:3001/candidate/getlName')
  			.send({candidate_id: candidate1._id})
  			.end(function(err,res) {
  				if (err) throw err;
@@ -248,7 +248,7 @@
  	it("admin should be able to get the candidate email", function(done) {
  		candidate1.save(function(err) {
  			user1
- 			.get('http://localhost:3001/candidate/getEmail')
+ 			.post('http://localhost:3001/candidate/getEmail')
  			.send({candidate_id: candidate1._id})
  			.end(function(err,res) {
  				if (err) throw err;
@@ -262,7 +262,7 @@
 /* 	it("admin should be able to get the candidate status", function(done) {
  		candidate1.save(function(err) {
  			user1
- 			.get('http://localhost:3001/candidate/getStatus')
+ 			.post('http://localhost:3001/candidate/getStatus')
  			.send({candidate_id: candidate1._id})
  			.end(function(err,res) {
  				if (err) throw err;
@@ -278,7 +278,7 @@
  	it("admin should be able to get the candidate EventsID", function(done) {
  		candidate1.save(function(err) {
  			user1
- 			.get('http://localhost:3001/candidate/getEvents')
+ 			.post('http://localhost:3001/candidate/getEvents')
  			.send({candidate_id: candidate1._id})
  			.end(function(err,res) {
  				if (err) throw err;
@@ -299,7 +299,7 @@
  	it("admin should be able to get the candidate note", function(done) {
  		candidate1.save(function(err) {
  			user1
- 			.get('http://localhost:3001/candidate/getNote')
+ 			.post('http://localhost:3001/candidate/getNote')
  			.send({candidate_id: candidate1._id})
  			.end(function(err,res) {
  				if (err) throw err;
@@ -314,7 +314,7 @@
  	it("admin should be able to get the candidate getUser_id", function(done) {
  		candidate1.save(function(err) {
  			user1
- 			.get('http://localhost:3001/candidate/getUser_id')
+ 			.post('http://localhost:3001/candidate/getUser_id')
  			.send({candidate_id: candidate1._id})
  			.end(function(err,res) {
  				if (err) throw err;
@@ -329,7 +329,7 @@
 
  	it("admin should be able to set the candidate first name", function(done) {
  		user1
- 		.get('http://localhost:3001/candidate/setfName')
+ 		.post('http://localhost:3001/candidate/setfName')
  		.send({candidate_id: candidate1._id,fName:'dan'})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -339,7 +339,7 @@
 			//res.body.fName.should.be.equal('Full');
 			//done();
 			user1
-			.get('http://localhost:3001/candidate/getfName')
+			.post('http://localhost:3001/candidate/getfName')
 			.send({candidate_id: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
@@ -358,7 +358,7 @@
  	});
  	it("admin should be able to set the candidate last name", function(done) {
  		user1
- 		.get('http://localhost:3001/candidate/setlName')
+ 		.post('http://localhost:3001/candidate/setlName')
  		.send({candidate_id: candidate1._id,lName:'pickle'})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -368,7 +368,7 @@
 			//res.body.fName.should.be.equal('Full');
 			//done();
 			user1
-			.get('http://localhost:3001/candidate/getlName')
+			.post('http://localhost:3001/candidate/getlName')
 			.send({candidate_id: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
@@ -388,7 +388,7 @@
 
  	it("admin should be able to set the candidate email", function(done) {
  		user1
- 		.get('http://localhost:3001/candidate/setEmail')
+ 		.post('http://localhost:3001/candidate/setEmail')
  		.send({candidate_id: candidate1._id,email:'DanP@test.com'})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -399,7 +399,7 @@
 			//res.body.fName.should.be.equal('Full');
 			//done();
 			user1
-			.get('http://localhost:3001/candidate/getEmail')
+			.post('http://localhost:3001/candidate/getEmail')
 			.send({candidate_id: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
@@ -418,7 +418,7 @@
  	});
  	it("admin should be able to set the candidate status", function(done) {
  		user1
- 	.get('http://localhost:3001/candidate/setStatus')
+ 	.post('http://localhost:3001/candidate/setStatus')
  	.send({'candidate_id' : candidate1._id, 'event_id': event2._id, 'status': 'accepted'})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -427,7 +427,7 @@
 
  		candidate1.save(function(err) {
  			user1
- 			.get('http://localhost:3001/candidate/getEvents')
+ 			.post('http://localhost:3001/candidate/getEvents')
  			.send({candidate_id: candidate1._id})
  			.end(function(err,res) {
  				if (err) throw err;
@@ -450,7 +450,7 @@
 
  	it("admin should be able to add(set) candidate event", function(done) {
  		user1
- 		.get('http://localhost:3001/candidate/setEvent')
+ 		.post('http://localhost:3001/candidate/setEvent')
  		.send({candidate_id: candidate1._id,newEvent:{event_id: event3._id, accepted: true}})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -458,7 +458,7 @@
  			res.status.should.equal(200);
 
  			user1
- 			.get('http://localhost:3001/candidate/getEvents')
+ 			.post('http://localhost:3001/candidate/getEvents')
  			.send({candidate_id: candidate1._id})
  			.end(function(err,res) {
  				if (err) throw err;
@@ -480,7 +480,7 @@
 
  it("admin should be able to set candidate event accepted field", function(done) {
  	user1
- 	.get('http://localhost:3001/candidate/setAccepted')
+ 	.post('http://localhost:3001/candidate/setAccepted')
  	.send({'candidate_id' : candidate1._id, 'event_id': event2._id, 'accepted': true})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -489,7 +489,7 @@
 
  		candidate1.save(function(err) {
  			user1
- 			.get('http://localhost:3001/candidate/getEvents')
+ 			.post('http://localhost:3001/candidate/getEvents')
  			.send({candidate_id: candidate1._id})
  			.end(function(err,res) {
  				if (err) throw err;
@@ -530,7 +530,7 @@
 
 it("admin should be able to set candidate event status field", function(done) {
  	user1
- 	.get('http://localhost:3001/candidate/setStatus')
+ 	.post('http://localhost:3001/candidate/setStatus')
  	.send({'candidate_id' : candidate3._id, 'event_id': event2._id, 'status': 'accepted'})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -539,7 +539,7 @@ it("admin should be able to set candidate event status field", function(done) {
 
  		candidate3.save(function(err) {
  			user1
- 			.get('http://localhost:3001/candidate/getEvents')
+ 			.post('http://localhost:3001/candidate/getEvents')
  			.send({candidate_id: candidate3._id})
  			.end(function(err,res) {
  				if (err) throw err;
@@ -564,10 +564,6 @@ it("admin should be able to set candidate event status field", function(done) {
   	//.send({'user' : attendee._id})
   	.end(function(err,res){
   		if (err) throw err;
-  		//console.log(err);
-  		//console.log(res.body);
-		//console.log(res.body);
-  		//console.log(err);
   		res.status.should.equal(200);
   		//res.body.should.have.property('event_id');
   		(res.body[0].recruiter.toString()).should.equal('true');
@@ -580,7 +576,7 @@ it("admin should be able to set candidate event status field", function(done) {
 
    it("Should automatically create a new user when a candidate accepts and is accepted to become a recruiter if they are not already a user", function(done) {
  	user1
- 	.get('http://localhost:3001/candidate/setStatus')
+ 	.post('http://localhost:3001/candidate/setStatus')
  	.send({'candidate_id' : acceptedCandidate._id, 'event_id': event2._id, 'status': 'accepted'})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -589,7 +585,7 @@ it("admin should be able to set candidate event status field", function(done) {
 
  		acceptedCandidate.save(function(err) {
  			user1
- 			.get('http://localhost:3001/candidate/getEvents')
+ 			.post('http://localhost:3001/candidate/getEvents')
  			.send({candidate_id: acceptedCandidate._id})
  			.end(function(err,res) {
  				if (err) throw err;
@@ -615,14 +611,14 @@ it("admin should be able to set candidate event status field", function(done) {
 
  it("admin should be able to set the candidate's note", function(done) {
  	user1
- 	.get('http://localhost:3001/candidate/setNote')
+ 	.post('http://localhost:3001/candidate/setNote')
  	.send({candidate_id: candidate1._id,note:'I have changed the candidate note'})
  	.end(function(err,res) {
  		if (err) throw err;
  		res.status.should.equal(200);
 
  		user1
- 		.get('http://localhost:3001/candidate/getNote')
+ 		.post('http://localhost:3001/candidate/getNote')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res1) {
  			if (err) throw err;
@@ -641,7 +637,7 @@ it("admin should be able to set candidate event status field", function(done) {
  });
  it("admin should be able to set a new candidate", function(done) {
  	user1
- 	.get('http://localhost:3001/candidate/setCandidate')
+ 	.post('http://localhost:3001/candidate/setCandidate')
  	.send({fName: 'John',lName: 'Smith',email:'JohnS@test.com',status:'volunteer',event_id: event1._id,accept_Key:false,note:'I Volunteer as Tribute!'})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -652,7 +648,7 @@ it("admin should be able to set candidate event status field", function(done) {
 			//res.body.fName.should.be.equal('Full');
 			//done();
 			user1
-			.get('http://localhost:3001/candidate/getfName')
+			.post('http://localhost:3001/candidate/getfName')
 			.send({candidate_id: newCandidate._id})
 			.end(function(err,res1) {
 				if (err) throw err;
@@ -668,7 +664,7 @@ it("admin should be able to set candidate event status field", function(done) {
  });
  it("admin should be able to delete a candidate", function(done) {
  	user1
- 	.get('http://localhost:3001/candidate/deleteCandidate')
+ 	.post('http://localhost:3001/candidate/deleteCandidate')
  	.send({candidate_id: newCandidate._id})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -694,7 +690,7 @@ it("admin should be able to set candidate event status field", function(done) {
 
  it("attendee should be able to volunteer as a new candidate", function(done) {
  	attendee1
- 	.get('http://localhost:3001/candidate/setCandidate')
+ 	.post('http://localhost:3001/candidate/setCandidate')
  	.send({fName:attendee.fName,lName:attendee.lName,email:attendee.email,newEvent: event1._id})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -705,7 +701,7 @@ it("admin should be able to set candidate event status field", function(done) {
 			//res.body.fName.should.be.equal('Full');
 			//done();
 			user1
-			.get('http://localhost:3001/candidate/getfName')
+			.post('http://localhost:3001/candidate/getfName')
 			.send({candidate_id: newCandidate._id})
 			.end(function(err,res1) {
 				if (err) throw err;
@@ -717,7 +713,7 @@ it("admin should be able to set candidate event status field", function(done) {
 
 
 						user1
-						.get('http://localhost:3001/candidate/deleteCandidate')
+						.post('http://localhost:3001/candidate/deleteCandidate')
 						.send({candidate_id: newCandidate._id})
 						.end(function(err,res) {
 							if (err) throw err;
@@ -732,7 +728,7 @@ it("admin should be able to set candidate event status field", function(done) {
  it("attendees should NOT be able to get the candidate first name", function(done) {
  	candidate1.save(function(err) {
  		attendee1
- 		.get('http://localhost:3001/candidate/getfName')
+ 		.post('http://localhost:3001/candidate/getfName')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -748,7 +744,7 @@ it("admin should be able to set candidate event status field", function(done) {
  it("attendees should NOT be able to get the candidate last name", function(done) {
  	candidate1.save(function(err) {
  		attendee1
- 		.get('http://localhost:3001/candidate/getlName')
+ 		.post('http://localhost:3001/candidate/getlName')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -764,7 +760,7 @@ it("admin should be able to set candidate event status field", function(done) {
  it("attendees should NOT be able to get the candidate email", function(done) {
  	candidate1.save(function(err) {
  		attendee1
- 		.get('http://localhost:3001/candidate/getEmail')
+ 		.post('http://localhost:3001/candidate/getEmail')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -778,7 +774,7 @@ it("admin should be able to set candidate event status field", function(done) {
  /*it("attendees should NOT be able to get the candidate status", function(done) {
  	candidate1.save(function(err) {
  		attendee1
- 		.get('http://localhost:3001/candidate/getStatus')
+ 		.post('http://localhost:3001/candidate/getStatus')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -795,7 +791,7 @@ it("admin should be able to set candidate event status field", function(done) {
  it("attendees should NOT be able to get the candidate EventsID", function(done) {
  	candidate1.save(function(err) {
  		attendee1
- 		.get('http://localhost:3001/candidate/getEvents')
+ 		.post('http://localhost:3001/candidate/getEvents')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -813,7 +809,7 @@ it("admin should be able to set candidate event status field", function(done) {
  it("attendees should NOT be able to get the candidate note", function(done) {
  	candidate1.save(function(err) {
  		attendee1
- 		.get('http://localhost:3001/candidate/getNote')
+ 		.post('http://localhost:3001/candidate/getNote')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -828,7 +824,7 @@ it("admin should be able to set candidate event status field", function(done) {
  it("attendees should NOT be able to get the candidate getUser_id", function(done) {
  		candidate1.save(function(err) {
  			attendee1
- 			.get('http://localhost:3001/candidate/getUser_id')
+ 			.post('http://localhost:3001/candidate/getUser_id')
  			.send({candidate_id: candidate1._id})
  			.end(function(err,res) {
  				if (err) throw err;
@@ -842,7 +838,7 @@ it("admin should be able to set candidate event status field", function(done) {
 
  it("attendees should NOT be able to set the candidate first name", function(done) {
  	attendee1
- 	.get('http://localhost:3001/candidate/setfName')
+ 	.post('http://localhost:3001/candidate/setfName')
  	.send({candidate_id: candidate1._id,fName:'blah'})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -852,7 +848,7 @@ it("admin should be able to set candidate event status field", function(done) {
 			//res.body.fName.should.be.equal('Full');
 			//done();
 			user1
-			.get('http://localhost:3001/candidate/getfName')
+			.post('http://localhost:3001/candidate/getfName')
 			.send({candidate_id: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
@@ -871,7 +867,7 @@ it("admin should be able to set candidate event status field", function(done) {
  });
  it("attendees should NOT be able to set the candidate last name", function(done) {
  	attendee1
- 	.get('http://localhost:3001/candidate/setlName')
+ 	.post('http://localhost:3001/candidate/setlName')
  	.send({candidate_id: candidate1._id,lName:'Blah'})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -881,7 +877,7 @@ it("admin should be able to set candidate event status field", function(done) {
 			//res.body.fName.should.be.equal('Full');
 			//done();
 			user1
-			.get('http://localhost:3001/candidate/getlName')
+			.post('http://localhost:3001/candidate/getlName')
 			.send({candidate_id: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
@@ -901,7 +897,7 @@ it("admin should be able to set candidate event status field", function(done) {
 
  it("attendees should NOT be able to set the candidate email", function(done) {
  	attendee1
- 	.get('http://localhost:3001/candidate/setEmail')
+ 	.post('http://localhost:3001/candidate/setEmail')
  	.send({candidate_id: candidate1._id,email:'blah@test.com'})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -911,7 +907,7 @@ it("admin should be able to set candidate event status field", function(done) {
 			//res.body.fName.should.be.equal('Full');
 			//done();
 			user1
-			.get('http://localhost:3001/candidate/getEmail')
+			.post('http://localhost:3001/candidate/getEmail')
 			.send({candidate_id: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
@@ -930,7 +926,7 @@ it("admin should be able to set candidate event status field", function(done) {
  });
  it("attendees should NOT be able to set the candidate status", function(done) {
  	attendee1
- 	.get('http://localhost:3001/candidate/setStatus')
+ 	.post('http://localhost:3001/candidate/setStatus')
  	.send({candidate_id: candidate1._id,'event_id': event2._id, status:'volunteer'})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -940,7 +936,7 @@ it("admin should be able to set candidate event status field", function(done) {
 			//res.body.fName.should.be.equal('Full');
 			//done();
 			user1
-			.get('http://localhost:3001/candidate/getEvents')
+			.post('http://localhost:3001/candidate/getEvents')
 			.send({candidate_id: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
@@ -960,7 +956,7 @@ it("admin should be able to set candidate event status field", function(done) {
  
  it("attendees should NOT be able to add(set) candidate event", function(done) {
  	attendee1
- 	.get('http://localhost:3001/candidate/setEvent')
+ 	.post('http://localhost:3001/candidate/setEvent')
  	.send({candidate_id: candidate1._id,newEvent:{event_id: event4._id, accepted: false}})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -968,7 +964,7 @@ it("admin should be able to set candidate event status field", function(done) {
  		res.status.should.equal(401);
 
  		user1
- 		.get('http://localhost:3001/candidate/getEvents')
+ 		.post('http://localhost:3001/candidate/getEvents')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -991,7 +987,7 @@ it("admin should be able to set candidate event status field", function(done) {
 
  it("attendees should NOT be able to set candidate event accepted field", function(done) {
  	attendee1
- 	.get('http://localhost:3001/candidate/setAccepted')
+ 	.post('http://localhost:3001/candidate/setAccepted')
  	.send({'candidate_id' : candidate1._id, 'event_id': event2._id, 'accepted': false})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -1000,7 +996,7 @@ it("admin should be able to set candidate event status field", function(done) {
 
  		candidate1.save(function(err) {
  			user1
- 			.get('http://localhost:3001/candidate/getEvents')
+ 			.post('http://localhost:3001/candidate/getEvents')
  			.send({candidate_id: candidate1._id})
  			.end(function(err,res) {
  				if (err) throw err;
@@ -1022,14 +1018,14 @@ it("admin should be able to set candidate event status field", function(done) {
 
  it("attendees should NOT be able to set the candidate's note", function(done) {
  	attendee1
- 	.get('http://localhost:3001/candidate/setNote')
+ 	.post('http://localhost:3001/candidate/setNote')
  	.send({candidate_id: candidate1._id,note:'blah'})
  	.end(function(err,res) {
  		if (err) throw err;
  		res.status.should.equal(401);
 
  		user1
- 		.get('http://localhost:3001/candidate/getNote')
+ 		.post('http://localhost:3001/candidate/getNote')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res1) {
  			if (err) throw err;
@@ -1048,7 +1044,7 @@ it("admin should be able to set candidate event status field", function(done) {
  });
  it("attendee should be able to volunteer as a new candidate", function(done) {
  	recruiter1
- 	.get('http://localhost:3001/candidate/setCandidate')
+ 	.post('http://localhost:3001/candidate/setCandidate')
  	.send({fName:attendee.fName,lName:attendee.lName,email:attendee.email,newEvent: event1._id})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -1059,7 +1055,7 @@ it("admin should be able to set candidate event status field", function(done) {
 			//res.body.fName.should.be.equal('Full');
 			//done();
 			user1
-			.get('http://localhost:3001/candidate/getfName')
+			.post('http://localhost:3001/candidate/getfName')
 			.send({candidate_id: newCandidate._id})
 			.end(function(err,res1) {
 				if (err) throw err;
@@ -1071,7 +1067,7 @@ it("admin should be able to set candidate event status field", function(done) {
 
 
 						user1
-						.get('http://localhost:3001/candidate/deleteCandidate')
+						.post('http://localhost:3001/candidate/deleteCandidate')
 						.send({candidate_id: newCandidate._id})
 						.end(function(err,res) {
 							if (err) throw err;
@@ -1090,7 +1086,7 @@ it("admin should be able to set candidate event status field", function(done) {
  it("recruiters should NOT be able to get the candidate first name", function(done) {
  	candidate1.save(function(err) {
  		recruiter1
- 		.get('http://localhost:3001/candidate/getfName')
+ 		.post('http://localhost:3001/candidate/getfName')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -1106,7 +1102,7 @@ it("admin should be able to set candidate event status field", function(done) {
  it("recruiters should NOT be able to get the candidate last name", function(done) {
  	candidate1.save(function(err) {
  		recruiter1
- 		.get('http://localhost:3001/candidate/getlName')
+ 		.post('http://localhost:3001/candidate/getlName')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -1122,7 +1118,7 @@ it("admin should be able to set candidate event status field", function(done) {
  it("recruiters should NOT be able to get the candidate email", function(done) {
  	candidate1.save(function(err) {
  		recruiter1
- 		.get('http://localhost:3001/candidate/getEmail')
+ 		.post('http://localhost:3001/candidate/getEmail')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -1136,7 +1132,7 @@ it("admin should be able to set candidate event status field", function(done) {
  /*it("recruiters should NOT be able to get the candidate status", function(done) {
  	candidate1.save(function(err) {
  		recruiter1
- 		.get('http://localhost:3001/candidate/getStatus')
+ 		.post('http://localhost:3001/candidate/getStatus')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -1153,7 +1149,7 @@ it("admin should be able to set candidate event status field", function(done) {
  it("recruiters should NOT be able to get the candidate EventsID", function(done) {
  	candidate1.save(function(err) {
  		recruiter1
- 		.get('http://localhost:3001/candidate/getEvents')
+ 		.post('http://localhost:3001/candidate/getEvents')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -1166,7 +1162,7 @@ it("admin should be able to set candidate event status field", function(done) {
  it("recruiters should NOT be able to get the candidate note", function(done) {
  	candidate1.save(function(err) {
  		recruiter1
- 		.get('http://localhost:3001/candidate/getNote')
+ 		.post('http://localhost:3001/candidate/getNote')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -1180,7 +1176,7 @@ it("admin should be able to set candidate event status field", function(done) {
 it("recruiters should NOT be able to get the candidate getUser_id", function(done) {
  		candidate1.save(function(err) {
  			recruiter1
- 			.get('http://localhost:3001/candidate/getUser_id')
+ 			.post('http://localhost:3001/candidate/getUser_id')
  			.send({candidate_id: candidate1._id})
  			.end(function(err,res) {
  				if (err) throw err;
@@ -1193,7 +1189,7 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
  	});
  it("recruiters should NOT be able to set the candidate first name", function(done) {
  	recruiter1
- 	.get('http://localhost:3001/candidate/setfName')
+ 	.post('http://localhost:3001/candidate/setfName')
  	.send({candidate_id: candidate1._id,fName:'blah'})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -1203,7 +1199,7 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
 			//res.body.fName.should.be.equal('Full');
 			//done();
 			user1
-			.get('http://localhost:3001/candidate/getfName')
+			.post('http://localhost:3001/candidate/getfName')
 			.send({candidate_id: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
@@ -1222,7 +1218,7 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
  });
  it("recruiters should NOT be able to set the candidate last name", function(done) {
  	recruiter1
- 	.get('http://localhost:3001/candidate/setlName')
+ 	.post('http://localhost:3001/candidate/setlName')
  	.send({candidate_id: candidate1._id,lName:'Blah'})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -1232,7 +1228,7 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
 			//res.body.fName.should.be.equal('Full');
 			//done();
 			user1
-			.get('http://localhost:3001/candidate/getlName')
+			.post('http://localhost:3001/candidate/getlName')
 			.send({candidate_id: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
@@ -1252,13 +1248,13 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
 
  it("recruiters should NOT be able to set the candidate email", function(done) {
  	recruiter1
- 	.get('http://localhost:3001/candidate/setEmail')
+ 	.post('http://localhost:3001/candidate/setEmail')
  	.send({candidate_id: candidate1._id,email:'blah@test.com'})
  	.end(function(err,res) {
  		if (err) throw err;
 			res.status.should.equal(401);
 			user1
-			.get('http://localhost:3001/candidate/getEmail')
+			.post('http://localhost:3001/candidate/getEmail')
 			.send({candidate_id: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
@@ -1273,7 +1269,7 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
  });
  it("recruiters should NOT be able to set the candidate status", function(done) {
  	recruiter1
- 		.get('http://localhost:3001/candidate/setStatus')
+ 		.post('http://localhost:3001/candidate/setStatus')
  	.send({candidate_id: candidate1._id,'event_id': event2._id, status:'volunteer'})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -1283,7 +1279,7 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
 			//res.body.fName.should.be.equal('Full');
 			//done();
 			user1
-			.get('http://localhost:3001/candidate/getEvents')
+			.post('http://localhost:3001/candidate/getEvents')
 			.send({candidate_id: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
@@ -1303,13 +1299,13 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
  
  it("recruiters should NOT be able to add(set) candidate event", function(done) {
  	recruiter1
- 	.get('http://localhost:3001/candidate/setEvent')
+ 	.post('http://localhost:3001/candidate/setEvent')
  	.send({candidate_id: candidate1._id,newEvent:{event_id: event4._id, accepted: false}})
  	.end(function(err,res) {
  		if (err) throw err;
  		res.status.should.equal(401);
  		user1
- 		.get('http://localhost:3001/candidate/getEvents')
+ 		.post('http://localhost:3001/candidate/getEvents')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -1329,7 +1325,7 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
 
  it("recruiters should NOT be able to set candidate event accepted field", function(done) {
  	recruiter1
- 	.get('http://localhost:3001/candidate/setAccepted')
+ 	.post('http://localhost:3001/candidate/setAccepted')
  	.send({'candidate_id' : candidate1._id, 'event_id': event2._id, 'accepted': false})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -1338,7 +1334,7 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
 
  		candidate1.save(function(err) {
  			user1
- 			.get('http://localhost:3001/candidate/getEvents')
+ 			.post('http://localhost:3001/candidate/getEvents')
  			.send({candidate_id: candidate1._id})
  			.end(function(err,res) {
  				if (err) throw err;
@@ -1360,14 +1356,14 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
 
  it("recruiters should NOT be able to set the candidate's note", function(done) {
  	recruiter1
- 	.get('http://localhost:3001/candidate/setNote')
+ 	.post('http://localhost:3001/candidate/setNote')
  	.send({candidate_id: candidate1._id,note:'blah'})
  	.end(function(err,res) {
  		if (err) throw err;
  		res.status.should.equal(401);
 
  		user1
- 		.get('http://localhost:3001/candidate/getNote')
+ 		.post('http://localhost:3001/candidate/getNote')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res1) {
  			if (err) throw err;
@@ -1385,7 +1381,7 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
 
  it("guests should NOT be able to volunteer as a new candidate", function(done) {
  	guest1
- 	.get('http://localhost:3001/candidate/setCandidate')
+ 	.post('http://localhost:3001/candidate/setCandidate')
  	.send({fName:attendee.fName,lName:attendee.lName,email:attendee.email,newEvent: event1._id})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -1398,7 +1394,7 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
  it("guest should NOT be able to get the candidate first name", function(done) {
  	candidate1.save(function(err) {
  		guest1
- 		.get('http://localhost:3001/candidate/getfName')
+ 		.post('http://localhost:3001/candidate/getfName')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -1413,7 +1409,7 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
  it("guest should NOT be able to get the candidate last name", function(done) {
  	candidate1.save(function(err) {
  		guest1
- 		.get('http://localhost:3001/candidate/getlName')
+ 		.post('http://localhost:3001/candidate/getlName')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -1428,7 +1424,7 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
  it("guest should NOT be able to get the candidate email", function(done) {
  	candidate1.save(function(err) {
  		guest1
- 		.get('http://localhost:3001/candidate/getEmail')
+ 		.post('http://localhost:3001/candidate/getEmail')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -1441,7 +1437,7 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
 /* it("guest should NOT be able to get the candidate status", function(done) {
  	candidate1.save(function(err) {
  		guest1
- 		.get('http://localhost:3001/candidate/getStatus')
+ 		.post('http://localhost:3001/candidate/getStatus')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -1457,7 +1453,7 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
  it("guest should NOT be able to get the candidate EventsID", function(done) {
  	candidate1.save(function(err) {
  		guest1
- 		.get('http://localhost:3001/candidate/getEvents')
+ 		.post('http://localhost:3001/candidate/getEvents')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -1470,7 +1466,7 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
  it("guest should NOT be able to get the candidate note", function(done) {
  	candidate1.save(function(err) {
  		guest1
- 		.get('http://localhost:3001/candidate/getNote')
+ 		.post('http://localhost:3001/candidate/getNote')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -1483,7 +1479,7 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
 it("guest should NOT be able to get the candidate getUser_id", function(done) {
  		candidate1.save(function(err) {
  			guest1
- 			.get('http://localhost:3001/candidate/getUser_id')
+ 			.post('http://localhost:3001/candidate/getUser_id')
  			.send({candidate_id: candidate1._id})
  			.end(function(err,res) {
  				if (err) throw err;
@@ -1496,13 +1492,13 @@ it("guest should NOT be able to get the candidate getUser_id", function(done) {
  	});
  it("guest should NOT be able to set the candidate first name", function(done) {
  	guest1
- 	.get('http://localhost:3001/candidate/setfName')
+ 	.post('http://localhost:3001/candidate/setfName')
  	.send({candidate_id: candidate1._id,fName:'blah'})
  	.end(function(err,res) {
  		if (err) throw err;
 			res.status.should.equal(401);
 			user1
-			.get('http://localhost:3001/candidate/getfName')
+			.post('http://localhost:3001/candidate/getfName')
 			.send({candidate_id: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
@@ -1516,13 +1512,13 @@ it("guest should NOT be able to get the candidate getUser_id", function(done) {
  });
  it("guest should NOT be able to set the candidate last name", function(done) {
  	guest1
- 	.get('http://localhost:3001/candidate/setlName')
+ 	.post('http://localhost:3001/candidate/setlName')
  	.send({candidate_id: candidate1._id,lName:'Blah'})
  	.end(function(err,res) {
  		if (err) throw err;
 			res.status.should.equal(401);
 			user1
-			.get('http://localhost:3001/candidate/getlName')
+			.post('http://localhost:3001/candidate/getlName')
 			.send({candidate_id: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
@@ -1538,13 +1534,13 @@ it("guest should NOT be able to get the candidate getUser_id", function(done) {
 
  it("guest should NOT be able to set the candidate email", function(done) {
  	guest1
- 	.get('http://localhost:3001/candidate/setEmail')
+ 	.post('http://localhost:3001/candidate/setEmail')
  	.send({candidate_id: candidate1._id,email:'blah@test.com'})
  	.end(function(err,res) {
  		if (err) throw err;
 			res.status.should.equal(401);
 			user1
-			.get('http://localhost:3001/candidate/getEmail')
+			.post('http://localhost:3001/candidate/getEmail')
 			.send({candidate_id: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
@@ -1559,7 +1555,7 @@ it("guest should NOT be able to get the candidate getUser_id", function(done) {
  });
  it("guest should NOT be able to set the candidate status", function(done) {
  	guest1
-	.get('http://localhost:3001/candidate/setStatus')
+	.post('http://localhost:3001/candidate/setStatus')
  	.send({candidate_id: candidate1._id,'event_id': event2._id, status:'volunteer'})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -1569,7 +1565,7 @@ it("guest should NOT be able to get the candidate getUser_id", function(done) {
 			//res.body.fName.should.be.equal('Full');
 			//done();
 			user1
-			.get('http://localhost:3001/candidate/getEvents')
+			.post('http://localhost:3001/candidate/getEvents')
 			.send({candidate_id: candidate1._id})
 			.end(function(err,res1) {
 				if (err) throw err;
@@ -1588,7 +1584,7 @@ it("guest should NOT be able to get the candidate getUser_id", function(done) {
  });
  it("guest should NOT be able to add(set) candidate event", function(done) {
  	guest1
- 	.get('http://localhost:3001/candidate/setEvent')
+ 	.post('http://localhost:3001/candidate/setEvent')
  	.send({candidate_id: candidate1._id,newEvent:{event_id: event4._id, accepted: false}})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -1596,7 +1592,7 @@ it("guest should NOT be able to get the candidate getUser_id", function(done) {
  		res.status.should.equal(401);
 
  		user1
- 		.get('http://localhost:3001/candidate/getEvents')
+ 		.post('http://localhost:3001/candidate/getEvents')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res) {
  			if (err) throw err;
@@ -1619,7 +1615,7 @@ it("guest should NOT be able to get the candidate getUser_id", function(done) {
 
  it("guest should NOT be able to set candidate event accepted field", function(done) {
  	guest1
- 	.get('http://localhost:3001/candidate/setAccepted')
+ 	.post('http://localhost:3001/candidate/setAccepted')
  	.send({'candidate_id' : candidate1._id, 'event_id': event2._id, 'accepted': false})
  	.end(function(err,res) {
  		if (err) throw err;
@@ -1628,7 +1624,7 @@ it("guest should NOT be able to get the candidate getUser_id", function(done) {
 
  		candidate1.save(function(err) {
  			user1
- 			.get('http://localhost:3001/candidate/getEvents')
+ 			.post('http://localhost:3001/candidate/getEvents')
  			.send({candidate_id: candidate1._id})
  			.end(function(err,res) {
  				if (err) throw err;
@@ -1650,14 +1646,14 @@ it("guest should NOT be able to get the candidate getUser_id", function(done) {
 
  it("guest should NOT be able to set the candidate's note", function(done) {
  	guest1
- 	.get('http://localhost:3001/candidate/setNote')
+ 	.post('http://localhost:3001/candidate/setNote')
  	.send({candidate_id: candidate1._id,note:'blah'})
  	.end(function(err,res) {
  		if (err) throw err;
  		res.status.should.equal(401);
 
  		user1
- 		.get('http://localhost:3001/candidate/getNote')
+ 		.post('http://localhost:3001/candidate/getNote')
  		.send({candidate_id: candidate1._id})
  		.end(function(err,res1) {
  			if (err) throw err;
