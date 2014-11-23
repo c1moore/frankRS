@@ -1,65 +1,17 @@
-angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams',
-	function($scope, ngTableParams) {
+angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams', '$http', '$timeout',
+	function($scope, ngTableParams, $http, $timeout) {
 		$scope.events = [
 			{
 				name: 'Frank',
-				start: '05/23/2014',
-				end: '05/25/2014',
+				start_date: '05/23/2014',
+				end_date: '05/25/2014',
 				location: 'Gainesville'
 			},
-			{
-				name: 'Graduation',
-				start: '12/18/2014',
-				end: '12/19/2014',
-				location: 'Gainesville'
-			},
-			{
-				name: 'Concert',
-				start: '06/07/2015',
-				end: '06/20/2015',
-				location: 'Jacksonville'
-			},
-			{
-				name: 'Football game',
-				start: '11/05/2014',
-				end: '11/10/2014',
-				location: 'Gainesville'
-			},
-			{
-				name: 'Bonaroo',
-				start: '06/13/2014',
-				end: '07/01/2014',
-				location: 'Tennessee'
-			},
-			{
-				name: 'Doms Birthday',
-				start: '05/24/2014',
-				end: '05/25/2014',
-				location: 'Somewhere'
-			},
-			{
-				name: 'New hobbit movie!',
-				start: '12/25/2014',
-				end: '12/25/2014',
-				location: 'New Zealand'
-			}
-		]; 
+		];
 
-		$scope.addEvent = function () {
-
-			$scope.events.push ({
-				name: $scope.eventName,
-				start: $scope.startDate,
-				end: $scope.endDate,
-				location: $scope.locationid
-			});
-
-		      // Clear input fields after push
-		      $scope.eventName = "";
-		      $scope.startDate = "";
-		      $scope.endDate = "";
-		      $scope.locationid = "";
-  		};
+		$http.get('/events/enumerateAll').success(function(data) {
+			$scope.events = data;
+		});
 
 		$scope.deleteRow = function(index) {
 	  		$scope.events.splice(index,1);
@@ -73,6 +25,46 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 				$defer.resolve($scope.events.slice((params.page() - 1) * params.count(), params.page() * params.count()));
         	}
         });
+
+        $scope.addEvent = function (newEvent) {
+        	$scope.events.push(newEvent);
+        	$scope.newEvent = null;
+        	$scope.tableParams.reload();
+  		};
+
+  		$scope.$watch($scope.events, function() {
+			$timeout(function() {
+				$scope.tableParams.reload();
+			});
+		});
+
+
+  		//the following code sets up the date selectors in the event form 
+  		$scope.today = function() {
+			$scope.dt = new Date();
+		}
+		$scope.today();
+
+		$scope.clear = function() {
+			$scope.dt = null;
+		}
+
+		$scope.openS = function($event) {
+			$event.preventDefault();
+			$event.stopPropagation();
+			$scope.openedS = true;
+		}
+
+		$scope.openE = function($event) {
+			$event.preventDefault();
+			$event.stopPropagation();
+			$scope.openedE = true;
+		}
+
+		$scope.dateOptions = {
+			formatYear: 'yy',
+			startingDay: 1
+		};
 	}
 ]);
 

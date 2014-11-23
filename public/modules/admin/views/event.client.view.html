@@ -2,18 +2,32 @@
 	<div class="row" ng-controller="eventController">
 		<div class="col-sm-4">
 			<div class="well">
-				<form name="eventForm" novalidate ng-submit="addEvent()">
+				<form name="eventForm" novalidate ng-submit="addEvent(newEvent)">
 					<div class="form-group row">
 						<label>Event Name:</label>
 						<input name="eventName" class="form-control" type="text" ng-model="newEvent.name" required>
 					</div>
 					<div class="form-group row">
-						<label>Start Date:</label>
-						<input name="sDate" class="form-control" type="text" ng-model="newEvent.sDate" required>
+						<label>Start Date (mm/dd/yy):</label>
+						<p class="input-group">
+							<input type="text" class="form-control" datepicker-popup="shortDate" ng-model="newEvent.start_date" is-open="openedS" min-date="dt" datepicker-options="dateOptions" ng-required="true" close-text="Close"/>
+	              			<span class="input-group-btn">
+	                			<button type="button" class="btn btn-default" ng-click="openS($event)">
+	                				<i class="glyphicon glyphicon-calendar"></i>
+	                			</button>
+	              			</span>
+              			</p>
 					</div>
 					<div class="form-group row">
-						<label>End Date:</label>
-						<input name="eDate" class="form-control" type="text" ng-model="newEvent.eDate" required>
+						<label>End Date (mm/dd/yy):</label>
+						<p class="input-group">
+							<input type="text" class="form-control" datepicker-popup="shortDate" ng-model="newEvent.end_date" is-open="openedE" min-date="newEvent.start_date" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
+	              			<span class="input-group-btn">
+	                			<button type="button" class="btn btn-default" ng-click="openE($event)">
+	                				<i class="glyphicon glyphicon-calendar"></i>
+	                			</button>
+	              			</span>
+              			</p>
 					</div>
 					<div class="form-group row">
 						<label>Location:</label>
@@ -26,16 +40,16 @@
 
   		<div class="col-sm-8">
 	  		<h2>Event List</h2>
-	  		<table ng-table="tableParams" class="table table-bordered">
+	  		<table ng-table="tableParams" class="table table-bordered frank-main-view">
 	  			<tr ng-repeat="event in $data">
 	  				<td data-title="'Name'">
 	  					{{event.name}}
 	  				</td>
 	  				<td data-title="'Start Date'">
-	  					{{event.start}}
+	  					{{event.start_date | date:'shortDate'}}
 	  				</td>
 	  				<td data-title="'End Date'">
-	  					{{event.end}}
+	  					{{event.end_date | date:'shortDate'}}
 	  				</td>
 	  				<td data-title="'Location'">
 	  					{{event.location}}
