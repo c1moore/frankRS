@@ -1,21 +1,11 @@
 angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams', '$http', '$timeout',
 	function($scope, ngTableParams, $http, $timeout) {
-		$scope.events = [
-			{
-				name: 'Frank',
-				start_date: '05/23/2014',
-				end_date: '05/25/2014',
-				location: 'Gainesville'
-			},
-		];
+		$scope.events = [];
 
 		$http.get('/events/enumerateAll').success(function(data) {
 			$scope.events = data;
+			$scope.tableParams.reload();
 		});
-
-		$scope.deleteRow = function(index) {
-	  		$scope.events.splice(index,1);
-	  	}
 
 	  	$scope.tableParams = new ngTableParams({
         	page: 1,
@@ -26,17 +16,23 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
         	}
         });
 
+        $scope.$watch($scope.events, function() {
+			$timeout(function() {
+				$scope.tableParams.reload();
+			});
+		});
+
         $scope.addEvent = function (newEvent) {
         	$scope.events.push(newEvent);
         	$scope.newEvent = null;
         	$scope.tableParams.reload();
   		};
 
-  		$scope.$watch($scope.events, function() {
-			$timeout(function() {
-				$scope.tableParams.reload();
+		$scope.deleteEvent = function(event) {
+			$http.post('/events/delete',{event_id:event._id}).success(function() {
+				console.log('Event Deleted');
 			});
-		});
+		};
 
 
   		//the following code sets up the date selectors in the event form 
