@@ -123,6 +123,18 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
         	}
 		});
 
+		var getStats = function() {
+			$http.get('/leaderboard/recruiterinfo', {params : {event_id : eventSelector.postEventId}}).success(function(response) {
+				$scope.userScore = response.place;
+				$scope.userInvites = response.invited;
+				$scope.userAttendees = response.attending;
+			}).error(function(response, status) {
+
+			});
+		}
+
+		getStats();
+
 
 
 		$scope.$watch(
@@ -130,6 +142,8 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 				return eventSelector.selectedEvent;
 			},
 			function() {
+				getStats();
+
 				$timeout(function() {
         			// $scope.mainTableParams.settings().$scope = $scope;
         			// $scope.attendingTableParams.settings().$scope = $scope;

@@ -330,27 +330,38 @@ exports.getAttendees = function(req, res) {
 	if(!req.isAuthenticated()) {
 		res.status(401).send({'message' : 'User is not logged in.'});
 	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
-		var query = User.find({'roles' : 'recruiter', 'status.event_id' : req.body.event_id, 'status.recruiter' : true});
-		/*query.elemMatch('status', function(elem) {
-			elem.where('event_id', req.body.event_id)
-			elem.where('recruiter', true);
-		});*/
-		/*query.$where(function() {
-
-		});*/
-		query.select('fName lName attendeeList');
-		query.populate('attendeeList.user_id', 'displayName organization');
-		query.exec(function(err, result) {
+		//var query = User.find({'roles' : 'recruiter', 'status.event_id' : req.body.event_id, 'status.recruiter' : true});
+		//query.select('fName lName attendeeList');
+		//query.populate('attendeeList.user_id', 'displayName organization');
+		//query.exec(function(err, result) {
+		User.aggregate([
+			{$match : {roles : 'recruiter', "status.event_id" : new mongoose.Types.ObjectId(req.body.event_id), "status.recruiter" : true}},
+			{$project : {recruiterName : "$displayName", fName : 1, lName : 1, attendeeList : 1}},
+			{$unwind : "$attendeeList"},
+			{$match : {"attendeeList.event_id" : new mongoose.Types.ObjectId(req.body.event_id)}}
+		], function(err, results) {
 			if(err) {
 				res.status(400).send(err);
-			} else if(!result || !result.length) {
+			} else if(!results || !results.length) {
 				res.status(400).json({'message' : 'Nobody is attending yet.', 'result' : result});
 			} else {
-				for(var i=0; i<result.length; i++) {
-					result[i].toObject();
-					result[i].attendeeList = searchByEvent(req.body.event_id, result[i].attendeeList);
-				}
-				res.status(200).send(result);
+				// for(var i=0; i<result.length; i++) {
+				// 	result[i].toObject();
+				// 	result[i].attendeeList = searchByEvent(req.body.event_id, result[i].attendeeList);
+				// }
+				User.populate(
+					results, {
+						path : "attendeeList.user_id",
+						model : 'User',
+						select : 'displayName -_id'
+					}, function(err, pResults) {
+						if(err) {
+							res.status(400).send({message : err});
+						} else {
+							res.status(200).send(pResults);	
+						}
+					}
+				);
 			}
 		});
 	} else {
@@ -370,8 +381,8 @@ exports.getInvitees = function(req, res) {
 		res.status(401).send({'message' : 'User is not logged in.'});
 	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
 		var query = User.find({'roles' : 'recruiter', 'status.event_id' : req.body.event_id, 'status.recruiter' : true});
-		query.select('inviteeList displayName');
-		query.populate('inviteeList.user_id', 'displayName');
+		query.select('inviteeList fName lName');
+		query.populate('inviteeList.user_id', 'displayName organization');
 		query.exec(function (err, result) {
 			if(err) {
 				res.status(400).send(err);
