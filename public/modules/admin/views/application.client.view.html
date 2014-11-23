@@ -2,7 +2,7 @@
 	<div class="row" ng-controller="applicationController">    
 		<div class="col-md-4">
 			<div class="well">
-				<form name="candidateForm" novalidate ng-submit="addCandidate()">
+				<form name="candidateForm" novalidate ng-submit="addCandidate(newCandidate)">
 					<div class="form-group row">
 						<label>First Name:</label>
 						<input name="fName" class="form-control" type="text" ng-model="newCandidate.fName" required>
@@ -25,7 +25,7 @@
 			<table ng-table="tableParams" class="table table-bordered">
 				<tr ng-repeat="candidate in $data">
 					<td data-title="'Name'">
-						{{candidate.name}}
+						{{candidate.fName + ' ' + candidate.lName}}
 					</td>
 					<td data-title="'Accept'">
 						<button class="btn btn-success" ng-click="addApplicant($index)">Accept</button>

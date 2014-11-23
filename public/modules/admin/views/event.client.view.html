@@ -2,23 +2,25 @@
 	<div class="row" ng-controller="eventController">
 		<div class="col-sm-4">
 			<div class="well">
-				<div class="form-group row">
-					<label for="eventName">Event Name:</label>
-					<input id="eventName" class="form-control" ng-model="eventName">
-				</div>
-				<div class="form-group row">
-					<label for="lName">Start Date:</label>
-					<input id="sDate" class="form-control" ng-model="sDate">
-				</div>
-				<div class="form-group row">
-					<label for="eDate">End Date:</label>
-					<input id="eDate" class="form-control" ng-model="eDate">
-				</div>
-				<div class="form-group row">
-					<label for="location">Location:</label>
-					<input id="location" class="form-control" ng-model="location">
-				</div>
-				<button class="btn btn-primary" ng-click="addEvent()">Add Event</button>
+				<form name="eventForm" novalidate ng-submit="addEvent()">
+					<div class="form-group row">
+						<label>Event Name:</label>
+						<input name="eventName" class="form-control" type="text" ng-model="newEvent.name" required>
+					</div>
+					<div class="form-group row">
+						<label>Start Date:</label>
+						<input name="sDate" class="form-control" type="text" ng-model="newEvent.sDate" required>
+					</div>
+					<div class="form-group row">
+						<label>End Date:</label>
+						<input name="eDate" class="form-control" type="text" ng-model="newEvent.eDate" required>
+					</div>
+					<div class="form-group row">
+						<label>Location:</label>
+						<input name="location" class="form-control" type="text" ng-model="newEvent.location" required>
+					</div>
+					<button type="submit" class="btn btn-primary" ng-disabled="eventForm.$invalid">Add Event</button>
+				</form>
 			</div>
 		</div>
 
