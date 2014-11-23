@@ -20,6 +20,9 @@ body {
 .content {
 	margin-top: 50px;
 }
+.frank-main-view {
+	margin-bottom: 85px !important;
+}
 .glyphicon.glyphicon-chevron-left {
 	top: -35px;
 	right: 5px;

@@ -1,9 +1,9 @@
 <table ng-table="attendingTableParams" show-filter="true" class="table table-bordered leaderboard">
 	<tr ng-repeat="user in $data">
-		<td data-title="'Name'" sortable="'displayName'" filter="{'displayName':'text'}">
-			{{user.attendeeList.user_id.displayName}}
+		<td data-title="'Attendee Name'" sortable="'attendeeName'" filter="{'attendeeName':'text'}">
+			{{user.attendeeName}}
 		</td>
-		<td data-title="'Recruiter'" sortable="'recruiterName'" filter="{'recruiterName':'text'}">
+		<td data-title="'Recruiter Name'" sortable="'recruiterName'" filter="{'recruiterName':'text'}">
 			{{user.recruiterName}}
 		</td>
 		<td data-title="'Organization'" sortable="'orginization'" filter="{'orginization':'text'}">

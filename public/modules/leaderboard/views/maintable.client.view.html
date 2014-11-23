@@ -3,16 +3,16 @@
 		<td data-title="'Rank'" sortable="'place'">
 			{{user.place}}
 		</td>
-		<td data-title="'Name'" sortable="'lName'" filter="{'lName':'text'}">
-			{{user.lName}}
+		<td data-title="'Name'" sortable="'displayName'" filter="{'displayName':'text'}">
+			{{user.displayName}}
 		</td>
 		<td data-title="'Attending/Invited Count'">
 			<div class="progress">
-				<div class="progress-bar progress-bar-warning" ng-style="{'width':((user.attendeeList.length/maxAttending)*100) + '%'}">
-					{{user.attendeeList.length}}
+				<div class="progress-bar progress-bar-warning" ng-style="{'width':((user.attending/maxAttending)*100) + '%'}">
+					{{user.attending}}
 				</div>
-				<div class="progress-bar progress-bar-success" ng-style="{'width':((user.inviteeList.length/maxInvited)*100) + '%'}">
-					{{user.inviteeList.length}}
+				<div class="progress-bar progress-bar-success" ng-style="{'width':((user.invited/maxInvited)*100) + '%'}">
+					{{user.invited}}
 				</div>
 			</div>
 		</td>
