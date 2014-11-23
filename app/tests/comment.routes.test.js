@@ -19,9 +19,10 @@ var should = require('should'),
 /**
  * Globals
  */
-var comment1, event1, event2, recruiter, user, userAdmin;
+var comment1, comment2, event1, event2, recruiter, user, userAdmin;
 var agent = superagent.agent();
 var agentAdmin = superagent.agent();
+var agentRecruiter = superagent.agent();
 
 function arraysEqual(array0,array1) {
     if (array0.length !== array1.length) return false;
@@ -76,7 +77,7 @@ describe('Express.js Comment Route Integration Tests:', function() {
  			displayName: 'Full Name',
  			email: 'anotheruser@test.com',
  			password: 'password',
- 			status: [{event_id: event1._id, attending:false, recruiter:true}],
+ 			status: [{event_id: event1._id, attending:false, recruiter:false}],
  			salt: 'abc123',
  			rank: [],
  			provider: 'local',
@@ -113,9 +114,18 @@ describe('Express.js Comment Route Integration Tests:', function() {
 								comment: "A comment",
 								stream: 'recruiter'
 							});
-							comment1.save(function(err){
+							comment2 = new Comment({
+								user_id: user._id,
+								event_id: event1._id,
+								comment: "A comment",
+								stream: 'social'
+							});
+							comment2.save(function(err){
 								if(err) throw err;
-								done();
+								comment1.save(function(err){
+									if(err) throw err;
+									done();
+								});
 							});
 						});
 					});
@@ -134,7 +144,7 @@ describe('Express.js Comment Route Integration Tests:', function() {
 		request('http://localhost:3001')
 			.get('/comments/getCommentObj')
 			.end(function(err, res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
 				res.body.message.should.be.equal("You are not logged in");
@@ -146,7 +156,7 @@ describe('Express.js Comment Route Integration Tests:', function() {
 		request('http://localhost:3001')
 			.get('/comments/getSocialCommentsForEvent')
 			.end(function(err, res) { 
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
 				res.body.message.should.be.equal("You are not logged in");
@@ -158,7 +168,7 @@ describe('Express.js Comment Route Integration Tests:', function() {
 		request('http://localhost:3001')
 			.get('/comments/getRecruiterCommentsForEvent')
 			.end(function(err, res) { 
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
 				res.body.message.should.be.equal("You are not logged in");
@@ -171,10 +181,92 @@ describe('Express.js Comment Route Integration Tests:', function() {
 			.post('/comments/postCommentSocial')
 			.send({comment:'c',event_id:event1._id,interests:['dogs'],user_id:user})
 			.end(function(err, res) { 
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
 				res.body.message.should.be.equal("You are not logged in");
+				done();
+			});
+	});
+
+	it("should not be able to get the post recruiter comments for an event when not signed in",function(done) {
+		request('http://localhost:3001')
+			.post('/comments/postCommentRecruiter')
+			.send({comment:'c',event_id:event1._id,interests:['dogs'],user_id:recruiter})
+			.end(function(err, res) { 
+				should.not.exist(err);
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
+				res.body.message.should.be.equal("You are not logged in");
+				done();
+			});
+	});
+
+	it("should not be able to get the delete comments when not signed in",function(done) {
+		request('http://localhost:3001')
+			.post('/comments/delete') //Shouldnt matter what we send
+			.end(function(err, res) { 
+				should.not.exist(err);
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
+				res.body.message.should.be.equal("You are not logged in");
+				done();
+			});
+	});
+	
+	it("should not be able to search by interests for a comment when not signed in",function(done) {
+		request('http://localhost:3001')
+			.post('/comments/searchByInterests')
+			.send({event_id:event1._id,interest:'dogs'})
+			.end(function(err, res) { 
+				should.not.exist(err);
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
+				res.body.message.should.be.equal("You are not logged in");
+				done();
+			});
+	});
+
+ 	it("should be able to sign in as a regular user", function(done) {
+ 		agent
+ 			.post('http://localhost:3001/auth/signin')
+ 			.send({email: user.email, password: 'password'})
+ 			.end(function(err,res) {
+				should.not.exist(err);
+				res.status.should.be.equal(200);
+       				done();
+ 			});
+     	});
+
+ 	it("should be able to sign in as an admin", function(done) {
+ 		agentAdmin
+ 			.post('http://localhost:3001/auth/signin')
+ 			.send({email: userAdmin.email, password: 'password'})
+ 			.end(function(err,res) {
+				should.not.exist(err);
+				res.status.should.be.equal(200);
+       				done();
+ 			});
+     	});
+
+ 	it("should be able to sign in as a recruiter", function(done) {
+ 		agentRecruiter
+ 			.post('http://localhost:3001/auth/signin')
+ 			.send({email: recruiter.email, password: 'password'})
+ 			.end(function(err,res) {
+				should.not.exist(err);
+				res.status.should.be.equal(200);
+       				done();
+ 			});
+     	});
+
+	it("should not be able to get a recruiter comment as a normal user",function(done) {
+		agent
+			.get('http://localhost:3001/comments/getCommentObj')
+			.query(comment1._id.toString())
+			.end(function(err, res) {
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
 				done();
 			});
 	});
