@@ -120,9 +120,48 @@ describe('Express.js Comment Route Integration Tests:', function() {
 				if (err) throw err;
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
+				res.body.message.should.be.equal("You are not logged in");
 				done();
 			});
 	});
+
+	it("should not be able to get the social comments for an event when not signed in",function(done) {
+		request('http://localhost:3001')
+			.get('/comments/getSocialCommentsForEvent')
+			.end(function(err, res) { 
+				if (err) throw err;
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
+				res.body.message.should.be.equal("You are not logged in");
+				done();
+			});
+	});
+
+	it("should not be able to get the recruiter comments for an event when not signed in",function(done) {
+		request('http://localhost:3001')
+			.get('/comments/getRecruiterCommentsForEvent')
+			.end(function(err, res) { 
+				if (err) throw err;
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
+				res.body.message.should.be.equal("You are not logged in");
+				done();
+			});
+	});
+
+	it("should not be able to get the post social comments for an event when not signed in",function(done) {
+		request('http://localhost:3001')
+			.post('/comments/postCommentSocial')
+			.send({comment:'c',event_id:event1._id,interests:['dogs'],
+			.end(function(err, res) { 
+				if (err) throw err;
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
+				res.body.message.should.be.equal("You are not logged in");
+				done();
+			});
+	});
+
 
 	after(function(done) {
 		event1.remove();
