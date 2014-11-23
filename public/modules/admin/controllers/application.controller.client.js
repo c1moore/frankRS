@@ -1,9 +1,7 @@
 angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams',
 	function($scope, ngTableParams) {
-      	$scope.applications = [
-                  {name: 'Nostra Dom'}, 
-                  {name: 'Bob the Builder',},
-                  {name: 'Clive',}
+      	$scope.candidates = [
+                  {fName: 'Dom', lName: 'Nostra'} 
             ];
 
             $scope.addApplicant = function(index) {
@@ -19,8 +17,13 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
             	count: 10,
             	}, {
             	getData: function($defer, params) {
-            		$defer.resolve($scope.applications.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+            		$defer.resolve($scope.candidates.slice((params.page() - 1) * params.count(), params.page() * params.count()));
             	}
             });
+
+            $scope.addCandidate = function(newCandidate) {
+                  $scope.candidates.push(newCandidate);
+                  $scope.tableParams.reload();
+            }
 
   }])
