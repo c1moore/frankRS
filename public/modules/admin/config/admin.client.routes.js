@@ -4,7 +4,7 @@ angular.module('admin').config(['$stateProvider', '$urlRouterProvider',
 		$stateProvider.
 		state("admin", { 
 			url:"/admin", 
-			templateUrl:"modules/admin/views/main.client.view.html" 
+			templateUrl:"modules/admin/views/admin.client.view.html" 
 		});
 	}
 ]);
