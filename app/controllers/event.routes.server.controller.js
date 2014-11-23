@@ -9,10 +9,10 @@ var errorHandler = require('./errors'),
 	User = mongoose.model('User'),
 	Event = mongoose.model('Event');
 
-var canViewEvent = function(user,eventID,hasAuthorization) {
+var canViewEvent = function(user,event_id,hasAuthorization) {
 	var statusArray = user.status;
 	for (var i = 0; i<statusArray.length;i++) {
-		if(statusArray[i].event_id.toString()==eventID.toString()) {
+		if(statusArray[i].event_id.toString()==event_id.toString()) {
 			return true;
 		}
 	}
@@ -65,14 +65,14 @@ exports.getStartDate = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.query.eventID,req.hasAuthorization)) {
+	} else if (!canViewEvent(req.user,req.query.event_id,req.hasAuthorization)) {
 		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
 	//Retrieve the requested field
 	var id = req.session.id;
-	var eventID = mongoose.Types.ObjectId(req.query.eventID);
-	var query = Event.findOne({_id: eventID});
+	var event_id = mongoose.Types.ObjectId(req.query.event_id);
+	var query = Event.findOne({_id: event_id});
 	var theResult;
 	query.exec(function(err,result) {
 		theResult = result;
@@ -87,13 +87,13 @@ exports.getEndDate = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.query.eventID,req.hasAuthorization)) {
+	} else if (!canViewEvent(req.user,req.query.event_id,req.hasAuthorization)) {
 		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
 	var id = req.session.id;
-	var eventID = mongoose.Types.ObjectId(req.query.eventID);
-	var query = Event.findOne({_id: eventID});
+	var event_id = mongoose.Types.ObjectId(req.query.event_id);
+	var query = Event.findOne({_id: event_id});
 	var theResult;
 	query.exec(function(err,result) {
 		theResult = result;
@@ -108,13 +108,13 @@ exports.getLocation = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.query.eventID,req.hasAuthorization)) {
+	} else if (!canViewEvent(req.user,req.query.event_id,req.hasAuthorization)) {
 		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
 	var id = req.user._id;
-	var eventID = mongoose.Types.ObjectId(req.query.eventID);
-	var query = Event.findOne({_id: eventID});
+	var event_id = mongoose.Types.ObjectId(req.query.event_id);
+	var query = Event.findOne({_id: event_id});
 	var theResult;
 	query.exec(function(err,result) {
 		theResult = result;
@@ -129,13 +129,13 @@ exports.getEventObj = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.query.eventID,req.hasAuthorization)) {
+	} else if (!canViewEvent(req.user,req.query.event_id,req.hasAuthorization)) {
 		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
 	var id = req.session.id;
-	var eventID = mongoose.Types.ObjectId(req.query.eventID);
-	var query = Event.findOne({_id: eventID});
+	var event_id = mongoose.Types.ObjectId(req.query.event_id);
+	var query = Event.findOne({_id: event_id});
 	var theResult;
 	query.exec(function(err,result) {
 		theResult = result;
@@ -150,13 +150,13 @@ exports.getSchedule = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.query.eventID,req.hasAuthorization)) {
+	} else if (!canViewEvent(req.user,req.query.event_id,req.hasAuthorization)) {
 		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
 	var id = req.session.id;
-	var eventID = mongoose.Types.ObjectId(req.query.eventID);
-	var query = Event.findOne({_id: eventID});
+	var event_id = mongoose.Types.ObjectId(req.query.event_id);
+	var query = Event.findOne({_id: event_id});
 	var theResult;
 	query.exec(function(err,result) {
 		theResult = result;
@@ -171,13 +171,13 @@ exports.getName = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	//Must have permission to make requests on this ID
-	} else if (!canViewEvent(req.user,req.query.eventID,req.hasAuthorization)) {
+	} else if (!canViewEvent(req.user,req.query.event_id,req.hasAuthorization)) {
 		res.status(401).json({message: "You do not have permission to request this ID"});
 		return;
 	}
 	var id = req.session.id;
-	var eventID = mongoose.Types.ObjectId(req.query.eventID);
-	var query = Event.findOne({_id: eventID});
+	var event_id = mongoose.Types.ObjectId(req.query.event_id);
+	var query = Event.findOne({_id: event_id});
 	var theResult;
 	query.exec(function(err,result) {
 		theResult = result;
@@ -200,9 +200,9 @@ exports.setStartDate = function(req, res) {
 	}
 	//Retrieve the requested field
 	var id = req.session.id;
-	var eventID = mongoose.Types.ObjectId(req.body.eventID);
+	var event_id = mongoose.Types.ObjectId(req.body.event_id);
 	var new_start_date = req.body.start_date;
-	var query = Event.findOne({_id: eventID});
+	var query = Event.findOne({_id: event_id});
 	var theResult;
 	query.exec(function(err,result) {
 		theResult = result;
@@ -231,9 +231,9 @@ exports.setEndDate = function(req, res) {
 		return;
 	}
 	var id = req.session.id;
-	var eventID = req.body.eventID;
+	var event_id = req.body.event_id;
 	var new_end_date = req.body.end_date;
-	var query = Event.findOne({_id: eventID});
+	var query = Event.findOne({_id: event_id});
 	var theResult;
 	query.exec(function(err,result) {
 		theResult = result;
@@ -262,9 +262,9 @@ exports.setLocation = function(req, res) {
 		return;
 	}
 	var id = req.user._id;
-	var eventID = req.body.eventID;
+	var event_id = req.body.event_id;
 	var new_location = req.body.location;
-	var query = Event.findOne({_id: eventID});
+	var query = Event.findOne({_id: event_id});
 	var theResult;
 	query.exec(function(err,result) {
 		theResult = result;
@@ -293,7 +293,7 @@ exports.setEventObj = function(req, res) {
 		return;
 	}
 	var id = req.session.id;
-	var eventID = mongoose.Types.ObjectId(req.body.eventID);
+	var event_id = mongoose.Types.ObjectId(req.body.event_id);
 	var new_event = req.body.event;
 	if (new_event==undefined) {
 		res.status(400).json({message: "No event provided"});
@@ -302,7 +302,7 @@ exports.setEventObj = function(req, res) {
 		res.status(400).json({message: "Unexpected type"});
 		return;
 	}
-	var query = Event.findOne({_id: eventID});
+	var query = Event.findOne({_id: event_id});
 	var theResult;
 	var validKeys = ["name","schedule","location","start_date","end_date"];
 	query.exec(function(err,result) {
@@ -343,9 +343,9 @@ exports.setSchedule = function(req, res) {
 		return;
 	}
 	var id = req.session.id;
-	var eventID = mongoose.Types.ObjectId(req.body.eventID);
+	var event_id = mongoose.Types.ObjectId(req.body.event_id);
 	var new_schedule = req.body.schedule;
-	var query = Event.findOne({_id: eventID});
+	var query = Event.findOne({_id: event_id});
 	var theResult;
 	query.exec(function(err,result) {
 		theResult = result;
@@ -374,9 +374,9 @@ exports.setName = function(req, res) {
 		return;
 	}
 	var id = req.session.id;
-	var eventID = mongoose.Types.ObjectId(req.body.eventID);
+	var event_id = mongoose.Types.ObjectId(req.body.event_id);
 	var new_name = req.body.name;
-	var query = Event.findOne({_id: eventID});
+	var query = Event.findOne({_id: event_id});
 	var theResult;
 	query.exec(function(err,result) {
 		theResult = result;
@@ -404,8 +404,8 @@ exports.delete = function(req, res) {
 		res.status(401).json({message: "Access denied"});
 		return;
 	}
-	var eventID = mongoose.Types.ObjectId(req.body.eventID);
-	var query = Event.findOne({_id: eventID});
+	var event_id = mongoose.Types.ObjectId(req.body.event_id);
+	var query = Event.findOne({_id: event_id});
 	var theResult;
 	query.exec(function(err,result) {
 		theResult = result;
