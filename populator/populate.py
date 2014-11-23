@@ -148,6 +148,17 @@ def dumpUserSummary(userList):
       #fd.write("password: " + user._password + '\n')
       fd.write("roles: " + str(user.roles) + '\n\n')
 
+def getForThisEvent(attendeeList,eventID):
+  eventID = ensureID(eventID)
+  attendees = []
+  events = [item['event_id'] for item in attendeeList]
+  users = [item['user_id'] for item in attendeeList]
+  for i in range(len(events)):
+    if events[i] == eventID:
+      attendees.append(users[i])
+  return attendees
+
+
 def main():
   resetMongo("The database has been reset.\n")
   welcome()
@@ -252,16 +263,18 @@ def main():
     for recruiter in recruiters:
       assert 'recruiter' in recruiter.roles, "Bug! Recruiter does not have the proper role!"
       for statusDict in recruiter.status:
-        if statusDict['recruiter'] == False:
-          continue #I'm just attending
         eventID = statusDict['event_id']
-        if ensureID(eventID) == ensureID(event):
+        if ensureID(eventID) == ensureID(event) and statusDict['recruiter'] == True:
           eventBins[insertionPoint].append(recruiter)
+          print(recruiter)
     insertionPoint += 1
     eventBins.append([])
   eventBins.pop()
   for bin in eventBins:
-    sortedBin = sorted(bin,key=lambda r:-(len(r.attendeeList)*100000+len(r.almostList)))
+    e = eventOrder[eventBins.index(bin)]
+    sortedBin = sorted(bin,key=lambda r:-(len(getForThisEvent(
+	r.attendeeList,e))*1000000+len(getForThisEvent(r.inviteeList,e))))
+    assert len(list(set(bin)))==len(bin)
     for i in range(len(sortedBin)):
       sortedBin[i].rank.append({'event_id':eventOrder[eventBins.index(bin)],'place':i+1})
       sortedBin[i].save()
