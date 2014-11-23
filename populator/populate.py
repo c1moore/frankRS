@@ -266,7 +266,6 @@ def main():
         eventID = statusDict['event_id']
         if ensureID(eventID) == ensureID(event) and statusDict['recruiter'] == True:
           eventBins[insertionPoint].append(recruiter)
-          print(recruiter)
     insertionPoint += 1
     eventBins.append([])
   eventBins.pop()
