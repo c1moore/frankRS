@@ -31,7 +31,7 @@ class User:
   def randomize(self):
     self.fName = randomNameString(2,16).capitalize()
     self.lName = randomNameString(2,16).capitalize()
-    self.displayName = randomString(2,16,' ')
+    self.displayName = lName + ', ' + fName;
     self.email = (randomString(4,35).lower()+'@'+randomString(4,35)+
 			random.choice(WEBS))
     self.salt = ''#randomBytes(16)

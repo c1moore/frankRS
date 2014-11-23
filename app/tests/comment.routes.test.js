@@ -113,7 +113,16 @@ describe('Express.js Comment Route Integration Tests:', function() {
  			.expect(200,done);
  	});
 
- 	//it("should not be able to enumerate events when not signed in",function(done)
+ 	it("should not be able to get the comment object when not signed in", function(done) {
+		request('http://localhost:3001')
+			.get('/comments/getCommentObj')
+			.end(function(err, res) {
+				if (err) throw err;
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
+				done();
+			});
+	});
 
 	after(function(done) {
 		event1.remove();
