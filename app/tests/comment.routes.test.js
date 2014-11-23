@@ -19,7 +19,7 @@ var should = require('should'),
 /**
  * Globals
  */
-var comment1, event1, event2, recruiter, userAdmin;
+var comment1, event1, event2, recruiter, user, userAdmin;
 var agent = superagent.agent();
 var agentAdmin = superagent.agent();
 
@@ -69,6 +69,20 @@ describe('Express.js Comment Route Integration Tests:', function() {
  			login_enabled: true
  		});
 
+		user = new User({
+ 			fName: 'Full',
+ 			lName: 'Name',
+ 			roles: ['attendee'],
+ 			displayName: 'Full Name',
+ 			email: 'anotheruser@test.com',
+ 			password: 'password',
+ 			status: [{event_id: event1._id, attending:false, recruiter:true}],
+ 			salt: 'abc123',
+ 			rank: [],
+ 			provider: 'local',
+ 			login_enabled: true
+ 		});
+
 		userAdmin = new User({
  			fName: 'Full',
  			lName: 'Name',
@@ -89,17 +103,20 @@ describe('Express.js Comment Route Integration Tests:', function() {
 				if(err) throw err;
 				recruiter.save(function(err){
 					if(err) throw err;
-					userAdmin.save(function(err){
-						if(err) throw err;
-						comment1 = new Comment({
-							user_id: recruiter._id,
-							event_id: event1._id,
-							comment: "A comment",
-							stream: 'recruiter'
-						});
-						comment1.save(function(err){
+					user.save(function(err){
+						if (err) throw err;
+						userAdmin.save(function(err){
 							if(err) throw err;
-							done();
+							comment1 = new Comment({
+								user_id: recruiter._id,
+								event_id: event1._id,
+								comment: "A comment",
+								stream: 'recruiter'
+							});
+							comment1.save(function(err){
+								if(err) throw err;
+								done();
+							});
 						});
 					});
 				});
@@ -120,9 +137,48 @@ describe('Express.js Comment Route Integration Tests:', function() {
 				if (err) throw err;
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
+				res.body.message.should.be.equal("You are not logged in");
 				done();
 			});
 	});
+
+	it("should not be able to get the social comments for an event when not signed in",function(done) {
+		request('http://localhost:3001')
+			.get('/comments/getSocialCommentsForEvent')
+			.end(function(err, res) { 
+				if (err) throw err;
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
+				res.body.message.should.be.equal("You are not logged in");
+				done();
+			});
+	});
+
+	it("should not be able to get the recruiter comments for an event when not signed in",function(done) {
+		request('http://localhost:3001')
+			.get('/comments/getRecruiterCommentsForEvent')
+			.end(function(err, res) { 
+				if (err) throw err;
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
+				res.body.message.should.be.equal("You are not logged in");
+				done();
+			});
+	});
+
+	it("should not be able to get the post social comments for an event when not signed in",function(done) {
+		request('http://localhost:3001')
+			.post('/comments/postCommentSocial')
+			.send({comment:'c',event_id:event1._id,interests:['dogs'],user_id:user})
+			.end(function(err, res) { 
+				if (err) throw err;
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
+				res.body.message.should.be.equal("You are not logged in");
+				done();
+			});
+	});
+
 
 	after(function(done) {
 		event1.remove();
