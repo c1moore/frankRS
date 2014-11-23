@@ -21,7 +21,7 @@ var errorHandler = require('./errors'),
 var canViewComment = function(user,hasAuthorization,comment) {
 	if (comment.stream=='social') return true;
 	if (hasAuthorization(user,['admin'])) return true;
-	if (hasAuthorization(user,['recruiter']) && comment.stream='recruiter' && isRecruitEvent(
+	if (hasAuthorization(user,['recruiter']) && comment.stream=='recruiter' && isRecruitEvent(
 		user,comment.event_id,hasAuthorization)) return true;
 	return false;
 };
@@ -30,7 +30,7 @@ var canViewComment = function(user,hasAuthorization,comment) {
 var canViewEvent = function(user,eventID,hasAuthorization) {
 	var statusArray = user.status;
 	for (var i = 0; i<statusArray.length;i++) {
-		if(statusArray[i].event_id==eventID) {
+		if(statusArray[i].event_id.toString()==eventID.toString()) {
 			return true;
 		}
 	}
@@ -42,7 +42,7 @@ var canViewEvent = function(user,eventID,hasAuthorization) {
 var isRecruitEvent = function(user,eventID,hasAuthorization) {
 	var statusArray = user.status;
 	for (var i = 0; i<statusArray.length;i++) {
-		if(statusArray[i].event_id==eventID && statusArray[i].recruiter==true) {
+		if(statusArray[i].event_id.toString()==eventID.toString() && statusArray[i].recruiter==true) {
 			return true;
 		}
 	}
@@ -54,7 +54,7 @@ exports.getCommentObj = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	}
-	var id = mongoose.Types.ObjectId(req.body.comment_id);
+	var id = mongoose.Types.ObjectId(req.query.comment_id);
 	var query = Comment.findOne({_id: id});
 	//Retrieve the comment
 	query.exec(function(err,result) {
@@ -74,7 +74,7 @@ exports.getSocialCommentsForEvent = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	}
-	var id = mongoose.Types.ObjectId(req.body.event_id);
+	var id = mongoose.Types.ObjectId(req.query.event_id);
 	var query = Comment.find({event_id: id,stream: 'social'});
 	//Retrieve the comments, any authenticated user may view the social stream
 	//Hopefully, this won't encode the cursor itselt. At least I hope not...
@@ -93,7 +93,7 @@ exports.getRecruiterCommentsForEvent = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	}
-	var id = mongoose.Types.ObjectId(req.body.event_id);
+	var id = mongoose.Types.ObjectId(req.query.event_id);
 	var query = Comment.find({event_id: id,stream: 'recruiter'});
 	//Retrieve the comments
 	query.exec(function(err,result) {

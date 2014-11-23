@@ -261,10 +261,11 @@ def main():
     eventBins.append([])
   eventBins.pop()
   for bin in eventBins:
-    sortedBin = sorted(bin,key=lambda r:-(len(r.attendeeList)*100000+len(r.almostList)))
+    sortedBin = sorted(bin,key=lambda r:-(len(r.attendeeList)*1000000+len(r.inviteeList)))
     for i in range(len(sortedBin)):
       sortedBin[i].rank.append({'event_id':eventOrder[eventBins.index(bin)],'place':i+1})
       sortedBin[i].save()
+    [print(str(user.rank) + ' ' + str(len(user.attendeeList))) for user in bin]
 
   dumpUserSummary(list(set(recruiters)|set(attendees)|set(admins)))
 
