@@ -115,7 +115,7 @@ exports.getLeaderboard = function(req, res) {
 		res.status(401).send({'message' : "User is not logged in."});
 	} else if(req.hasAuthorization(req.user, ["recruiter", "admin"])) {
 		var query = User.find({'roles' : 'recruiter', 'status.event_id' : req.body.event_id, 'status.recruiter' : true});
-		query.select('fName lName rank inviteeList attendeeList');
+		query.select('displayName rank inviteeList attendeeList');
 		query.populate('inviteeList.user_id', 'displayName email');
 		query.populate('attendeeList.user_id', 'displayName email');
 		query.exec(function(err, result) {
@@ -126,8 +126,13 @@ exports.getLeaderboard = function(req, res) {
 			} else {
 				for(var i=0; i<result.length; i++) {
 					result[i] = result[i].toObject();
+					
 					result[i].inviteeList = searchByEvent(req.body.event_id, result[i].inviteeList);
 					result[i].attendeeList = searchByEvent(req.body.event_id, result[i].attendeeList);
+					result[i].invited = result[i].inviteeList.length;
+					result[i].attending = result[i].attendeeList.length;
+					delete result[i].inviteeList;
+					delete result[i].attendeeList;
 
 					for(var j=0; j<result[i].rank.length; j++) {
 						if(result[i].rank[j].event_id.toString() === req.body.event_id.toString()) {
@@ -330,13 +335,9 @@ exports.getAttendees = function(req, res) {
 	if(!req.isAuthenticated()) {
 		res.status(401).send({'message' : 'User is not logged in.'});
 	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
-		//var query = User.find({'roles' : 'recruiter', 'status.event_id' : req.body.event_id, 'status.recruiter' : true});
-		//query.select('fName lName attendeeList');
-		//query.populate('attendeeList.user_id', 'displayName organization');
-		//query.exec(function(err, result) {
 		User.aggregate([
 			{$match : {roles : 'recruiter', "status.event_id" : new mongoose.Types.ObjectId(req.body.event_id), "status.recruiter" : true}},
-			{$project : {recruiterName : "$displayName", fName : 1, lName : 1, attendeeList : 1}},
+			{$project : {recruiterName : "$displayName", attendeeList : 1, _id : -1}},
 			{$unwind : "$attendeeList"},
 			{$match : {"attendeeList.event_id" : new mongoose.Types.ObjectId(req.body.event_id)}}
 		], function(err, results) {
@@ -345,10 +346,6 @@ exports.getAttendees = function(req, res) {
 			} else if(!results || !results.length) {
 				res.status(400).json({'message' : 'Nobody is attending yet.', 'result' : result});
 			} else {
-				// for(var i=0; i<result.length; i++) {
-				// 	result[i].toObject();
-				// 	result[i].attendeeList = searchByEvent(req.body.event_id, result[i].attendeeList);
-				// }
 				User.populate(
 					results, {
 						path : "attendeeList.user_id",
@@ -358,6 +355,11 @@ exports.getAttendees = function(req, res) {
 						if(err) {
 							res.status(400).send({message : err});
 						} else {
+							for(var i=0; i<pResults.length; i++) {
+								pResults[i].attendeeName = pResults[i].attendeeList.user_id.displayName;
+								delete pResults[i].attendeeList;
+							}
+
 							res.status(200).send(pResults);	
 						}
 					}
@@ -380,20 +382,35 @@ exports.getInvitees = function(req, res) {
 	if(!req.isAuthenticated()) {
 		res.status(401).send({'message' : 'User is not logged in.'});
 	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
-		var query = User.find({'roles' : 'recruiter', 'status.event_id' : req.body.event_id, 'status.recruiter' : true});
-		query.select('inviteeList fName lName');
-		query.populate('inviteeList.user_id', 'displayName organization');
-		query.exec(function (err, result) {
+		User.aggregate([
+			{$match : {roles : 'recruiter', "status.event_id" : new mongoose.Types.ObjectId(req.body.event_id), "status.recruiter" : true}},
+			{$project : {recruiterName : "$displayName", inviteeList : 1, _id : -1}},
+			{$unwind : "$inviteeList"},
+			{$match : {"inviteeList.event_id" : new mongoose.Types.ObjectId(req.body.event_id)}}
+		], function(err, results) {
 			if(err) {
 				res.status(400).send(err);
-			} else if(!result || !result.length) {
-				res.status(400).json({'message' : 'Nobody is invited yet.'});
+			} else if(!results || !results.length) {
+				res.status(400).json({'message' : 'Nobody is attending yet.', 'result' : result});
 			} else {
-				for(var i=0; i<result.length; i++) {
-					result[i].toObject();
-					result[i].inviteeList = searchByEvent(req.body.event_id, result[i].inviteeList);
-				}
-				res.status(200).send(result);
+				User.populate(
+					results, {
+						path : "inviteeList.user_id",
+						model : 'User',
+						select : 'displayName -_id'
+					}, function(err, pResults) {
+						if(err) {
+							res.status(400).send({message : err});
+						} else {
+							for(var i=0; i<pResults.length; i++) {
+								pResults[i].inviteeName = pResults[i].inviteeList.user_id.displayName;
+								delete pResults[i].inviteeList;
+							}
+
+							res.status(200).send(pResults);	
+						}
+					}
+				);
 			}
 		});
 	} else {

@@ -41,7 +41,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
         	page: 1,            // show first page
         	count: 10,           // count per page
         	filter: {
-        		lName:''	//set the initial filter to nothing for name
+        		displayName:''	//set the initial filter to nothing for name
         	},
         	sorting: {
         		place:'asc'		// set the initial sorting to be place asc
@@ -58,11 +58,11 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 	            		data;
 	           
 	           		//get the max invited and attending
-	            	var maxInvitedFilter = $filter('orderBy')(data,'inviteeList.length', 'reverse');
-	            	$scope.maxInvited = maxInvitedFilter[0].inviteeList.length;
+	            	var maxInvitedFilter = $filter('orderBy')(data,'invited', 'reverse');
+	            	$scope.maxInvited = maxInvitedFilter[0].invited;
 
-	            	var maxAttendingFilter = $filter('orderBy')(data,'attendeeList.length', 'reverse');
-	            	$scope.maxAttending = maxAttendingFilter[0].attendeeList.length;
+	            	var maxAttendingFilter = $filter('orderBy')(data,'attending', 'reverse');
+	            	$scope.maxAttending = maxAttendingFilter[0].attending;
 
 	            	params.total(orderedData.length); //set total recalculation for paganation
 	            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
@@ -74,10 +74,10 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
         	page: 1,            // show first page
         	count: 10,           // count per page
         	filter: {
-        		lName:''	//set the initial filter to nothing for name
+        		attendeeName:''	//set the initial filter to nothing for name
         	},
         	sorting: {
-        		lName:'asc'		// set the initial sorting to be displayName asc
+        		attendeeName:'asc'		// set the initial sorting to be displayName asc
         	}
     		}, {
         	total: 0, // length of data
@@ -100,10 +100,10 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
         	page: 1,            // show first page
         	count: 10,           // count per page
         	filter: {
-        		displayName:''	//set the initial filter to nothing for name
+        		inviteeName:''	//set the initial filter to nothing for name
         	},
         	sorting: {
-        		displayName:'asc'		// set the initial sorting to be displayName asc
+        		inviteeName:'asc'		// set the initial sorting to be displayName asc
         	}
     		}, {
         	total: 0, // length of data
