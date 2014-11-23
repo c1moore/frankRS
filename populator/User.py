@@ -65,6 +65,9 @@ class User:
   def decide(self,eventID,attending,recruiting,recruiter=None):
     eventID = ensureID(eventID)
     statdict = {'event_id':eventID,'attending':attending,'recruiter':recruiting}
+    for sd in self.status:
+      if sd['event_id']==eventID:
+	return #I have already decided
     self.status.append(statdict)
     self.save()
     if attending and recruiter:
