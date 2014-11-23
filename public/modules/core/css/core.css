@@ -3,6 +3,9 @@ body {
 	background-image: url("http://frank.jou.ufl.edu/recruiters/Pictures/background.jpg");
 	background-size: cover;
 }
+li .disabled {
+	pointer-events: none;
+}
 .commentBar {
 	border: solid black 1px;
 }
