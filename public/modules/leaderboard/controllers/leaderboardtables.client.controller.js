@@ -67,7 +67,8 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 	            	params.total(orderedData.length); //set total recalculation for paganation
 	            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
 	            });
-        	}
+        	},
+   			$scope: { $data: {}}
 		});
 
 		$scope.attendingTableParams = new ngTableParams({
