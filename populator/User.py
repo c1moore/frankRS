@@ -99,6 +99,9 @@ class User:
     eventID = ensureID(eventID)
     if not 'recruiter' in self.roles:
       raise RuntimeError("User: Cant recruit unless recruiter")
+    for sd in self.status:
+      if sd['event_id']==eventID:
+        return #Already recruiting for the event
     self.status.append({'event_id':eventID,'attending':random.choice([True,False]),'recruiter':True})
 
   def getEvents(self):
