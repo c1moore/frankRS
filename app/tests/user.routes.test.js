@@ -616,7 +616,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		it("should return the inviteeList for a specific event (for all recruiters).", function(done) {
 			useragent
 				.post('http://localhost:3001/leaderboard/invitees')
-				.send({'event_id' : event1._id}).end(function(err, res) {
+				.send({'event_id' : event1._id})
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(200);
@@ -631,7 +631,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					}
 
 					recruiter1.should.equal(1);
-					recruiter2.should.equal(2s);
+					recruiter2.should.equal(2);
 					
 					done();
 				});
