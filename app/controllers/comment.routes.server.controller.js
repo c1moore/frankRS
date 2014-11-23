@@ -123,8 +123,17 @@ exports.postCommentSocial = function(req, res) {
 	var comment = req.body.comment;
 	var event_id = req.body.event_id;
 	var query = Comment.findOne({_id: id});
+	var interests = req.body.interests;
 	var user = req.user;
-	Comment.insert({user_id: user._id,event_id: event_id,comment:comment,stream:'social'});
+	var newComment = new Comment({user_id: user._id,event_id: event_id,comment:comment,stream:'social',
+				interests:interests});
+	newComment.save(function(err) {
+		if (err) {
+			res.send(400).json(err);
+		} else {
+			res.send(200).json({comment_id: newComment._id});
+		}
+	});
 };
 
 exports.postCommentRecruiter = function(req, res) {
@@ -136,11 +145,20 @@ exports.postCommentRecruiter = function(req, res) {
 	var event_id = req.body.event_id;
 	var query = Comment.findOne({_id: id});
 	var user = req.user;
-	var commentObj = {user_id: user._id,event_id: event_id,comment:comment,stream:'social'};
+	var interests = req.body.interests;
+	var commentObj = {user_id: user._id,event_id: event_id,comment:comment,stream:'social',
+		interests:interests};
 	if (!canViewComment(user,req.hasAuthorization,commentObj)) {
 		req.status(401).json({message: 'You do not have permissions to post that comment'});
 	} else {
-		Comment.insert(commentObj);
+		var newComment = new Comment(commentObj);
+		newComment.save(function(err) {
+			if (err) {
+				res.send(400).json(err);
+			} else {
+				res.send(200).json({comment_id: newComment._id});
+			}
+		});
 	}
 };
 
@@ -161,6 +179,30 @@ exports.delete = function(req, res) {
 		} else {
 			result.remove();
 			res.status(200).json({message: "Comment removed"});
+		}
+	});
+};
+
+exports.searchByInterests = function(req, res) {
+	if (!req.isAuthenticated()) { //Check if the user is authenticated
+		res.status(401).json({message: "You are not logged in"});
+		return;
+	}
+	var id = req.body.event_id;
+	var interest = req.body.interest;
+	if (!canViewEvent(req.user,id,req.hasAuthorization)) {
+		res.status(401).send({message: "You do not have permission to perform this search"});
+		return;
+	}
+	var query = Comment.find({event_id: id,interest: interest});
+	//Retrieve the comments, any authenticated user may view the social stream
+	//Hopefully, this won't encode the cursor itself. At least I hope not...
+	//	will have to test this
+	query.exec(function(err,result) {
+		if (err) {res.status(400).send(err);return;}
+		else if (!user) {res.status(400).json({message: "No comments found!"});
+		} else {
+			res.status(200).json(result);
 		}
 	});
 };

@@ -55,6 +55,7 @@ describe('Comment Model Unit Tests:', function() {
 			user_id: recruiter._id,
 			event_id: event1._id,
 			comment: "A comment",
+			interests: ['big','green','eggs'],
 			stream: 'recruiter'
 		});
 
@@ -123,6 +124,30 @@ describe('Comment Model Unit Tests:', function() {
 
 	it('should be able to save to the social comment stream',function(done) {
 		comment1.stream = 'social';
+		comment1.save(function(err) {
+			if (err) throw err;
+			done();
+		});
+	});
+
+	it('should be able to set an explicit creation date',function(done) {
+		comment1.date = new Date().getTime();
+		comment1.save(function(err) {
+			if (err) throw err;
+			done();
+		});
+	});
+
+	it('should not be able to set something other than a date into the date field',function(done) {
+		comment1.date = "Not a date";
+		comment1.save(function(err) {
+			should.exist(err);
+			done();
+		});
+	});
+
+	it('should be able to set the interests',function(done) {
+		comment1.interests = ['dogs','cats'];
 		comment1.save(function(err) {
 			if (err) throw err;
 			done();

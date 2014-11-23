@@ -34,12 +34,25 @@ var CommentSchema = new Schema({
 		validate: [validateRequired, 'Comment body is required.'],
 		required: true
 	},
+	interests: {
+		type: [String]
+	},
+	date: {
+		type: Number
+	},
 	stream: {
 		type: String,
 		enum: ['recruiter', 'social'],
 		validate: [validateRequired, 'A comment stream type is required.'],
 		required: true
 	}
+});
+
+CommentSchema.pre('validate', function(next) {
+	if (!this.date) {
+		this.date = new Date().getTime();
+	}
+	next();
 });
 
 //ID validator

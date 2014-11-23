@@ -31,7 +31,7 @@ class User:
   def randomize(self):
     self.fName = randomNameString(2,16).capitalize()
     self.lName = randomNameString(2,16).capitalize()
-    self.displayName = randomString(2,16,' ')
+    self.displayName = lName + ', ' + fName;
     self.email = (randomString(4,35).lower()+'@'+randomString(4,35)+
 			random.choice(WEBS))
     self.salt = ''#randomBytes(16)
@@ -65,6 +65,9 @@ class User:
   def decide(self,eventID,attending,recruiting,recruiter=None):
     eventID = ensureID(eventID)
     statdict = {'event_id':eventID,'attending':attending,'recruiter':recruiting}
+    for sd in self.status:
+      if sd['event_id']==eventID:
+        return #I have already decided
     self.status.append(statdict)
     self.save()
     if attending and recruiter:

@@ -1,41 +1,48 @@
-<div class="row" ng-controller="eventController">
+<div class="container">
+	<div class="row" ng-controller="eventController">
+		<div class="col-sm-4">
+			<div class="well">
+				<div class="form-group row">
+					<label for="eventName">Event Name:</label>
+					<input id="eventName" class="form-control" ng-model="eventName">
+				</div>
+				<div class="form-group row">
+					<label for="lName">Start Date:</label>
+					<input id="sDate" class="form-control" ng-model="sDate">
+				</div>
+				<div class="form-group row">
+					<label for="eDate">End Date:</label>
+					<input id="eDate" class="form-control" ng-model="eDate">
+				</div>
+				<div class="form-group row">
+					<label for="location">Location:</label>
+					<input id="location" class="form-control" ng-model="location">
+				</div>
+				<button class="btn btn-primary" ng-click="addEvent()">Add Event</button>
+			</div>
+		</div>
 
-  <div class="col-sm-6">
-    <!---<form ng-submit="addEvent()"></form>--->
-    <input value="" type="text" placeholder="Name of Event" ng-model="eventName">
-    <br>
-    <input value="" type="text" placeholder="Start Date" ng-model="startDate">
-    <br>
-    <input value="" type="text" placeholder="End Date" ng-model="endDate">
-    <br>
-    <input value="" type="text" placeholder="Location" ng-model="locationid">
-    <br>
-    <button ng-click="addEvent()">Add to Event List</button>
-    <!---<input type="submit" class="btn btn-primary" value="Add Event">--->
-  </div>
-  <div class="col-sm-6">
-    <h2>Event List</h2>
-    <table class="table table-hover table-striped table-bordered">
-      <thead>
-        <tr>
-          <td>Name</td>
-          <td>Start Date</td>
-          <td>End Date</td>
-          <td>Location</td>
-          <!---<td>Event Link</td>--->
-        </tr>
-      </thead>
-      <tbody>
-        <tr ng-repeat="event in events">
-          <td>{{ event.name }}</td>
-          <td>{{ event.start }}</td>
-          <td>{{ event.end }}</td>
-          <td>{{ event.location }}</td>
-          <td>
-            <input type="button" value="Remove" class="btn btn-primary" ng-click="deleteRow($index)" />
-          </td>
-          <!---<td>{{ event.link }}</td>--->
-        </tr>
-      </tbody>
-  </div>
+  		<div class="col-sm-8">
+	  		<h2>Event List</h2>
+	  		<table ng-table="tableParams" class="table table-bordered">
+	  			<tr ng-repeat="event in $data">
+	  				<td data-title="'Name'">
+	  					{{event.name}}
+	  				</td>
+	  				<td data-title="'Start Date'">
+	  					{{event.start}}
+	  				</td>
+	  				<td data-title="'End Date'">
+	  					{{event.end}}
+	  				</td>
+	  				<td data-title="'Location'">
+	  					{{event.location}}
+	  				</td>
+	  				<td data-title="'Remove'">
+	  					<input type="button" value="Remove" class="btn btn-primary" ng-click="deleteRow($index)" />
+	  				</td>
+	  			</tr>
+	  		</table>
+  		</div>
+  	</div>
 </div>
