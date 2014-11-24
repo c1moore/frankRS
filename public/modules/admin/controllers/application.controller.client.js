@@ -21,6 +21,10 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
             	}
             });
 
+            $scope.$watch("candidates", function() {
+                  tableParams.reload();
+            })
+
             $scope.addCandidate = function(newCandidate) {
                   $scope.candidates.push(newCandidate);
                   $scope.tableParams.reload();
