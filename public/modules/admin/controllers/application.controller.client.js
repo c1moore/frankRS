@@ -1,16 +1,25 @@
-angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams',
-	function($scope, ngTableParams) {
-      	$scope.candidates = [
-                  {fName: 'Dom', lName: 'Nostra'} 
-            ];
+angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams', '$http',
+	function($scope, ngTableParams, $http) {
+      	$scope.candidates = [];
 
-            $scope.addApplicant = function(index) {
-            	$scope.applications.splice(index, 1);
+            $scope.getCandidates = function() {
+                  $http.post('/candidate/getCandidates').success(function(data) {
+                        $scope.candidates = [];
+                        $scope.candidates = data;
+                  }).error(function(error) {
+                        console.log(error)
+                  });
             }
 
-            $scope.removeApplicant = function(index) {
-            	$scope.applications.splice(index, 1);
+            $scope.getCandidates();
+
+            $scope.addCandidate = function(newCandidate) {
+                  
             }
+
+            $scope.$watch("candidates", function() {
+                  $scope.tableParams.reload();
+            });
 
             $scope.tableParams = new ngTableParams({
             	page: 1,
@@ -20,14 +29,4 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
             		$defer.resolve($scope.candidates.slice((params.page() - 1) * params.count(), params.page() * params.count()));
             	}
             });
-
-            $scope.$watch("candidates", function() {
-                  tableParams.reload();
-            })
-
-            $scope.addCandidate = function(newCandidate) {
-                  $scope.candidates.push(newCandidate);
-                  $scope.tableParams.reload();
-            }
-
   }])
