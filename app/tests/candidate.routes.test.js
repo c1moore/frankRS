@@ -121,7 +121,7 @@
 					recruiter = new User({
 						fName: 'attendee',
 						lName: 'Testing',
-						roles: ['attendee'],
+						roles: ['recruiter'],
 						email: 'test12@test.com',
 						password: 'password',
 						login_enabled: true
@@ -212,6 +212,54 @@
 
 
  describe('Admin route tests:', function() {
+
+ 	describe('Obtain all candidates:', function() {
+ 		it("should return all of the candidates in the db.", function(done) {
+ 			candidate1.save(function(err) {
+ 				user1
+ 					.post('http://localhost:3001/candidate/getCandidates')
+ 					.end(function(err, res) {
+ 						should.not.exist(err);
+ 						res.status.should.equal(200);
+ 						res.body.length.should.equal(3);
+ 						done();
+ 					});
+ 			});
+ 		});
+
+ 		it("should return an error when the user is a recruiter.", function(done) {
+ 			recruiter1
+ 				.post('http://localhost:3001/candidate/getCandidates')
+ 				.end(function(err, res) {
+ 					should.not.exist(err);
+ 					res.status.should.equal(401);
+ 					res.body.message.should.equal("User does not have permission.");
+ 					done();
+ 				});
+ 		});
+
+ 		it("should return an error when the user is an attendee.", function(done) {
+ 			attendee1
+ 				.post('http://localhost:3001/candidate/getCandidates')
+ 				.end(function(err, res) {
+ 					should.not.exist(err);
+ 					res.status.should.equal(401);
+ 					res.body.message.should.equal("User does not have permission.");
+ 					done();
+ 				});
+ 		});
+
+ 		it("should return an error when the user is not logged in.", function(done) {
+ 			guest1
+ 				.post('http://localhost:3001/candidate/getCandidates')
+ 				.end(function(err, res) {
+ 					should.not.exist(err);
+ 					res.status.should.equal(401);
+ 					res.body.message.should.equal("User is not logged in.");
+ 					done();
+ 				});
+ 		});
+ 	});
 
  	it("admin should be able to get the candidate first name", function(done) {
  		candidate1.save(function(err) {
@@ -534,7 +582,7 @@ it("admin should be able to set candidate event status field", function(done) {
  	.send({'candidate_id' : candidate3._id, 'event_id': event2._id, 'status': 'accepted'})
  	.end(function(err,res) {
  		if (err) throw err;
- 		//console.log(res.body);
+ 		console.log(res.body);
  		res.status.should.equal(200);
 
  		candidate3.save(function(err) {
