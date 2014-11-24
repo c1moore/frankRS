@@ -12,6 +12,23 @@
  Candidate = mongoose.model('Candidate');
 
 
+exports.getCandidates = function(req, res) {
+	if(!req.isAuthenticated()) {
+		return res.status(401).send({message : "User is not logged in."});
+	} else if(!req.hasAuthorization(req.user, ["admin"])) {
+		return res.status(401).send({message : "User does not have permission."});
+	} else {
+		Candidate.find({}, function(err, results) {
+			if(err) {
+				return res.status(400).send({message : err});
+			} else if(!results.length) {
+				return res.status(400).send({message : "No candidates found."});
+			} else {
+				return res.status(200).send(results);
+			}
+		});
+	}
+}
 
  exports.getfName = function(req, res) {
  	var user = req.user;
