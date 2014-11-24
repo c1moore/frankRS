@@ -1,6 +1,11 @@
 angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams', '$http',
 	function($scope, ngTableParams, $http) {
       	$scope.candidates = [];
+            $scope.events = [];
+
+            $http.get('/events/enumerateAll').success(function(data) {
+                  $scope.events = data;
+            });
 
             $scope.getCandidates = function() {
                   $http.post('/candidate/getCandidates').success(function(data) {
@@ -14,7 +19,14 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
             $scope.getCandidates();
 
             $scope.addCandidate = function(newCandidate) {
-                  
+                  newCandidate.status = "volunteer";
+                  $http.post('/candidate/setCandidate',newCandidate).success(function() {
+                        console.log("Candidate created");
+                        $scope.candidates.push(newCandidate);
+                  }).error(function(error) {
+                        console.log(error);
+                  });
+                  $scope.newCandidate = null;
             }
 
             $scope.$watch("candidates", function() {
