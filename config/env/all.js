@@ -17,7 +17,6 @@ module.exports = {
 				'public/lib/bootstrap/dist/css/bootstrap-theme.css',
 				'public/lib/ng-table/ng-table.css',
 				'public/lib/font-awesome/css/font-awesome.min.css',
-				'public/lib/angular-multi-select.css'
 			],
 			js: [
 				'public/lib/jquery/dist/jquery.min.js',
@@ -33,7 +32,6 @@ module.exports = {
 				'public/lib/ng-table/ng-table.js',
 				'public/lib/lodash/dist/lodash.js',
 				'public/lib/jquery-ui/jquery-ui.min.js',
-				'public/lib/angular-multi-select/angular-multi-select.js'
 			]
 		},
 		css: [
