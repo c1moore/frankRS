@@ -1,10 +1,22 @@
 angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams', '$http',
 	function($scope, ngTableParams, $http) {
+            $scope.newCandidate = {
+                  events: []
+            }
       	$scope.candidates = [];
-            $scope.events = [];
+            $scope.selectEvents = [];
+            $scope.selectSettings = {
+                  smartButtonMaxItems: 3,
+                  externalIdProp: 'event_id',
+                  idProp: 'event_id',
+                  displayProp: 'label'
+            };
 
             $http.get('/events/enumerateAll').success(function(data) {
-                  $scope.events = data;
+                  //formats the event data for the multiselect directive
+                  for (var i=0;i<data.length;i++) {
+                        $scope.selectEvents.push({label:data[i].name, event_id:data[i]._id});
+                  }
             });
 
             $scope.getCandidates = function() {
@@ -18,15 +30,18 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 
             $scope.getCandidates();
 
-            $scope.addCandidate = function(newCandidate) {
-                  newCandidate.status = "volunteer";
-                  $http.post('/candidate/setCandidate',newCandidate).success(function() {
+            $scope.addCandidate = function() {
+                  $scope.newCandidate.status = "volunteer";
+                  $http.post('/candidate/setCandidate',$scope.newCandidate).success(function() {
                         console.log("Candidate created");
-                        $scope.candidates.push(newCandidate);
+                        $scope.candidates.push($scope.newCandidate);
                   }).error(function(error) {
                         console.log(error);
                   });
-                  $scope.newCandidate = null;
+
+                  $scope.newCandidate = {
+                        events: []
+                  };
             }
 
             $scope.$watch("candidates", function() {
