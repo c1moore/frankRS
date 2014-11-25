@@ -72,7 +72,7 @@ var newAttendeePass = function(credentialsArr) {
 	}
 
 	return password.join('');
-}
+};
 
 /*
 * Update the rank of all recruiters for the specified event.
@@ -372,7 +372,7 @@ exports.getAttendees = function(req, res) {
 			if(err) {
 				res.status(400).send(err);
 			} else if(!results || !results.length) {
-				res.status(400).json({'message' : 'Nobody is attending yet.', 'result' : result});
+				res.status(400).json({'message' : 'Nobody is attending yet.'});
 			} else {
 				User.populate(
 					results, {
