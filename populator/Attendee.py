@@ -9,7 +9,7 @@ class Attendee:
 
   def __init__(self,userID,eventID,regTimeMS):
     self.attendee = ensureID(userID)
-    self.eventid = ensureID(eventID)
+    self.event_id = ensureID(eventID)
     self.time = regTimeMS
 
   def valid(self):

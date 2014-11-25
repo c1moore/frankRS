@@ -5,6 +5,7 @@ from Util import WEBS
 from Util import getPymongoDB
 from Util import randomTimeInMS
 from Util import ensureID
+from Attendee import Attendee
 
 import random
 import inspect
@@ -67,7 +68,7 @@ class User:
     statdict = {'event_id':eventID,'attending':attending,'recruiter':recruiting}
     for sd in self.status:
       if sd['event_id']==eventID:
-        return #I have already decided
+        return None #I have already decided
     self.status.append(statdict)
     self.save()
     if attending and recruiter:
@@ -83,6 +84,9 @@ class User:
           rec['almostList'].append({'user_id':self._id,'event_id':eventID})
           rec['inviteeList'].remove({'user_id':self._id,'event_id':eventID})
           Users.save(rec)
+    if attending:
+      attendee = Attendee(ensureID(self),eventID,int(datetime.now().strftime('%s'))*1000)
+      return attendee
 
   def invite(self,userID,eventID):
     userID = ensureID(userID)

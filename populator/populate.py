@@ -44,7 +44,7 @@ def main():
     attendeesUnionRecruiters=random.randint(0,min(numRecruiters,numAttendees))
   print("\nGenerating objects (this may take some time)...")
   recruiters = []
-  attendees = []
+  attendees = [] #By role
   admins = []
   candidates = []
   events = []
@@ -144,8 +144,7 @@ def main():
 
   dumpUserSummary(list(set(recruiters)|set(attendees)|set(admins)))
 
-  numObjs = len(set(recruiters)|set(attendees)|set(admins)|set(candidates)|set(events))
-  print("%s Objects Injected." % numObjs)
+  print("Objects Injected.")
 
 
 if __name__=='__main__':
