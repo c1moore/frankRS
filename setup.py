@@ -19,7 +19,11 @@ def ask(msg):
     print("User rejected the operations")
     return False
 
+def welcome():
+  print("I assume you have already install npm, nodejs, mongo, and bower")
+
 def main():
+  welcome()
   res = ask("Would you like to update your system packages first?: ")
   if res:
     system("sudo aptitude update; sudo aptitude full-upgrade")
