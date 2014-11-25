@@ -1,9 +1,31 @@
 <table ng-table="mainTableParams" show-filter="true" class="table table-bordered leaderboard">
+	<thead>
+		<tr>
+			<th class="sortable header" ng-class="{'sort-asc' : mainTableParams.isSortBy('place', 'asc'), 'sort-desc' : mainTableParams.isSortBy('place', 'desc')}" ng-click="mainTableParams.sorting({'place' : mainTableParams.isSortBy('place', 'asc') ? 'desc' : 'asc'})">
+				<div>Rank</div>
+			</th>
+			<th class="sortable header" ng-class="{'sort-asc' : mainTableParams.isSortBy('displayName', 'asc'), 'sort-desc' : mainTableParams.isSortBy('displayName', 'desc')}" ng-click="mainTableParams.sorting({'displayName' : mainTableParams.isSortBy('displayName', 'asc') ? 'desc' : 'asc'})">
+				<div>Name</div>
+			</th>
+			<th class="header">
+				<span style="color: rgb(247, 181, 24);">Attending</span>
+				/
+				<span style="color: rgb(115, 201, 45);">Invited</span>
+			</th>
+		</tr>
+		<tr>
+			<th></th>
+			<th>
+				<input class="form-control" type="text" ng-model="mainTableFilter.displayName" placeholder="Search..." />
+			</th>
+			<th></th>
+		</tr>
+	</thead>
 	<tr ng-repeat="user in $data">
 		<td data-title="'Rank'" sortable="'place'">
 			{{user.place}}
 		</td>
-		<td data-title="'Name'" sortable="'displayName'" filter="{'displayName':'text'}">
+		<td data-title="'Name'" sortable="'displayName'">
 			{{user.displayName}}
 		</td>
 		<td data-title="'Attending/Invited Count'">
