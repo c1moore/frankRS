@@ -111,7 +111,7 @@ describe('Express.js Event Route Integration Tests:', function() {
  	it("should not be able to get the event start date when not signed in", function(done) {
  		request('http://localhost:3001')
  			.get('/events/getStartDate')
- 			.query({eventID: event1._id.toString()})
+ 			.query({event_id: event1._id.toString()})
  			.expect(401,done);
 
  	});
@@ -119,7 +119,7 @@ describe('Express.js Event Route Integration Tests:', function() {
  	it("should not be able to get the event name when not signed in", function(done) {
  		request('http://localhost:3001')
  			.get('/events/getName')
- 			.query({eventID: event1._id.toString()})
+ 			.query({event_id: event1._id.toString()})
  			.expect(401,done);
 
  	});
@@ -127,17 +127,17 @@ describe('Express.js Event Route Integration Tests:', function() {
  	it("should not be able to get the event end date when not signed in", function(done) {
  		request('http://localhost:3001')
  			.get('/events/getEndDate')
- 			.query({eventID: event1._id.toString()})
+ 			.query({event_id: event1._id.toString()})
  			.expect(401,done);
  	});
 
 	it("should not be able to get the event location when not signed in", function(done) {
  		request('http://localhost:3001')
  			.get('/events/getLocation')
- 			.query({eventID: event1._id.toString()})
+ 			.query({event_id: event1._id.toString()})
  			.expect(401)
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
 				res.body.should.have.property('message');
  				done();
  			});
@@ -147,17 +147,17 @@ describe('Express.js Event Route Integration Tests:', function() {
  	it("should not be able to get the event schedule when not signed in", function(done) {
  		request('http://localhost:3001')
  			.get('/events/getSchedule')
- 			.query({eventID: event1._id.toString()})
+ 			.query({event_id: event1._id.toString()})
  			.expect(401,done);
  	});
 
  	it("should not be able to get the event object when not signed in", function(done) {
  		request('http://localhost:3001')
  			.get('/events/getEventObj')
- 			.query({eventID: event1._id.toString()})
+ 			.query({event_id: event1._id.toString()})
  			.expect(401)
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
  				res.body.should.have.property('message');
  				done();
  			});
@@ -169,11 +169,8 @@ describe('Express.js Event Route Integration Tests:', function() {
  			.post('http://localhost:3001/auth/signin')
  			.send({email: user.email, password: 'password'})
  			.end(function (err, res) {
-				res.status.should.be.equal(200);
 				should.not.exist(err);
-       				if (err) {
-         				throw err;
-       				}
+				res.status.should.be.equal(200);
        				done();
  			});
      	});
@@ -182,7 +179,7 @@ describe('Express.js Event Route Integration Tests:', function() {
  		agent //IMPORTANT: Agent does not support expect, use should
 			.get('http://localhost:3001/events/enumerate')
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
 				res.status.should.be.equal(200);
  				res.body.should.have.property('events');
  				done();
@@ -192,9 +189,9 @@ describe('Express.js Event Route Integration Tests:', function() {
  	it("should now be able to get the event name when signed in", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getName')
- 			.query({eventID: event1._id.toString()})
+ 			.query({event_id: event1._id.toString()})
  			.end(function(err,res) {
-				if (err) throw erro;
+				should.not.exist(err);
 				res.status.should.be.equal(200);
 				res.body.should.have.property('name');
 				done();
@@ -205,9 +202,9 @@ describe('Express.js Event Route Integration Tests:', function() {
 	 it("should now be able to get the event start date when signed in", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getStartDate')
- 			.query({eventID: event1._id.toString()})
+ 			.query({event_id: event1._id.toString()})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(200);
 				res.body.should.have.property('start_date');
 				done();
@@ -217,9 +214,9 @@ describe('Express.js Event Route Integration Tests:', function() {
 	 it("should now be able to get the event end date when signed in", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getEndDate')
- 			.query({eventID: event1._id.toString()})
+ 			.query({event_id: event1._id.toString()})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(200);
 				res.body.should.have.property('end_date');
 				done();
@@ -230,9 +227,9 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should now be able to get the event location when signed in", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getLocation')
- 			.query({eventID: event1._id.toString()})
+ 			.query({event_id: event1._id.toString()})
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
 				res.status.should.be.equal(200);
 				res.body.should.have.property('location');
  				done();
@@ -242,9 +239,9 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should now be able to get the event schedule when signed in", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getSchedule')
- 			.query({eventID: event1._id.toString()})
+ 			.query({event_id: event1._id.toString()})
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
 				res.status.should.be.equal(200);
 				res.body.should.have.property('schedule');
  				done();
@@ -254,9 +251,9 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should now be able to get the event object when signed in", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getEventObj')
- 			.query({eventID: event1._id.toString()})
+ 			.query({event_id: event1._id.toString()})
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
 				res.status.should.be.equal(200);
 				res.body.should.have.property('start_date');
 				res.body.should.have.property('end_date');
@@ -271,7 +268,7 @@ describe('Express.js Event Route Integration Tests:', function() {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/enumerateAll')
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
 				res.body.message.should.be.equal('Access Denied. This incident will be reported.');
@@ -282,9 +279,9 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to access an eventObj by ID if the user shouldn't know about it", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getEventObj')
-			.query({eventID: event2._id.toString()})
+			.query({event_id: event2._id.toString()})
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
  				done();
@@ -294,9 +291,9 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to access start_date if the user shouldn't know about that event", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getStartDate')
-			.query({eventID: event2._id.toString()})
+			.query({event_id: event2._id.toString()})
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
  				done();
@@ -306,9 +303,9 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to access end_date if the user shouldn't know about that event", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getEndDate')
-			.query({eventID: event2._id.toString()})
+			.query({event_id: event2._id.toString()})
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
  				done();
@@ -318,9 +315,9 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to access location if the user shouldn't know about that event", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getLocation')
-			.query({eventID: event2._id.toString()})
+			.query({event_id: event2._id.toString()})
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
  				done();
@@ -330,9 +327,9 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to access schedule if the user shouldn't know about that event", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getSchedule')
-			.query({eventID: event2._id.toString()})
+			.query({event_id: event2._id.toString()})
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
  				done();
@@ -342,9 +339,9 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to access event name if the user shouldn't know about that event", function(done) {
  		agent //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getName')
-			.query({eventID: event2._id.toString()})
+			.query({event_id: event2._id.toString()})
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
  				done();
@@ -356,11 +353,8 @@ describe('Express.js Event Route Integration Tests:', function() {
 			.post('http://localhost:3001/auth/signin')
 			.send({email: userAdmin.email, password: 'password'})
  			.end(function (err, res) {
-				res.status.should.be.equal(200);
 				should.not.exist(err);
-       				if (err) {
-         				throw err;
-       				}
+				res.status.should.be.equal(200);
        				done();
  			});
      	});
@@ -369,7 +363,7 @@ describe('Express.js Event Route Integration Tests:', function() {
  		agentAdmin //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/enumerateAll')
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
 				res.status.should.be.equal(200);
  				done();
  			});
@@ -378,9 +372,9 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to access any event by ID if admin", function(done) {
  		agentAdmin //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getEventObj')
-			.query({eventID: event2._id.toString()})
+			.query({event_id: event2._id.toString()})
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
 				res.status.should.be.equal(200);
  				done();
  			});
@@ -389,9 +383,9 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to access start_date of any event if admin", function(done) {
  		agentAdmin //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getStartDate')
-			.query({eventID: event2._id.toString()})
+			.query({event_id: event2._id.toString()})
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
 				res.status.should.be.equal(200);
 				res.body.should.have.property('start_date');
  				done();
@@ -401,9 +395,9 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to access any end_date if admin", function(done) {
  		agentAdmin //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getEndDate')
-			.query({eventID: event2._id.toString()})
+			.query({event_id: event2._id.toString()})
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
 				res.status.should.be.equal(200);
 				res.body.should.have.property('end_date');
  				done();
@@ -413,9 +407,9 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to access any location if admin", function(done) {
  		agentAdmin //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getLocation')
-			.query({eventID: event2._id.toString()})
+			.query({event_id: event2._id.toString()})
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
 				res.status.should.be.equal(200);
 				res.body.should.have.property('location');
  				done();
@@ -425,9 +419,9 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to access any schedule if admin", function(done) {
  		agentAdmin //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getSchedule')
-			.query({eventID: event2._id.toString()})
+			.query({event_id: event2._id.toString()})
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
 				res.status.should.be.equal(200);
 				res.body.should.have.property('schedule');
  				done();
@@ -437,9 +431,9 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to access any event name if admin", function(done) {
  		agentAdmin //IMPORTANT: Agent does not support expect, use should
  			.get('http://localhost:3001/events/getName')
-			.query({eventID: event2._id.toString()})
+			.query({event_id: event2._id.toString()})
  			.end(function(err,res) {
- 				if (err) throw err;
+ 				should.not.exist(err);
 				res.status.should.be.equal(200);
 				res.body.should.have.property('name');
  				done();
@@ -451,15 +445,15 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to set the name if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setName')
-			.send({eventID: event2._id.toString(), name:"ItsANewNameDog"})
+			.send({event_id: event2._id.toString(), name:"ItsANewNameDog"})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(200);
 				agentAdmin
 					.get('http://localhost:3001/events/getName')
-					.query({eventID: event2._id.toString()})
+					.query({event_id: event2._id.toString()})
 					.end(function(err,res) {
-						if (err) throw err;
+						should.not.exist(err);
 						res.status.should.be.equal(200);
 						res.body.should.have.property('name');
 						res.body.name.should.be.equal("ItsANewNameDog");
@@ -471,15 +465,15 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set invalid name if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setName')
-			.send({eventID: event2._id.toString(), name:""})
+			.send({event_id: event2._id.toString(), name:""})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(400);
 				agentAdmin
 					.get('http://localhost:3001/events/getName')
-					.query({eventID: event2._id.toString()})
+					.query({event_id: event2._id.toString()})
 					.end(function(err,res) {
-						if (err) throw err;
+						should.not.exist(err);
 						res.status.should.be.equal(200);
 						res.body.should.have.property('name');
 						res.body.name.should.be.equal("ItsANewNameDog");
@@ -491,15 +485,15 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set name if user", function(done) {
 		agent
 			.post('http://localhost:3001/events/setName')
-			.send({eventID: event1._id.toString(), name:"UserName"})
+			.send({event_id: event1._id.toString(), name:"UserName"})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(401);
 				agentAdmin
 					.get('http://localhost:3001/events/getName')
-					.query({eventID: event1._id.toString()})
+					.query({event_id: event1._id.toString()})
 					.end(function(err,res) {
-						if (err) throw err;
+						should.not.exist(err);
 						res.status.should.be.equal(200);
 						res.body.should.have.property('name');
 						res.body.name.should.be.equal("testing123");
@@ -511,15 +505,15 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set invalid start_date if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setStartDate')
-			.send({eventID: event2._id.toString(), start_date:new Date(2004,11,30,10,0,0).getTime()})
+			.send({event_id: event2._id.toString(), start_date:new Date(2004,11,30,10,0,0).getTime()})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(400);
 				agentAdmin
 					.get('http://localhost:3001/events/getStartDate')
-					.query({eventID: event2._id.toString()})
+					.query({event_id: event2._id.toString()})
 					.end(function(err,res) {
-						if (err) throw err;
+						should.not.exist(err);
 						res.status.should.be.equal(200);
 						res.body.should.have.property('start_date');
 						res.body.start_date.should.be.equal(
@@ -532,15 +526,15 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to set start_date if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setStartDate')
-			.send({eventID: event2._id.toString(), start_date:new Date(2145,11,30,10,0,0).getTime()})
+			.send({event_id: event2._id.toString(), start_date:new Date(2145,11,30,10,0,0).getTime()})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(200);
 				agentAdmin
 					.get('http://localhost:3001/events/getStartDate')
-					.query({eventID: event2._id.toString()})
+					.query({event_id: event2._id.toString()})
 					.end(function(err,res) {
-						if (err) throw err;
+						should.not.exist(err);
 						res.status.should.be.equal(200);
 						res.body.should.have.property('start_date');
 						res.body.start_date.should.be.equal(
@@ -553,15 +547,15 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set start_date if user", function(done) {
 		agent
 			.post('http://localhost:3001/events/setStartDate')
-			.send({eventID: event1._id.toString(), start_date:new Date(2146,11,30,10,0,0).getTime()})
+			.send({event_id: event1._id.toString(), start_date:new Date(2146,11,30,10,0,0).getTime()})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(401);
 				agentAdmin
 					.get('http://localhost:3001/events/getStartDate')
-					.query({eventID: event1._id.toString()})
+					.query({event_id: event1._id.toString()})
 					.end(function(err,res) {
-						if (err) throw err;
+						should.not.exist(err);
 						res.status.should.be.equal(200);
 						res.body.should.have.property('start_date');
 						res.body.start_date.should.be.equal(
@@ -574,15 +568,15 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to set end_date if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setEndDate')
-			.send({eventID: event2._id.toString(), end_date:new Date(2155,11,30,10,0,0).getTime()})
+			.send({event_id: event2._id.toString(), end_date:new Date(2155,11,30,10,0,0).getTime()})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(200);
 				agentAdmin
 					.get('http://localhost:3001/events/getEndDate')
-					.query({eventID: event2._id.toString()})
+					.query({event_id: event2._id.toString()})
 					.end(function(err,res) {
-						if (err) throw err;
+						should.not.exist(err);
 						res.status.should.be.equal(200);
 						res.body.should.have.property('end_date');
 						res.body.end_date.should.be.equal(
@@ -595,15 +589,15 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set invalid end_date if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setEndDate')
-			.send({eventID: event2._id.toString(), end_date:new Date(2105,11,30,10,0,0).getTime()})
+			.send({event_id: event2._id.toString(), end_date:new Date(2105,11,30,10,0,0).getTime()})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(400);
 				agentAdmin
 					.get('http://localhost:3001/events/getEndDate')
-					.query({eventID: event2._id.toString()})
+					.query({event_id: event2._id.toString()})
 					.end(function(err,res) {
-						if (err) throw err;
+						should.not.exist(err);
 						res.status.should.be.equal(200);
 						res.body.should.have.property('end_date');
 						res.body.end_date.should.be.equal(
@@ -616,15 +610,15 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set end_date if user", function(done) {
 		agent
 			.post('http://localhost:3001/events/setEndDate')
-			.send({eventID: event1._id.toString(), end_date:new Date(2146,11,30,10,0,0).getTime()})
+			.send({event_id: event1._id.toString(), end_date:new Date(2146,11,30,10,0,0).getTime()})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(401);
 				agent
 					.get('http://localhost:3001/events/getEndDate')
-					.query({eventID: event1._id.toString()})
+					.query({event_id: event1._id.toString()})
 					.end(function(err,res) {
-						if (err) throw err;
+						should.not.exist(err);
 						res.status.should.be.equal(200);
 						res.body.should.have.property('end_date');
 						res.body.end_date.should.be.equal(
@@ -638,15 +632,15 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to set location if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setLocation')
-			.send({eventID: event2._id.toString(), location:"Rainbow2"})
+			.send({event_id: event2._id.toString(), location:"Rainbow2"})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(200);
 				agentAdmin
 					.get('http://localhost:3001/events/getLocation')
-					.query({eventID: event2._id.toString()})
+					.query({event_id: event2._id.toString()})
 					.end(function(err,res) {
-						if (err) throw err;
+						should.not.exist(err);
 						res.status.should.be.equal(200);
 						res.body.should.have.property('location');
 						res.body.location.should.be.equal(
@@ -659,15 +653,15 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set invalid location if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setLocation')
-			.send({eventID: event2._id.toString(), location:""})
+			.send({event_id: event2._id.toString(), location:""})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(400);
 				agentAdmin
 					.get('http://localhost:3001/events/getLocation')
-					.query({eventID: event2._id.toString()})
+					.query({event_id: event2._id.toString()})
 					.end(function(err,res) {
-						if (err) throw err;
+						should.not.exist(err);
 						res.status.should.be.equal(200);
 						res.body.should.have.property('location');
 						res.body.location.should.be.equal(
@@ -680,15 +674,15 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set location if user", function(done) {
 		agent
 			.post('http://localhost:3001/events/setLocation')
-			.send({eventID: event1._id.toString(), location:"UserLocation"})
+			.send({event_id: event1._id.toString(), location:"UserLocation"})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(401);
 				agent
 					.get('http://localhost:3001/events/getLocation')
-					.query({eventID: event1._id.toString()})
+					.query({event_id: event1._id.toString()})
 					.end(function(err,res) {
-						if (err) throw err;
+						should.not.exist(err);
 						res.status.should.be.equal(200);
 						res.body.should.have.property('location');
 						res.body.location.should.be.equal(
@@ -701,15 +695,15 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to set schedule if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setSchedule')
-			.send({eventID: event2._id.toString(), schedule:"BoBoBo"})
+			.send({event_id: event2._id.toString(), schedule:"BoBoBo"})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(200);
 				agentAdmin
 					.get('http://localhost:3001/events/getSchedule')
-					.query({eventID: event2._id.toString()})
+					.query({event_id: event2._id.toString()})
 					.end(function(err,res) {
-						if (err) throw err;
+						should.not.exist(err);
 						res.status.should.be.equal(200);
 						res.body.should.have.property('schedule');
 						res.body.schedule.should.be.equal(
@@ -722,15 +716,15 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to set schedule to empty string if admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/setSchedule')
-			.send({eventID: event2._id.toString(), schedule:""})
+			.send({event_id: event2._id.toString(), schedule:""})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(200);
 				agentAdmin
 					.get('http://localhost:3001/events/getSchedule')
-					.query({eventID: event2._id.toString()})
+					.query({event_id: event2._id.toString()})
 					.end(function(err,res) {
-						if (err) throw err;
+						should.not.exist(err);
 						res.status.should.be.equal(200);
 						res.body.should.have.property('schedule');
 						res.body.schedule.should.be.equal(
@@ -743,15 +737,15 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set schedule if user for event I don't know about", function(done) {
 		agent
 			.post('http://localhost:3001/events/setSchedule')
-			.send({eventID: event2._id.toString(), schedule:"UserSchedule"})
+			.send({event_id: event2._id.toString(), schedule:"UserSchedule"})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(401);
 				agentAdmin
 					.get('http://localhost:3001/events/getSchedule')
-					.query({eventID: event2._id.toString()})
+					.query({event_id: event2._id.toString()})
 					.end(function(err,res) {
-						if (err) throw err;
+						should.not.exist(err);
 						res.status.should.be.equal(200);
 						res.body.should.have.property('schedule');
 						res.body.schedule.should.be.equal(
@@ -764,15 +758,15 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to set schedule if user in general", function(done) {
 		agent
 			.post('http://localhost:3001/events/setSchedule')
-			.send({eventID: event1._id.toString(), schedule:"UserSchedule"})
+			.send({event_id: event1._id.toString(), schedule:"UserSchedule"})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(401);
 				agent
 					.get('http://localhost:3001/events/getSchedule')
-					.query({eventID: event1._id.toString()})
+					.query({event_id: event1._id.toString()})
 					.end(function(err,res) {
-						if (err) throw err;
+						should.not.exist(err);
 						res.status.should.be.equal(200);
 						res.body.should.have.property('schedule');
 						res.body.schedule.should.be.equal(
@@ -786,15 +780,15 @@ describe('Express.js Event Route Integration Tests:', function() {
 		event2.name = "ReallyNewName";
 		agentAdmin
 			.post('http://localhost:3001/events/setEventObj')
-			.send({eventID: event2._id.toString(), event:event2})
+			.send({event_id: event2._id.toString(), event:event2})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(200);
 				agentAdmin
 					.get('http://localhost:3001/events/getName')
-					.query({eventID: event2._id.toString()})
+					.query({event_id: event2._id.toString()})
 					.end(function(err,res) {
-						if (err) throw err;
+						should.not.exist(err);
 						res.status.should.be.equal(200);
 						res.body.should.have.property('name');
 						res.body.name.should.be.equal(
@@ -811,15 +805,15 @@ describe('Express.js Event Route Integration Tests:', function() {
 		event1.name = "ReallyNewName2";
 		agent
 			.post('http://localhost:3001/events/setEventObj')
-			.send({eventID: event1._id.toString(), event:event1})
+			.send({event_id: event1._id.toString(), event:event1})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(401);
 				agent
 					.get('http://localhost:3001/events/getName')
-					.query({eventID: event1._id.toString()})
+					.query({event_id: event1._id.toString()})
 					.end(function(err,res) {
-						if (err) throw err;
+						should.not.exist(err);
 						res.status.should.be.equal(200);
 						res.body.should.have.property('name');
 						res.body.name.should.be.equal(
@@ -832,9 +826,9 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should not be able to delete an event as a normal user", function(done) {
 		agent
 			.post('http://localhost:3001/events/delete')
-			.send({eventID: event1._id.toString()})
+			.send({event_id: event1._id.toString()})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(401);
 				done();
 			});
@@ -843,9 +837,9 @@ describe('Express.js Event Route Integration Tests:', function() {
 	it("should be able to delete an event as an admin", function(done) {
 		agentAdmin
 			.post('http://localhost:3001/events/delete')
-			.send({eventID: event1._id.toString()})
+			.send({event_id: event1._id.toString()})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(200);
 				done();
 			});
@@ -857,7 +851,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 			.send({name: "NewName",start_date: new Date().getTime()+100000,end_date:
 				new Date().getTime()+1000000,location: "asdf",schedule: "asdf"})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(200);
 				res.body.should.have.property('event_id');
 				done();
@@ -870,7 +864,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 			.send({name: "NewName",start_date: new Date().getTime()+100000,end_date:
 				new Date().getTime()+1000000,location: "asdf",schedule: "asdf"})
 			.end(function(err,res) {
-				if (err) throw err;
+				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
 				done();

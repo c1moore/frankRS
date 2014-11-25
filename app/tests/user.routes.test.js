@@ -223,11 +223,9 @@ describe('Express.js User Route Unit Tests:', function() {
 	          				break;
 	          		}
 
-	          		res.body[i].attendeeList.length.should.equal(2);
-	          		res.body[i].inviteeList.length.should.equal(1);
+	          		res.body[i].attending.should.equal(2);
+	          		res.body[i].invited.should.equal(1);
 	          		res.body[i].place.should.equal(1);
-	          		var testemail = res.body[i].attendeeList[0].user_id.email;
-	          		(testemail === 'calvin@example.com' || testemail === 'example.name@example.com').should.be.true;
 					done();
 				});
 		});
@@ -560,13 +558,19 @@ describe('Express.js User Route Unit Tests:', function() {
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(200);
-					res.body.length.should.equal(2);
-					(res.body[0].attendeeList.length + res.body[1].attendeeList.length).should.equal(3);
+					res.body.length.should.equal(3);
+
+					var recruiter1=0, recruiter2=0;
 					for(var i=0; i<res.body.length; i++) {
-						for(var j=0; j<res.body[i].attendeeList.length; j++) {
-							res.body[i].attendeeList[j].event_id.toString().should.equal(event1._id.toString());
-						}
+						if(res.body[i].recruiterName === "Moore, Calvin")
+							recruiter1++;
+						else if(res.body[i].recruiterName === "Name, Example")
+							recruiter2++;
 					}
+
+					recruiter1.should.equal(2);
+					recruiter2.should.equal(1);
+					
 					done();
 				});
 		});
@@ -616,13 +620,19 @@ describe('Express.js User Route Unit Tests:', function() {
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(200);
-					res.body.length.should.equal(2);
-					(res.body[0].inviteeList.length + res.body[1].inviteeList.length).should.equal(3);
+					res.body.length.should.equal(3);
+
+					var recruiter1=0, recruiter2=0;
 					for(var i=0; i<res.body.length; i++) {
-						for(var j=0; j<res.body[i].inviteeList.length; j++) {
-							res.body[i].inviteeList[j].event_id.toString().should.equal(event1._id.toString());
-						}
+						if(res.body[i].recruiterName === "Moore, Calvin")
+							recruiter1++;
+						else if(res.body[i].recruiterName === "Name, Example")
+							recruiter2++;
 					}
+
+					recruiter1.should.equal(1);
+					recruiter2.should.equal(2);
+					
 					done();
 				});
 		});

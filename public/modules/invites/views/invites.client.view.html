@@ -4,7 +4,7 @@
 			<h2>Recruiter Control Room</h2>
 		</div>
 	</div>
-	<form id="invite" data-ng-submit="send()">
+	<form id="invite" data-ng-submit="send()" class="frank-main-view">
 		<div id="from" class="invitation_field">
 			<strong>From: </strong>
 			<p id="recruiter_email">{{recruiter_email}}</p>
@@ -29,7 +29,7 @@
 	</form>
 	<div class="frank-invites-sidebar">
 		<accordion close-others="true">
-			<accordion-group is-open="firstSelected">
+			<accordion-group is-open="firstSelected" style="margin-top: 183px;">
 				<accordion-heading>
 					Awesome People Attending <i class="pull-right fa" ng-class="{'fa-chevron-right' : !firstSelected, 'fa-chevron-down' : firstSelected}"></i>
 				</accordion-heading>

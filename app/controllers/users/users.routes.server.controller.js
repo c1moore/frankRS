@@ -46,6 +46,34 @@ var tempPass = function() {
 	return temp.toString();
 };
 
+/**
+* Create a temporary password for a new attendee.  This password is the password that will
+* be sent to the attendee so they can log into their account.
+*
+* @param credentialsArr - An array that will be used to build the personalized password.  This
+* variable should follow the following format: [attendee_first_name, attendee_last_name,
+* attendee_email, attendee_organization].
+*/
+var newAttendeePass = function(credentialsArr) {
+	var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	var password = [];
+	var salt = '';
+
+	for (var i=0; i<5; i++) {
+		salt += chars[Math.round(_.random(0, 1, true) * (chars.length - 1))];
+	}
+
+	var pos = _.random(0, 2, false);
+	password[pos] = salt;
+
+	for(var i=0; i<3; i++) {
+		if(!password[i])
+			_.random(0, credentialsArr.length, false);
+	}
+
+	return password.join('');
+};
+
 /*
 * Update the rank of all recruiters for the specified event.
 */
@@ -115,7 +143,7 @@ exports.getLeaderboard = function(req, res) {
 		res.status(401).send({'message' : "User is not logged in."});
 	} else if(req.hasAuthorization(req.user, ["recruiter", "admin"])) {
 		var query = User.find({'roles' : 'recruiter', 'status.event_id' : req.body.event_id, 'status.recruiter' : true});
-		query.select('fName lName rank inviteeList attendeeList');
+		query.select('displayName rank inviteeList attendeeList');
 		query.populate('inviteeList.user_id', 'displayName email');
 		query.populate('attendeeList.user_id', 'displayName email');
 		query.exec(function(err, result) {
@@ -126,8 +154,13 @@ exports.getLeaderboard = function(req, res) {
 			} else {
 				for(var i=0; i<result.length; i++) {
 					result[i] = result[i].toObject();
+					
 					result[i].inviteeList = searchByEvent(req.body.event_id, result[i].inviteeList);
 					result[i].attendeeList = searchByEvent(req.body.event_id, result[i].attendeeList);
+					result[i].invited = result[i].inviteeList.length;
+					result[i].attending = result[i].attendeeList.length;
+					delete result[i].inviteeList;
+					delete result[i].attendeeList;
 
 					for(var j=0; j<result[i].rank.length; j++) {
 						if(result[i].rank[j].event_id.toString() === req.body.event_id.toString()) {
@@ -330,27 +363,35 @@ exports.getAttendees = function(req, res) {
 	if(!req.isAuthenticated()) {
 		res.status(401).send({'message' : 'User is not logged in.'});
 	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
-		var query = User.find({'roles' : 'recruiter', 'status.event_id' : req.body.event_id, 'status.recruiter' : true});
-		/*query.elemMatch('status', function(elem) {
-			elem.where('event_id', req.body.event_id)
-			elem.where('recruiter', true);
-		});*/
-		/*query.$where(function() {
-
-		});*/
-		query.select('fName lName attendeeList');
-		query.populate('attendeeList.user_id', 'displayName organization');
-		query.exec(function(err, result) {
+		User.aggregate([
+			{$match : {roles : 'recruiter', "status.event_id" : new mongoose.Types.ObjectId(req.body.event_id), "status.recruiter" : true}},
+			{$project : {recruiterName : "$displayName", attendeeList : 1, _id : -1}},
+			{$unwind : "$attendeeList"},
+			{$match : {"attendeeList.event_id" : new mongoose.Types.ObjectId(req.body.event_id)}}
+		], function(err, results) {
 			if(err) {
 				res.status(400).send(err);
-			} else if(!result || !result.length) {
-				res.status(400).json({'message' : 'Nobody is attending yet.', 'result' : result});
+			} else if(!results || !results.length) {
+				res.status(400).json({'message' : 'Nobody is attending yet.'});
 			} else {
-				for(var i=0; i<result.length; i++) {
-					result[i].toObject();
-					result[i].attendeeList = searchByEvent(req.body.event_id, result[i].attendeeList);
-				}
-				res.status(200).send(result);
+				User.populate(
+					results, {
+						path : "attendeeList.user_id",
+						model : 'User',
+						select : 'displayName -_id'
+					}, function(err, pResults) {
+						if(err) {
+							res.status(400).send({message : err});
+						} else {
+							for(var i=0; i<pResults.length; i++) {
+								pResults[i].attendeeName = pResults[i].attendeeList.user_id.displayName;
+								delete pResults[i].attendeeList;
+							}
+
+							res.status(200).send(pResults);	
+						}
+					}
+				);
 			}
 		});
 	} else {
@@ -369,20 +410,35 @@ exports.getInvitees = function(req, res) {
 	if(!req.isAuthenticated()) {
 		res.status(401).send({'message' : 'User is not logged in.'});
 	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
-		var query = User.find({'roles' : 'recruiter', 'status.event_id' : req.body.event_id, 'status.recruiter' : true});
-		query.select('inviteeList displayName');
-		query.populate('inviteeList.user_id', 'displayName');
-		query.exec(function (err, result) {
+		User.aggregate([
+			{$match : {roles : 'recruiter', "status.event_id" : new mongoose.Types.ObjectId(req.body.event_id), "status.recruiter" : true}},
+			{$project : {recruiterName : "$displayName", inviteeList : 1, _id : -1}},
+			{$unwind : "$inviteeList"},
+			{$match : {"inviteeList.event_id" : new mongoose.Types.ObjectId(req.body.event_id)}}
+		], function(err, results) {
 			if(err) {
 				res.status(400).send(err);
-			} else if(!result || !result.length) {
-				res.status(400).json({'message' : 'Nobody is invited yet.'});
+			} else if(!results || !results.length) {
+				res.status(400).json({'message' : 'Nobody is attending yet.'});
 			} else {
-				for(var i=0; i<result.length; i++) {
-					result[i].toObject();
-					result[i].inviteeList = searchByEvent(req.body.event_id, result[i].inviteeList);
-				}
-				res.status(200).send(result);
+				User.populate(
+					results, {
+						path : "inviteeList.user_id",
+						model : 'User',
+						select : 'displayName -_id'
+					}, function(err, pResults) {
+						if(err) {
+							res.status(400).send({message : err});
+						} else {
+							for(var i=0; i<pResults.length; i++) {
+								pResults[i].inviteeName = pResults[i].inviteeList.user_id.displayName;
+								delete pResults[i].inviteeList;
+							}
+
+							res.status(200).send(pResults);	
+						}
+					}
+				);
 			}
 		});
 	} else {
@@ -525,6 +581,15 @@ exports.sendInvitation = function(req, res) {
 			} else if(!recruiter) {
 				res.status(400).send({'message' : 'Recruiter not found.'});
 			} else {
+				/**
+				* We need to determine if the user is already attending the event.  If not,
+				* we need to either add them to the database or update their status array
+				* to show they have been invited, but not yet attending.  The invitee should
+				* also be sent the email invitation since they are not attending.  These cases will be
+				* taken care of if this query does not return a result.  If it does return a
+				* result, however, the user is already attending this event and the only thing
+				* that needs to be done is to add the invitee to the recruiter's almostList.
+				*/
 				var query2 = User.findOne({'email' : req.body.email, 'status.event_id' : req.body.event_id, 'status.attending' : true});
 				query2.exec(function(err, invitee) {
 					if(err) {
@@ -534,11 +599,22 @@ exports.sendInvitation = function(req, res) {
 					} else if(!invitee) {
 						async.waterfall([
 							function(callback) {
+								/**
+								* This query will determine if the user is already in the database 
+								* (either from being invited to this event or another) or if the
+								* invitee should be added to the database.  The former case will
+								* return a result, while the latter will not return anything.
+								*/
 								User.findOne({'email' : req.body.email}, function(err, result) {
 									if(err) {
-										callback(true, null);//res.status(400).send({'message' : 'Invitation sent, but could not be added to Leaderboard.  Please contact frank with invitee information to get credit for this invitation.'});
+										callback(true, null);
 									} else if(!result) {
-										//Invitee is not in the db yet.  Add the invitee to the db and send the new User object to the next function.
+										/**
+										* Invitee is not in the db yet.  Add the invitee to the db and send the new User
+										* object to the next function.  We will use a temporary password that will be
+										* reset when the user accepts the invitation.  We can determine if the user needs
+										* a real password by checking the login_enabled field.
+										*/
 										var newUser = new User({
 											fName : req.body.fName,
 											lName : req.body.lName,
@@ -546,7 +622,7 @@ exports.sendInvitation = function(req, res) {
 											roles : ['attendee'],
 											login_enabled : false,
 											displayName : req.body.lName + ', ' + req.body.fName,
-											status : [{'event_id' : req.body.event_id, 'attending' : false, 'recruiter' : false}],
+											status : [{'event_id' : new mongoose.Types.ObjectId(req.body.event_id), 'attending' : false, 'recruiter' : false}],
 											password : tempPass()
 										});
 
@@ -554,8 +630,17 @@ exports.sendInvitation = function(req, res) {
 											callback(err, result2);
 										});
 									} else {
-										//Invitee is already in the db, send the User object to the next function to be added to the recruiter's inviteeList.
-										callback(null, result);
+										/**
+										* Invitee is already in the db, all we need to do is
+										* add this event to the user's status array, if it is
+										* not already there, and send the User object to the
+										* next function to be added to the recruiter's inviteeList.
+										*/
+
+										result.status.addToSet({'event_id' : new mongoose.Types.ObjectId(req.body.event_id), 'attending' : false, 'recruiter' : false});
+										result.save(function(err, updatedUser) {
+											callback(err, updatedUser);
+										});
 									}
 								});
 							},
@@ -570,6 +655,10 @@ exports.sendInvitation = function(req, res) {
 									}
 								});
 							},
+							/**
+							* Get the template for this event and populate the fields
+							* accordingly.
+							*/
 							function(invitee, callback) {
 								res.render('templates/invitation-email', {
 									name: req.body.fName,
@@ -580,6 +669,16 @@ exports.sendInvitation = function(req, res) {
 									callback(err, invitee);
 								});
 							}
+						/**
+						* If there were no errors up to this point, send the invitee their
+						* email invitation.  If the invitation was sent correctly, update
+						* the ranks for the users.  Since the ranks will be updated every
+						* time an invitation is sent (to sombebody not attending the event
+						* yet), if an error occurs while updating the ranks, we do not have
+						* to worry.  This is why the ranks are updated last, it is the least
+						* important step in the process and easily corrected the next time
+						* an invitation is sent.
+						*/
 						], function(err, invitee) {
 							if(err) {
 								res.status(400).send({'message' : "Invitation was not sent.  We could not connect to the server, please try again later."});
@@ -646,7 +745,12 @@ exports.sendInvitation = function(req, res) {
 							}
 						});
 					
-					//This user has already been invited and is attending this event.
+					/**
+					* This user has already been invited and is attending this event.  Simply
+					* add this 'invitee' to the recruiter's almostList and send a message
+					* informing the recruiter that this person is already attending the
+					* event.
+					*/
 					} else {
 						recruiter.almostList.addToSet({'event_id' : req.body.event_id, 'user_id' : invitee._id});
 						recruiter.save(function(err, result) {
@@ -674,7 +778,227 @@ exports.sendInvitation = function(req, res) {
 * determined by checking the login_enable), they will need to be given permission to log into the system by setting
 * login_enable to true and resetting their password from the random one created when they were first invited.  This
 * new password will then be sent to them in an email telling them of their account on this website.
+*
+* TODO: Change the API before production.
 */
 exports.acceptInvitation = function(req, res) {
-	
+	//We will use an API key to determine whether or not this is an authenticated request.
+	if(!(req.body.api_key === 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe')) {
+		return res.status(400).send({message : 'You are not authorized to make this request.'});
+	} else {
+		/**
+		* These are the fields we will expect from Zapier.  We need to check to make sure
+		* they are specified in the request and have a typeof value of 'string'.  If both
+		* of these conditions are not met, we will return a 400 error.
+		*/
+
+		var expectedFields = ['api_key', 'invitee_fName', 'invitee_lName', 'invitee_email', 'organization', 'event_name', 'event_location', 'recruiter_email'];
+
+		for(var i=0; i<expectedFields.length; i++) {
+			if(req.body[expectedFields[i]] == undefined) {
+				return res.status(400).send({message : 'All required fields not specified.'});
+			} else if(typeof req.body[expectedFields[i]] !== 'string') {
+				return res.status(400).send({message : 'Illegal value for field ' + expectedFields[i] + '.'});
+			}
+		}
+
+		User.findOne({email : req.body.invitee_email}, function(err, attendee) {
+			if(err) {
+				return res.status(400).send({message : err});
+			} else {
+				Event.findOne({name : req.body.event_name}, function(err, evnt) {
+					if(err) {
+						return res.status(400).send({message : err});
+					} else if(!evnt) {
+						return res.status(400).send({message : 'Event not found.'});
+					} else {
+						if(!attendee) {
+							/**
+							* The attendee has not been added to the db before (meaning they were invited
+							* outside of the recruiter system) and needs to be added as an attendee.  This
+							* could also mean that the user was using another email when they received their
+							* invitation.  This situation will not be considered as there are no good ways
+							* to determine if a user account should belong to this attendee.
+							*/
+
+							var pass = newAttendeePass([req.body.invitee_fName, req.body.invitee_lName, req.body.invitee_email, req.body.organization]);
+
+							var newAttendee = new User({
+								fName : req.body.invitee_fName,
+								lName : req.body.invitee_lName,
+								email : req.body.invitee_email,
+								displayName : req.body.invitee_lName + ', ' + req.body.invitee_fName,
+								roles : ['attendee'],
+								login_enabled : true,
+								status : {event_id : evnt._id, attending : true, recruiter : false},
+								password : pass
+							});
+
+							newAttendee.save(function(err, result) {
+								if(err) {
+									return res.status(400).send({message : err});
+								} else {
+									/**
+									* Now we can send the attendee an email about their new account
+									* and inform the recruiter that one of their invitations were
+									* accepted.
+									*/
+									var smtpTransport = nodemailer.createTransport(config.mailer.options);
+									var attendeeMailOptions = {
+										to: req.body.invitee_email,
+										from: 'frank@jou.ufl.edu',
+										sender: 'frank@jou.ufl.edu',
+										replyTo: 'frank@jou.ufl.edu',
+										subject: "New frank account for " + req.body.event_name
+									};
+									var recruiterMailOptions = {
+										from: 'frank@jou.ufl.edu',
+										sender: 'frank@jou.ufl.edu',
+										replyTo: 'frank@jou.ufl.edu',
+										subject: 'Yet Another Invitation Accepted'
+									};
+									
+									async.parallel([
+										//Send message to attendee.
+										function(callback) {
+											res.render('templates/invitation-accepted-attendee-email', {
+												name: req.body.invitee_fName,
+												event: req.body.event_name,
+												password : pass,
+												address : 'http://frank.jou.ufl.edu/recruiters'
+											}, function(err, emailHTML) {
+												attendeeMailOptions.html = emailHTML;
+												smtpTransport.sendMail(attendeeMailOptions, function(err, info) {
+													callback(err, info.response);
+												});
+											});
+										},
+										//Get recruiter information and send notification.
+										function(callback) {
+											User.findOne({email : req.body.recruiter_email}, function(err, result) {
+												if(err) {
+													callback(err, false);
+												} else if(!result) {
+													callback(true, false);
+												} else {
+													res.render('templates/invitation-accepted-recruiter-email', {
+														recruiter_name : result.fName,
+														event: req.body.event_name,
+														attendee_name: req.body.invitee_fName + " " + req.body.invitee_lName,
+														address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard'
+													}, function(err, emailHTML) {
+														recruiterMailOptions.html = emailHTML;
+														smtpTransport.sendMail(recruiterMailOptions, function(err, info) {
+															callback(err, info.response);
+														});
+													});	
+												}
+											});
+										},
+									],
+										//Callback function.
+										function(err, results) {
+											if(err) {
+												return res.status(400).send({message : err});
+											} else {
+												return res.status(200).send({message : "As expected, everything worked perfectly."});
+											}
+										}
+									);
+								}
+							});
+						} else {
+							/**
+							* The attendee has been added to the db, but this does not mean they have
+							* been invited to attend this event through the recruiter system.  We
+							* simply need to update their status array by either updating the event
+							* to show they are attending or adding the event to their status array,
+							* change their password if login_enabled is false, and send them an email.
+							*/
+
+							var i;
+							for(i=0; i<attendee.status.length; i++) {
+								if(attendee.status[i].event_id.toString() === evnt._id.toString()) {
+									attendee.status[i].attending = true;
+									break;
+								}
+							}
+
+							if(i === attendee.status.length) {
+								attendee.status.addToSet({event_id : evnt._id, attending : true, recruiter : false});
+							}
+
+							attendee.save(function(err) {
+								if(err) {
+									return res.status(400).send({message : err});
+								} else {
+									var smtpTransport = nodemailer.createTransport(config.mailer.options);
+									var attendeeMailOptions = {
+										to: req.body.invitee_email,
+										from: 'frank@jou.ufl.edu',
+										sender: 'frank@jou.ufl.edu',
+										replyTo: 'frank@jou.ufl.edu',
+										subject: "New frank account for " + req.body.event_name
+									};
+									var recruiterMailOptions = {
+										from: 'frank@jou.ufl.edu',
+										sender: 'frank@jou.ufl.edu',
+										replyTo: 'frank@jou.ufl.edu',
+										subject: 'Yet Another Invitation Accepted'
+									};
+									
+									async.parallel([
+										//Send message to attendee.
+										function(callback) {
+											res.render('templates/invitation-accepted-user-email', {
+												name: req.body.invitee_fName,
+												event: req.body.event_name,
+												address : 'http://frank.jou.ufl.edu/recruiters'
+											}, function(err, emailHTML) {
+												attendeeMailOptions.html = emailHTML;
+												smtpTransport.sendMail(attendeeMailOptions, function(err, info) {
+													callback(err, info.response);
+												});
+											});
+										},
+										//Get recruiter information and send notification.
+										function(callback) {
+											User.findOne({email : req.body.recruiter_email}, function(err, result) {
+												if(err) {
+													callback(err, false);
+												} else if(!result) {
+													callback(true, false);
+												} else {
+													res.render('templates/invitation-accepted-recruiter-email', {
+														recruiter_name : result.fName,
+														event: req.body.event_name,
+														attendee_name: req.body.invitee_fName + " " + req.body.invitee_lName,
+														address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard'
+													}, function(err, emailHTML) {
+														recruiterMailOptions.html = emailHTML;
+														smtpTransport.sendMail(recruiterMailOptions, function(err, info) {
+															callback(err, info.response);
+														});
+													});	
+												}
+											});
+										},
+									],
+										//Callback function.
+										function(err, results) {
+											if(err) {
+												return res.status(400).send({message : err});
+											} else {
+												return res.status(200).send({message : "As expected, everything worked perfectly."});
+											}
+										}
+									);
+								}
+							});
+						}
+					}
+				});
+			}
+		});
+	}
 };

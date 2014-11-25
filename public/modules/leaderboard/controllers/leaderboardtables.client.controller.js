@@ -6,6 +6,8 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		$scope.userInvites = 0;
 		$scope.userAttendees = 0;
 
+		$scope.mainTableFilter = {displayName : ''};
+
 		/*
 		* If the user is not logged in, they should be redirected to the sigin page.  If the
 		* user is logged in, but does not have the proper permissions they should be
@@ -40,9 +42,10 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		$scope.mainTableParams = new ngTableParams({
         	page: 1,            // show first page
         	count: 10,           // count per page
-        	filter: {
-        		lName:''	//set the initial filter to nothing for name
-        	},
+        	filter: $scope.mainTableFilter,
+        	/*{
+        		displayName:''	//set the initial filter to nothing for name
+        	},*/
         	sorting: {
         		place:'asc'		// set the initial sorting to be place asc
         	}
@@ -58,26 +61,27 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 	            		data;
 	           
 	           		//get the max invited and attending
-	            	var maxInvitedFilter = $filter('orderBy')(data,'inviteeList.length', 'reverse');
-	            	$scope.maxInvited = maxInvitedFilter[0].inviteeList.length;
+	            	var maxInvitedFilter = $filter('orderBy')(data,'invited', 'reverse');
+	            	$scope.maxInvited = maxInvitedFilter[0].invited;
 
-	            	var maxAttendingFilter = $filter('orderBy')(data,'attendeeList.length', 'reverse');
-	            	$scope.maxAttending = maxAttendingFilter[0].attendeeList.length;
+	            	var maxAttendingFilter = $filter('orderBy')(data,'attending', 'reverse');
+	            	$scope.maxAttending = maxAttendingFilter[0].attending;
 
 	            	params.total(orderedData.length); //set total recalculation for paganation
 	            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
 	            });
-        	}
+        	},
+   			$scope: { $data: {}}
 		});
 
 		$scope.attendingTableParams = new ngTableParams({
         	page: 1,            // show first page
         	count: 10,           // count per page
         	filter: {
-        		lName:''	//set the initial filter to nothing for name
+        		attendeeName:''	//set the initial filter to nothing for name
         	},
         	sorting: {
-        		lName:'asc'		// set the initial sorting to be displayName asc
+        		attendeeName:'asc'		// set the initial sorting to be displayName asc
         	}
     		}, {
         	total: 0, // length of data
@@ -100,10 +104,10 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
         	page: 1,            // show first page
         	count: 10,           // count per page
         	filter: {
-        		displayName:''	//set the initial filter to nothing for name
+        		inviteeName:''	//set the initial filter to nothing for name
         	},
         	sorting: {
-        		displayName:'asc'		// set the initial sorting to be displayName asc
+        		inviteeName:'asc'		// set the initial sorting to be displayName asc
         	}
     		}, {
         	total: 0, // length of data
@@ -123,6 +127,18 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
         	}
 		});
 
+		var getStats = function() {
+			$http.get('/leaderboard/recruiterinfo', {params : {event_id : eventSelector.postEventId}}).success(function(response) {
+				$scope.userScore = response.place;
+				$scope.userInvites = response.invited;
+				$scope.userAttendees = response.attending;
+			}).error(function(response, status) {
+
+			});
+		}
+
+		getStats();
+
 
 
 		$scope.$watch(
@@ -130,6 +146,8 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 				return eventSelector.selectedEvent;
 			},
 			function() {
+				getStats();
+
 				$timeout(function() {
         			// $scope.mainTableParams.settings().$scope = $scope;
         			// $scope.attendingTableParams.settings().$scope = $scope;

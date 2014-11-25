@@ -1,41 +1,64 @@
-<div class="row" ng-controller="eventController">
+<div class="container">
+	<div class="row" ng-controller="eventController">
+		<div class="col-sm-4">
+			<div class="well">
+				<form name="eventForm" novalidate ng-submit="addEvent(newEvent)">
+					<div class="form-group row">
+						<label>Event Name:</label>
+						<input name="eventName" class="form-control" type="text" ng-model="newEvent.name" required>
+					</div>
+					<div class="form-group row">
+						<label>Start Date (mm/dd/yy):</label>
+						<p class="input-group">
+							<input type="text" class="form-control" datepicker-popup="shortDate" ng-model="newEvent.start_date" is-open="openedS" min-date="dt" datepicker-options="dateOptions" ng-required="true" close-text="Close"/>
+	              			<span class="input-group-btn">
+	                			<button type="button" class="btn btn-default" ng-click="openS($event)">
+	                				<i class="glyphicon glyphicon-calendar"></i>
+	                			</button>
+	              			</span>
+              			</p>
+					</div>
+					<div class="form-group row">
+						<label>End Date (mm/dd/yy):</label>
+						<p class="input-group">
+							<input type="text" class="form-control" datepicker-popup="shortDate" ng-model="newEvent.end_date" is-open="openedE" min-date="newEvent.start_date" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
+	              			<span class="input-group-btn">
+	                			<button type="button" class="btn btn-default" ng-click="openE($event)">
+	                				<i class="glyphicon glyphicon-calendar"></i>
+	                			</button>
+	              			</span>
+              			</p>
+					</div>
+					<div class="form-group row">
+						<label>Location:</label>
+						<input name="location" class="form-control" type="text" ng-model="newEvent.location" required>
+					</div>
+					<button type="submit" class="btn btn-primary" ng-disabled="eventForm.$invalid">Add Event</button>
+				</form>
+			</div>
+		</div>
 
-  <div class="col-sm-6">
-    <!---<form ng-submit="addEvent()"></form>--->
-    <input value="" type="text" placeholder="Name of Event" ng-model="eventName">
-    <br>
-    <input value="" type="text" placeholder="Start Date" ng-model="startDate">
-    <br>
-    <input value="" type="text" placeholder="End Date" ng-model="endDate">
-    <br>
-    <input value="" type="text" placeholder="Location" ng-model="locationid">
-    <br>
-    <button ng-click="addEvent()">Add to Event List</button>
-    <!---<input type="submit" class="btn btn-primary" value="Add Event">--->
-  </div>
-  <div class="col-sm-6">
-    <h2>Event List</h2>
-    <table class="table table-hover table-striped table-bordered">
-      <thead>
-        <tr>
-          <td>Name</td>
-          <td>Start Date</td>
-          <td>End Date</td>
-          <td>Location</td>
-          <!---<td>Event Link</td>--->
-        </tr>
-      </thead>
-      <tbody>
-        <tr ng-repeat="event in events">
-          <td>{{ event.name }}</td>
-          <td>{{ event.start }}</td>
-          <td>{{ event.end }}</td>
-          <td>{{ event.location }}</td>
-          <td>
-            <input type="button" value="Remove" class="btn btn-primary" ng-click="deleteRow($index)" />
-          </td>
-          <!---<td>{{ event.link }}</td>--->
-        </tr>
-      </tbody>
-  </div>
+  		<div class="col-sm-8">
+	  		<h2>Event List</h2>
+	  		<table ng-table="tableParams" class="table table-bordered frank-main-view">
+	  			<tr ng-repeat="event in $data">
+	  				<td data-title="'Name'">
+	  					{{event.name}}
+	  				</td>
+	  				<td data-title="'Start Date'">
+	  					{{event.start_date | date:'shortDate'}}
+	  				</td>
+	  				<td data-title="'End Date'">
+	  					{{event.end_date | date:'shortDate'}}
+	  				</td>
+	  				<td data-title="'Location'">
+	  					{{event.location}}
+	  				</td>
+	  				<td data-title="'Remove'">
+	  					<input type="button" value="Remove" class="btn btn-primary" ng-click="deleteEvent(event)" />
+	  				</td>
+	  			</tr>
+	  		</table>
+  		</div>
+  	</div>
 </div>

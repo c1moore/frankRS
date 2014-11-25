@@ -8,3 +8,4 @@ app/tests/coverage/
 .bower-*/
 .idea/
 populator/user_summary.txt
+populator/__pycache__

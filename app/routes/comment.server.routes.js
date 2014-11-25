@@ -11,6 +11,7 @@ module.exports = function(app) {
 	app.route('/comments/getRecruiterCommentsForEvent').get(james_comment_routes.getRecruiterCommentsForEvent);
 	app.route('/comments/postCommentSocial').post(james_comment_routes.postCommentSocial);
 	app.route('/comments/postCommentRecruiter').post(james_comment_routes.postCommentRecruiter);
+	app.route('/comments/searchByInterests').post(james_comment_routes.searchByInterests);
 	app.route('/comments/delete').post(james_comment_routes.delete);
 
 };

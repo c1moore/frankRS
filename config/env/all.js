@@ -16,7 +16,7 @@ module.exports = {
 				'public/lib/bootstrap/dist/css/bootstrap.css',
 				'public/lib/bootstrap/dist/css/bootstrap-theme.css',
 				'public/lib/ng-table/ng-table.css',
-				'public/lib/font-awesome/css/font-awesome.min.css'
+				'public/lib/font-awesome/css/font-awesome.min.css',
 			],
 			js: [
 				'public/lib/jquery/dist/jquery.min.js',
@@ -31,7 +31,7 @@ module.exports = {
 				'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
 				'public/lib/ng-table/ng-table.js',
 				'public/lib/lodash/dist/lodash.js',
-				'public/lib/jquery-ui/jquery-ui.min.js'
+				'public/lib/jquery-ui/jquery-ui.min.js',
 			]
 		},
 		css: [

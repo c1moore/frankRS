@@ -1,18 +1,40 @@
 <table ng-table="mainTableParams" show-filter="true" class="table table-bordered leaderboard">
+	<thead>
+		<tr>
+			<th class="sortable header" ng-class="{'sort-asc' : mainTableParams.isSortBy('place', 'asc'), 'sort-desc' : mainTableParams.isSortBy('place', 'desc')}" ng-click="mainTableParams.sorting({'place' : mainTableParams.isSortBy('place', 'asc') ? 'desc' : 'asc'})">
+				<div>Rank</div>
+			</th>
+			<th class="sortable header" ng-class="{'sort-asc' : mainTableParams.isSortBy('displayName', 'asc'), 'sort-desc' : mainTableParams.isSortBy('displayName', 'desc')}" ng-click="mainTableParams.sorting({'displayName' : mainTableParams.isSortBy('displayName', 'asc') ? 'desc' : 'asc'})">
+				<div>Name</div>
+			</th>
+			<th class="header">
+				<span style="color: rgb(247, 181, 24);">Attending</span>
+				/
+				<span style="color: rgb(115, 201, 45);">Invited</span>
+			</th>
+		</tr>
+		<tr>
+			<th></th>
+			<th>
+				<input class="form-control" type="text" ng-model="mainTableFilter.displayName" placeholder="Search..." />
+			</th>
+			<th></th>
+		</tr>
+	</thead>
 	<tr ng-repeat="user in $data">
 		<td data-title="'Rank'" sortable="'place'">
 			{{user.place}}
 		</td>
-		<td data-title="'Name'" sortable="'lName'" filter="{'lName':'text'}">
-			{{user.lName}}
+		<td data-title="'Name'" sortable="'displayName'">
+			{{user.displayName}}
 		</td>
 		<td data-title="'Attending/Invited Count'">
 			<div class="progress">
-				<div class="progress-bar progress-bar-warning" ng-style="{'width':((user.attendeeList.length/maxAttending)*100) + '%'}">
-					{{user.attendeeList.length}}
+				<div class="progress-bar progress-bar-warning" ng-style="{'width':((user.attending/maxAttending)*100) + '%'}">
+					{{user.attending}}
 				</div>
-				<div class="progress-bar progress-bar-success" ng-style="{'width':((user.inviteeList.length/maxInvited)*100) + '%'}">
-					{{user.inviteeList.length}}
+				<div class="progress-bar progress-bar-success" ng-style="{'width':((user.invited/maxInvited)*100) + '%'}">
+					{{user.invited}}
 				</div>
 			</div>
 		</td>
