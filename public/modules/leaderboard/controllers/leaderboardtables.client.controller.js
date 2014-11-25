@@ -6,6 +6,8 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		$scope.userInvites = 0;
 		$scope.userAttendees = 0;
 
+		$scope.mainTableFilter = {displayName : ''};
+
 		/*
 		* If the user is not logged in, they should be redirected to the sigin page.  If the
 		* user is logged in, but does not have the proper permissions they should be
@@ -40,9 +42,10 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		$scope.mainTableParams = new ngTableParams({
         	page: 1,            // show first page
         	count: 10,           // count per page
-        	filter: {
+        	filter: $scope.mainTableFilter,
+        	/*{
         		displayName:''	//set the initial filter to nothing for name
-        	},
+        	},*/
         	sorting: {
         		place:'asc'		// set the initial sorting to be place asc
         	}
