@@ -582,7 +582,7 @@ it("admin should be able to set candidate event status field", function(done) {
  	.send({'candidate_id' : candidate3._id, 'event_id': event2._id, 'status': 'accepted'})
  	.end(function(err,res) {
  		if (err) throw err;
- 		console.log(res.body);
+ 		//console.log(res.body);
  		res.status.should.equal(200);
 
  		candidate3.save(function(err) {
