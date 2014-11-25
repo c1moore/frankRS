@@ -538,7 +538,7 @@ exports.setCandidate = function(req,res){
 			lName: req.body.lName,
 			email: req.body.email,
 			status: req.body.status,
-			events: [{event_id: req.body.event_id._id,accepted: req.body.accept_Key}],
+			events: [{event_id: req.body.event_id,accepted: false}],
 			note: req.body.note,
 			user_id: req.body.user_id
 		});
