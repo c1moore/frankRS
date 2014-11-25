@@ -20,7 +20,8 @@ def ask(msg):
     return False
 
 def welcome():
-  print("I assume you have already install npm, nodejs, mongo, and bower")
+  print("I assume you have already installed npm, nodejs, mongo, and bower.")
+  print("I will now perform more advanced configuration at your request.")
 
 def main():
   welcome()
