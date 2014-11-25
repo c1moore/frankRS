@@ -32,6 +32,7 @@ module.exports = {
 				'public/lib/ng-table/ng-table.js',
 				'public/lib/lodash/dist/lodash.js',
 				'public/lib/jquery-ui/jquery-ui.min.js',
+				'public/lib/angularjs-dropdown-multiselect/src/angularjs-dropdown-multiselect.js'
 			]
 		},
 		css: [

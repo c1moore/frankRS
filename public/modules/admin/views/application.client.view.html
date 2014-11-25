@@ -2,7 +2,11 @@
 	<div class="row" ng-controller="applicationController">    
 		<div class="col-md-4">
 			<div class="well">
-				<form name="candidateForm" novalidate ng-submit="addCandidate(newCandidate)">
+				<form name="candidateForm" novalidate ng-submit="addCandidate()">
+					<div class="form-group row">
+						<label>Select Event:</label>
+						<div ng-dropdown-multiselect="" options="selectEvents" selected-model="newCandidate.events" extra-settings="selectSettings"></div>
+					</div>
 					<div class="form-group row">
 						<label>First Name:</label>
 						<input name="fName" class="form-control" type="text" ng-model="newCandidate.fName" required>
@@ -14,10 +18,6 @@
 					<div class="form-group row">
 						<label>Email Address:</label>
 						<input name="email" class="form-control" type="email" ng-model="newCandidate.email" required>
-					</div>
-					<div class="form-group row">
-						<label>Select Event:</label>
-						<select name="event" class="form-control" ng-options="event.event_id as event.name for event in events" ng-model="newCandidate.event_id" multiple></select>
 					</div>
 					<button type="submit" class="btn btn-primary" ng-disabled="candidateForm.$invalid">+ Candidate</button>
 				</form>
