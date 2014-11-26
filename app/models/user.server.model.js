@@ -141,7 +141,12 @@ var UserSchema = new Schema({
 	},
 	organization: {
 		type: String,
-		validate: [validateRequired, 'You must specify an organization if at all possible']
+	},
+	interests: {
+		type: [String]
+		//Mongoose.js converts assignments of incorrect type to string arrays. I have tested that it
+		//	provides this functionality. A test that such an assignment should fail is
+		//	unnecessary
 	},
 	providerData: {},
 	additionalProvidersData: {},

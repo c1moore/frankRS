@@ -140,15 +140,6 @@ describe('User Model Unit Tests:', function() {
 			});
 		});
 
-		it('should not be able to save without an organization',function(done) {
-			user.organization = '';
-			user.save(function(err) {
-				should.exist(err);
-				user.organization = 'organ'; //Just in case
-				done();
-			});
-		});
-
 		it('should allow getting the password salt', function(done) {
 			user.save(function(err) {
 				var query = User.findOne({'salt':user.salt});
