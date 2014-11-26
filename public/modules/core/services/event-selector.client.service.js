@@ -20,8 +20,8 @@ angular.module('core').service('eventSelector', ['$http', '$location', 'cacheSer
 		}
 
 		var checkEvent = function(needle) {
-			for (x in thisService.events) {
-				if (x.event_id === needle) return true;
+			for (var i=0; i<thisService.events.length; i++) {
+				if (thisService.events[i].event_id._id === needle) return true;
 			}
 			return false;
 		}
@@ -32,7 +32,7 @@ angular.module('core').service('eventSelector', ['$http', '$location', 'cacheSer
 				if(thisService.events[i].recruiter)
 					thisService.numRecruiting++;
 			}
-			if(cache.getData('selectedEvent') != null && cache.getData('eventId') != null && thisService.events.length > 0 && checkEvent(cache.getData('eventId'))) {
+			if(cache.getData('selectedEvent') != null && cache.getData('eventId') != null && thisService.events.length > 0 && checkEvent(cache.getData('eventId')) == true) {
 				thisService.selectedEvent = cache.getData('selectedEvent');
 				thisService.postEventId = cache.getData('eventId');
 				thisService.recruiterEvent = cache.getData('recruiterEvent');
