@@ -20,7 +20,7 @@
  /**
 	* Globals
 	*/
-	var candidate1,candidate3, user, user1,acceptedCandidate,attendee,attendee1,attendee3,attendee4,guest1,recruiter,recruiter1,event1,event2,event3,event4,newCandidate;
+	var candidate1,candidate3, user, user1,acceptedCandidate,attendee,attendee1,attendee3,attendee4,guest1,recruiter,recruiter1,event1,event2,event3,event4,tempNewCandidate;
 
 	function arraysEqual(array0,array1) {
 		if (array0.length !== array1.length) return false;
@@ -498,10 +498,12 @@
 
  	it("admin should be able to add(set) candidate event", function(done) {
  		user1
- 		.post('http://localhost:3001/candidate/setEvent')
- 		.send({candidate_id: candidate1._id,newEvent:{event_id: event3._id, accepted: true}})
+ 		.post('http://localhost:3001/candidate/addEvent')
+ 		.send({candidate_id: candidate1._id, event_id: event3._id})
  		.end(function(err,res) {
  			if (err) throw err;
+
+ 			console.log(res.body);
 
  			res.status.should.equal(200);
 
@@ -519,7 +521,7 @@
  				(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
  				(res.body.events[1].accepted.toString()).should.be.equal('false');
  				(res.body.events[2].event_id.name.toString()).should.be.equal(event3.name);
- 				(res.body.events[2].accepted.toString()).should.be.equal('true');
+ 				(res.body.events[2].accepted.toString()).should.be.equal('false');
 
  				done();
  			});
@@ -527,34 +529,35 @@
  	});
 
  it("admin should be able to set candidate event accepted field", function(done) {
- 	user1
- 	.post('http://localhost:3001/candidate/setAccepted')
- 	.send({'candidate_id' : candidate1._id, 'event_id': event2._id, 'accepted': true})
- 	.end(function(err,res) {
- 		if (err) throw err;
+ 	candidate1.save(function(err) {
+	 	user1
+	 		.post('http://localhost:3001/candidate/setAccepted')
+	 		.send({'candidate_id' : candidate1._id, 'event_id': event2._id, 'accepted': true})
+	 		.end(function(err,res) {
+		 		if (err) throw err;
 
- 		res.status.should.equal(200);
+		 		res.status.should.equal(200);
+		 		console.log(res.body);
 
- 		candidate1.save(function(err) {
- 			user1
- 			.post('http://localhost:3001/candidate/getEvents')
- 			.send({candidate_id: candidate1._id})
- 			.end(function(err,res) {
- 				if (err) throw err;
+ 				user1
+	 				.post('http://localhost:3001/candidate/getEvents')
+	 				.send({candidate_id: candidate1._id})
+	 				.end(function(err,res) {
+		 				if (err) throw err;
 
- 				res.status.should.equal(200);
- 				res.body.should.have.property('events');
+	 					res.status.should.equal(200);
+	 					res.body.should.have.property('events');
 
- 				(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
- 				(res.body.events[0].accepted.toString()).should.be.equal('false');
- 				(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
- 				(res.body.events[1].accepted.toString()).should.be.equal('true');
- 				(res.body.events[2].event_id.name.toString()).should.be.equal(event3.name);
- 				(res.body.events[2].accepted.toString()).should.be.equal('true');
+		 				(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
+	 					(res.body.events[0].accepted.toString()).should.be.equal('false');
+	 					(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
+	 					(res.body.events[1].accepted.toString()).should.be.equal('true');
+	 					(res.body.events[2].event_id.name.toString()).should.be.equal(event3.name);
+	 					(res.body.events[2].accepted.toString()).should.be.equal('false');
 
- 				done();
+	 					done();
+	 				});
  			});
- 		});
  	});
  });
 
@@ -685,35 +688,39 @@ it("admin should be able to set candidate event status field", function(done) {
  });
  it("admin should be able to set a new candidate", function(done) {
  	user1
- 	.post('http://localhost:3001/candidate/setCandidate')
- 	.send({fName: 'John',lName: 'Smith',email:'JohnS@test.com',status:'volunteer',event_id: event1._id,accept_Key:false,note:'I Volunteer as Tribute!'})
- 	.end(function(err,res) {
- 		if (err) throw err;
-			//console.log(res.body);
+	 	.post('http://localhost:3001/candidate/setCandidate')
+	 	.send({fName: 'John', lName: 'Smith', email:'JohnS@test.com', events : [event1._id]})
+	 	.end(function(err,res) {
+			console.log(res.body);
+			console.log(res.status);
+	 		if (err) throw err;
 			res.status.should.equal(200);
-			newCandidate=res.body;
-			//res.body.should.have.property('fName');
-			//res.body.fName.should.be.equal('Full');
-			//done();
-			user1
-			.post('http://localhost:3001/candidate/getfName')
-			.send({candidate_id: newCandidate._id})
-			.end(function(err,res1) {
-				if (err) throw err;
-						//console.log(res1.body);
+
+			Candidate.findOne({email : 'JohnS@test.com'}, function(err, newCandidate) {
+				tempNewCandidate = newCandidate;
+				if(err) {
+					throw err;
+				}
+				user1
+					.post('http://localhost:3001/candidate/getfName')
+					.send({candidate_id: newCandidate._id})
+					.end(function(err,res1) {
 						if (err) throw err;
+
+						console.log(res1.body);
 						res1.status.should.equal(200);
 						res1.body.should.have.property('fName');
 						res1.body.fName.should.be.equal('John');
 						done();
 					});
+			});
 		});
 
  });
  it("admin should be able to delete a candidate", function(done) {
  	user1
  	.post('http://localhost:3001/candidate/deleteCandidate')
- 	.send({candidate_id: newCandidate._id})
+ 	.send({candidate_id: tempNewCandidate._id})
  	.end(function(err,res) {
  		if (err) throw err;
  		res.status.should.equal(200);			
@@ -739,18 +746,17 @@ it("admin should be able to set candidate event status field", function(done) {
  it("attendee should be able to volunteer as a new candidate", function(done) {
  	attendee1
  	.post('http://localhost:3001/candidate/setCandidate')
- 	.send({fName:attendee.fName,lName:attendee.lName,email:attendee.email,newEvent: event1._id})
+ 	.send({events: [event1._id]})
  	.end(function(err,res) {
  		if (err) throw err;
- 		//console.log(err);
  		res.status.should.equal(200);
- 		newCandidate=res.body;
+ 		tempNewCandidate=res.body;
 			//res.body.should.have.property('fName');
 			//res.body.fName.should.be.equal('Full');
 			//done();
 			user1
 			.post('http://localhost:3001/candidate/getfName')
-			.send({candidate_id: newCandidate._id})
+			.send({candidate_id: tempNewCandidate._id})
 			.end(function(err,res1) {
 				if (err) throw err;
 						//console.log(res1.body);
@@ -762,7 +768,7 @@ it("admin should be able to set candidate event status field", function(done) {
 
 						user1
 						.post('http://localhost:3001/candidate/deleteCandidate')
-						.send({candidate_id: newCandidate._id})
+						.send({candidate_id: tempNewCandidate._id})
 						.end(function(err,res) {
 							if (err) throw err;
 							res.status.should.equal(200);			
@@ -1004,63 +1010,14 @@ it("admin should be able to set candidate event status field", function(done) {
  
  it("attendees should NOT be able to add(set) candidate event", function(done) {
  	attendee1
- 	.post('http://localhost:3001/candidate/setEvent')
- 	.send({candidate_id: candidate1._id,newEvent:{event_id: event4._id, accepted: false}})
- 	.end(function(err,res) {
- 		if (err) throw err;
-
- 		res.status.should.equal(401);
-
- 		user1
- 		.post('http://localhost:3001/candidate/getEvents')
- 		.send({candidate_id: candidate1._id})
- 		.end(function(err,res) {
- 			if (err) throw err;
-
- 			res.status.should.equal(200);
- 			res.body.should.have.property('events');
-
- 			(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
- 			(res.body.events[0].accepted.toString()).should.be.equal('false');
- 			(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
- 			(res.body.events[1].accepted.toString()).should.be.equal('true');
- 			(res.body.events[2].event_id.name.toString()).should.be.equal(event3.name);
- 			(res.body.events[2].accepted.toString()).should.be.equal('true');
- 			should.not.exist(res.body.events[3]);
-
- 			done();
- 		});
- 	});
- });
-
- it("attendees should NOT be able to set candidate event accepted field", function(done) {
- 	attendee1
  	.post('http://localhost:3001/candidate/setAccepted')
- 	.send({'candidate_id' : candidate1._id, 'event_id': event2._id, 'accepted': false})
+ 	.send({candidate_id: candidate1._id, event_id: event4._id, accepted: false})
  	.end(function(err,res) {
  		if (err) throw err;
 
  		res.status.should.equal(401);
-
- 		candidate1.save(function(err) {
- 			user1
- 			.post('http://localhost:3001/candidate/getEvents')
- 			.send({candidate_id: candidate1._id})
- 			.end(function(err,res) {
- 				if (err) throw err;
-
- 				res.status.should.equal(200);
- 				res.body.should.have.property('events');
-
- 				(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
- 				(res.body.events[0].accepted.toString()).should.be.equal('false');
- 				(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
- 				(res.body.events[1].accepted.toString()).should.be.equal('true');
- 				(res.body.events[2].event_id.name.toString()).should.be.equal(event3.name);
- 				(res.body.events[2].accepted.toString()).should.be.equal('true');
- 				done();
- 			});
- 		});
+ 		res.body.message.should.equal('User not authorized.');
+ 		done();
  	});
  });
 
@@ -1093,18 +1050,18 @@ it("admin should be able to set candidate event status field", function(done) {
  it("attendee should be able to volunteer as a new candidate", function(done) {
  	recruiter1
  	.post('http://localhost:3001/candidate/setCandidate')
- 	.send({fName:attendee.fName,lName:attendee.lName,email:attendee.email,newEvent: event1._id})
+ 	.send({events: [event1._id]})
  	.end(function(err,res) {
  		if (err) throw err;
  		//console.log(err);
  		res.status.should.equal(200);
- 		newCandidate=res.body;
+ 		tempNewCandidate=res.body;
 			//res.body.should.have.property('fName');
 			//res.body.fName.should.be.equal('Full');
 			//done();
 			user1
 			.post('http://localhost:3001/candidate/getfName')
-			.send({candidate_id: newCandidate._id})
+			.send({candidate_id: tempNewCandidate._id})
 			.end(function(err,res1) {
 				if (err) throw err;
 						//console.log(res1.body);
@@ -1116,7 +1073,7 @@ it("admin should be able to set candidate event status field", function(done) {
 
 						user1
 						.post('http://localhost:3001/candidate/deleteCandidate')
-						.send({candidate_id: newCandidate._id})
+						.send({candidate_id: tempNewCandidate._id})
 						.end(function(err,res) {
 							if (err) throw err;
 							res.status.should.equal(200);			
@@ -1345,60 +1302,15 @@ it("recruiters should NOT be able to get the candidate getUser_id", function(don
 
  });
  
- it("recruiters should NOT be able to add(set) candidate event", function(done) {
- 	recruiter1
- 	.post('http://localhost:3001/candidate/setEvent')
- 	.send({candidate_id: candidate1._id,newEvent:{event_id: event4._id, accepted: false}})
- 	.end(function(err,res) {
- 		if (err) throw err;
- 		res.status.should.equal(401);
- 		user1
- 		.post('http://localhost:3001/candidate/getEvents')
- 		.send({candidate_id: candidate1._id})
- 		.end(function(err,res) {
- 			if (err) throw err;
- 			res.status.should.equal(200);
- 			res.body.should.have.property('events');
- 			(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
- 			(res.body.events[0].accepted.toString()).should.be.equal('false');
- 			(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
- 			(res.body.events[1].accepted.toString()).should.be.equal('true');
- 			(res.body.events[2].event_id.name.toString()).should.be.equal(event3.name);
- 			(res.body.events[2].accepted.toString()).should.be.equal('true');
- 			should.not.exist(res.body.events[3]);
- 			done();
- 		});
- 	});
- });
-
- it("recruiters should NOT be able to set candidate event accepted field", function(done) {
+ it("recruiters should NOT be able to set candidate accepted field", function(done) {
  	recruiter1
  	.post('http://localhost:3001/candidate/setAccepted')
- 	.send({'candidate_id' : candidate1._id, 'event_id': event2._id, 'accepted': false})
+ 	.send({candidate_id: candidate1._id, event_id : event4._id, accepted : false})
  	.end(function(err,res) {
  		if (err) throw err;
-
  		res.status.should.equal(401);
-
- 		candidate1.save(function(err) {
- 			user1
- 			.post('http://localhost:3001/candidate/getEvents')
- 			.send({candidate_id: candidate1._id})
- 			.end(function(err,res) {
- 				if (err) throw err;
-
- 				res.status.should.equal(200);
- 				res.body.should.have.property('events');
-
- 				(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
- 				(res.body.events[0].accepted.toString()).should.be.equal('false');
- 				(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
- 				(res.body.events[1].accepted.toString()).should.be.equal('true');
- 				(res.body.events[2].event_id.name.toString()).should.be.equal(event3.name);
- 				(res.body.events[2].accepted.toString()).should.be.equal('true');
- 				done();
- 			});
- 		});
+ 		res.body.message.should.equal('User not authorized.');
+ 		done();
  	});
  });
 
@@ -1630,36 +1542,6 @@ it("guest should NOT be able to get the candidate getUser_id", function(done) {
 		});
 
  });
- it("guest should NOT be able to add(set) candidate event", function(done) {
- 	guest1
- 	.post('http://localhost:3001/candidate/setEvent')
- 	.send({candidate_id: candidate1._id,newEvent:{event_id: event4._id, accepted: false}})
- 	.end(function(err,res) {
- 		if (err) throw err;
-
- 		res.status.should.equal(401);
-
- 		user1
- 		.post('http://localhost:3001/candidate/getEvents')
- 		.send({candidate_id: candidate1._id})
- 		.end(function(err,res) {
- 			if (err) throw err;
-
- 			res.status.should.equal(200);
- 			res.body.should.have.property('events');
-
- 			(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
- 			(res.body.events[0].accepted.toString()).should.be.equal('false');
- 			(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
- 			(res.body.events[1].accepted.toString()).should.be.equal('true');
- 			(res.body.events[2].event_id.name.toString()).should.be.equal(event3.name);
- 			(res.body.events[2].accepted.toString()).should.be.equal('true');
- 			should.not.exist(res.body.events[3]);
-
- 			done();
- 		});
- 	});
- });
 
  it("guest should NOT be able to set candidate event accepted field", function(done) {
  	guest1
@@ -1669,26 +1551,8 @@ it("guest should NOT be able to get the candidate getUser_id", function(done) {
  		if (err) throw err;
 
  		res.status.should.equal(401);
-
- 		candidate1.save(function(err) {
- 			user1
- 			.post('http://localhost:3001/candidate/getEvents')
- 			.send({candidate_id: candidate1._id})
- 			.end(function(err,res) {
- 				if (err) throw err;
-
- 				res.status.should.equal(200);
- 				res.body.should.have.property('events');
-
- 				(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
- 				(res.body.events[0].accepted.toString()).should.be.equal('false');
- 				(res.body.events[1].event_id.name.toString()).should.be.equal(event2.name);
- 				(res.body.events[1].accepted.toString()).should.be.equal('true');
- 				(res.body.events[2].event_id.name.toString()).should.be.equal(event3.name);
- 				(res.body.events[2].accepted.toString()).should.be.equal('true');
- 				done();	
- 			});
- 		});
+ 		res.body.message.should.equal('User is not logged in.');
+ 		done();
  	});
  });
 

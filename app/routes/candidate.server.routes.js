@@ -24,7 +24,7 @@ app.route('/candidate/setfName').post(dan_candidate_routes.setfName);
 app.route('/candidate/setlName').post(dan_candidate_routes.setlName);
 app.route('/candidate/setEmail').post(dan_candidate_routes.setEmail);
 app.route('/candidate/setStatus').post(dan_candidate_routes.setEventStatus);
-app.route('/candidate/setEvent').post(dan_candidate_routes.setEvent);
+app.route('/candidate/addEvent').post(dan_candidate_routes.addEvent);
 app.route('/candidate/setAccepted').post(dan_candidate_routes.setEventAccepted);
 app.route('/candidate/setNote').post(dan_candidate_routes.setNote);
 
