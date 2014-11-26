@@ -62,6 +62,7 @@ describe('User Model Unit Tests:', function() {
 				salt: 'abc123',
 				rank: [{'event_id': event._id, 'place': 1}],
 				provider: 'local',
+				organization: 'organ',
 				login_enabled: false
 			});
 			user2 = new User({
@@ -74,6 +75,7 @@ describe('User Model Unit Tests:', function() {
 				salt: 'abc123',
 				rank: [{'event_id': event._id, 'place': 1}],
 				provider: 'local',
+				organization: 'organ',
 				login_enabled: false
 			});
 
@@ -135,6 +137,15 @@ describe('User Model Unit Tests:', function() {
 					(result.password).should.be.equal(user.password);
 					done();
 				});
+			});
+		});
+
+		it('should not be able to save without an organization',function(done) {
+			user.organization = '';
+			user.save(function(err) {
+				should.exist(err);
+				user.organization = 'organ'; //Just in case
+				done();
 			});
 		});
 

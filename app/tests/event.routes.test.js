@@ -164,6 +164,17 @@ describe('Express.js Event Route Integration Tests:', function() {
 
  	});
 
+	it("should not be able to sign in without a password", function(done) {
+ 		agent
+ 			.post('http://localhost:3001/auth/signin')
+ 			.send({email: user.email, password: ''})
+ 			.end(function (err, res) {
+				should.not.exist(err);
+				res.status.should.be.equal(400);
+       				done();
+ 			});
+     	});
+
  	it("should be able to sign in correctly", function(done) {
  		agent
  			.post('http://localhost:3001/auth/signin')

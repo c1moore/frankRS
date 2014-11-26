@@ -137,7 +137,11 @@ var UserSchema = new Schema({
 	},
 	provider: {
 		type: String,
-		validate: [validateRequired, 'Provider required.']
+		validate: [validateRequired, 'Provider required']
+	},
+	organization: {
+		type: String,
+		validate: [validateRequired, 'You must specify an organization if at all possible']
 	},
 	providerData: {},
 	additionalProvidersData: {},
