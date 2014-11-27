@@ -291,95 +291,134 @@ exports.getCandidates = function(req, res) {
  		return res.status(401).send('User not Authorized');
 
  };
- exports.setEventStatus = function(req,res){
- 	if(!req.isAuthenticated())
- 		return res.status(401).send("User is not logged in");
- 	if (req.hasAuthorization(req.user, ["admin"])){
- 		var candidate_id = mongoose.Types.ObjectId(req.body.candidate_id);
- 		var query = Candidate.findOne({'_id' : candidate_id });
- 		query.exec(function(err,result){
- 			if(err) {
- 				return res.status(400).send(err);
- 			} else if(!result) {
- 				return res.status(400).json("No candidate found!");
- 			} else {
- 				for(var i=0; i<result.events.length; i++) {
- 					if(result.events[i].event_id.toString() === req.body.event_id.toString() ){
- 						result.events[i].status = req.body.status;
- 						if (req.body.status ==='accepted'){
- 							if(result.events[i].accepted ===true){	
 
- 							if(result.user_id){
- 								var user_id = result.user_id;
- 								var query2 = User.findOne({'_id' : user_id});
- 								query2.exec(function(err,result3){
- 									if(err)
- 										return res.status(400).send(err);
- 									else if(!result)
- 										return res.status(400).json("no user with candidate.user_id is found");
- 									else{
- 										for (var j = 0; j<result3.status.length;j++){
- 											if (result3.status[j].event_id.toString() === req.body.event_id.toString()){
- 												result3.status[j].recruiter = true;
+/**
+* This function updates a candidate's status.  This will be updated after the candidate receives an email asking them to be a recruiter and they use a special
+* link to become a recruiter.  Similar to updating the 'accepted' field, while updating the candidate's status we need to check to see if the 'accepted' field
+* is set to true.  If this is the case, we can either add this event to the user's 'status' array as an event for which they are recruiting or create a new
+* user account that will allow this candidate to recruit for this event.  In either case, an email should be sent to the recruiter to inform them of the change.
+*
+* @param candidate_id - The id of the candidate the should be updated.
+* @param event_id - The id of the event of which we need to update the status
+* @param status - The new status to set for the given candidate and event
+*/
+exports.setEventStatus = function(req,res) {
+	if(!req.isAuthenticated()) {
+		return res.status(401).send({message : "User is not logged in"});
+	} else if(req.body.candidate_id == undefined || req.body.event_id == undefined || req.body.status == undefined) {
+		return res.status(400).send({message : 'A required field is not specified.  Nice going.'});
+	} else if(req.hasAuthorization(req.user, ["admin"])) {
 
- 												break;
- 											}
- 										}
-		 								result3.roles.push("recruiter");
+		var candidate_id = mongoose.Types.ObjectId(req.body.candidate_id);
+		var event_id = mongoose.Types.ObjectId(req.body.event_id);
 
- 										result3.save(function(err,ress){
- 											if (err)
- 												res.status(400).send(err);
- 										});
- 									}
+		var query = Candidate.findOne({'_id' : candidate_id });
+		query.exec(function(err,result) {
+			if(err) {
+				return res.status(400).send({message : err});
+			} else if(!result) {
+				return res.status(400).send({message : "This candidate could not be found in our records."});
+			} else {
+				var i;
+				for(i=0; i<result.events.length; i++) {
+					if(result.events[i].event_id.toString() === req.body.event_id.toString() ){
+						result.events[i].status = req.body.status;
 
+						//If we updated the status to be 'accepted' and an admin has accepted their request, make them a recruiter.
+						if (req.body.status ==='accepted' && result.events[i].accepted) {
+							//User is no longer a candidate for this event, now they are a recruiter.
+							result.events.pull({event_id : event_id});
 
- 								});
+							//Check if this candidate is already a user, but the user_id field was not filled out (possible if they were invited after being a candidate, for example).
+							User.findOne({email : result.email}, function(err, user) {
+								if(err) {
+									return res.status(400).send({message : err});
+								} else if(user) {
+									//If the user already has an account, simply add necessary information.
 
- 							}
- 							else{
- 								var user = new User({
- 									fName: result.fName,
- 									lName: result.lName,
- 									roles: ['recruiter'],
- 									email: result.email,
- 									status: [{event_id: result.events[i].event_id,attending: false,recruiter:true}],
- 									password: result.fName + result.lName,
- 									login_enabled: true
- 								});
+									var j;
+									//Search for this event in status array and make changes to recruiter field if event is in there.
+									for (j = 0; j<user.status.length;j++){
+										if (user.status[j].event_id.toString() === req.body.event_id.toString()){
+											user.status[j].recruiter = true;
+											break;
+										}
+									}
 
+									//User does not have this event in their status array, add it.
+									if(j===user.status.length) {
+										user.status.addToSet({event_id : req.body.event_id, attending : false, recruiter : true});
+									}
+		 							
+		 							user.roles.addToSet("recruiter");
 
- 								result.user_id=user._id;
- 								result.save(function(err,resss){
- 									if (err)
- 										return res.status(400).send(err)
- 								});
+		 							result.save(function(err) {
+		 								if(err) {
+		 									return res.status(400).send({message : err});
+		 								} else {
+											user.save(function(err,ress) {
+												if(err) {
+													return res.status(400).send({message : err});
+												} else {
+													return res.status(200).send({message : "New recruiter added and notification sent!"});
+												}
+											});
+										}
+									});
+								} else {
+									//There is not already a user for this candidate.  Create one and send notification.
+									
+									var newUser = new User({
+										fName: result.fName,
+										lName: result.lName,
+										roles: ['recruiter'],
+										email: result.email,
+										status: [{event_id: event_id, attending: false, recruiter:true}],
+										password: result.fName + result.lName,	//TODO Use the password creation method used in User routes controller.
+										login_enabled: true
+									});
 
- 								user.save(function(err,ress){
- 									if (err)
- 										return res.status(400).send(err)
- 								});
- 							}
- 						}
- 					}
+									result.user_id = newUser._id;
 
+									result.save(function(err) {
+										if(err) {
+											return res.status(400).send({message : err});
+										} else {
+											newUser.save(function(err) {
+												if (err) {
+													return res.status(400).send({message : err});
+												} else {
+													return res.status(200).send({message : "New recruiter added and notification sent!"});
+												}
+											});
+										}
+									});
+								}
+							});
+						} else {
+							result.save(function(err) {
+								if(err) {
+									return res.status(400).send({message : err});
+								} else {
+									return res.status(200).send({message : "Candidate information updated."});
+								}
+							});
+						}
+						
+						break;
+					}
+				}
 
- 						break;
- 					}
- 				}
-
- 				result.save(function(err, result2) {
- 					if(err) {
- 						return res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
- 					} else {
- 						return res.status(200).send(result2);
- 					}
- 				});
- 			}
- 		});
- 	} else
- 	return res.status(401).send('User not Authorized');
- };
+				//The event was not found.  Send an error message informing them and suggesting to add the event to their events array.
+				if(i === result.events.length) {
+					return res.status(400).send({message : 'User is not a candidate for this event.  If you want to make them a candidate, add them to this event.'});
+				}
+			}
+		});
+	} else {
+		return res.status(401).send({message : 'User is not authorized.'});
+	}
+};
 
 /**
 * This methods adds a new event to a pre-existing candidate's events array.  If the user is not already a candidate or if the user is not an admin
@@ -392,7 +431,7 @@ exports.addEvent = function(req,res){
 	if(!req.isAuthenticated()) {
 		return res.status(401).send({message : "User is not logged in"});
 	} else if(req.body.candidate_id == undefined || req.body.event_id == undefined) {
-		return res.status(400).send({message : "A required fieldis not specified.  Nice going."});
+		return res.status(400).send({message : "A required field is not specified.  Nice going."});
 	} else if(req.hasAuthorization(req.user, ["admin"])) {
 		var candidate_id = mongoose.Types.ObjectId(req.body.candidate_id);
 
@@ -401,7 +440,7 @@ exports.addEvent = function(req,res){
 			if(err) {
 				res.status(400).send(err);
 			} else if(!result) {
-				res.status(400).json("No candidate found!");
+				res.status(400).send({message : "No candidate found!"});
 			} else {
 				result.events.addToSet({event_id : req.body.event_id});
 
@@ -488,98 +527,103 @@ exports.setEventAccepted = function(req,res){
 		return res.status(400).send({message : 'Required fields were not specified.  Nice going.'});
 	} else if(req.hasAuthorization(req.user, ["admin"])) {
 		var candidate_id = mongoose.Types.ObjectId(req.body.candidate_id);
+		var event_id = mongoose.Types.ObjectId(req.body.event_id);
 
 		var query = Candidate.findOne({'_id' : candidate_id });
 		query.exec(function(err,result) {
 			if(err) {
 				return res.status(400).send({message : err});
 			} else if(!result) {
-				return res.status(400).send({message : "No candidate found!"});
+				return res.status(400).send({message : "This candidate could not be found in our records."});
 			} else {
-				var i = 0;
-				for(i; i<result.events.length; i++) {
-					if(result.events[i].event_id.toString() === req.body.event_id.toString()) {
+				var i;
+				for(i=0; i<result.events.length; i++) {
+					if(result.events[i].event_id.toString() === req.body.event_id.toString() ){
 						result.events[i].accepted = req.body.accepted;
-						
-						/**
-						* If the candidate has been accepted by the recruiter and they still want to be a recruiter, create recruiter account 
-						* for them if they do not already have an account or simply add make it so they can recruit for this event.
-						*/
-						if(req.body.accepted && result.events[i].status === 'accepted') {
-							if(result.user_id) {
-								var user_id = result.user_id;
-								
-								var query2 = User.findOne({'_id' : user_id});
-								query2.exec(function(err,result3){
-									if(err) {
-										return res.status(400).send({message : err});
-									} else if(!result) {
-										return res.status(400).send({message : "There was a error that needs to be handled better."});
-									} else{
-										var j;
-										for (j=0; j<result3.status.length;j++){
-											if (result3.status[j].event_id.toString() === req.body.event_id.toString()) {
-												result3.status[j].recruiter = true;
-												break;
-											}
+
+						//If we updated the accepted field to be true and their status is 'accepted', make them a recruiter.
+						if (req.body.accepted && result.events[i].status  ==='accepted') {
+							//User is no longer a candidate for this event, now they are a recruiter.
+							result.events.pull({event_id : event_id});
+
+							//Check if this candidate is already a user, but the user_id field was not filled out (possible if they were invited after being a candidate, for example).
+							User.findOne({email : result.email}, function(err, user) {
+								if(err) {
+									return res.status(400).send({message : err});
+								} else if(user) {
+									//If the user already has an account, simply add necessary information.
+
+									var j;
+									//Search for this event in status array and make changes to recruiter field if event is in there.
+									for (j = 0; j<user.status.length;j++){
+										if (user.status[j].event_id.toString() === req.body.event_id.toString()){
+											user.status[j].recruiter = true;
+											break;
 										}
+									}
 
-										//User does not have this event in their status array.  Add it.
-										if(j === result3.status.length) {
-											result3.status.addToSet({event_id : new mongoose.Types.ObjectId(req.body.event_id), recruiter : true, attending : false});
+									//User does not have this event in their status array, add it.
+									if(j===user.status.length) {
+										user.status.addToSet({event_id : req.body.event_id, attending : false, recruiter : true});
+									}
+		 							
+		 							user.roles.addToSet("recruiter");
+
+		 							result.save(function(err) {
+		 								if(err) {
+		 									return res.status(400).send({message : err});
+		 								} else {
+											user.save(function(err,ress) {
+												if(err) {
+													return res.status(400).send({message : err});
+												} else {
+													return res.status(200).send({message : "New recruiter added and notification sent!"});
+												}
+											});
 										}
+									});
+								/**
+								* The candidate is not already a user.  We need to create an account for them.
+								*
+								* TODO Use a better password generation function and send an email to the recruiter informing them of their new account.
+								*/
+								} else {
+									var newUser = new User({
+										fName: result.fName,
+										lName: result.lName,
+										roles: ['recruiter'],
+										email: result.email,
+										status: [{event_id: new mongoose.Types.ObjectId(req.body.event_id), attending: false, recruiter:true}],
+										password: result.fName + result.lName,	//TODO Use the password function in the users.routes.server.controller.js.
+										login_enabled: true
+									});
 
-										//Add recruiter to their roles.
-		 								result3.roles.addToSet("recruiter");
-
-		 								result.save(function(err) {
-		 									if(err) {
-		 										return res.status(400).send({message : err});
-		 									} else {
-												result3.save(function(err) {
-													if(err) {
-														return res.status(400).send({message : err});
-													} else {
-														return res.status(200).send({message : "Recruiter added!"});
-													}
-												});
-											}
-										});
-									}
-								});
-							/**
-							* The candidate is not already a user.  We need to create an account for them.
-							*
-							* TODO Use a better password generation function and send an email to the recruiter informing them of their new account.
-							*/
-							} else {
-								var user = new User({
-									fName: result.fName,
-									lName: result.lName,
-									roles: ['recruiter'],
-									email: result.email,
-									status: [{event_id: new mongoose.Types.ObjectId(req.body.event_id), attending: false, recruiter:true}],
-									password: result.fName + result.lName,	//TODO Use the password function in the users.routes.server.controller.js.
-									login_enabled: true
-								});
-
-								result.user_id = user._id;
-								result.events.pull({event_id : new mongoose.Types.ObjectId(req.body.event_id)});
-								
-								result.save(function(err){
-									if (err) {
-										return res.status(400).send({message : err})
-									} else {
-										user.save(function(err){
-											if (err) {
-												return res.status(400).send({message : err})
-											} else {
-												return res.status(200).send({message : "New recruiter added and notification sent!"});
-											}
-										});
-									}
-								});
-							}
+									result.user_id = newUser._id;
+									result.events.pull({event_id : event_id});
+									
+									result.save(function(err){
+										if (err) {
+											return res.status(400).send({message : err})
+										} else {
+											newUser.save(function(err){
+												if (err) {
+													return res.status(400).send({message : err})
+												} else {
+													return res.status(200).send({message : "New recruiter added and notification sent!"});
+												}
+											});
+										}
+									});
+								}
+							});
+						} else {
+							result.save(function(err) {
+								if(err) {
+									return res.status(400).send({message : err});
+								} else {
+									return res.status(200).send({message : "Candidate information updated."});
+								}
+							});
 						}
 						break;
 					}
