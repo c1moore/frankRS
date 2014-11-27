@@ -116,8 +116,6 @@ describe('Attendees Model Unit Tests:', function() {
 		});
 
 		it('should save when everything is the same except event id', function(done) {
-			console.log(attendee1);
-			console.log(attendee3e);
 			attendee1.save(function() {
 				attendee3e.save(done);
 			});

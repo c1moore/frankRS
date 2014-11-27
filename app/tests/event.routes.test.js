@@ -38,7 +38,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 		User.remove().exec(); //Prevent earlier failed tests from poisoning us
 		Event.remove().exec();
 		event1 = new Event({
-			name:  'testing123',
+			name:  'testing1231',
  			start_date: new Date(2140,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
  			end_date:  new Date(2150,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
  			location: 'UF',
@@ -46,7 +46,7 @@ describe('Express.js Event Route Integration Tests:', function() {
  		});
 
  		event2 = new Event({
- 			name:  'testing123',
+ 			name:  'testing1232',
  			start_date: new Date(2140,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
  			end_date:  new Date(2150,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
  			location: 'UF2',
@@ -163,6 +163,17 @@ describe('Express.js Event Route Integration Tests:', function() {
  			});
 
  	});
+
+	it("should not be able to sign in without a password", function(done) {
+ 		agent
+ 			.post('http://localhost:3001/auth/signin')
+ 			.send({email: user.email, password: ''})
+ 			.end(function (err, res) {
+				should.not.exist(err);
+				res.status.should.be.equal(400);
+       				done();
+ 			});
+     	});
 
  	it("should be able to sign in correctly", function(done) {
  		agent
@@ -496,7 +507,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 						should.not.exist(err);
 						res.status.should.be.equal(200);
 						res.body.should.have.property('name');
-						res.body.name.should.be.equal("testing123");
+						res.body.name.should.be.equal("testing1231");
 						done();
 					});
 			});
@@ -817,7 +828,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 						res.status.should.be.equal(200);
 						res.body.should.have.property('name');
 						res.body.name.should.be.equal(
-							"testing123");
+							"testing1231");
 						done();
 					});
 			});

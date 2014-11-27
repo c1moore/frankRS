@@ -34,7 +34,7 @@
 
 		before(function(done){
 			event1 = new Event({
-				name:  'testing123',
+				name:  'testing1231',
 				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
 				location: 'UF',
@@ -42,21 +42,21 @@
 			});
 
 			event2 = new Event({
-				name:  'testing123',
+				name:  'testing1232',
 					start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 					end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
 					location: 'SFCC',
 					schedule: 'www.google.com'
 				});
 			event3 = new Event({
-				name:  'testing123',
+				name:  'testing1233',
 					start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 					end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
 					location: 'Orlando',
 					schedule: 'www.google.com'
 				});
 			event4 = new Event({
-				name:  'testing123',
+				name:  'testing1234',
 					start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 					end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
 					location: 'Tampa',
@@ -663,7 +663,7 @@ it('Should not have changed the attendee user to a recruiter for the whan status
  				res.status.should.equal(200);
  				res.body.should.have.property('events');
 
- 				(res.body.events[0].event_id.name.toString()).should.be.equal(event1.name);
+ 				(res.body.events[0].event_id.name.toString()).should.be.equal(event2.name);
  				(res.body.events[0].accepted.toString()).should.be.equal('true');
  				(res.body.events[0].status.toString()).should.be.equal('accepted');
 
