@@ -73,6 +73,7 @@ module.exports = function(app) {
 
 	//Setting invitation routes
 	app.route('/invitation/send').post(users.sendInvitation);
+	app.route('/invitation/accept').post(users.acceptInvitation);
 
 	// Finish by binding the user middleware
 	app.param('userId', users.userByID);

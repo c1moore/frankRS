@@ -559,12 +559,11 @@ exports.getEmail = function(req, res) {
 */
 exports.sendInvitation = function(req, res) {
 	if(req.body.fName == undefined || req.body.lName == undefined || req.body.email == undefined || req.body.event_id == undefined || req.body.event_name == undefined) {
-		res.status(400).send({'message' : 'Required fields not specified.'});
-		return;
+		return res.status(400).send({'message' : 'Required fields not specified.'});
 	}
 
 	if(!req.isAuthenticated()) {
-		res.status(401).send({'message' : 'User is not logged in.'});
+		return res.status(401).send({'message' : 'User is not logged in.'});
 	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
 		var smtpTransport = nodemailer.createTransport(config.mailer.options);
 		var mailOptions = {
@@ -577,9 +576,9 @@ exports.sendInvitation = function(req, res) {
 		var query = User.findOne({'_id' : req.user._id});
 		query.exec(function(err, recruiter) {
 			if(err) {
-				res.status(400).send({'message' : 'User is not logged in or does not have permissions.'});
+				return res.status(400).send({'message' : 'User is not logged in or does not have permissions.'});
 			} else if(!recruiter) {
-				res.status(400).send({'message' : 'Recruiter not found.'});
+				return res.status(400).send({'message' : 'Recruiter not found.'});
 			} else {
 				/**
 				* We need to determine if the user is already attending the event.  If not,
@@ -593,7 +592,7 @@ exports.sendInvitation = function(req, res) {
 				var query2 = User.findOne({'email' : req.body.email, 'status.event_id' : req.body.event_id, 'status.attending' : true});
 				query2.exec(function(err, invitee) {
 					if(err) {
-						res.status(400).send({'message' : 'Invitation could not be sent.  Please contact frank about this issue.'});
+						return res.status(400).send({'message' : 'Invitation could not be sent.  Please contact frank about this issue.'});
 		
 					//Either the specified user is not attending the event yet or has not even been invited.
 					} else if(!invitee) {
@@ -681,11 +680,11 @@ exports.sendInvitation = function(req, res) {
 						*/
 						], function(err, invitee) {
 							if(err) {
-								res.status(400).send({'message' : "Invitation was not sent.  We could not connect to the server, please try again later."});
+								return res.status(400).send({'message' : "Invitation was not sent.  We could not connect to the server, please try again later."});
 							} else {
 								smtpTransport.sendMail(mailOptions, function(err) {
 									if(err) {
-										res.status(400).send({'message' : 'Invitation was not sent.  Please try again later.', 'error' : err});
+										return res.status(400).send({'message' : 'Invitation was not sent.  Please try again later.', 'error' : err});
 									} else {
 										//updateRanks(req.body.event_id);
 										async.waterfall([
@@ -734,9 +733,9 @@ exports.sendInvitation = function(req, res) {
 											}],
 											function(err, results) {
 												if(err) {
-													res.status(400).send({message: 'Invitation has been sent to ' + req.body.fName + ', but an error occurred.  Please contact frank about this error.'});
+													return res.status(400).send({message: 'Invitation has been sent to ' + req.body.fName + ', but an error occurred.  Please contact frank about this error.'});
 												} else {
-													res.status(200).send({message: 'Invitation has been sent to ' + req.body.fName + '!'});
+													return res.status(200).send({message: 'Invitation has been sent to ' + req.body.fName + '!'});
 												}
 											}
 										);
@@ -754,7 +753,7 @@ exports.sendInvitation = function(req, res) {
 					} else {
 						recruiter.almostList.addToSet({'event_id' : req.body.event_id, 'user_id' : invitee._id});
 						recruiter.save(function(err, result) {
-							res.status(200).send({message: req.body.fName + ' ' + req.body.lName + ' is already attending frank.  You\'re thinking of the right people '});
+							return res.status(200).send({message: req.body.fName + ' ' + req.body.lName + ' is already attending frank.  You\'re thinking of the right people.'});
 						});
 					}
 				});
@@ -762,7 +761,7 @@ exports.sendInvitation = function(req, res) {
 		});
 
 	} else {
-		res.status(401).send({'message' : 'User does not have permission.'});
+		return res.status(401).send({'message' : 'User does not have permission.'});
 	}
 };
 
@@ -792,7 +791,7 @@ exports.acceptInvitation = function(req, res) {
 		* of these conditions are not met, we will return a 400 error.
 		*/
 
-		var expectedFields = ['api_key', 'invitee_fName', 'invitee_lName', 'invitee_email', 'organization', 'event_name', 'event_location', 'recruiter_email'];
+		var expectedFields = ['api_key', 'invitee_fName', 'invitee_lName', 'invitee_email', 'organization', 'event_name', 'recruiter_email'];
 
 		for(var i=0; i<expectedFields.length; i++) {
 			if(req.body[expectedFields[i]] == undefined) {
@@ -830,7 +829,7 @@ exports.acceptInvitation = function(req, res) {
 								displayName : req.body.invitee_lName + ', ' + req.body.invitee_fName,
 								roles : ['attendee'],
 								login_enabled : true,
-								status : {event_id : evnt._id, attending : true, recruiter : false},
+								status : [{event_id : evnt._id, attending : true, recruiter : false}],
 								password : pass
 							});
 
@@ -852,6 +851,7 @@ exports.acceptInvitation = function(req, res) {
 										subject: "New frank account for " + req.body.event_name
 									};
 									var recruiterMailOptions = {
+										to: req.body.recruiter_email,
 										from: 'frank@jou.ufl.edu',
 										sender: 'frank@jou.ufl.edu',
 										replyTo: 'frank@jou.ufl.edu',
@@ -869,7 +869,11 @@ exports.acceptInvitation = function(req, res) {
 											}, function(err, emailHTML) {
 												attendeeMailOptions.html = emailHTML;
 												smtpTransport.sendMail(attendeeMailOptions, function(err, info) {
-													callback(err, info.response);
+													if(err) {
+														callback(err, false);
+													} else {
+														callback(false, info.response);
+													}
 												});
 											});
 										},
@@ -881,17 +885,28 @@ exports.acceptInvitation = function(req, res) {
 												} else if(!result) {
 													callback(true, false);
 												} else {
-													res.render('templates/invitation-accepted-recruiter-email', {
-														recruiter_name : result.fName,
-														event: req.body.event_name,
-														attendee_name: req.body.invitee_fName + " " + req.body.invitee_lName,
-														address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard'
-													}, function(err, emailHTML) {
-														recruiterMailOptions.html = emailHTML;
-														smtpTransport.sendMail(recruiterMailOptions, function(err, info) {
-															callback(err, info.response);
-														});
-													});	
+													result.attendeeList.addToSet({event_id : evnt._id, user_id : newAttendee._id});
+													result.save(function(err) {
+														if(err) {
+															return res.status(400).send({message : err});
+														} else {
+															res.render('templates/invitation-accepted-recruiter-email', {
+																recruiter_name : result.fName,
+																event: req.body.event_name,
+																attendee_name: req.body.invitee_fName + " " + req.body.invitee_lName,
+																address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard'
+															}, function(err, emailHTML) {
+																recruiterMailOptions.html = emailHTML;
+																smtpTransport.sendMail(recruiterMailOptions, function(err, info) {
+																	if(err) {
+																		callback(err, false);
+																	} else {
+																		callback(false, info.response);
+																	}
+																});
+															});
+														}
+													});
 												}
 											});
 										},
@@ -941,6 +956,7 @@ exports.acceptInvitation = function(req, res) {
 										subject: "New frank account for " + req.body.event_name
 									};
 									var recruiterMailOptions = {
+										to: req.body.recruiter_email,
 										from: 'frank@jou.ufl.edu',
 										sender: 'frank@jou.ufl.edu',
 										replyTo: 'frank@jou.ufl.edu',
@@ -957,7 +973,11 @@ exports.acceptInvitation = function(req, res) {
 											}, function(err, emailHTML) {
 												attendeeMailOptions.html = emailHTML;
 												smtpTransport.sendMail(attendeeMailOptions, function(err, info) {
-													callback(err, info.response);
+													if(err) {
+														callback(err, false);
+													} else {
+														callback(false, info.response);
+													}
 												});
 											});
 										},
@@ -969,17 +989,28 @@ exports.acceptInvitation = function(req, res) {
 												} else if(!result) {
 													callback(true, false);
 												} else {
-													res.render('templates/invitation-accepted-recruiter-email', {
-														recruiter_name : result.fName,
-														event: req.body.event_name,
-														attendee_name: req.body.invitee_fName + " " + req.body.invitee_lName,
-														address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard'
-													}, function(err, emailHTML) {
-														recruiterMailOptions.html = emailHTML;
-														smtpTransport.sendMail(recruiterMailOptions, function(err, info) {
-															callback(err, info.response);
-														});
-													});	
+													result.attendeeList.addToSet({event_id : evnt._id, user_id : attendee._id});
+													result.save(function(err) {
+														if(err) {
+															return res.status(400).send({message : err});
+														} else {
+															res.render('templates/invitation-accepted-recruiter-email', {
+																recruiter_name : result.fName,
+																event: req.body.event_name,
+																attendee_name: req.body.invitee_fName + " " + req.body.invitee_lName,
+																address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard'
+															}, function(err, emailHTML) {
+																recruiterMailOptions.html = emailHTML;
+																smtpTransport.sendMail(recruiterMailOptions, function(err, info) {
+																	if(err) {
+																		callback(err, false);
+																	} else {
+																		callback(false, info.response);
+																	}
+																});
+															});
+														}
+													});
 												}
 											});
 										},
