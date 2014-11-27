@@ -56,12 +56,8 @@ describe('Event Model Unit Tests',function() {
 
 		it('should fail to save an existing event again',function(done){
 			event1.save(function(err){
-				return event2.save(function(err){
-					should.not.exist(err);
-				});
-			});
-			event1d.save(function(err){
-				return event2.save(function(err){
+				should.not.exist(err);
+				event1d.save(function(err){
 					should.exist(err);
 					done();
 				});
