@@ -10,8 +10,6 @@ from Interfacing import *
 
 import random, time
 
-required = "Entry is invalid. This field is required."
-
 def getForThisEvent(attendeeList,eventID):
   eventID = ensureID(eventID)
   attendees = []

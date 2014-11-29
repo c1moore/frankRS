@@ -17,6 +17,8 @@ from base64 import b64encode
 import hashlib
 
 ROLES = ['admin', 'recruiter', 'attendee']
+INTERESTS = ['dogs','cats','music','elephants','DJ Evian','Foxes','Tor','minorities',
+		'dreams','eurodance','electric house','autophagy','999','my love is forever']
 
 def makeTemplates(min,max):
   result = []
@@ -40,6 +42,8 @@ class User:
     self.password = ''#b64encode(hashlib.pbkdf2_hmac('sha1',bytes(self._password,'utf-16'),self.salt,10000,64*32))
     #self.salt = b64encode(self.salt)
     self.provider = "local"
+    self.organization = randomString(3,22)
+    self.interests = random.choice(INTERESTS)
     self.roles = [random.choice(ROLES)]
     cday = random.randint(1,28)
     cmonth = random.randint(1,12)

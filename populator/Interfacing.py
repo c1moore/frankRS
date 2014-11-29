@@ -1,5 +1,7 @@
 #Interface code for retrieving information from the user
 
+required = "Entry is invalid. This field is required."
+
 def welcome():
   msg = ("---Welcome to the populator script!---\n" +
 	"This program will populate the database for testing and demonstration purposes.\n")
