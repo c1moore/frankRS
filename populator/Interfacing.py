@@ -41,7 +41,7 @@ def getNumAdmins():
   while True:
     try:
       numAdmins = int(input("How many admins will there be?: "))
-      assert (numAdmins >= 0)
+      assert (numAdmins > 0)
     except (ValueError, AssertionError):
       print(required)
     else:
@@ -128,6 +128,26 @@ def getInviteProbability():
       print(required)
     else:
       return p
+
+def getNumSocialComments():
+  while True:
+    try:
+      numSocialComments = int(input("How many comments to create for the social stream?: "))
+      assert (numSocialComments >= 0)
+    except (ValueError, AssertionError):
+      print(required)
+    else:
+      return numSocialComments
+
+def getNumRecruiterComments():
+  while True:
+    try:
+      numRecruiterComments = int(input("How many comments to create for the recruiter stream?: "))
+      assert (numRecruiterComments >= 0)
+    except (ValueError, AssertionError):
+      print(required)
+    else:
+      return numRecruiterComments
 
 def dumpUserSummary(userList):
   with open('user_summary.txt','w') as fd:
