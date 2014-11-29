@@ -10,15 +10,18 @@ from Attendee import Attendee
 import random
 import inspect
 import calendar
+import pickle
 from datetime import datetime
 from datetime import date as Date
 from time import mktime
-from base64 import b64encode
-import hashlib
 
 ROLES = ['admin', 'recruiter', 'attendee']
 INTERESTS = ['dogs','cats','music','elephants','DJ Evian','Foxes','Tor','minorities',
 		'dreams','eurodance','electric house','autophagy','999','my love is forever']
+hashfile = open('hashfile.dat','rb')
+salt = pickle.load(hashfile)
+password = pickle.load(hashfile)
+hashfile.close()
 
 def makeTemplates(min,max):
   result = []
@@ -37,10 +40,9 @@ class User:
     self.displayName = self.lName + ', ' + self.fName;
     self.email = (randomString(4,35).lower()+'@'+randomString(4,35)+
 			random.choice(WEBS))
-    self.salt = ''#randomBytes(16)
-    self._password = ''#randomString(6,22,"""~!@#$%^&*(")[]{}|\;:<>,.""")
-    self.password = ''#b64encode(hashlib.pbkdf2_hmac('sha1',bytes(self._password,'utf-16'),self.salt,10000,64*32))
-    #self.salt = b64encode(self.salt)
+    self.salt = salt
+    self._password = 'password'
+    self.password = password
     self.provider = "local"
     self.organization = randomString(3,22)
     self.interests = random.choice(INTERESTS)

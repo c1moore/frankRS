@@ -20,7 +20,6 @@ def getForThisEvent(attendeeList,eventID):
       attendees.append(users[i])
   return attendees
 
-
 def main():
   resetMongo("The database has been reset.\n")
   welcome()
