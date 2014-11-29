@@ -5,6 +5,7 @@
 from User import User
 from Candidate import Candidate
 from Event import Event
+from Comment import Comment
 from Util import resetMongo, ensureID
 from Interfacing import *
 
@@ -20,7 +21,6 @@ def getForThisEvent(attendeeList,eventID):
       attendees.append(users[i])
   return attendees
 
-
 def main():
   resetMongo("The database has been reset.\n")
   welcome()
@@ -35,6 +35,8 @@ def main():
   maxEventsPerRecruiter = getMaxEventsPerRecruiter(numEvents)
   numInvitesPerRecruiter = getNumInvitesPerRecruiter()
   numEventsPerCandidate = getNumEventsPerCandidate()
+  numSocialComments = getNumSocialComments()
+  numRecruiterComments = getNumRecruiterComments()
   p = getInviteProbability()
   if adminsUnionRecruiters==-1:
     adminsUnionRecruiters=random.randint(0,min(numAdmins,numRecruiters))
@@ -46,6 +48,7 @@ def main():
   admins = []
   candidates = []
   events = []
+  comments = []
   #Make events
   for i in range(numEvents):
     event = Event()
@@ -139,7 +142,30 @@ def main():
     for i in range(len(sortedBin)):
       sortedBin[i].rank.append({'event_id':eventOrder[eventBins.index(bin)],'place':i+1})
       sortedBin[i].save()
-
+  #Social comment stream
+  while len(comments) < numSocialComments:
+    user = random.choice(list(set(recruiters)|set(attendees)|set(admins)))
+    if 'admin' in user.roles:
+      event = random.choice(events)
+    else:
+      userEvents = user.getEvents()
+      if not userEvents: continue
+      event = random.choice(userEvents)
+    comments.append(Comment(ensureID(user),ensureID(event),comment=None,interests=None,
+			date=None,stream='social'))
+  #Recruiter comment stream
+  while len(comments)-numSocialComments < numRecruiterComments:
+    recruiterOrAdmin = random.choice(list(set(recruiters)|set(admins)))
+    if 'admin' in recruiterOrAdmin.roles:
+      event = random.choice(events)
+    else:
+      userEvents = recruiterOrAdmin.getEvents()
+      if not userEvents: continue
+      event = random.choice(userEvents)
+    comments.append(Comment(ensureID(recruiterOrAdmin),ensureID(event),comment=None,interests=None,
+			date=None,stream='recruiter'))
+  [comment.save() for comment in comments]
+    
   dumpUserSummary(list(set(recruiters)|set(attendees)|set(admins)))
 
   print("Objects Injected.")

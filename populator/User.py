@@ -16,14 +16,15 @@ from time import mktime
 from base64 import b64encode
 import hashlib
 
-ROLES = ['admin', 'recruiter', 'attendee']
-INTERESTS = ['dogs','cats','music','elephants','DJ Evian','Foxes','Tor','minorities',
-		'dreams','eurodance','electric house','autophagy','999','my love is forever']
+ROLES = ('admin', 'recruiter', 'attendee')
+INTERESTS = ('dogs','cats','music','elephants','DJ Evian','Foxes','Tor','minorities',
+		'dreams','eurodance','electric house','autophagy','999','my love is forever')
 
 def makeTemplates(min,max):
   result = []
   for i in range(0,random.randint(min,max)):
-    result.append({'name':randomString(2,12,' '),'template':randomString(0,500,' ')})
+    result.append({'name':randomString(2,12,""" ~!@#$%^&*()_+-={}|[]\:;'<>?,./"""),
+		'template':randomString(0,500,""" ~!@#$%^&*()_+-={}|[]\:;'<>?,./""")})
   return result
 
 class User:
@@ -90,6 +91,7 @@ class User:
           Users.save(rec)
     if attending:
       attendee = Attendee(ensureID(self),eventID,int(datetime.now().strftime('%s'))*1000)
+      attendee.save()
       return attendee
 
   def invite(self,userID,eventID):
