@@ -149,7 +149,7 @@ describe('Express.js Comment Route Integration Tests:', function() {
 
  	it("should not be able to get the comment object when not signed in", function(done) {
 		request('http://localhost:3001')
-			.get('/comments/getCommentObj')
+			.post('/comments/getCommentObj')
 			.end(function(err, res) {
 				should.not.exist(err);
 				res.status.should.be.equal(401);
@@ -161,7 +161,7 @@ describe('Express.js Comment Route Integration Tests:', function() {
 
 	it("should not be able to get the social comments for an event when not signed in",function(done) {
 		request('http://localhost:3001')
-			.get('/comments/getSocialCommentsForEvent')
+			.post('/comments/getSocialCommentsForEvent')
 			.end(function(err, res) { 
 				should.not.exist(err);
 				res.status.should.be.equal(401);
@@ -173,7 +173,7 @@ describe('Express.js Comment Route Integration Tests:', function() {
 
 	it("should not be able to get the recruiter comments for an event when not signed in",function(done) {
 		request('http://localhost:3001')
-			.get('/comments/getRecruiterCommentsForEvent')
+			.post('/comments/getRecruiterCommentsForEvent')
 			.end(function(err, res) { 
 				should.not.exist(err);
 				res.status.should.be.equal(401);
@@ -280,8 +280,8 @@ describe('Express.js Comment Route Integration Tests:', function() {
 
 	it("should not be able to get a recruiter comment as a normal user",function(done) {
 		agent
-			.get('http://localhost:3001/comments/getCommentObj')
-			.query({comment_id: comment1._id.toString()})
+			.post('http://localhost:3001/comments/getCommentObj')
+			.send({comment_id: comment1._id.toString()})
 			.end(function(err, res) {
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
@@ -291,8 +291,8 @@ describe('Express.js Comment Route Integration Tests:', function() {
 
 	it("should not be able to get a recruiter comment if not recruiting for that event",function(done) {
 		agentBadRecruiter
-			.get('http://localhost:3001/comments/getCommentObj')
-			.query({comment_id: comment1._id.toString()})
+			.post('http://localhost:3001/comments/getCommentObj')
+			.send({comment_id: comment1._id.toString()})
 			.end(function(err, res) {
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
@@ -302,8 +302,8 @@ describe('Express.js Comment Route Integration Tests:', function() {
 
 	it("should be able to get a recruiter comment always when admin",function(done) {
 		agentAdmin
-			.get('http://localhost:3001/comments/getCommentObj')
-			.query({comment_id: comment1._id.toString()})
+			.post('http://localhost:3001/comments/getCommentObj')
+			.send({comment_id: comment1._id.toString()})
 			.end(function(err, res) {
 				res.status.should.be.equal(200);
 				res.body.should.have.property('_id');
@@ -313,8 +313,8 @@ describe('Express.js Comment Route Integration Tests:', function() {
 
 	it("should be able to get a recruiter comment as an recruiter",function(done) {
 		agentRecruiter
-			.get('http://localhost:3001/comments/getCommentObj')
-			.query({comment_id: comment1._id.toString()})
+			.post('http://localhost:3001/comments/getCommentObj')
+			.send({comment_id: comment1._id.toString()})
 			.end(function(err, res) {
 				res.status.should.be.equal(200);
 				res.body.should.have.property('_id');

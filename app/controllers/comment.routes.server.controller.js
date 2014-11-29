@@ -54,10 +54,10 @@ exports.getCommentObj = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	}
-	var id = mongoose.Types.ObjectId(req.query.comment_id);
-	var query = Comment.findOne({_id: id});
+	var id = mongoose.Types.ObjectId(req.body.comment_id);
+	var body = Comment.findOne({_id: id});
 	//Retrieve the comment
-	query.exec(function(err,result) {
+	body.exec(function(err,result) {
 		if (err) {res.status(400).send(err);return;}
 		else if (!result) {
 			res.status(400).json({message: "No comment with that id"});
@@ -74,12 +74,12 @@ exports.getSocialCommentsForEvent = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	}
-	var id = mongoose.Types.ObjectId(req.query.event_id);
-	var query = Comment.find({event_id: id,stream: 'social'});
+	var id = mongoose.Types.ObjectId(req.body.event_id);
+	var body = Comment.find({event_id: id,stream: 'social'});
 	//Retrieve the comments, any authenticated user may view the social stream
 	//Hopefully, this won't encode the cursor itselt. At least I hope not...
 	//	will have to test this
-	query.exec(function(err,result) {
+	body.exec(function(err,result) {
 		if (err) {res.status(400).send(err);return;}
 		else if (!result) {res.status(400).json({message: "No comments found!"});
 		} else {
@@ -93,10 +93,10 @@ exports.getRecruiterCommentsForEvent = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	}
-	var id = mongoose.Types.ObjectId(req.query.event_id);
-	var query = Comment.find({event_id: id,stream: 'recruiter'});
+	var id = mongoose.Types.ObjectId(req.body.event_id);
+	var body = Comment.find({event_id: id,stream: 'recruiter'});
 	//Retrieve the comments
-	query.exec(function(err,result) {
+	body.exec(function(err,result) {
 		if (err) {res.status(400).send(err);return;}
 		else if (!result) {res.status(400).json({message: "No comments found!"});
 		} else if (!req.hasAuthorization(user,['recruiter','admin'])) {
@@ -123,7 +123,7 @@ exports.postCommentSocial = function(req, res) {
 	//	could be abused
 	var comment = req.body.comment;
 	var event_id = mongoose.Types.ObjectId(req.body.event_id);
-	var query = Comment.findOne({_id: id});
+	var body = Comment.findOne({_id: id});
 	var interests = req.body.interests;
 	var user = req.user;
 	var newComment = new Comment({user_id: user._id,event_id: event_id,comment:comment,stream:'social',
@@ -168,9 +168,9 @@ exports.delete = function(req, res) {
 		return;
 	}
 	var id = mongoose.Types.ObjectId(req.body.comment_id);
-	var query = Comment.findOne({_id: id});
+	var body = Comment.findOne({_id: id});
 	//Retrieve the comments
-	query.exec(function(err,result) {
+	body.exec(function(err,result) {
 		if (err) {res.status(400).send(err);return;}
 		else if (!result) {res.status(400).json({message: "No comment found!"});
 		} else if (req.user._id!=result.user_id && !req.hasAuthorization(req.user,['admin'])) {
@@ -193,11 +193,11 @@ exports.searchByInterests = function(req, res) {
 		res.status(401).send({message: "You do not have permission to perform this search"});
 		return;
 	}
-	var query = Comment.find({event_id: id,interest: interest});
+	var body = Comment.find({event_id: id,interest: interest});
 	//Retrieve the comments, any authenticated user may view the social stream
 	//Hopefully, this won't encode the cursor itself. At least I hope not...
 	//	will have to test this
-	query.exec(function(err,result) {
+	body.exec(function(err,result) {
 		if (err) {res.status(400).send(err);return;}
 		else if (!result) {res.status(400).json({message: "No comments found!"});
 		} else {
