@@ -1,0 +1,27 @@
+.frank-recruiter-comment-board {
+	float: right;
+	margin-top: 10px;
+	margin-right: 50px;
+	width: 20%;
+	min-width: 0;
+	height: 575px;
+	background-color: #F5F5F5;
+	border-radius: 5px;
+}
+.frank-recruiter-comment-header {
+	background: -moz-linear-gradient(top, rgba(51, 50, 50, .6) 0%, rgba(51, 50, 50, 1) 50%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(51, 50, 50, .6)), color-stop(50%,rgba(51, 50, 50, 1)));
+	background: -webkit-linear-gradient(top, rgba(51, 50, 50, .6) 0%,rgba(51, 50, 50, 1) 50%);
+	background: -o-linear-gradient(top, rgba(51, 50, 50, .6) 0%,rgba(51, 50, 50, 1) 50%);
+	background: -ms-linear-gradient(top, rgba(51, 50, 50, .6) 0%,rgba(51, 50, 50, 1) 50%);
+	background: linear-gradient(to bottom, rgba(51, 50, 50, .6) 0%,rgba(51, 50, 50, 1) 50%);
+
+	text-align: center;
+	border-radius: 5px 5px 0 0;
+	height: 42px;
+	color: #E8E9EB;
+	padding: 7px;
+}
+.frank-recruiter-comment-title {
+	margin: 0;
+}

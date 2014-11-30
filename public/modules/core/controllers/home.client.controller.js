@@ -29,7 +29,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 		// Temporary data for buttons
 		$scope.data = {
 			buttons: [
-				{name:"Admin Page", description:"A place where admins can fulfill their fantasies of being all-powerful.", link:'#', roles:['admin']},
+				{name:"Admin Page", description:"A place where admins can fulfill their fantasies of being all-powerful.", link:'/#!/admin', roles:['admin']},
 				{name:"Leaderboard", description:"See how your friends and competitors rank against you.", link:'/#!/leaderboard', roles:['recruiter','admin'], image: "http://frank.jou.ufl.edu/recruiters/Pictures/but4.jpg"},
 				{name:"Control Room", description:"Send out your invitations and see your invitation stats.", link:'/#!/invite', roles:['recruiter','admin'], image: "http://frank.jou.ufl.edu/recruiters/Pictures/but3.jpg"},
 				{name:"Recruiter Enrollment Form", description:"Think you got what it takes to be a recruiter for frank?  Then sign up here.  Warning: we only accept the best.", link:'#', roles:['admin', 'recruiter', 'attendee']},
