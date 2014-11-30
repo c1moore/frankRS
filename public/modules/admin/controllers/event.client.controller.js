@@ -20,8 +20,8 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 		});
 
         $scope.addEvent = function (newEvent) {
-        	newEvent.start_date = new Date(newEvent.start_date);
-        	newEvent.end_date = new Date(newEvent.end_date);
+        	newEvent.start_date = new Date(newEvent.start_date).getTime();
+        	newEvent.end_date = new Date(newEvent.end_date).getTime();
         	$http.post('/events/create',newEvent).success(function() {
         		console.log('Event created');
         		$scope.events.push(newEvent);
