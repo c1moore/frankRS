@@ -221,23 +221,36 @@ exports.getRecruiterEvents = function(req, res) {
 */
 exports.getUserEvents = function(req, res) {
 	if(!req.isAuthenticated()) {
-		res.status(401).send({'message' : 'User is not logged in.'});
+		return res.status(401).send({'message' : 'User is not logged in.'});
 	} else if(req.hasAuthorization(req.user, ["recruiter", "admin", "attendee"])) {
-		var id = req.user._id;
-		var query = User.findOne({'_id' : id});
-		query.select('status');
-		query.populate('status.event_id');
-		query.exec(function(err, result) {
-			if(err) {
-				res.status(400).send(err);
-			} else if(!result) {
-				res.status(400).json({message : 'User not found or is not associated with any events!'});
-			} else {
-				res.status(200).send(result);
-			}
-		});
+		if(req.hasAuthorization(req.user, ['admin'])) {
+			var query = Event.find({});
+			query.exec(function(err, result) {
+				if(err) {
+					return res.status(400).send({message : err});
+				} else if(!result.length) {
+					return res.status(400).send({message : 'No events found.'});
+				} else {
+					return res.status(200).send(result);
+				}
+			});
+		} else {
+			var id = req.user._id;
+			var query = User.findOne({'_id' : id});
+			query.select('status');
+			query.populate('status.event_id');
+			query.exec(function(err, result) {
+				if(err) {
+					return res.status(400).send({message : err});
+				} else if(!result) {
+					return res.status(400).json({message : 'User not found or is not associated with any events!'});
+				} else {
+					return res.status(200).send(result);
+				}
+			});
+		}
 	} else {
-		res.status(401).send({'message' : 'User does not have permission.'});
+		return res.status(401).send({'message' : 'User does not have permission.'});
 	}
 };
 

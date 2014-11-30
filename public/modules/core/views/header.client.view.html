@@ -70,7 +70,12 @@
 				<a href='' class="dropdown-toggle" data-toggle="dropdown">
 					<span data-ng-bind="eventSelector.selectedEvent"></span> <b class="caret"></b>
 				</a>
-				<ul class="dropdown-menu">
+				<ul class="dropdown-menu" ng-if="eventSelector.admin">
+						<li ng-repeat="event in eventSelector.events">
+							<a href="" ng-click="eventSelector.changeEvent(event)">{{event.name}}</a>
+						</li>
+				</ul>
+				<ul class="dropdown-menu" ng-if="!eventSelector.admin">
 						<li ng-repeat="event in eventSelector.events" ng-if="eventSelector.numRecruiting > 0">
 							<a href="" ng-click="eventSelector.changeEvent(event)" ng-if="event.recruiter">{{event.event_id.name}}</a>
 						</li>

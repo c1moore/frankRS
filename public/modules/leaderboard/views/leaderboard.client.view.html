@@ -22,11 +22,11 @@
 			</tabset>
 		</div>
 	</div>
-	<div ng-controller="commentsCtrl">
-		<div>
-			<span>Message Board</span>
+	<div ng-controller="commentsCtrl" class="frank-comment-board frank-recruiter-comment-board">
+		<div class="frank-recruiter-comment-header">
+			<h4 class="frank-recruiter-comment-title">Message Board</h4>
 		</div>
-		<div>
+		<div class="frank-recruiter-comment-board">
 			<comment ng-repeat="comment in comments">
 				<comment-header author-name="{{comment.user_id.displayName}}" post-time="{{comment.date}}" removable="{{removable(comment.user_id._id)}}">
 				</comment-header>
