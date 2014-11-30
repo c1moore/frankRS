@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3 -B
 
 #Script that was used to create hashfile.dat, containing a salt and password
 #You must first create a single valid user in the database for me to locate
