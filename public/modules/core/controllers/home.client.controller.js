@@ -29,10 +29,11 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 		// Temporary data for buttons
 		$scope.data = {
 			buttons: [
-				{name:"Admin Page", description:"Description 3", link:'#', roles:['admin']},
-				{name:"Leaderboard", description:"Description 1", link:'/#!/leaderboard', roles:['recruiter','admin'], image: "http://frank.jou.ufl.edu/recruiters/Pictures/but4.jpg"},
-				{name:"Invites", description:"Description 2", link:'/#!/invite', roles:['recruiter','admin'], image: "http://frank.jou.ufl.edu/recruiters/Pictures/but3.jpg"},
-				{name:"Volunteer to be a Recruiter", description:"Description 4", link:'#', roles:['admin', 'recruiter', 'attendee']}
+				{name:"Admin Page", description:"A place where admins can fulfill their fantasies of being all-powerful.", link:'#', roles:['admin']},
+				{name:"Leaderboard", description:"See how your friends and competitors rank against you.", link:'/#!/leaderboard', roles:['recruiter','admin'], image: "http://frank.jou.ufl.edu/recruiters/Pictures/but4.jpg"},
+				{name:"Control Room", description:"Send out your invitations and see your invitation stats.", link:'/#!/invite', roles:['recruiter','admin'], image: "http://frank.jou.ufl.edu/recruiters/Pictures/but3.jpg"},
+				{name:"Recruiter Enrollment Form", description:"Think you got what it takes to be a recruiter for frank?  Then sign up here.  Warning: we only accept the best.", link:'#', roles:['admin', 'recruiter', 'attendee']}
+				{name:"Memo Board", description:"Take a look at what people are saying about the events you are attending and weigh in on the chatter.", link:'/#!/memoboard', roles:['admin', 'recruiter', 'attendee']}
 			],
 			comments: ["Comment 1", "Comment 2"]
 		};
