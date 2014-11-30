@@ -503,7 +503,7 @@
  		.end(function(err,res) {
  			if (err) throw err;
 
- 			console.log(res.body);
+ 			//console.log(res.body);
 
  			res.status.should.equal(200);
 
@@ -613,8 +613,8 @@ it("admin should be able to set candidate event status field", function(done) {
 
 	 					res.status.should.equal(200);
 	 					res.body.should.have.property('events');
-	 					console.log(res.body.events);
-	 					console.log(event2._id);
+	 					//console.log(res.body.events);
+	 					//console.log(event2._id);
 
 		 				for(i=0; i<res.body.events.length; i++) {
 		 					if(res.body.events[i].event_id._id.toString() === event2._id.toString()) {
@@ -710,8 +710,8 @@ it('Should not have changed the attendee user to a recruiter for the whan status
 	 	.post('http://localhost:3001/candidate/setCandidate')
 	 	.send({fName: 'John', lName: 'Smith', email:'JohnS@test.com', events : [event1._id]})
 	 	.end(function(err,res) {
-			console.log(res.body);
-			console.log(res.status);
+			//console.log(res.body);
+			//console.log(res.status);
 	 		if (err) throw err;
 			res.status.should.equal(200);
 
@@ -726,7 +726,7 @@ it('Should not have changed the attendee user to a recruiter for the whan status
 					.end(function(err,res1) {
 						if (err) throw err;
 
-						console.log(res1.body);
+						//console.log(res1.body);
 						res1.status.should.equal(200);
 						res1.body.should.have.property('fName');
 						res1.body.fName.should.be.equal('John');
