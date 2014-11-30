@@ -2,6 +2,7 @@ body {
 	font-family: "Helvetica", sans-serif;
 	background-image: url("http://frank.jou.ufl.edu/recruiters/Pictures/background.jpg");
 	background-size: cover;
+	overflow : auto !important;
 }
 li .disabled {
 	pointer-events: none;
