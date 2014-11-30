@@ -38,7 +38,7 @@ angular.module('core').directive('commentHeader', [
 								"<span>{{time}}</span>" +
 							"</div>" +
 							"<div ng-if='removable' class='frank-comment-remove'>" +
-								"<a href='#' class='frank-comment-remove-icon'><i class='fa fa-remove text-danger'></i></a>"
+								"<a href='#' class='frank-comment-remove-icon'><i class='fa fa-remove text-danger'></i></a>" +
 							"</div>" +
 						"</div>"
 		};

@@ -74,6 +74,9 @@ exports.getSocialCommentsForEvent = function(req, res) {
 		res.status(401).json({message: "You are not logged in"});
 		return;
 	}
+	if(req.body.event_id == undefined) {
+		return res.status(400).send({message : "Event not specified."});
+	}
 	var id = mongoose.Types.ObjectId(req.body.event_id);
 	var body = Comment.find({event_id: id,stream: 'social'});
 	//Retrieve the comments, any authenticated user may view the social stream
@@ -90,24 +93,26 @@ exports.getSocialCommentsForEvent = function(req, res) {
 
 exports.getRecruiterCommentsForEvent = function(req, res) {
 	if (!req.isAuthenticated()) { //Check if the user is authenticated
-		res.status(401).json({message: "You are not logged in"});
-		return;
+		return res.status(401).json({message: "You are not logged in"});
+	} else 	if(req.body.event_id == undefined) {
+		return res.status(400).send({message : "Event not specified."});
+	} else {
+		var id = mongoose.Types.ObjectId(req.body.event_id);
+		var body = Comment.find({event_id: id,stream: 'recruiter'});
+		//Retrieve the comments
+		body.exec(function(err,result) {
+			if (err) {res.status(400).send(err);return;}
+			else if (!result.length) {res.status(400).json({message: "No comments found!"});
+			} else if (!req.hasAuthorization(req.user,['recruiter','admin'])) {
+				res.status(401).json({message: "You do not have the correct role"});
+			} else if (!canViewEvent(req.user,result.event_id,req.hasAuthorization) ||
+					!isRecruitEvent(req.user,result.event_id,req.hasAuthorization)) {
+				res.status(401).json({message: "You are not authorized to view the comments of this event"});
+			} else {
+				res.status(200).json(result);
+			}
+		});
 	}
-	var id = mongoose.Types.ObjectId(req.body.event_id);
-	var body = Comment.find({event_id: id,stream: 'recruiter'});
-	//Retrieve the comments
-	body.exec(function(err,result) {
-		if (err) {res.status(400).send(err);return;}
-		else if (!result) {res.status(400).json({message: "No comments found!"});
-		} else if (!req.hasAuthorization(user,['recruiter','admin'])) {
-			res.status(401).json({message: "You do not have the correct role"});
-		} else if (!canViewEvent(user,result.event_id,req.hasAuthorization) ||
-				!isRecruitEvent(user,result.event_id,req.hasAuthorization)) {
-			res.status(401).json({message: "You are not authorized to view the comments of this event"});
-		} else {
-			res.status(200).json(result);
-		}
-	});
 };
 
 exports.postCommentSocial = function(req, res) {

@@ -1,10 +1,10 @@
 'use strict';
 
-angular.module('leaderboard').controller('commentsCtrl', ['$scope', 'Authentication', '$location', 'eventSelector', '$http', '$window', '$modal', 'cacheService', '$interval',
-	function($scope, Authentication, $location, eventSelector, $http, $window, $modal, cacheService, $interval) {
+angular.module('leaderboard').controller('commentsCtrl', ['$scope', 'Authentication', '$timeout', '$location', 'eventSelector', '$http', '$window', '$modal', 'cacheService', '$interval',
+	function($scope, Authentication, $timeout, $location, eventSelector, $http, $window, $modal, cacheService, $interval) {
 		$scope.authentication = Authentication;
 
-		$scope.removable() = function(user_id) {
+		$scope.removable = function(user_id) {
 			if(_.intersection($scope.authentication.user.roles, ['admin']).length === 1)
 				return true;
 			else {
@@ -22,6 +22,7 @@ angular.module('leaderboard').controller('commentsCtrl', ['$scope', 'Authenticat
 		var getComments = function() {
 			$http.post('/comments/getRecruiterCommentsForEvent', {event_id : eventSelector.postEventId}).success(function(response) {
 				$scope.comments = response;
+				console.log(response);
 			}).error(function(response, status) {
 				if(status === 401) {
 					if(response.message === "User is not logged in.") {
@@ -30,16 +31,19 @@ angular.module('leaderboard').controller('commentsCtrl', ['$scope', 'Authenticat
 						$location.path('/');
 					}
 				} else if(status === 400) {
-					$scope.comments.error = "Error retrieving comments.  Try refreshing the page.";
+					$scope.commentErr = "Error retrieving comments.  Try refreshing the page.";
 				}
 			});
 		};
 
-		getComments();
+		//Get comments when the page is first loaded.
+		$timeout(getComments);
+		//Watch for changes in the selected event and update the comments accordingly.
+		$scope.$watch(function() {
+			return eventSelector.selectedEvent;
+		}, getComments);
 
 		//Update comments every 2 minutes.
 		$interval(getComments(), 120000);
-
-
 	}
 ]);
