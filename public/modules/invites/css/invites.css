@@ -347,7 +347,7 @@ animation:0.5s flipInX ease;
 }
 body {
   background-color:#F5F5F5;
-  overflow:hidden;
+  /*overflow:hidden;
 }
 
 

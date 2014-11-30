@@ -28,8 +28,12 @@
 			<h2>Pending Applications</h2>
 			<table ng-table="tableParams" class="table table-bordered frank-main-view">
 				<tr ng-repeat="candidate in $data">
-					<td data-title="'Name'">
+					<td data-title="'Candidate'">
 						{{candidate.fName + ' ' + candidate.lName}}
+					</td>
+					<td data-title="'Events'">
+						
+					</td>
 					</td>
 					<td data-title="'Accept'">
 						<button class="btn btn-success" ng-click="addApplicant($index)">Accept</button>

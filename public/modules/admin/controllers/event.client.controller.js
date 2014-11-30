@@ -4,7 +4,6 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 
 		$http.get('/events/enumerateAll').success(function(data) {
 			$scope.events = data;
-			$scope.tableParams.reload();
 		});
 
 	  	$scope.tableParams = new ngTableParams({
@@ -16,16 +15,18 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
         	}
         });
 
-        $scope.$watch($scope.events, function() {
-			$timeout(function() {
-				$scope.tableParams.reload();
-			});
+        $scope.$watch('events', function() {
+			$scope.tableParams.reload();
 		});
 
         $scope.addEvent = function (newEvent) {
-        	$scope.events.push(newEvent);
+        	newEvent.start_date = new Date(newEvent.start_date);
+        	newEvent.end_date = new Date(newEvent.end_date);
+        	$http.post('/events/create',newEvent).success(function() {
+        		console.log('Event created');
+        		$scope.events.push(newEvent);
+        	})
         	$scope.newEvent = null;
-        	$scope.tableParams.reload();
   		};
 
 		$scope.deleteEvent = function(event) {
