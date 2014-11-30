@@ -22,7 +22,7 @@ def getForThisEvent(attendeeList,eventID):
   return attendees
 
 def main():
-  resetMongo("The database has been reset.\n")
+  resetMongo("The database (dev) has been reset.\n")
   welcome()
   random.seed(a=getRandomSeed())
   numAttendees = getNumAttendees()
@@ -66,7 +66,12 @@ def main():
     newUser.save()
   count = 0
   #Make some recruiters attendees
-  while count<attendeesUnionRecruiters:
+  preAttendees = 0
+  for recruiter in recruiters:
+    if 'attendee' in recruiter.roles:
+      attendees.append(recruiter)
+      preAttendees += 1
+  while (count+preAttendees)<attendeesUnionRecruiters:
     recruiter = random.choice(recruiters)
     if 'attendee' in recruiter.roles:
       continue

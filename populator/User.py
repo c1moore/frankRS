@@ -115,7 +115,10 @@ class User:
     for sd in self.status:
       if sd['event_id']==eventID:
         return #Already recruiting for the event
-    self.status.append({'event_id':eventID,'attending':random.choice([True,False]),'recruiter':True})
+    newStatsDict = {'event_id':eventID,'attending':random.choice([True,False]),'recruiter':True}
+    if newStatsDict['attending']==True and 'attendee' not in self.roles:
+      self.roles.append('attendee')
+    self.status.append(newStatsDict)
 
   def getEvents(self):
     events = []
