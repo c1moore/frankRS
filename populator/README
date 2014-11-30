@@ -1,6 +1,6 @@
-To install depdendencies:
+To install depdendencies manually:
 
 sudo aptitude install python3-pip build-essential python3-dev
 sudo pip3 install pymongo
 
-
+These dependencies are automatically handled by setup.py in the root of the project directory.
