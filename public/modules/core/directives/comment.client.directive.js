@@ -88,19 +88,19 @@ angular.module('core').directive('commentFooter', [
 	}
 ]);
 
-angular.module('core').directive('commentEditor', ['$compile',
-	function($compile) {
+angular.module('core').directive('commentEditor', ['$compile', '$timeout',
+	function($compile, $timeout) {
 		var commentEditorDefinition = {
 			restrict : 'E',
 			replace : true,
 			scope : {
-				newComment : '=commentContent'
+				newComment : '=commentContent',
+				expanded : '='
 			},
 			template : "<div class='frank-comment-editor'>" +
-							"<div class='frank-comment-editor-compressed' ng-click='toggleExpanded()' ng-hide='expanded'></div>" +
+							"<div class='frank-comment-editor-compressed' ng-click='toggleExpanded()' ng-hide='expanded'>Click to comment...</div>" +
 							"<div class='frank-comment-editor-expanded' ng-show='expanded'>" +
-								"<div text-angular ng-model='newComment' ta-toolbar=\"[['undo', 'redo'], ['ul', 'ol', 'quote'], ['bold', 'italics', 'underline'], ['insertLink', 'insertVideo']]\"></div>" +
-								"<button ng-file-select ng-file-model='comPic' ng-file-change='uploadFile()' accept='image/*,*.pdf'><i class='fa fa-camera'></i></button>" +
+								"<div text-angular ng-model='newComment' ta-toolbar=\"[['undo', 'redo'], ['ul', 'ol', 'quote'], ['bold', 'italics', 'underline'], ['insertLink', 'insertVideo']]\" ></div>" +
 							"</div>" +
 						"</div>",
 			link : function postLink($scope, element, attrs) {
@@ -113,6 +113,20 @@ angular.module('core').directive('commentEditor', ['$compile',
 				$scope.uploadFile = function() {};
 
 				$scope.newComment = "Test.";
+
+				angular.element(".ta-toolbar .btn-group:last").append($compile("<button type='button' class='btn btn-default' ng-file-select ng-file-model='comPic' ng-file-change='uploadFile()' accept='image/*,*.pdf'><i class='fa fa-camera'></i></button>")($scope));
+				angular.element(".ta-toolbar button").removeAttr("ng-disabled");
+				angular.element(".ta-toolbar button").removeAttr("unselectable");
+				$timeout(function() {
+					angular.element(".ta-toolbar button").removeAttr("disabled")
+				}, 100);
+				angular.element(".ta-root").on('focusout', function() {
+					$scope.$apply(function() {
+						$timeout(function() {
+							angular.element(".ta-toolbar button").removeAttr("disabled")
+						}, 10);
+					});
+				});
 			}
 		};
 

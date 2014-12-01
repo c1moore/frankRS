@@ -3,7 +3,7 @@
 angular.module('leaderboard').controller('commentsCtrl', ['$scope', 'Authentication', '$timeout', '$location', 'eventSelector', '$http', '$window', '$modal', 'cacheService', '$interval',
 	function($scope, Authentication, $timeout, $location, eventSelector, $http, $window, $modal, cacheService, $interval) {
 		$scope.authentication = Authentication;
-
+		$scope.editorExpanded = false;
 		$scope.removable = function(user_id) {
 			if(_.intersection($scope.authentication.user.roles, ['admin']).length === 1)
 				return true;
