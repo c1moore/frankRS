@@ -87,3 +87,35 @@ angular.module('core').directive('commentFooter', [
 		return commentFooterDefinition;
 	}
 ]);
+
+angular.module('core').directive('commentEditor', ['$compile',
+	function($compile) {
+		var commentEditorDefinition = {
+			restrict : 'E',
+			replace : true,
+			scope : {
+				newComment : '=commentContent'
+			},
+			template : "<div class='frank-comment-editor'>" +
+							"<div class='frank-comment-editor-compressed' ng-click='toggleExpanded()' ng-hide='expanded'></div>" +
+							"<div class='frank-comment-editor-expanded' ng-show='expanded'>" +
+								"<div text-angular ng-model='newComment' ta-toolbar=\"[['undo', 'redo'], ['ul', 'ol', 'quote'], ['bold', 'italics', 'underline'], ['insertLink', 'insertVideo']]\"></div>" +
+								"<button ng-file-select ng-file-model='comPic' ng-file-change='uploadFile()' accept='image/*,*.pdf'><i class='fa fa-camera'></i></button>" +
+							"</div>" +
+						"</div>",
+			link : function postLink($scope, element, attrs) {
+				$scope.expanded = false;
+
+				$scope.toggleExpanded = function() {
+					$scope.expanded = !$scope.expanded;
+				}
+
+				$scope.uploadFile = function() {};
+
+				$scope.newComment = "Test.";
+			}
+		};
+
+		return commentEditorDefinition;
+	}
+]);

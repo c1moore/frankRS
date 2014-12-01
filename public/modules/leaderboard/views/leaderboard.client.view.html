@@ -26,7 +26,7 @@
 		<div class="frank-recruiter-comment-header">
 			<h3 class="frank-recruiter-comment-title">Message Board</h3>
 		</div>
-		<div class="frank-recruiter-comment-board">
+		<div class="frank-recruiter-comments">
 			<comment ng-repeat="comment in comments">
 				<comment-header author-name="{{comment.user_id.displayName}}" post-time="{{comment.date}}" removable="{{removable(comment.user_id._id)}}">
 				</comment-header>
@@ -36,6 +36,7 @@
 				<comment-footer interests="comment.interests">
 				</comment-footer>
 			</comment>
+			<comment-editor comment-content="comment"></comment-editor>
 		</div>
 	</div>
 </section>
