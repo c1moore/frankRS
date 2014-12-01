@@ -20,20 +20,22 @@ angular.module('leaderboard').controller('commentsCtrl', ['$scope', 'Authenticat
 		* this event.
 		*/
 		var getComments = function() {
-			$http.post('/comments/getRecruiterCommentsForEvent', {event_id : eventSelector.postEventId}).success(function(response) {
-				$scope.comments = response;
-				console.log(response);
-			}).error(function(response, status) {
-				if(status === 401) {
-					if(response.message === "User is not logged in.") {
-						$location.path('/signin');
-					} else {
-						$location.path('/');
+			if(eventSelector.postEventId) {
+				$http.post('/comments/getRecruiterCommentsForEvent', {event_id : eventSelector.postEventId}).success(function(response) {
+					$scope.comments = response;
+					console.log(response);
+				}).error(function(response, status) {
+					if(status === 401) {
+						if(response.message === "User is not logged in.") {
+							$location.path('/signin');
+						} else {
+							$location.path('/');
+						}
+					} else if(status === 400) {
+						$scope.commentErr = "Error retrieving comments.  Try refreshing the page.";
 					}
-				} else if(status === 400) {
-					$scope.commentErr = "Error retrieving comments.  Try refreshing the page.";
-				}
-			});
+				});
+			}
 		};
 
 		//Get comments when the page is first loaded.
@@ -43,7 +45,7 @@ angular.module('leaderboard').controller('commentsCtrl', ['$scope', 'Authenticat
 			return eventSelector.selectedEvent;
 		}, getComments);
 
-		//Update comments every 2 minutes.
-		$interval(getComments(), 120000);
+		//Update comments every 1 minute.
+		$interval(getComments(), 60000);
 	}
 ]);
