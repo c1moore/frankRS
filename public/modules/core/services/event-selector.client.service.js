@@ -4,32 +4,29 @@
 * Service that allows users to select the event for which the current page should display information about.  Admins should be able to view all events
 * at all times, the eventSelector will have to behave slightly differently if the user is an admin.  Otherwise, the user should only view the events that are in
 * their status array.  While this is handled in the backend, the data sent to the frontend differs slightly.
+*
+* Since the eventSelector is refreshed every time the page is refreshed, we should store the value that
+* the user selected before refreshing the page so this event can automatically be restored.  We are using
+* cacheService to deal with saving these values to the localStorage.
 */
 angular.module('core').service('eventSelector', ['$http', '$location', 'cacheService', 'Authentication',
 
 	function($http, $location, cacheService, Authentication) {
 		var thisService = this;
-		this.events = [];
-		this.selectedEvent = "Select Event";
-		this.disabled = false;
-		this.numRecruiting = 0;
-		this.postEventId = null;
-		this.nresDisabled = false;
-		this.recruiterEvent = true;
-		this.admin = false;
-
 		var cache = cacheService;
+
+		this.events = [];				//List of events viewable to this user.
+		this.selectedEvent = "Select Event";
+		this.postEventId = null;
+		this.numRecruiting = 0;
+		this.recruiterEvent = true;		//Whether or not this user is recruiting for the selected event.
+		this.nresDisabled = false;		//Whether or not the events for which this user is only attending (not recruiting) are disabled (used on pages that require recruiter/admin privileges).
+		this.disabled = false;
+		this.admin = false;				//Whether or not this user is an admin.
+
 		var keys = [];
 		var put = function(key, value) {
 			cache.setData(key,value);
-		}
-
-		//Functions common to all users.
-		var checkEvent = function(needle) {
-			for (var i=0; i<thisService.events.length; i++) {
-				if (thisService.events[i].event_id._id === needle) return true;
-			}
-			return false;
 		}
 
 		this.hideEventSelector = function() {
@@ -38,14 +35,28 @@ angular.module('core').service('eventSelector', ['$http', '$location', 'cacheSer
 			return (path === '/signin' || path === '/settings/profile' || path === '/settings/password');
 		}
 
-		if(_.intersection(Authentication.user.roles, ['admin']).length === 1) {
+		/**
+		* Functions will be defined based on whether or not the current user is an admin.  Since
+		* admins should be able to see all events, their eventSelector will behave differently than
+		* attendees and recruiters.
+		*/
+		if(_.intersection(Authentication.user.roles, ['admin']).length > 0) {
 			this.admin = true;
+
+			var checkEvent = function(needle) {
+				for (var i=0; i<thisService.events.length; i++) {
+					if(thisService.events[i]._id === needle)
+						return true;
+				}
+				return false;
+			}
+
 			$http.get('/users/events').success(function(data) {
 				thisService.events = data;
 
 				var cachedEvent = cache.getData('selectedEvent'), cachedId = cache.getData('eventId');
 
-				if(!(cachedEvent) && !(cachedId) && (data.length > 0) && checkEvent(cachedId)) {
+				if(cachedEvent && cachedId && thisService.events.length && checkEvent(cachedId)) {
 					thisService.selectedEvent = cache.getData('selectedEvent');
 					thisService.postEventId = cache.getData('eventId');
 				}
@@ -61,19 +72,32 @@ angular.module('core').service('eventSelector', ['$http', '$location', 'cacheSer
 				put('eventId', event._id);
 			};
 
+			/**
+			* Admins have permission to do anything with any event so there is no need for a divider
+			* or to make events disabled on any page.
+			*/
 			thisService.showDivider = function() {
 				return false;
 			}
-
 			thisService.toggleDisabledEvents = function() {};
 		} else {
+			var checkEvent = function(needle) {
+				for (var i=0; i<thisService.events.length; i++) {
+					if (thisService.events[i].event_id._id === needle) return true;
+				}
+				return false;
+			}
+
 			$http.get('/users/events').success(function(data) {
 				thisService.events = data.status;
 				for(var i=0; i<thisService.events.length; i++) {
 					if(thisService.events[i].recruiter)
 						thisService.numRecruiting++;
 				}
-				if(cache.getData('selectedEvent') != null && cache.getData('eventId') != null && thisService.events.length > 0 && checkEvent(cache.getData('eventId')) == true) {
+
+				var cachedEvent = cache.getData('selectedEvent'), cachedId = cache.getData('eventId');
+
+				if(cachedEvent && cachedId && thisService.events.length && checkEvent(cachedId)) {
 					thisService.selectedEvent = cache.getData('selectedEvent');
 					thisService.postEventId = cache.getData('eventId');
 					thisService.recruiterEvent = cache.getData('recruiterEvent');
