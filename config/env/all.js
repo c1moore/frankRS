@@ -36,8 +36,8 @@ module.exports = {
 				'public/lib/textAngular/src/textAngular-sanitize.js',
 				'public/lib/textAngular/src/textAngular.js',
 				'public/lib/textAngular/src/textAngularSetup.js',
-				'public/lib/ng-flow-2.4.0/dist/ng-flow.js',
-				'public/lib/ng-flow-2.4.0/dist/ng-flow-standalone.js'
+				'public/lib/ng-flow/dist/ng-flow.js',
+				'public/lib/ng-flow/dist/ng-flow-standalone.js'
 			]
 		},
 		css: [
