@@ -33,6 +33,15 @@ def injectDemoUser():
   demo.save()
   return demo
 
+def injectDemoEventFor(demo):
+  event = Event()
+  event.randomize()
+  event.name = "Project Demonstration"
+  event.location = "CSE Building"
+  demo.recruitFor(event)
+  event.save() #Redundant, but I want to save it again
+  return event
+
 def main():
   resetMongo("The database (dev) has been reset.\n")
   welcome()
@@ -66,6 +75,8 @@ def main():
     recruiters.append(demo)
     attendees.append(demo)
     admins.append(demo)
+    demoEvent = injectDemoEventFor(demo)
+    events.append(demoEvent)
   print("\nGenerating objects (this may take some time)...")
   #Make events
   for i in range(numEvents):
