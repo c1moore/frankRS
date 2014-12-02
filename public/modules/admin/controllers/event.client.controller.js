@@ -40,8 +40,10 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 		};
 
 		$scope.updateEvent = function(event) {
-			$http.post('/events/setName',event).success(function() {
-				console.log("Event Updated");
+			$http.post('/events/setName',{event_id : event._id, name:event.name}).success(function() {
+				$http.post('/events/setLocation',{event_id: event._id, location:event.location}).success(function() {
+					console.log("Event Created");
+				});
 			});
 		};
 
