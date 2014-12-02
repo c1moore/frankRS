@@ -95,11 +95,12 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout',
 			replace : true,
 			scope : {
 				newComment : '=commentContent',
-				expanded : '='
+				expanded : '=',
+				files : '=files'
 			},
 			template : "<div class='frank-comment-editor'>" +
 							"<div class='frank-comment-editor-compressed' ng-click='toggleExpanded()' ng-hide='expanded'>Click to comment...</div>" +
-							"<div class='frank-comment-editor-expanded' ng-show='expanded'>" +
+							"<div class='frank-comment-editor-expanded' ng-show='expanded' flow-init>" +
 								"<div text-angular ng-model='newComment' ta-toolbar=\"[['undo', 'redo'], ['ul', 'ol', 'quote'], ['bold', 'italics', 'underline'], ['insertLink', 'insertVideo']]\" ></div>" +
 							"</div>" +
 						"</div>",
@@ -110,11 +111,7 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout',
 					$scope.expanded = !$scope.expanded;
 				}
 
-				$scope.uploadFile = function() {};
-
-				$scope.newComment = "Test.";
-
-				angular.element(".ta-toolbar .btn-group:last").append($compile("<button type='button' class='btn btn-default' ng-file-select ng-file-model='comPic' ng-file-change='uploadFile()' accept='image/*,*.pdf'><i class='fa fa-camera'></i></button>")($scope));
+				angular.element(".ta-toolbar .btn-group:last").append($compile("<span class='btn btn-default' flow-btn><i class='fa fa-camera'></i></button>")($scope));
 				angular.element(".ta-toolbar button").removeAttr("ng-disabled");
 				angular.element(".ta-toolbar button").removeAttr("unselectable");
 				$timeout(function() {

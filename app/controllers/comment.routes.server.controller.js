@@ -15,7 +15,9 @@ var errorHandler = require('./errors'),
 	mongoose = require('mongoose'),
 	Comment = mongoose.model('Comment'),
 	User = mongoose.model('User'),
-	Event = mongoose.model('Event');
+	Event = mongoose.model('Event'),
+	fs = require('fs'),
+	path = require('path');
 
 //Full check to see if comment is visible to the user, but requires the comment
 var canViewComment = function(user,hasAuthorization,comment) {
@@ -93,6 +95,10 @@ exports.getSocialCommentsForEvent = function(req, res) {
 	});
 };
 
+/**
+* Returns all comments that will be displayed on the leaderboard for a
+* particular event.  Only recruiters and admin should see these comments.
+*/
 exports.getRecruiterCommentsForEvent = function(req, res) {
 	if (!req.isAuthenticated()) { //Check if the user is authenticated
 		return res.status(401).json({message: "You are not logged in"});
@@ -215,3 +221,22 @@ exports.searchByInterests = function(req, res) {
 	});
 };
 
+/**
+* This controller is save images that are uploaded by recruiters on the leaderboard
+* comment stream to a file on our server.
+*/
+exports.uploadRecruiterCommentImage = function(req, res) {
+	if(!req.isAuthenticated()) {
+		return res.status(401).send({message : "User is not logged in."});
+	} else if(!req.file || !req.body.event_id) {
+		return res.status(400).send({message : "Required field not specified."});
+	} else if(!req.hasAuthorization(req.user, ['admin', 'recruiter'])) {
+		return res.status(401).send({message : "User does not have permission."});
+	} else if(!canViewEvent(req.user, req.body.event_id, req.hasAuthorization) || !isRecruitEvent(req.user, req.body.event_id, req.hasAuthorization)) {
+		res.status(401).json({message: "You are not authorized to view the comments of this event"});
+	} else {
+		var path = path.normalize(__dirname + "../../public/img/recruiter");
+		console.log(req.files.file);
+
+	}
+};

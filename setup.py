@@ -37,7 +37,7 @@ def main():
     system("sudo pip3 install pymongo")
   res = ask("Would you like me install required bower packages?: ")
   if res:
-      system("bower install ng-table lodash jquery-ui font-awesome angularjs-dropdown-multiselect")
+      system("bower install ng-table lodash jquery-ui font-awesome angularjs-dropdown-multiselect textAngular ng-flow#~2")
   print("Done!")
 
 if __name__=='__main__':
