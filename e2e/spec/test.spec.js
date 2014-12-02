@@ -22,7 +22,9 @@ describe('angularjs homepage todo list', function() {
     browser.get('http://localhost:3000/#!/');
     expect(browser.getTitle()).toEqual('frank Recruiter System - Development Environment');
     //element(by.buttonText('Leaderboard')).click();
-   element.all((by.binding('button[type="Leaderboard"]'))).click();
+        element.all(by.css('.homeButtonContainer a[href="/#!/leaderboard"]')).click();
+        browser.sleep(500);
+
 
     //<button type="submit" class="btn btn-primary">Sign in</button>
 
@@ -34,7 +36,9 @@ describe('angularjs homepage todo list', function() {
     browser.get('http://localhost:3000/#!/');
     expect(browser.getTitle()).toEqual('frank Recruiter System - Development Environment');
     //element(by.buttonText('Leaderboard')).click();
-    element.all((by.binding('button[type="Control Room"]'))).click();
+        element.all(by.css('.homeButtonContainer a[href="/#!/admin"]')).click();
+        browser.sleep(500);
+
 
     //<button type="submit" class="btn btn-primary">Sign in</button>
 
@@ -46,7 +50,9 @@ describe('angularjs homepage todo list', function() {
     browser.get('http://localhost:3000/#!/');
     expect(browser.getTitle()).toEqual('frank Recruiter System - Development Environment');
     //element(by.buttonText('Leaderboard')).click();
-    element.all((by.binding('button[type="Invitations"]'))).click();
+        element.all(by.css('.homeButtonContainer a[href="/#!/invite"]')).click();
+          browser.sleep(500);
+
 
     //<button type="submit" class="btn btn-primary">Sign in</button>
 
