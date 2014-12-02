@@ -21,6 +21,27 @@ def getForThisEvent(attendeeList,eventID):
       attendees.append(users[i])
   return attendees
 
+def injectDemoUser():
+  demo = User()
+  demo.randomize()
+  demo.roles = ['admin','recruiter','attendee']
+  demo.email = "demo@example.com"
+  demo.fName = "Alin"
+  demo.lName = "Dobra"
+  demo.displayName = demo.lName + ', ' + demo.fName
+  demo.organization = "University of Florida"
+  demo.save()
+  return demo
+
+def injectDemoEventFor(demo):
+  event = Event()
+  event.randomize()
+  event.name = "Project Demonstration"
+  event.location = "CSE Building"
+  demo.recruitFor(event)
+  event.save() #Redundant, but I want to save it again
+  return event
+
 def main():
   resetMongo("The database (dev) has been reset.\n")
   welcome()
@@ -42,19 +63,33 @@ def main():
     adminsUnionRecruiters=random.randint(0,min(numAdmins,numRecruiters))
   if attendeesUnionRecruiters==-1:
     attendeesUnionRecruiters=random.randint(0,min(numRecruiters,numAttendees))
-  print("\nGenerating objects (this may take some time)...")
   recruiters = []
   attendees = [] #By role
   admins = []
   candidates = []
   events = []
   comments = []
+  usingDemoUser = getInjectDemoUser()
+  if usingDemoUser:
+    demo = injectDemoUser()
+    recruiters.append(demo)
+    attendees.append(demo)
+    admins.append(demo)
+    demoEvent = injectDemoEventFor(demo)
+    events.append(demoEvent)
+  print("\nGenerating objects (this may take some time)...")
   #Make events
   for i in range(numEvents):
     event = Event()
     event.randomize()
     event.save()
     events.append(event)
+  if usingDemoUser:
+    if len(events)==0:
+      raise RuntimeError("No events exist to add to the demo user--Demo must have events!")
+    demoEvents = random.sample(events,random.randint(1,maxEventsPerRecruiter))
+    for event in demoEvents:
+      demo.recruitFor(event)    
   #Make recruiters
   for i in range(numRecruiters):
     newUser = User()

@@ -48,5 +48,3 @@ def getPymongoDB():
     client = pymongo.MongoClient('mongodb://localhost:27017/')
     PymongoDB = client[DATABASE]
   return PymongoDB
-
-
