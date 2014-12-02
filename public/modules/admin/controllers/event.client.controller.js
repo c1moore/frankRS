@@ -39,6 +39,12 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 			});
 		};
 
+		$scope.updateEvent = function(event) {
+			$http.post('/events/setName',event).success(function() {
+				console.log("Event Updated");
+			});
+		};
+
 
   		//the following code sets up the date selectors in the event form 
   		$scope.today = function() {

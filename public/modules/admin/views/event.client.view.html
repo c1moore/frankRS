@@ -65,7 +65,7 @@
 	  				</td>
 	  				<td data-title="'Actions'" width="200">
                 		<a ng-if="!event.$edit" href="" class="btn btn-default btn-xs" ng-click="event.$edit = true">Edit</a>
-                		<a ng-if="event.$edit" href="" class="btn btn-primary btn-xs" ng-click="event.$edit = false">Save</a>
+                		<a ng-if="event.$edit" href="" class="btn btn-primary btn-xs" ng-click="event.$edit = false; updateEvent(event)">Save</a>
             		</td>
 	  			</tr>
 	  		</table>
