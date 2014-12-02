@@ -77,8 +77,8 @@ angular.module('core').directive('commentFooter', [
 			require : '^comment',
 			template : "<div class='frank-comment-footer'>" +
 							"<div class='frank-comment-interests'>" +
-								"<div ng-repeat='interest in interests'>" +
-									"<img src='interest.url' alt='interest.text' />" +
+								"<div ng-repeat='interest in interests' class='frank-comment-footer-img-container'>" +
+									"<img src='interest.url' alt='interest.text' class='frank-comment-footer-img' />" +
 								"</div>" +
 							"</div>" +
 						"</div>"

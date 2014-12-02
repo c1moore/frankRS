@@ -28,7 +28,7 @@
 		</div>
 		<div class="frank-recruiter-comments" ng-class="{'frank-recruiter-comments-compressed' : editorExpanded, 'frank-recruiter-comments-expanded' : !editorExpanded}">
 			<comment ng-repeat="comment in comments">
-				<comment-header author-name="{{comment.user_id.displayName}}" post-time="{{comment.date}}" removable="{{removable(comment.user_id._id)}}">
+				<comment-header author-name="{{comment.user_id.displayName}}" post-time="{{toHumanReadable(comment.date)}}" removable="{{removable(comment.user_id._id)}}">
 				</comment-header>
 				<comment-body>
 					{{comment.comment}}

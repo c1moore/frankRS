@@ -29,8 +29,8 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		}
 		
 		$scope.returnInt = function(value) {
-			return Math.floor(value)
-		}
+			return Math.floor(value);
+		};
 
 		var mainApi = $resource('/leaderboard/maintable',{event_id: eventSelector.postEventId}, {'getTable':{method:'POST', isArray:true}});
 		var attendingApi = $resource('/leaderboard/attendees',{event_id: eventSelector.postEventId}, {'getTable':{method:'POST', isArray:true}});
@@ -135,7 +135,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 			}).error(function(response, status) {
 
 			});
-		}
+		};
 
 		getStats();
 
