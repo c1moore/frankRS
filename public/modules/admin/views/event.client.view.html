@@ -43,7 +43,10 @@
 	  		<table ng-table="tableParams" class="table table-bordered frank-main-view">
 	  			<tr ng-repeat="event in $data">
 	  				<td data-title="'Name'">
-	  					{{event.name}}
+	  					<span ng-if="!event.$edit">{{event.name}}</span>
+	  					<div ng-if="event.$edit">
+	  						<input class="form-control" type="text" ng-model="event.name" />
+	  					</div>
 	  				</td>
 	  				<td data-title="'Start Date'">
 	  					{{event.start_date | date:'shortDate'}}
@@ -52,11 +55,18 @@
 	  					{{event.end_date | date:'shortDate'}}
 	  				</td>
 	  				<td data-title="'Location'">
-	  					{{event.location}}
+	  					<span ng-if="!event.$edit">{{event.location}}</span>
+	  					<div ng-if="event.$edit">
+	  						<input class="form-control" type="text" ng-model="event.location" />
+	  					</div>
 	  				</td>
 	  				<td data-title="'Remove'">
-	  					<input type="button" value="Remove" class="btn btn-primary" ng-click="deleteEvent(event)" />
+	  					<input type="button" value="Remove" class="btn btn-default btn-xs" ng-click="deleteEvent(event)" />
 	  				</td>
+	  				<td data-title="'Actions'" width="200">
+                		<a ng-if="!event.$edit" href="" class="btn btn-default btn-xs" ng-click="event.$edit = true">Edit</a>
+                		<a ng-if="event.$edit" href="" class="btn btn-primary btn-xs" ng-click="event.$edit = false; updateEvent(event)">Save</a>
+            		</td>
 	  			</tr>
 	  		</table>
   		</div>

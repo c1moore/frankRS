@@ -373,7 +373,6 @@ exports.setName = function(req, res) {
 		res.status(401).json({message: "Access denied"});
 		return;
 	}
-	var id = req.session.id;
 	var event_id = mongoose.Types.ObjectId(req.body.event_id);
 	var new_name = req.body.name;
 	var query = Event.findOne({_id: event_id});
