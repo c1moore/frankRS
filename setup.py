@@ -28,16 +28,19 @@ def main():
   res = ask("Would you like to update your system packages first?: ")
   if res:
     system("sudo aptitude update; sudo aptitude full-upgrade")
-  res = ask("Would you like me to run 'npm install'?: ")
+  res = ask("Would you like to run 'npm install'?: ")
   if res:
     system("sudo npm install")
-  res = ask("Would you like me install the populator's dependencies?: ")
+  res = ask("Would you like to install the populator's dependencies?: ")
   if res:
     system("sudo aptitude install python3-pip build-essential python3-dev")
     system("sudo pip3 install pymongo")
-  res = ask("Would you like me install required bower packages?: ")
+  res = ask("Would you like to install required bower packages?: ")
   if res:
       system("bower install ng-table lodash jquery-ui font-awesome angularjs-dropdown-multiselect textAngular ng-flow#~2")
+  res = ask("Would you like to install protractor?: ")
+  if res:
+    system("sudo npm install -g protractor")
   print("Done!")
 
 if __name__=='__main__':
