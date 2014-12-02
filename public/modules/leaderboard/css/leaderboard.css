@@ -116,6 +116,10 @@ th.header {
 	color:#ffffff;
 }
 
+.frank-rank-smaller h1{
+	font-size: 110px !important;
+}
+
 #stats {
 	font-size:3em;
 }
