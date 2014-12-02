@@ -5,8 +5,8 @@ describe('angularjs homepage todo list', function() {
   it('should be able to sign in', function() {
     browser.get('http://localhost:3000/#!/');
     expect(browser.getTitle()).toEqual('frank Recruiter System - Development Environment');
-
-    element(by.model('credentials.email')).sendKeys('h6qep298x61j@pGop1bULdMtDiO5nbggEPu6eF5tyyXaMLs.com');
+    //expect(ptor.getCurrentUrl()).toContain
+    element(by.model('credentials.email')).sendKeys('faaal1dkcb3nngznn4jhu94hj6@HHuGgdgOBlmE3MMFmyczhOhBsD.gov');
     element(by.model('credentials.password')).sendKeys('password');
 
 
