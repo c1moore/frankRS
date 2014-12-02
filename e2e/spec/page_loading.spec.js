@@ -1,5 +1,5 @@
 describe('e2e page loading tests', function() {
-
+    var delaylength = 500;
 
     it('should be able to sign in', function() {
         browser.get('http://localhost:3000/#!/');
@@ -13,7 +13,7 @@ describe('e2e page loading tests', function() {
 
 
         element(by.css('button[type="submit"]')).click();
-        browser.sleep(500);
+        browser.waitForAngular();
 
     });
 
@@ -23,7 +23,7 @@ describe('e2e page loading tests', function() {
 
         expect(browser.getTitle()).toEqual('frank Recruiter System - Development Environment');
         element.all(by.css('.homeButtonContainer a[href="/#!/leaderboard"]')).click();
-        browser.sleep(500);
+        browser.waitForAngular();
 
         var ptor;
         ptor = protractor.getInstance();
@@ -36,7 +36,7 @@ describe('e2e page loading tests', function() {
 
         expect(browser.getTitle()).toEqual('frank Recruiter System - Development Environment');
         element.all(by.css('.homeButtonContainer a[href="/#!/admin"]')).click();
-        browser.sleep(500);
+        browser.waitForAngular();
 
 
         var ptor;
@@ -49,7 +49,7 @@ describe('e2e page loading tests', function() {
 
         expect(browser.getTitle()).toEqual('frank Recruiter System - Development Environment');
         element.all(by.css('.homeButtonContainer a[href="/#!/invite"]')).click();
-        browser.sleep(500);
+        browser.waitForAngular();
 
 
         var ptor;
@@ -62,7 +62,7 @@ describe('e2e page loading tests', function() {
 
         expect(browser.getTitle()).toEqual('frank Recruiter System - Development Environment');
         element.all(by.css('.homeButtonContainer a[href="/#!/memoboard"]')).click();
-        browser.sleep(500);
+        browser.waitForAngular();
 
 
         var ptor;
@@ -71,4 +71,3 @@ describe('e2e page loading tests', function() {
 
     });
 });
-
