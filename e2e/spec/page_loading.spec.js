@@ -8,7 +8,7 @@ describe('e2e page loading tests', function() {
         expect(ptor.getCurrentUrl()).toContain('signin');
 
         expect(browser.getTitle()).toEqual('frank Recruiter System - Development Environment');
-        element(by.model('credentials.email')).sendKeys('faaal1dkcb3nngznn4jhu94hj6@HHuGgdgOBlmE3MMFmyczhOhBsD.gov');
+        element(by.model('credentials.email')).sendKeys('demo@example.com');
         element(by.model('credentials.password')).sendKeys('password');
 
 
@@ -70,5 +70,5 @@ describe('e2e page loading tests', function() {
         expect(ptor.getCurrentUrl()).toContain('memoboard');
 
     });
-
+});
 
