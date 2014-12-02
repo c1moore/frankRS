@@ -1,0 +1,121 @@
+i.fa.fa-remove.text-danger:hover {
+	color: red;
+}
+.frank-recruiter-comment-board {
+	float: right;
+	margin-top: 10px;
+	margin-right: 50px;
+	width: 20%;
+	min-width: 0;
+	height: 575px;
+	background-color: #F5F5F5;
+	border-radius: 5px;
+}
+.frank-recruiter-comment-header {
+	background: -moz-linear-gradient(top, rgba(51, 50, 50, .6) 0%, rgba(51, 50, 50, 1) 50%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(51, 50, 50, .6)), color-stop(50%,rgba(51, 50, 50, 1)));
+	background: -webkit-linear-gradient(top, rgba(51, 50, 50, .6) 0%,rgba(51, 50, 50, 1) 50%);
+	background: -o-linear-gradient(top, rgba(51, 50, 50, .6) 0%,rgba(51, 50, 50, 1) 50%);
+	background: -ms-linear-gradient(top, rgba(51, 50, 50, .6) 0%,rgba(51, 50, 50, 1) 50%);
+	background: linear-gradient(to bottom, rgba(51, 50, 50, .6) 0%,rgba(51, 50, 50, 1) 50%);
+
+	text-align: center;
+	border-radius: 5px 5px 0 0;
+	height: 42px;
+	color: #E8E9EB;
+	padding: 7px;
+}
+.frank-recruiter-comment-title {
+	margin: 0;
+}
+.frank-recruiter-comments {
+	overflow: auto;
+}
+.frank-recruiter-comments-compressed {
+	height: 405px;
+}
+.frank-recruiter-comments-expanded {
+	height: 490px;
+}
+.frank-comment {
+	word-wrap: break-word;
+	width: 99%;
+	margin: auto;
+	border-radius: 15px;
+	margin-top: 5px;
+	color: black;
+	padding: 10px;
+	background-color: limegreen;
+	color: white;
+}
+.frank-comment-author {
+	font-weight: bolder;
+	max-width: 92%;
+}
+.frank-comment-body {
+	padding: 7px;
+}
+.frank-comment-editor {
+	position: relative;
+	margin: auto;
+	top: 0;
+	width: 98%;
+}
+.frank-comment-editor-compressed {
+	width: 100%;
+	height: 25px;
+	background-color: white;
+	border: 1px solid #333232;
+	border-radius: 3px;
+	padding: 1px;
+	color: rgba(0, 0, 0, .5);
+}
+.frank-comment-footer-img-container {
+	width: 34px;
+	height: 34px;
+	display: inline-block;
+	margin-right: 3px;
+}
+.frank-comment-footer-img {
+	width: 32px;
+	height: 32px;
+}
+.frank-comment-interests {
+	margin-left: 7px;
+}
+.frank-comment-remove {
+	width: 16px;
+	display: inline-block;
+	float: right;
+	margin-top: -25px;
+}
+.frank-comment-time {
+	width: 175px;
+	display: inline-block;
+}
+.ta-editor {
+    height: 75px;
+    min-height: 75px !important;
+    overflow: auto;
+    font-family: inherit;
+    font-size: 100%;
+    margin: 5px 0;
+}
+.ta-bind {
+	height: 73px;
+	min-height: 73px !important;
+}
+.ta-toolbar button[type='button'] {
+	width: 30px;
+	height: 30px;
+	padding: 0;
+}
+.ta-toolbar {
+	width: 96%;
+	margin: auto;
+}
+
+#frank-comment-editorDivider {
+	margin: 5px;
+	border-color: rgba(51, 50, 50, .75);
+}

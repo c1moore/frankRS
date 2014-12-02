@@ -11,7 +11,7 @@ li .disabled {
 	border: solid black 1px;
 }
 .comments-sidebar {
-	padding 7px;
+	padding: 7px;
 	height: 110px;
 	width: 26px;
 	position: absolute;

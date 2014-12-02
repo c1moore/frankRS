@@ -46,6 +46,8 @@ var isRecruitEvent = function(user,eventID,hasAuthorization) {
 			return true;
 		}
 	}
+	if (hasAuthorization(user,['admin'])) return true;
+	
 	return false;
 };
 
@@ -98,15 +100,17 @@ exports.getRecruiterCommentsForEvent = function(req, res) {
 		return res.status(400).send({message : "Event not specified."});
 	} else {
 		var id = mongoose.Types.ObjectId(req.body.event_id);
-		var body = Comment.find({event_id: id,stream: 'recruiter'});
+		var body = Comment.find({event_id: id, stream: 'recruiter'});
+		body.populate('user_id displayName -_id');
 		//Retrieve the comments
 		body.exec(function(err,result) {
-			if (err) {res.status(400).send(err);return;}
-			else if (!result.length) {res.status(400).json({message: "No comments found!"});
-			} else if (!req.hasAuthorization(req.user,['recruiter','admin'])) {
-				res.status(401).json({message: "You do not have the correct role"});
-			} else if (!canViewEvent(req.user,result.event_id,req.hasAuthorization) ||
-					!isRecruitEvent(req.user,result.event_id,req.hasAuthorization)) {
+			if (err) {
+				return res.status(400).send({message : err});
+			} else if(!result.length) {
+				return res.status(400).json({message: "No comments found!"});
+			} else if(!req.hasAuthorization(req.user,['recruiter','admin'])) {
+				return res.status(401).json({message: "User does not have permission."});
+			} else if(!canViewEvent(req.user, id, req.hasAuthorization) || !isRecruitEvent(req.user, id, req.hasAuthorization)) {
 				res.status(401).json({message: "You are not authorized to view the comments of this event"});
 			} else {
 				res.status(200).json(result);

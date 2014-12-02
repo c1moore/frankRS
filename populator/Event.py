@@ -27,7 +27,7 @@ class Event:
 
   def save(self):
     members = inspect.getmembers(self)
-    names = [name for name, val in members if (not '_' in name or name=='_id') and
+    names = [name for name, val in members if (name[0]!='_' or name=='_id') and
 		not inspect.isfunction(val) and not inspect.isclass(val) and
 		not inspect.ismodule(val) and not inspect.ismethod(val) and
 		not inspect.isbuiltin(val)]

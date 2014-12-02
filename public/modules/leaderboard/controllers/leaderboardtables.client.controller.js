@@ -29,8 +29,8 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		}
 		
 		$scope.returnInt = function(value) {
-			return Math.floor(value)
-		}
+			return Math.floor(value);
+		};
 
 		var mainApi = $resource('/leaderboard/maintable',{event_id: eventSelector.postEventId}, {'getTable':{method:'POST', isArray:true}});
 		var attendingApi = $resource('/leaderboard/attendees',{event_id: eventSelector.postEventId}, {'getTable':{method:'POST', isArray:true}});
@@ -127,15 +127,30 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
         	}
 		});
 
+		$scope.smallRankHeader = false;
 		var getStats = function() {
 			$http.get('/leaderboard/recruiterinfo', {params : {event_id : eventSelector.postEventId}}).success(function(response) {
-				$scope.userScore = response.place;
+				//$scope.userScore = response.place ? response.place : "N/A";
+				if(response.place) {
+					$scope.userScore = response.place;
+				} else {
+					$scope.userScore = "N/A";
+					$scope.smallRankHeader = true;
+				}
 				$scope.userInvites = response.invited;
 				$scope.userAttendees = response.attending;
 			}).error(function(response, status) {
 
 			});
-		}
+		};
+
+		$scope.getRatio = function() {
+			if(($scope.userInvites + $scope.userAttendees) === 0) {
+				return 0;
+			} else {
+				return $scope.userAttendees/($scope.userInvites + $scope.userAttendees);
+			}
+		};
 
 		getStats();
 
