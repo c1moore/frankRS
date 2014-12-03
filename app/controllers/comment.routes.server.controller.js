@@ -226,6 +226,7 @@ exports.searchByInterests = function(req, res) {
 * comment stream to a file on our server.
 */
 exports.uploadRecruiterCommentImage = function(req, res) {
+	return res.status(156).send({message : "Image received."});
 	if(!req.isAuthenticated()) {
 		return res.status(401).send({message : "User is not logged in."});
 	} else if(!req.file || !req.body.event_id) {

@@ -88,8 +88,8 @@ angular.module('core').directive('commentFooter', [
 	}
 ]);
 
-angular.module('core').directive('commentEditor', ['$compile', '$timeout',
-	function($compile, $timeout) {
+angular.module('core').directive('commentEditor', ['$compile', '$timeout', 'eventSelector',
+	function($compile, $timeout, eventSelector) {
 		var commentEditorDefinition = {
 			restrict : 'E',
 			replace : true,
@@ -100,30 +100,65 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout',
 			},
 			template : "<div class='frank-comment-editor'>" +
 							"<div class='frank-comment-editor-compressed' ng-click='toggleExpanded()' ng-hide='expanded'>Click to comment...</div>" +
-							"<div class='frank-comment-editor-expanded' ng-show='expanded' flow-init>" +
+							"<div class='frank-comment-editor-expanded' ng-show='expanded' flow-init flow-name='uploader.flowInstance'>" +
 								"<div text-angular ng-model='newComment' ta-toolbar=\"[['undo', 'redo'], ['ul', 'ol', 'quote'], ['bold', 'italics', 'underline'], ['insertLink', 'insertVideo']]\" ></div>" +
+								"<span class='btn btn-default frank-comment-editor-img-uploader' flow-btn><i class='fa fa-camera'></i></span>" +
+								"<div class='frank-comment-editor-preview-container'><div class='frank-comment-editor-preview' ng-repeat='file in $flow.files'><img class='frank-comment-editor-preview-img' flow-img='file' ng-mouseover='showOverlay = $index' /><div ng-class='{\"frank-comment-editor-preview-overlay\" : showOverlay===$index, \"frank-comment-editor-preview-overlay-hidden\" : showOverlay!==$index}' ng-click='file.cancel()' ng-mouseleave='showOverlay = -1'><i class='fa fa-remove'></i></div></div></div>" +
 							"</div>" +
 						"</div>",
 			link : function postLink($scope, element, attrs) {
 				$scope.expanded = false;
+				$scope.showOverlay = -1;
+				// $scope.uploader = {};
 
 				$scope.toggleExpanded = function() {
 					$scope.expanded = !$scope.expanded;
-				}
+				};
 
-				angular.element(".ta-toolbar .btn-group:last").append($compile("<span class='btn btn-default' flow-btn><i class='fa fa-camera'></i></button>")($scope));
+				var imgbut = angular.element(".frank-comment-editor-img-uploader").detach();
+				angular.element(".ta-toolbar .btn-group:last").append(imgbut);
+				
+				//Remove the disabled attributes from the textAngular toolbar.  This is mainly for styling.
 				angular.element(".ta-toolbar button").removeAttr("ng-disabled");
 				angular.element(".ta-toolbar button").removeAttr("unselectable");
 				$timeout(function() {
-					angular.element(".ta-toolbar button").removeAttr("disabled")
+					angular.element(".ta-toolbar button").removeAttr("disabled");
 				}, 100);
+				//Make sure the toolbar is not disabled after textAngular textbox loses focus.
 				angular.element(".ta-root").on('focusout', function() {
 					$scope.$apply(function() {
 						$timeout(function() {
-							angular.element(".ta-toolbar button").removeAttr("disabled")
+							angular.element(".ta-toolbar button").removeAttr("disabled");
 						}, 10);
 					});
 				});
+
+				// /**
+				// * Automatically upload an image once it is submitted to Flow.js's queue.  Since $flow is not
+				// * available immediately, we need to add a timeout before trying to access it.
+				// */
+				// $timeout(function() {
+				// 	console.log($scope.uploader.flowInstance);
+				// 	$scope.uploader.flowInstance.filesSubmitted = function(files, event) {
+				// 		//Set the 'query' field so we can use the event_id in the filename.
+				// 		$scope.uploader.flowInstance.opts.query = {event_id : eventSelector.postEventId};
+				// 	};
+				// },10000);
+			},
+			controller : function($scope) {
+				$scope.uploader = {};
+
+				/**
+				* Automatically upload an image once it is submitted to Flow.js's queue.  Since $flow is not
+				* available immediately, we need to add a timeout before trying to access it.
+				*/
+				$timeout(function() {
+					$scope.uploader.flowInstance.filesSubmitted = function(files, event) {
+						//Set the 'query' field so we can use the event_id in the filename.
+						$scope.uploader.flowInstance.opts.query = {event_id : eventSelector.postEventId};
+					};
+				});
+
 			}
 		};
 
