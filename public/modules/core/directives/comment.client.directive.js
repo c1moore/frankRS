@@ -6,7 +6,7 @@ angular.module('core').directive('comment', [
 			template: '<div class="frank-comment" ng-transclude></div>',
 			restrict: 'E',
 			replace : true,
-			transclude : true,
+			transclude : true
 			//link: function postLink(scope, element, attrs) {
 			//}
 		};
@@ -56,9 +56,12 @@ angular.module('core').directive('commentBody', [
 			require : '^comment',
 			template : "<div class='frank-comment-body'>" +
 							"<div class='frank-comment-message'>" +
-								"<span ng-transclude></span>" +
+								"<span ng-bind-html='comment'></span>" +
 							"</div>" +
-						"</div>"
+						"</div>",
+			scope : {
+				comment : '=commentBody'
+			}
 		};
 
 		return commentBodyDefinition;
@@ -102,7 +105,7 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout', 'even
 			},
 			template : "<form class='frank-comment-editor' ng-submit='postComment()'>" +
 							"<div class='frank-comment-editor-compressed' ng-click='toggleExpanded()' ng-hide='expanded'>Click to comment...</div>" +
-							"<div class='frank-comment-editor-expanded' ng-show='expanded' flow-init flow-name='uploader.flowInstance' flow-file-added='!!{jpg:1,gif:1,png:1,tiff:1,jpeg:1}[$file.getExtension()]'>" +
+							"<div class='frank-comment-editor-expanded' ng-show='expanded' flow-init flow-name='uploader.flowInstance' flow-file-added='!!{jpg:1,gif:1,png:1,tiff:1,jpeg:1}[$file.getExtension()]' flow-complete='flowComplete()'>" +
 								"<div text-angular ng-model='newComment' ta-toolbar=\"[['undo', 'redo'], ['ul', 'ol', 'quote'], ['bold', 'italics', 'underline'], ['insertLink', 'insertVideo']]\" ></div>" +
 								"<span class='btn btn-default frank-comment-editor-img-uploader' flow-btn><i class='fa fa-camera'></i></span>" +
 								"<div class='frank-comment-editor-preview-container'><div class='frank-comment-editor-preview' ng-repeat='file in $flow.files'><img class='frank-comment-editor-preview-img' flow-img='file' ng-mouseover='showOverlay = $index' /><div ng-class='{\"frank-comment-editor-preview-overlay\" : showOverlay===$index, \"frank-comment-editor-preview-overlay-hidden\" : showOverlay!==$index}' ng-click='file.cancel()' ng-mouseleave='showOverlay = -1'><i class='fa fa-remove'></i></div></div></div>" +
@@ -138,40 +141,30 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout', 'even
 			controller : function($scope) {
 				$scope.uploader = {};
 
-				// /**
-				// * Automatically upload an image once it is submitted to Flow.js's queue.  Since $flow is not
-				// * available immediately, we need to add a timeout before trying to access it.
-				// */
-				// $timeout(function() {
-				// 	$scope.uploader.flowInstance.filesSubmitted = function(files, event) {
-				// 		//Set the 'query' field so we can use the event_id in the filenames.
-				// 		$scope.uploader.flowInstance.opts.query = {event_id : eventSelector.postEventId};
-				// 	};
-				// });
-
 				$scope.postComment = function() {
 					if($scope.uploader.flowInstance.getSize() > 2097152) {
 						$window.alert("We can't handle all the awesomeness from your pictures.  Try removing a few or if you only have 1, try cropping it.");
 					} else if(!$scope.newComment && !$scope.uploader.flowInstance.files.length) {
 						$window.alert("Don't forget to add some of your deep thoughts before posting a comment.");
 					} else {
-						var fileNames = [];
 						var now = Date.now();
 						for(var i=0; i<$scope.uploader.flowInstance.files.length; i++) {
-							fileNames.push(Authentication.user._id + eventSelector.selectedEvent + now + i + $scope.uploader.flowInstance.files[i].getExtension());
+							$scope.uploader.flowInstance.files[i].name = Authentication.user._id + eventSelector.selectedEvent + now + i + "." + $scope.uploader.flowInstance.files[i].getExtension();
+							console.log($scope.uploader.flowInstance.files[i].name);
 						}
-						$scope.uploader.flowInstance.opts.query = {file_names : fileNames};
+						$scope.uploader.flowInstance.opts.query = {event_id : eventSelector.postEventId};
 						$scope.uploader.flowInstance.opts.testChunks = false;
 						$scope.uploader.flowInstance.opts.permanentErrors = [400, 401, 404, 415, 500, 501];
 
-						$scope.uploader.flowInstance.upload();
 						//TODO: Add an .error() event and a var.  If there was an error, set the var to false and do not add the comment to db.
-						$scope.uploader.flowInstance.complete = function() {
+						//$scope.uploader.flowInstance.complete = function() {
+						//$scope.$on('flow::complete', function() {
+						$scope.flowComplete = function() {
 							var commentWithImg = $scope.newComment;
-							for(var i=0; i<fileNames; i++) {
-								commentWithImg += "<div class='frank-comment-pic-containter'><img class='frank-comment-pic' src='img/recruiter/" + fileNamess[i] + "' /></div>";
+							for(var i=0; i<$scope.uploader.flowInstance.files.length; i++) {
+								commentWithImg += "<div class='frank-comment-pic-containter'><img class='frank-comment-pic' src='img/recruiter/" + $scope.uploader.flowInstance.files[i].name + "' /></div>";
 							}
-							$http.post($scope.postAddress, {comment : $scope.newComment, event_id : eventSelector.postEventId}).success(function(response) {
+							$http.post($scope.postAddress, {comment : commentWithImg, event_id : eventSelector.postEventId}).success(function(response) {
 								$scope.commentsArr.push({
 									user_id : {
 										displayName : Authentication.user.displayName
@@ -187,6 +180,8 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout', 'even
 								$window.alert(status + " " + response.message);
 							});
 						};
+
+						$scope.uploader.flowInstance.upload();
 					}
 				};
 
