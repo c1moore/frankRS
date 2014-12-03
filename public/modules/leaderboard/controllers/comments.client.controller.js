@@ -55,34 +55,6 @@ angular.module('leaderboard').controller('commentsCtrl', ['$scope', 'Authenticat
 		//Update comments every 1 minute.
 		$interval(getComments(), 60000);
 
-		/*//Logic for uploading files
-		$scope.files = [];
-		var previousFiles=0;
-
-		$scope.uploader = new FileUploader({
-			url : '/comments/uploadRecruiterImage'
-		});
-
-		$scope.$watch('files', function() {
-			var i = $scope.files.length;
-			if(i < previousFiles || !i) {
-				previousFiles = $scope.files.length;
-				return;
-			} else {
-				console.log($scope.files[0]);
-				previousFiles = $scope.files.length;
-				$upload.upload({
-					url : '/comments/uploadRecruiterImage',
-					method : 'POST',
-					data : {event_id : eventSelector.postEventId},
-					file : $scope.files[i],
-					fileName : Date.now() + $scope.authentication.user._id + '.' + $scope.files[i].ext
-				}).success(function(data) {
-					alert("Cool.");
-				}).error(function(data, status) {
-					alert("Still cool, but less so.");
-				});
-			}
-		});*/
+		
 	}
 ]);

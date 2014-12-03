@@ -70,6 +70,25 @@ i.fa.fa-remove.text-danger:hover {
 	padding: 1px;
 	color: rgba(0, 0, 0, .5);
 }
+.frank-comment-editor-preview-overlay {
+	position: relative;
+	top: -32px;
+	left: 0;
+	height: 32px;
+	width: 32px;
+	background-color: #333232;
+	background-color: rgba(51, 50, 50, .5);
+	font-size: 35px;
+	color: red;
+	cursor: pointer;
+}
+.frank-comment-editor-preview-overlay i{
+	display: block;
+	text-align: center;
+}
+.frank-comment-editor-preview-overlay-hidden {
+	display: none;
+}
 .frank-comment-header {
 	font-size: 16px;
 	color: black;
@@ -86,6 +105,16 @@ i.fa.fa-remove.text-danger:hover {
 }
 .frank-comment-interests {
 	margin-left: 7px;
+}
+.frank-comment-editor-preview {
+	width: 32px;
+	display: inline-block;
+	margin-right: 5px;
+}
+.frank-comment-editor-preview-img {
+	width: 32px;
+	height: 32px;
+	cursor: pointer;
 }
 .frank-comment-remove {
 	width: 16px;
@@ -113,6 +142,12 @@ i.fa.fa-remove.text-danger:hover {
 	width: 30px;
 	height: 30px;
 	padding: 0;
+}
+.ta-toolbar span {
+	width: 30px;
+	height: 30px;
+	padding: 0;
+	padding-top: 4px;
 }
 .ta-toolbar {
 	width: 96%;
