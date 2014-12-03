@@ -160,9 +160,7 @@ exports.postCommentRecruiter = function(req, res) {
 	var comment = req.body.comment;
 	var event_id = mongoose.Types.ObjectId(req.body.event_id);
 	var user = req.user;
-	var interests = req.body.interests;
-	var commentObj = {user_id: user._id,event_id: event_id,comment:comment,stream:'social',
-		interests:interests};
+	var commentObj = {user_id: user._id,event_id: event_id,comment:comment,stream:'recruiter'};
 	if (!canViewComment(user,req.hasAuthorization,commentObj)) {
 		req.status(401).json({message: 'You do not have permissions to post that comment'});
 	} else {
@@ -226,18 +224,26 @@ exports.searchByInterests = function(req, res) {
 * comment stream to a file on our server.
 */
 exports.uploadRecruiterCommentImage = function(req, res) {
-	return res.status(156).send({message : "Image received."});
+	//return res.status(400).send({files : req.files, names : req.body.file_names});
 	if(!req.isAuthenticated()) {
 		return res.status(401).send({message : "User is not logged in."});
-	} else if(!req.file || !req.body.event_id) {
+	} else if(!req.files.length || 
+		!req.body.file_names.length) {
 		return res.status(400).send({message : "Required field not specified."});
 	} else if(!req.hasAuthorization(req.user, ['admin', 'recruiter'])) {
 		return res.status(401).send({message : "User does not have permission."});
 	} else if(!canViewEvent(req.user, req.body.event_id, req.hasAuthorization) || !isRecruitEvent(req.user, req.body.event_id, req.hasAuthorization)) {
 		res.status(401).json({message: "You are not authorized to view the comments of this event"});
 	} else {
-		var path = path.normalize(__dirname + "../../public/img/recruiter");
-		console.log(req.files.file);
+		for(var i=0; i<req.body.file_names.length; i++) {
+			var path = path.normalize(__dirname + "../../public/img/recruiter/" + file_names[i]);
+			fs.writeFile(path, req.files[i], function(err) {
+				if(err) {
+					return res.status(400).send({message : err});
+				}
+			});
+		}
 
+		return res.status(200).send({message : "All files uploaded successfully."});
 	}
 };
