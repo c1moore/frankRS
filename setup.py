@@ -41,6 +41,7 @@ def main():
   res = ask("Would you like to install protractor?: ")
   if res:
     system("sudo npm install -g protractor")
+    system("sudo webdriver-manager update")
   print("Done!")
 
 if __name__=='__main__':
