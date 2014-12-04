@@ -1,10 +1,12 @@
 describe('e2e page loading tests', function() {
     var delaylength = 500;
+    var ptor;
+        ptor = protractor.getInstance();
+
 
     it('should be able to sign in', function() {
         browser.get('http://localhost:3000/#!/');
-        var ptor;
-        ptor = protractor.getInstance();
+        
         expect(ptor.getCurrentUrl()).toContain('signin');
 
         expect(browser.getTitle()).toEqual('frank Recruiter System - Development Environment');
@@ -25,8 +27,7 @@ describe('e2e page loading tests', function() {
         element.all(by.css('.homeButtonContainer a[href="/#!/leaderboard"]')).click();
         browser.waitForAngular();
 
-        var ptor;
-        ptor = protractor.getInstance();
+       
         expect(ptor.getCurrentUrl()).toContain('leaderboard');
 
     });
@@ -39,8 +40,7 @@ describe('e2e page loading tests', function() {
         browser.waitForAngular();
 
 
-        var ptor;
-        ptor = protractor.getInstance();
+       
         expect(ptor.getCurrentUrl()).toContain('admin');
 
     });
@@ -52,8 +52,7 @@ describe('e2e page loading tests', function() {
         browser.waitForAngular();
 
 
-        var ptor;
-        ptor = protractor.getInstance();
+       
         expect(ptor.getCurrentUrl()).toContain('invite');
 
     });
@@ -65,9 +64,20 @@ describe('e2e page loading tests', function() {
         browser.waitForAngular();
 
 
-        var ptor;
-        ptor = protractor.getInstance();
+        
         expect(ptor.getCurrentUrl()).toContain('memoboard');
 
+    });
+    it('should be able to sign out',function() {
+        browser.get('http://localhost:3000/auth/signout');
+        browser.waitForAngular();
+        expect(ptor.getCurrentUrl()).toContain('signin');
+        ptor.manage().deleteAllCookies();
+    });
+
+    it('should be able to visit the sign in page',function() {
+        browser.get('http://localhost:3000/');
+        browser.waitForAngular();
+        expect(ptor.getCurrentUrl()).toContain('signin');
     });
 });
