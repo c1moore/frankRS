@@ -5,10 +5,9 @@
 /**
  * Module dependencies.
  */
-var mongoose = require('mongoose'),
-	assert = require('assert'),
-        users = mongoose.model('User'),
-	events = mongoose.model('Event');
+var assert = require('assert'),
+        users = require('./models/user.server.model'),
+	events = require('./models/events.server.model');
 
 /**
 * Global Variabls used for testing
