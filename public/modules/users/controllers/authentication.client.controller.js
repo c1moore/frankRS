@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('users').controller('AuthenticationController', ['$scope', '$http', '$location', 'Authentication',
-	function($scope, $http, $location, Authentication) {
+angular.module('users').controller('AuthenticationController', ['$scope', '$http', '$location', 'Authentication', 'eventSelector',
+	function($scope, $http, $location, Authentication, eventSelector) {
 		$scope.authentication = Authentication;
 
 		// If user is signed in then redirect back home
@@ -23,6 +23,9 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$http
 			$http.post('/auth/signin', $scope.credentials).success(function(response) {
 				// If successful we assign the response to the global user model
 				$scope.authentication.user = response;
+
+				//Tell eventSelector to get data from db.
+				eventSelector.eventSelect();
 
 				// And redirect to the index page
 				$location.path('/');
