@@ -5,7 +5,7 @@ from subprocess import Popen
 
 grunt = Popen(['grunt'])
 time.sleep(15)
-protractor = Popen(['protractor','conf.js'])
+protractor = Popen(['protractor','e2e/conf.js'])
 protractor.wait()
 grunt.terminate()
 
