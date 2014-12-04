@@ -708,45 +708,49 @@ exports.sendInvitation = function(req, res) {
 													{$project : {'_id' : 1, 'rank' : 1, 'attendeeLength' : {$size : "$attendeeList"}, 'inviteeLength' : {$size : "$inviteeList"}}},
 													{$sort : {'attendeeLength' : -1, 'inviteeLength' : -1}}
 												], function(err, result) {
-													var aqueue = async.queue(function(recruiter, callback) {
-														User.findOne({'_id' : recruiter._id}, function(err, result) {
-															if(!err) {
-																for(var i=0; i<result.rank.length; i++) {
-																	if(result.rank[i].event_id.toString() === req.body.event_id.toString()) {
-																		result.rank.place = recruiter.place;
+													if(err) {
+														next(err, false);
+													} else {
+														var aqueue = async.queue(function(recruiter, callback) {
+															User.findOne({'_id' : recruiter._id}, function(err, result) {
+																if(!err) {
+																	for(var i=0; i<result.rank.length; i++) {
+																		if(result.rank[i].event_id.toString() === req.body.event_id.toString()) {
+																			result.rank.place = recruiter.place;
+																			result.save(function() {
+																				callback();
+																			});
+																			break;
+																		}
+																	}
+
+																	if(i===result.rank.length) {
+																		result.rank.push({event_id : new mongoose.Types.ObjectId(req.body.event_id), place : recruiter.place});
 																		result.save(function() {
 																			callback();
 																		});
-																		break;
 																	}
 																}
+															});
+														}, 20);
 
-																if(i===result.rank.length) {
-																	result.rank.push({event_id : new mongoose.Types.ObjectId(req.body.event_id), place : recruiter.place});
-																	result.save(function() {
-																		callback();
-																	});
-																}
-															}
-														});
-													}, 20);
+														var i=0;
 
-													var i=0;
+														aqueue.drain = function() {
+															if(i===result.length)
+																next(null, true);
+														};
 
-													aqueue.drain = function() {
-														if(i===result.length)
-															next(null, true);
-													};
-
-													for(; i<result.length; i++) {
-														var recruiter = {'_id' : result[i]._id, 'place' : i};
-														aqueue.push(recruiter);
+														for(; i<result.length; i++) {
+															var recruiter = {'_id' : result[i]._id, 'place' : i};
+															aqueue.push(recruiter);
+														}
 													}
 												});
 											}],
 											function(err, results) {
 												if(err) {
-													return res.status(400).send({message: 'Invitation has been sent to ' + req.body.fName + ', but an error occurred.  Please contact frank about this error.'});
+													return res.status(400).send({message: 'Invitation has been sent to ' + req.body.fName + ', but an error occurred.  Please contact frank about this error.', error : err});
 												} else {
 													return res.status(200).send({message: 'Invitation has been sent to ' + req.body.fName + '!'});
 												}
