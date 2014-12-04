@@ -36,8 +36,8 @@ describe('Admin Page Protractor End-To-End Tests',function() {
         	browser.waitForAngular();
 	});
 
-	it('should be able to sign out',function() {
-		element(
+	//it('should be able to sign out',function() {
+	//	element(
 
 });
 		
