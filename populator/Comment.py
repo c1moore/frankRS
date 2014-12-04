@@ -15,9 +15,9 @@ class Comment:
     self.user_id = user_id
     self.event_id = event_id
     if comment is None:
-      comment = randomString(2,400,""" ~!@#$%^&*()_+-={}|[]\:;'<>?,./""")
+      comment = randomString(2,400,""" .!?@:;+-_*""")
     self.comment = comment
-    if interests is None:
+    if interests is None and stream is not 'recruiter':
       interests = random.sample(INTERESTS,random.randint(0,len(INTERESTS)-2))
     self.interests = interests
     if date is None:
@@ -25,6 +25,8 @@ class Comment:
     self.date = date
     if stream is None:
       stream = random.choice(['social','recruiter'])
+      if stream=='recruiter':
+        self.interests = None
     self.stream = stream
 
   def save(self):
