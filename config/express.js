@@ -21,7 +21,8 @@ var express = require('express'),
 	flash = require('connect-flash'),
 	config = require('./config'),
 	consolidate = require('consolidate'),
-	path = require('path');
+	path = require('path'),
+	formidable = require('formidable');
 
 module.exports = function(db) {
 	// Initialize express app

@@ -30,14 +30,13 @@
 			<comment ng-repeat="comment in comments">
 				<comment-header author-name="{{comment.user_id.displayName}}" post-time="{{toHumanReadable(comment.date)}}" removable="{{removable(comment.user_id._id)}}">
 				</comment-header>
-				<comment-body>
-					{{comment.comment}}
+				<comment-body comment-body="comment.comment">
 				</comment-body>
 				<comment-footer interests="comment.interests">
 				</comment-footer>
 			</comment>
 		</div>
 		<hr id="frank-comment-editorDivider" />
-		<comment-editor comment-content="comment" expanded="editorExpanded" files="files" frank-flow-instance="frankFlowInstance"></comment-editor>
+		<comment-editor comment-content="comment" expanded="editorExpanded" files="files" post-address="/comments/postCommentRecruiter" comments-arr="comments"></comment-editor>
 	</div>
 </section>

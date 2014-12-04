@@ -17,7 +17,9 @@ var errorHandler = require('./errors'),
 	User = mongoose.model('User'),
 	Event = mongoose.model('Event'),
 	fs = require('fs'),
-	path = require('path');
+	mv = require('mv'),
+	path = require('path'),
+	formidable = require('formidable');
 
 //Full check to see if comment is visible to the user, but requires the comment
 var canViewComment = function(user,hasAuthorization,comment) {
@@ -154,24 +156,27 @@ exports.postCommentSocial = function(req, res) {
 
 exports.postCommentRecruiter = function(req, res) {
 	if (!req.isAuthenticated()) { //Check if the user is authenticated
-		res.status(401).json({message: "You are not logged in"});
-		return;
+		return res.status(401).send({message: "You are not logged in"});
 	}
+
+	if(!req.body.comment || !req.body.event_id) {
+		return res.status(400).send({message : "All required fields were not specified."});
+	}
+
 	var comment = req.body.comment;
 	var event_id = mongoose.Types.ObjectId(req.body.event_id);
 	var user = req.user;
-	var interests = req.body.interests;
-	var commentObj = {user_id: user._id,event_id: event_id,comment:comment,stream:'social',
-		interests:interests};
+	var commentObj = {user_id: new mongoose.Types.ObjectId(user._id), event_id: new mongoose.Types.ObjectId(event_id), comment: comment, stream:'recruiter'};
+
 	if (!canViewComment(user,req.hasAuthorization,commentObj)) {
-		req.status(401).json({message: 'You do not have permissions to post that comment'});
+		return res.status(401).send({message: 'You do not have permissions to post that comment'});
 	} else {
 		var newComment = new Comment(commentObj);
 		newComment.save(function(err) {
 			if (err) {
-				res.send(400).json(err);
+				return res.status(400).send({message : err});
 			} else {
-				res.send(200).json({comment_id: newComment._id});
+				return res.status(200).send({comment_id: newComment._id});
 			}
 		});
 	}
@@ -226,18 +231,36 @@ exports.searchByInterests = function(req, res) {
 * comment stream to a file on our server.
 */
 exports.uploadRecruiterCommentImage = function(req, res) {
-	return res.status(156).send({message : "Image received."});
 	if(!req.isAuthenticated()) {
 		return res.status(401).send({message : "User is not logged in."});
-	} else if(!req.file || !req.body.event_id) {
-		return res.status(400).send({message : "Required field not specified."});
 	} else if(!req.hasAuthorization(req.user, ['admin', 'recruiter'])) {
 		return res.status(401).send({message : "User does not have permission."});
-	} else if(!canViewEvent(req.user, req.body.event_id, req.hasAuthorization) || !isRecruitEvent(req.user, req.body.event_id, req.hasAuthorization)) {
-		res.status(401).json({message: "You are not authorized to view the comments of this event"});
 	} else {
-		var path = path.normalize(__dirname + "../../public/img/recruiter");
-		console.log(req.files.file);
+		var form = new formidable.IncomingForm({
+			keepExtensions : true,
+			uploadDir : path.normalize(__dirname + "../../../public/img/recruiter")
+		});
 
+		form.parse(req, function(err, fields, files) {
+			if(!fields.event_id || !fields.flowFilename) {
+				fs.unlink(path.normalize(__dirname + "../../../public/img/recruiter/" + files.file.name), function() {
+					return res.status(400).send({message : "Required field not set correctly."});
+				});
+			} else {
+				if(!canViewEvent(req.user, fields.event_id, req.hasAuthorization) || !isRecruitEvent(req.user, fields.event_id, req.hasAuthorization)) {
+					fs.unlink(path.normalize(__dirname + "../../../public/img/recruiter/" + files.file.name), function() {
+						return res.status(401).send({message : "You are not authorized to view the comments for this event."});
+					});
+				} else {
+					fs.rename(files.file.path, path.normalize(__dirname + "../../../public/img/recruiter/" + fields.flowFilename), function(err) {
+						if(err) {
+							return res.status(400).send({message : err, err : errorHandler.getErrorMessage(err)});
+						} else {
+							return res.status(200).send({message : "Files uploaded!"});
+						}
+					});
+				}
+			}
+		});
 	}
 };

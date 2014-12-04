@@ -4,7 +4,7 @@ angular.module('core').config(['flowFactoryProvider',
 	function(flowFactoryProvider) {
 		flowFactoryProvider.defaults = {
 			target : '/comments/uploadRecruiterImage',
-			//uploadMethod : 'POST'
+			uploadMethod : 'POST'
 		};
 
 		flowFactoryProvider.on('catchAll', function(event) {
