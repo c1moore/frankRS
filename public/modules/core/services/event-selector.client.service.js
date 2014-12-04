@@ -9,9 +9,9 @@
 * the user selected before refreshing the page so this event can automatically be restored.  We are using
 * cacheService to deal with saving these values to the localStorage.
 */
-angular.module('core').service('eventSelector', ['$http', '$location', 'cacheService', 'Authentication',
+angular.module('core').service('eventSelector', ['$rootScope', '$http', '$location', 'cacheService', 'Authentication', '$window',
 
-	function($http, $location, cacheService, Authentication) {
+	function($rootScope, $http, $location, cacheService, Authentication, $window) {
 		var thisService = this;
 		var cache = cacheService;
 
@@ -35,97 +35,105 @@ angular.module('core').service('eventSelector', ['$http', '$location', 'cacheSer
 			return (path === '/signin' || path === '/settings/profile' || path === '/settings/password');
 		}
 
-		/**
-		* Functions will be defined based on whether or not the current user is an admin.  Since
-		* admins should be able to see all events, their eventSelector will behave differently than
-		* attendees and recruiters.
-		*/
-		if(_.intersection(Authentication.user.roles, ['admin']).length > 0) {
-			this.admin = true;
-
-			var checkEvent = function(needle) {
-				for (var i=0; i<thisService.events.length; i++) {
-					if(thisService.events[i]._id === needle)
-						return true;
-				}
-				return false;
-			}
-
-			$http.get('/users/events').success(function(data) {
-				thisService.events = data;
-
-				var cachedEvent = cache.getData('selectedEvent'), cachedId = cache.getData('eventId');
-
-				if(cachedEvent && cachedId && thisService.events.length && checkEvent(cachedId)) {
-					thisService.selectedEvent = cache.getData('selectedEvent');
-					thisService.postEventId = cache.getData('eventId');
-				}
-			}).error(function(error, status) {
-				thisService.selectedEvent = "Error";
-				console.log(error);
-			});
-
-			thisService.changeEvent = function(event) {
-				thisService.selectedEvent = event.name;
-				thisService.postEventId = event._id;
-				put('selectedEvent', event.name);
-				put('eventId', event._id);
-			};
-
+		thisService.eventSelect = function() {
 			/**
-			* Admins have permission to do anything with any event so there is no need for a divider
-			* or to make events disabled on any page.
+			* Functions will be defined based on whether or not the current user is an admin.  Since
+			* admins should be able to see all events, their eventSelector will behave differently than
+			* attendees and recruiters.
 			*/
-			thisService.showDivider = function() {
-				return false;
-			}
-			thisService.toggleDisabledEvents = function() {};
-		} else {
-			var checkEvent = function(needle) {
-				for (var i=0; i<thisService.events.length; i++) {
-					if (thisService.events[i].event_id._id === needle) return true;
-				}
-				return false;
-			}
+			if(_.intersection(Authentication.user.roles, ['admin']).length > 0) {
+				thisService.admin = true;
 
-			$http.get('/users/events').success(function(data) {
-				thisService.events = data.status;
-				for(var i=0; i<thisService.events.length; i++) {
-					if(thisService.events[i].recruiter)
-						thisService.numRecruiting++;
+				var checkEvent = function(needle) {
+					for (var i=0; i<thisService.events.length; i++) {
+						if(thisService.events[i]._id === needle)
+							return true;
+					}
+					return false;
 				}
 
-				var cachedEvent = cache.getData('selectedEvent'), cachedId = cache.getData('eventId');
+				$http.get('/users/events').success(function(data) {
+					thisService.events = data;
 
-				if(cachedEvent && cachedId && thisService.events.length && checkEvent(cachedId)) {
-					thisService.selectedEvent = cache.getData('selectedEvent');
-					thisService.postEventId = cache.getData('eventId');
-					thisService.recruiterEvent = cache.getData('recruiterEvent');
-				}
-			}).error(function(error, status) {
-				if(status === 401) {
+					var cachedEvent = cache.getData('selectedEvent'), cachedId = cache.getData('eventId');
+
+					if(cachedEvent && cachedId && thisService.events.length && checkEvent(cachedId)) {
+						thisService.selectedEvent = cache.getData('selectedEvent');
+						thisService.postEventId = cache.getData('eventId');
+					}
+				}).error(function(error, status) {
 					thisService.selectedEvent = "Error";
-					thisService.disabled = !thisService.disabled;
+					console.log(error);
+				});
+
+				thisService.changeEvent = function(event) {
+					thisService.selectedEvent = event.name;
+					thisService.postEventId = event._id;
+					put('selectedEvent', event.name);
+					put('eventId', event._id);
+				};
+
+				/**
+				* Admins have permission to do anything with any event so there is no need for a divider
+				* or to make events disabled on any page.
+				*/
+				thisService.showDivider = function() {
+					return false;
 				}
-				console.log(error);
-			});
+				thisService.toggleDisabledEvents = function() {};
+			} else {
+				var checkEvent = function(needle) {
+					for (var i=0; i<thisService.events.length; i++) {
+						if (thisService.events[i].event_id._id === needle) return true;
+					}
+					return false;
+				}
 
-			thisService.changeEvent = function(event) {
-				thisService.selectedEvent = event.event_id.name;
-				thisService.postEventId = event.event_id._id;
-				thisService.recruiterEvent = event.recruiter;
-				put('selectedEvent',event.event_id.name);
-				put('eventId',event.event_id._id);
-				put('recruiterEvent', thisService.recruiterEvent);
-			};
+				$http.get('/users/events').success(function(data) {
+					thisService.events = data.status;
+					for(var i=0; i<thisService.events.length; i++) {
+						if(thisService.events[i].recruiter)
+							thisService.numRecruiting++;
+					}
 
-			thisService.showDivider = function() {
-				return ((thisService.numRecruiting > 0) && (thisService.events.length > thisService.numRecruiting));
-			};
+					var cachedEvent = cache.getData('selectedEvent'), cachedId = cache.getData('eventId');
 
-			thisService.toggleDisabledEvents = function() {
-				thisService.nresDisabled = !thisService.nresDisabled;
-			};
+					if(cachedEvent && cachedId && thisService.events.length && checkEvent(cachedId)) {
+						thisService.selectedEvent = cache.getData('selectedEvent');
+						thisService.postEventId = cache.getData('eventId');
+						thisService.recruiterEvent = cache.getData('recruiterEvent');
+					}
+				}).error(function(error, status) {
+					if(status === 401) {
+						thisService.selectedEvent = "Error";
+						thisService.disabled = !thisService.disabled;
+					}
+					console.log(error);
+				});
+
+				thisService.changeEvent = function(event) {
+					thisService.selectedEvent = event.event_id.name;
+					thisService.postEventId = event.event_id._id;
+					thisService.recruiterEvent = event.recruiter;
+					put('selectedEvent',event.event_id.name);
+					put('eventId',event.event_id._id);
+					put('recruiterEvent', thisService.recruiterEvent);
+				};
+
+				thisService.showDivider = function() {
+					return ((thisService.numRecruiting > 0) && (thisService.events.length > thisService.numRecruiting));
+				};
+
+				thisService.toggleDisabledEvents = function() {
+					thisService.nresDisabled = !thisService.nresDisabled;
+				};
+			}
+		}
+
+		console.log($window.user);
+
+		if($window.user != "") {
+			thisService.eventSelect();
 		}
 	}
 ]);
