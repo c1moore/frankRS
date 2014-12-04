@@ -1,74 +1,83 @@
 <div class="container">
-	<div class="row" ng-controller="eventController">
-		<div class="col-sm-4">
-			<div class="well">
-				<form name="eventForm" novalidate ng-submit="addEvent(newEvent)">
-					<div class="form-group row">
-						<label>Event Name:</label>
-						<input name="eventName" class="form-control" type="text" ng-model="newEvent.name" required>
-					</div>
-					<div class="form-group row">
-						<label>Start Date (mm/dd/yy):</label>
-						<p class="input-group">
-							<input type="text" class="form-control" datepicker-popup="shortDate" ng-model="newEvent.start_date" is-open="openedS" min-date="dt" datepicker-options="dateOptions" ng-required="true" close-text="Close"/>
-	              			<span class="input-group-btn">
-	                			<button type="button" class="btn btn-default" ng-click="openS($event)">
-	                				<i class="glyphicon glyphicon-calendar"></i>
-	                			</button>
-	              			</span>
-              			</p>
-					</div>
-					<div class="form-group row">
-						<label>End Date (mm/dd/yy):</label>
-						<p class="input-group">
-							<input type="text" class="form-control" datepicker-popup="shortDate" ng-model="newEvent.end_date" is-open="openedE" min-date="newEvent.start_date" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
-	              			<span class="input-group-btn">
-	                			<button type="button" class="btn btn-default" ng-click="openE($event)">
-	                				<i class="glyphicon glyphicon-calendar"></i>
-	                			</button>
-	              			</span>
-              			</p>
-					</div>
-					<div class="form-group row">
-						<label>Location:</label>
-						<input name="location" class="form-control" type="text" ng-model="newEvent.location" required>
-					</div>
-					<button type="submit" class="btn btn-primary" ng-disabled="eventForm.$invalid">Add Event</button>
-				</form>
-			</div>
-		</div>
+   <div class="row" ng-controller="eventController">
+      <div class="col-sm-4">
+         <div class="well">
+            <form name="eventForm" novalidate ng-submit="addEvent(newEvent)">
+               <div class="form-group row">
+                  <label>Event Name:</label>
+                  <input name="eventName" class="form-control" type="text" ng-model="newEvent.name" required>
+               </div>
+               <div class="form-group row">
+                  <label>Start Date (mm/dd/yy):</label>
+                  <p class="input-group">
+                    <input type="text" class="form-control" datepicker-popup="shortDate" ng-model="newEvent.start_date" is-open="openedS" min-date="dt" datepicker-options="dateOptions" ng-required="true" close-text="Close"/>
+                    <span class="input-group-btn">
+                      <button type="button" class="btn btn-default" ng-click="openS($event)">
+                        <i class="glyphicon glyphicon-calendar"></i>
+                     </button>
+                  </span>
+               </p>
+            </div>
+            <div class="form-group row">
+               <label>End Date (mm/dd/yy):</label>
+               <p class="input-group">
+                   <input type="text" class="form-control" datepicker-popup="shortDate" ng-model="newEvent.end_date" is-open="openedE" min-date="newEvent.start_date" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
+                   <span class="input-group-btn">
+                       <button type="button" class="btn btn-default" ng-click="openE($event)">
+                           <i class="glyphicon glyphicon-calendar"></i>
+                       </button>
+                   </span>
+               </p>
+            </div>
+              <div class="form-group row">
+                  <label>Location:</label>
+                  <input name="location" class="form-control" type="text" ng-model="newEvent.location" required>
+              </div>
+              <button type="submit" class="btn btn-primary" ng-disabled="eventForm.$invalid">Add Event</button>
+            </form>
+         </div>
+      </div>
 
-  		<div class="col-sm-8">
-	  		<h2>Event List</h2>
-	  		<table ng-table="tableParams" class="table table-bordered frank-main-view">
-	  			<tr ng-repeat="event in $data">
-	  				<td data-title="'Name'">
-	  					<span ng-if="!event.$edit">{{event.name}}</span>
-	  					<div ng-if="event.$edit">
-	  						<input class="form-control" type="text" ng-model="event.name" />
-	  					</div>
-	  				</td>
-	  				<td data-title="'Start Date'">
-	  					{{event.start_date | date:'shortDate'}}
-	  				</td>
-	  				<td data-title="'End Date'">
-	  					{{event.end_date | date:'shortDate'}}
-	  				</td>
-	  				<td data-title="'Location'">
-	  					<span ng-if="!event.$edit">{{event.location}}</span>
-	  					<div ng-if="event.$edit">
-	  						<input class="form-control" type="text" ng-model="event.location" />
-	  					</div>
-	  				</td>
-	  				<td data-title="'Remove'">
-	  					<input type="button" value="Remove" class="btn btn-default btn-xs" ng-click="deleteEvent(event)" />
-	  				</td>
-	  				<td data-title="'Actions'" width="200">
-                		<a ng-if="!event.$edit" href="" class="btn btn-default btn-xs" ng-click="event.$edit = true">Edit</a>
-                		<a ng-if="event.$edit" href="" class="btn btn-primary btn-xs" ng-click="event.$edit = false; updateEvent(event)">Save</a>
-            		</td>
-	  			</tr>
-	  		</table>
-  		</div>
-  	</div>
+      <div class="col-sm-8">
+         <h2>Event List</h2>
+         <form name="editForm" novalidate>
+            <table ng-table="tableParams" class="table table-bordered frank-main-view">
+                <tr ng-repeat="event in $data">
+                    <td data-title="'Name'">
+                        <span ng-if="!event.$edit">{{event.name}}</span>
+                        <div ng-if="event.$edit">
+                            <input class="form-control" type="text" ng-model="event.name" />
+                        </div>
+                    </td>
+                    <td data-title="'Start Date'">
+                        <span ng-if="!event.$edit">{{event.start_date | date:'shortDate'}}</span>
+                        <div ng-if="event.$edit">
+                              <input class="form-control" type="date" max="event.end_date" ng-model="event.start_date" required/>
+                        </div>
+                    </td>
+                    <td data-title="'End Date'">
+                     <span ng-if="!event.$edit">{{event.end_date | date:'shortDate'}}</span>
+                        <div ng-if="event.$edit">
+                           <input class="form-control" type="date" min="event.start_date" ng-model="event.end_date" required/>
+                        </div>
+                    </td>
+                    <td data-title="'Location'">
+                        <span ng-if="!event.$edit">{{event.location}}</span>
+                        <div ng-if="event.$edit">
+                            <input class="form-control" type="text" ng-model="event.location" />
+                        </div>
+                    </td>
+                    <td data-title="'Remove'">
+                        <input type="button" value="Remove" class="btn btn-default btn-xs" ng-click="deleteEvent(event)" />
+                    </td>
+                    <td data-title="'Actions'" width="200">
+                        <a ng-if="!event.$edit" href="" class="btn btn-default btn-xs" ng-click="event.$edit = true">Edit</a>
+                        <a ng-if="event.$edit" href="" class="btn btn-primary btn-xs" ng-click="event.$edit = false; updateEvent(event)">Save</a>
+                        <a ng-if="event.$edit" href="" class="btn btn-primary btn-xs" ng-click="event.$edit = false">Cancel</a>
+                    </td>
+                </tr>
+            </table>
+         </form>
+     </div>
+   </div>
 </div>
