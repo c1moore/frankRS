@@ -13,6 +13,13 @@
 		"angular-sanitize": "~1.2",
 		"angular-bootstrap": "~0.11.0",
 		"angular-ui-utils": "~0.1.1",
-		"angular-ui-router": "~0.2.10"
+		"angular-ui-router": "~0.2.10",
+		"ng-table": "~0.3.3",
+		"lodash": "~2.4.1",
+		"jquery-ui": "~1.11.2",
+		"ng-flow": "~2.5.1",
+		"font-awesome": "~4.2.0",
+		"textAngular": "~1.2.2",
+		"angularjs-dropdown-multiselect": "~1.5.2"
 	}
 }
