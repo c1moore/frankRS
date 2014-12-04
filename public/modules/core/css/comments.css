@@ -7,7 +7,7 @@ i.fa.fa-remove.text-danger:hover {
 	margin-right: 50px;
 	width: 20%;
 	min-width: 0;
-	height: 575px;
+	min-height: 575px;
 	background-color: #F5F5F5;
 	border-radius: 5px;
 }
