@@ -59,3 +59,5 @@ CommentSchema.pre('validate', function(next) {
 CommentSchema.plugin(idvalidator);
 
 mongoose.model('Comment', CommentSchema);
+
+exports = CommentSchema;

@@ -238,3 +238,5 @@ UserSchema.methods.authenticate = function(password) {
 };
 
 mongoose.model('User', UserSchema);
+
+exports = UserSchema;

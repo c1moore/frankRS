@@ -41,3 +41,5 @@ AttendeesSchema.index({attendee:1, event_id:1}, {unique: true});
 AttendeesSchema.plugin(idvalidator);
 
 mongoose.model('Attendees', AttendeesSchema);
+
+exports = AttendeesSchema;

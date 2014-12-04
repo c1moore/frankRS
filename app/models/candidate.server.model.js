@@ -70,3 +70,6 @@ CandidateSchema.methods.CreateAcceptKey = function() {
 };
 
 mongoose.model('Candidate', CandidateSchema);
+
+exports = CandidateSchema;
+

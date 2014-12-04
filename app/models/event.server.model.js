@@ -60,3 +60,5 @@ EventSchema.pre('validate', function(next) {
 });
 
 mongoose.model('Event', EventSchema);
+
+exports = EventSchema;
