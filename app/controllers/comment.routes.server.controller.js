@@ -183,21 +183,28 @@ exports.postCommentRecruiter = function(req, res) {
 };
 
 exports.delete = function(req, res) {
-	if (!req.isAuthenticated()) { //Check if the user is authenticated
-		res.status(401).json({message: "You are not logged in"});
-		return;
+	if(!req.isAuthenticated()) { //Check if the user is authenticated
+		return res.status(401).json({message: "You are not logged in"});
+	} else if(!req.body.comment_id) {
+		return res.status(400).send({message : "Missing required fields."});
 	}
+	
 	var id = mongoose.Types.ObjectId(req.body.comment_id);
 	var body = Comment.findOne({_id: id});
 	//Retrieve the comments
 	body.exec(function(err,result) {
 		if (err) {res.status(400).send(err);return;}
-		else if (!result) {res.status(400).json({message: "No comment found!"});
+		else if (!result) {res.status(400).send({message: "No comment found!"});
 		} else if (req.user._id!=result.user_id && !req.hasAuthorization(req.user,['admin'])) {
-			res.status(401).json({message: "You must be the comment author or admin to delete"});
+			res.status(401).send({message: "You must be the comment author or admin to delete"});
 		} else {
-			result.remove();
-			res.status(200).json({message: "Comment removed"});
+			result.remove(function(err) {
+				if(err) {
+					return res.status(400).send({message : err});
+				} else {
+					res.status(200).send({message: "Comment removed"});
+				}
+			});
 		}
 	});
 };
