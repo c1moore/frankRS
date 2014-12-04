@@ -20,6 +20,7 @@
 		"ng-flow": "~2.5.1",
 		"font-awesome": "~4.2.0",
 		"textAngular": "~1.2.2",
-		"angularjs-dropdown-multiselect": "~1.5.2"
+		"angularjs-dropdown-multiselect": "~1.5.2",
+		"angular-input-date": "~1.0.4"
 	}
 }
