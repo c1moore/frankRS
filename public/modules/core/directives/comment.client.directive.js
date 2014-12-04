@@ -15,17 +15,26 @@ angular.module('core').directive('comment', [
 	}
 ]);
 
-angular.module('core').directive('commentHeader', [
-	function() {
+/**
+*
+*
+* Possible imporovement: simply pass the entire object to the directive instead of requiring
+* to pass all the fields into the header individually.
+*/
+angular.module('core').directive('commentHeader', ['$http', '$window',
+	function($http, $window) {
 		var commentHeaderDefinition = {
 			restrict : 'E',
 			scope : {
 				author : '@authorName',
 				time : '@postTime',
 				image : '@authorImage',
-				removable : '@'
+				removable : '@',
+				removeAddress : '@',
+				commentId : '@',
+				commentsArr : '=',
+				arrIndex : '='
 			},
-			require : '^comment',
 			replace : true,
 			template : "<div class='frank-comment-header'>" +
 							"<div ng-if='image' class='frank-comment-image-container'>" +
@@ -38,9 +47,19 @@ angular.module('core').directive('commentHeader', [
 								"<span>{{time}}</span>" +
 							"</div>" +
 							"<div ng-if='removable' class='frank-comment-remove'>" +
-								"<a href='#' class='frank-comment-remove-icon'><i class='fa fa-remove text-danger'></i></a>" +
+								"<a href='#' class='frank-comment-remove-icon' ng-click='removeComment()'><i class='fa fa-remove text-danger'></i></a>" +
 							"</div>" +
-						"</div>"
+						"</div>",
+			link : function postLink($scope, element, attrs) {
+				$scope.removeComment = function() {
+					$http.post($scope.removeAddress, {comment_id : $scope.commentId}).success(function(response) {
+						$scope.commentsArr.splice($scope.arrIndex, 1);
+					}).error(function(response, status) {
+						$window.alert("There was an error deleting this comment.  Please try again.");
+						console.log(response.message);
+					});
+				};
+			}
 		};
 
 		return commentHeaderDefinition;
@@ -53,7 +72,6 @@ angular.module('core').directive('commentBody', [
 			restrict : 'E',
 			transclude : true,
 			replace : true,
-			require : '^comment',
 			template : "<div class='frank-comment-body'>" +
 							"<div class='frank-comment-message'>" +
 								"<span ng-bind-html='comment'></span>" +
@@ -77,7 +95,6 @@ angular.module('core').directive('commentFooter', [
 			scope : {
 				interests : '='
 			},
-			require : '^comment',
 			template : "<div class='frank-comment-footer'>" +
 							"<div class='frank-comment-interests'>" +
 								"<div ng-repeat='interest in interests' class='frank-comment-footer-img-container'>" +
