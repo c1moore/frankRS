@@ -57,5 +57,25 @@ describe('Admin Page Protractor End-To-End Tests',function() {
         	element(by.css('button[type="submit"]')).click();
         	browser.waitForAngular();
 	});
+
+	it('should be able to visit the admin page', function() {
+		element(by.css('.homeButton.text-center a[href="/#!/admin"]')).click();
+		browser.waitForAngular();
+		expect(ptor.getCurrentUrl()).toContain('admin');
+	});
+
+	it('should be able to add a new candidate', function() {
+		element(by.css('.dropdown-toggle.ng-binding.btn.btn-default')).click();
+		browser.waitForAngular();
+		element(by.cssContainingText('a[role="menuitem"]',' Project Demonstration')).click();
+		browser.waitForAngular();
+		element(by.cssContainingText('.container-fluid h2','Admin Page')).click();
+		browser.waitForAngular();
+		element(by.model('newCandidate.fName')).sendKeys('George');
+		element(by.model('newCandidate.lName')).sendKeys('Bush');
+		element(by.model('newCandidate.email')).sendKeys('bagins_candidate@example.com');
+		expect(element(by.css('button[type="submit"]')).isEnabled()).toBe(true);
+		element(by.css('button[type="submit"]')).click();
+	});
 });
 		
