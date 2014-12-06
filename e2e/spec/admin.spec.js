@@ -34,11 +34,13 @@ describe('Admin Page Protractor End-To-End Tests',function() {
         	element(by.model('credentials.email')).sendKeys('demo@example.com');
         	element(by.model('credentials.password')).sendKeys('password');
 
-        	element(by.css('button[type="submit"]')).click(); //Can select obscure entities
+        	element(by.css('button[type="submit"]')).click();
 	});
 
 	it('should be able to sign out',function() {
-		element(by.css('.dropdown-menu a[href="/auth/signout"]'));
+		element(by.css('.dropdown-toggle span[data-ng-bind="authentication.user.fName"]')).click();
+		browser.waitForAngular();
+		element(by.css('.dropdown-menu a[href="/auth/signout"]')).click();
 		browser.waitForAngular();
 		expect(ptor.getCurrentUrl()).toContain('signin');
 	});
