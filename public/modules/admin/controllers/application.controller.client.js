@@ -1,12 +1,12 @@
 angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams', '$http',
 	function($scope, ngTableParams, $http) {
-            $scope.newCandidate = {
-                  events: []
-            }
+            $scope.newCandidateEvents = [];
       	$scope.candidates = [];
             $scope.selectEvents = [];
+            //settings for the multi select directive
             $scope.selectSettings = {
                   smartButtonMaxItems: 3,
+                  //the name of the object field sent to the newCanidateEvents array
                   externalIdProp: 'event_id',
                   idProp: 'event_id',
                   displayProp: 'label'
@@ -30,18 +30,24 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 
             $scope.getCandidates();
 
-            $scope.addCandidate = function() {
-                  $scope.newCandidate.status = "volunteer";
-                  $http.post('/candidate/setCandidate',$scope.newCandidate).success(function() {
-                        console.log("Candidate created");
-                        $scope.candidates.push($scope.newCandidate);
-                  }).error(function(error) {
-                        console.log(error);
-                  });
+            $scope.addCandidate = function(newCandidate) {
+                  if($scope.newCandidateEvents.length > 0) {
+                        newCandidate.note = "stuff";
+                        newCandidate.events = [];
+                        for (var i = 0; i < $scope.newCandidateEvents.length; i++) {
+                              newCandidate.events.push($scope.newCandidateEvents[i].event_id);
+                        }
 
-                  $scope.newCandidate = {
-                        events: []
-                  };
+                        $http.post('/candidate/setCandidate',newCandidate).success(function() {
+                              console.log("Candidate created");
+                              $scope.getCandidates();
+                        }).error(function(error) {
+                              console.log(error);
+                        });
+                  }
+
+                  $scope.newCandidate = {};
+                  $scope.newCanidateEvents = [];
             }
 
             $scope.$watch("candidates", function() {
