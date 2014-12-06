@@ -2,18 +2,20 @@
 	<div class="row" ng-controller="applicationController">    
 		<div class="col-md-4">
 			<div class="well">
-				<form name="candidateForm" novalidate ng-submit="addCandidate()">
+				<form name="candidateForm" novalidate ng-submit="addCandidate(newCandidate)">
 					<div class="form-group row">
 						<label>Select Event:</label>
-						<div ng-dropdown-multiselect="" options="selectEvents" selected-model="newCandidate.events" extra-settings="selectSettings"></div>
+						<div ng-dropdown-multiselect="" options="selectEvents" selected-model="newCandidateEvents" extra-settings="selectSettings" required></div>
 					</div>
 					<div class="form-group row">
 						<label>First Name:</label>
 						<input name="fName" class="form-control" type="text" ng-model="newCandidate.fName" required>
+						<p ng-show="candidateForm.fName.$invalid && !candidateForm.fName.$pristine" class="help-block">A first name is required.</p>
 					</div>
 					<div class="form-group row">
 						<label>Last Name:</label>
 						<input name="lName" class="form-control" type="text" ng-model="newCandidate.lName" required>
+						<p ng-show="candidateForm.lName.$invalid && !candidateForm.lName.$pristine" class="help-block">A last name is required.</p>
 					</div>
 					<div class="form-group row">
 						<label>Email Address:</label>
@@ -32,7 +34,9 @@
 						{{candidate.fName + ' ' + candidate.lName}}
 					</td>
 					<td data-title="'Events'">
-						
+						<ul>
+							<li ng-repeat="event in canidate.events">{{event}}</li>
+						</ul>
 					</td>
 					</td>
 					<td data-title="'Accept'">
