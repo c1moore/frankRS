@@ -20,7 +20,7 @@ describe('e2e page loading tests', function() {
     });
 
     it('should be able to get to the leaderboards', function() {
-        browser.get('http://localhost:3000/#!/');
+    browser.navigate().back();
 
 
         expect(browser.getTitle()).toEqual('frank Recruiter System - Development Environment');
@@ -32,7 +32,7 @@ describe('e2e page loading tests', function() {
 
     });
     it('should be able to get to the admin page', function() {
-        browser.get('http://localhost:3000/#!/');
+    browser.navigate().back();
 
 
         expect(browser.getTitle()).toEqual('frank Recruiter System - Development Environment');
@@ -45,7 +45,7 @@ describe('e2e page loading tests', function() {
 
     });
     it('should be able to get to the invitations page', function() {
-        browser.get('http://localhost:3000/#!/');
+    browser.navigate().back();
 
         expect(browser.getTitle()).toEqual('frank Recruiter System - Development Environment');
         element.all(by.css('.homeButtonContainer a[href="/#!/invite"]')).click();
@@ -57,7 +57,7 @@ describe('e2e page loading tests', function() {
 
     });
     it('should be able to get to the memoboard page', function() {
-        browser.get('http://localhost:3000/#!/');
+    browser.navigate().back();
 
         expect(browser.getTitle()).toEqual('frank Recruiter System - Development Environment');
         element.all(by.css('.homeButtonContainer a[href="/#!/memoboard"]')).click();
@@ -68,11 +68,12 @@ describe('e2e page loading tests', function() {
         expect(ptor.getCurrentUrl()).toContain('memoboard');
 
     });
-    it('should be able to sign out',function() {
-        browser.get('http://localhost:3000/auth/signout');
+   it('should be able to sign out',function() {
+        element(by.css('.dropdown-toggle span[data-ng-bind="authentication.user.fName"]')).click();
+        browser.waitForAngular();
+        element(by.css('.dropdown-menu a[href="/auth/signout"]')).click();
         browser.waitForAngular();
         expect(ptor.getCurrentUrl()).toContain('signin');
-        ptor.manage().deleteAllCookies();
     });
 
     it('should be able to visit the sign in page',function() {
