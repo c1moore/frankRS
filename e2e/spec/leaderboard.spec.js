@@ -22,7 +22,7 @@ describe('e2e leaderboard tests', function() {
 it('should be able to select demo event',function(){
     element.all(by.css('.dropdown span[data-ng-bind="eventSelector.selectedEvent"]')).click();
     browser.waitForAngular();
-    element(by.css('.dropdown-menu.ng-scope li a', 'Project Demonstration')).click();
+    element(by.css('.dropdown.open .dropdown-menu.ng-scope[ng-if="eventSelector.admin"] li a', 'Project Demonstration')).click();
     browser.waitForAngular();
     //expect(element(by.css('.dropdown li a span[eventSelector.selectedEvent'))).toMatch(/Project Demonstration/);
 });
@@ -47,7 +47,7 @@ it('should be able to select demo event',function(){
        link = element.all(by.css('.nav.nav-tabs li[heading="Leaderboard"]'));
        link.click();
         browser.waitForAngular();
-        browser.driver.sleep(2000);
+        //browser.driver.sleep(2000);
       
        // expect(ptor.getCurrentUrl()).toContain('leaderboard');
 
@@ -56,6 +56,16 @@ it('should be able to select demo event',function(){
 
 
     });
+  it('should be able to sort the leaderboard ranks', function(){
+    element.all(by.model('mainTableFilter.displayName')).sendKeys('Alin');
+    browser.waitForAngular();
+    //browser.driver.sleep(2000);
+        element.all(by.model('mainTableFilter.displayName')).clear();
+        browser.waitForAngular();
+
+
+  });
+
   it('should be able to get to the attending tab', function() {
 
 
@@ -65,7 +75,7 @@ it('should be able to select demo event',function(){
        link = element.all(by.css('.nav.nav-tabs li[heading="Attending"]'));
        link.click();
         browser.waitForAngular();
-        browser.driver.sleep(2000);
+        //browser.driver.sleep(2000);
       
        // expect(ptor.getCurrentUrl()).toContain('leaderboard');
 
@@ -74,6 +84,16 @@ it('should be able to select demo event',function(){
 
 
     });
+
+    // it('should be able to sort the attending by attendee name', function(){
+    // element.all(by.model('params.filter()[th:"Attendee Name"]')).sendKeys('Alin');
+    // browser.waitForAngular();
+    // //browser.driver.sleep(2000);
+    // element.all(by.model('params.filter()[name]')).clear;
+    // browser.waitForAngular();
+
+    // });
+
   it('should be able to get to the Invited tab', function() {
 
 
@@ -83,7 +103,7 @@ it('should be able to select demo event',function(){
        link = element.all(by.css('.nav.nav-tabs li[heading="Invited"]'));
        link.click();
         browser.waitForAngular();
-        browser.driver.sleep(2000);
+        //browser.driver.sleep(2000);
       
        // expect(ptor.getCurrentUrl()).toContain('leaderboard');
 
