@@ -37,7 +37,8 @@ module.exports = {
 				'public/lib/textAngular/src/textAngular.js',
 				'public/lib/textAngular/src/textAngularSetup.js',
 				'public/lib/ng-flow/dist/ng-flow.js',
-				'public/lib/ng-flow/dist/ng-flow-standalone.js'
+				'public/lib/ng-flow/dist/ng-flow-standalone.js',
+				'public/lib/angular-input-date/src/angular-input-date.js'
 			]
 		},
 		css: [

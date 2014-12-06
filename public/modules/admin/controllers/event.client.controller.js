@@ -2,8 +2,22 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 	function($scope, ngTableParams, $http, $timeout) {
 		$scope.events = [];
 
+		$scope.test = function(event) {
+			console.log(event);
+		}
+
+		//converts to date object so the date forms can be validated
+		var toDate = function(element) {
+			if (element.start_date && element.end_date) {
+				element.start_date = new Date(element.start_date);
+				element.end_date = new Date(element.end_date);
+			};
+		}
+
 		var getEvents = function() {
 			$http.get('/events/enumerateAll').success(function(data) {
+				$scope.events = [];
+				data.forEach(toDate);
 				$scope.events = data;
 			});
 		}
@@ -40,10 +54,14 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 		};
 
 		$scope.updateEvent = function(event) {
-			$http.post('/events/setName',{event_id : event._id, name:event.name}).success(function() {
-				$http.post('/events/setLocation',{event_id: event._id, location:event.location}).success(function() {
-					console.log("Event Created");
-				});
+			event.start_date = new Date(event.start_date).getTime();
+        	event.end_date = new Date(event.end_date).getTime();
+			$http.post('/events/setEventObj',{event_id : event._id, event:event}).success(function() {
+				console.log("Event Updated");
+				getEvents();
+			}).error(function(error) {
+				console.log(error);
+				getEvents();
 			});
 		};
 
