@@ -112,6 +112,15 @@ it('should be able to select demo event',function(){
 
 
     });
+
+//   it('should be able to add a comment',function(){
+//     element(by.css('.frank-comment-editor-compressed')).click();
+//     browser.waitForAngular();
+//     element(by.partialText("taTextElement")).sendKeys("this is a test");
+//     browser.waitForAngular();
+//     //<div id="taTextElement7067285159137100" contenteditable="true" ta-bind="ta-bind" ng-model="html" class="ng-isolate-scope ng-pristine ng-valid ta-bind"><p><br></p></div>
+// });
+
   it('should be able to sign out',function() {
         element(by.css('.dropdown-toggle span[data-ng-bind="authentication.user.fName"]')).click();
         browser.waitForAngular();
