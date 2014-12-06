@@ -38,16 +38,22 @@ describe('Admin Page Protractor End-To-End Tests',function() {
 	});
 
 	it('should be able to sign out',function() {
-		browser.get('http://localhost:3000/auth/signout');
+		element(by.css('.dropdown-menu a[href="/auth/signout"]'));
 		browser.waitForAngular();
 		expect(ptor.getCurrentUrl()).toContain('signin');
-		ptor.manage().deleteAllCookies();
 	});
 
 	it('should be able to visit the sign in page',function() {
 		browser.get('http://localhost:3000/');
 		browser.waitForAngular();
 		expect(ptor.getCurrentUrl()).toContain('signin');
+	});
+
+	it('should be able to sign in',function() {
+		element(by.model('credentials.email')).sendKeys('demo@example.com');
+        	element(by.model('credentials.password')).sendKeys('password');
+        	element(by.css('button[type="submit"]')).click();
+        	browser.waitForAngular();
 	});
 });
 		
