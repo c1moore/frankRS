@@ -44,6 +44,7 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
         		getEvents();
         	});
         	$scope.newEvent = null;
+        	$scope.eventForm.$setPristine(true);
   		};
 
 		$scope.deleteEvent = function(event) {
