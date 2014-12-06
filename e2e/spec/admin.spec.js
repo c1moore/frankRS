@@ -5,9 +5,6 @@
 /**
  * Module dependencies.
  */
-var assert = require('assert'),
-        users = require('./models/user.server.model'),
-	events = require('./models/event.server.model');
 
 /**
 * Global Variabls used for testing
@@ -76,6 +73,10 @@ describe('Admin Page Protractor End-To-End Tests',function() {
 		element(by.model('newCandidate.email')).sendKeys('bagins_candidate@example.com');
 		expect(element(by.css('button[type="submit"]')).isEnabled()).toBe(true);
 		element(by.css('button[type="submit"]')).click();
+                browser.waitForAngular();
+		browser.refresh();
+		browser.waitForAngular();
+		expect(element(by.cssContainingText('frank-main-view tbody tr td', 'George Bush')).isPresent());
 	});
 });
 		
