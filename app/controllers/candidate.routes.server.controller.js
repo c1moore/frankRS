@@ -30,7 +30,7 @@ exports.getCandidates = function(req, res) {
 	}
 }
 
-exports.getCandidatesbyEvent = function(req, res) {
+exports.getCandidatesByEvent = function(req, res) {
 	if(!req.isAuthenticated()) {
 		return res.status(401).send({message : "User is not logged in."});
 	} else if(!req.hasAuthorization(req.user, ["admin"])) {
