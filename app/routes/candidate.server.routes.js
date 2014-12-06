@@ -10,6 +10,7 @@ module.exports = function(app){
 
 //candidate routes
 app.route('/candidate/getCandidates').post(dan_candidate_routes.getCandidates);
+app.route('/candidate/getCandidatesByEvent').post(dan_candidate_routes.getCandidatesByEvent);
 app.route('/candidate/getfName').post(dan_candidate_routes.getfName);
 app.route('/candidate/getlName').post(dan_candidate_routes.getlName);
 app.route('/candidate/getEmail').post(dan_candidate_routes.getEmail);

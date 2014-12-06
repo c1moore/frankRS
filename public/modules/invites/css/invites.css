@@ -56,6 +56,7 @@
   font-size: 15px;
   text-transform: uppercase;
   letter-spacing: 1px;
+  color: white;
 }
 .invitation_field {
   height:25px;
@@ -285,16 +286,14 @@ animation:0.5s flipInX ease;
   margin: auto;
 }
 #invite {
-  border:1px solid #ffc174;
   max-height: 475px;
   min-height: 375px;
   height: 60vh;
   position: absolute;
   margin-left: 5%;
   width: 60vw;
-  background-color: #ffdbae;
+  background-color: white;
   margin-top: 10px;
-  border-radius: 5px;
 }
 #invitee_email {
   width: 19vw;
@@ -310,7 +309,6 @@ animation:0.5s flipInX ease;
 }*/
 #to_fields {
   display: inline-block;
-  margin-left: 18px;
   border: 1px solid rgb(169, 169, 169);
   width: 45vw;
   height: 30px;
@@ -332,7 +330,6 @@ animation:0.5s flipInX ease;
   min-height: 185px;
   height: 30vh;
   resize: none;
-  margin-left: 43px;
   border-radius: 5px;
 }
 #recruiter_email {
@@ -347,7 +344,14 @@ animation:0.5s flipInX ease;
 }
 body {
   background-color:#F5F5F5;
-  /*overflow:hidden;*/
+}
+#previewbutton {
+  background-color: rgb(197, 78, 144);
+  border-radius: 0;
+}
+#invitation-submit-button {
+  background-color: rgb(115, 201, 45);
+  border-radius: 0;
 }
 
 
@@ -370,6 +374,13 @@ body {
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
   background-repeat: repeat-x;
   color: #E8E9EB;
+}
+.panel-default > .panel-heading:hover {
+  color: white;
+}
+.panel-default > .panel-heading a:hover {
+  color: white;
+  text-decoration: none;
 }
 
 /*Overwritten jQuery-UI*/

@@ -77,11 +77,13 @@ exports.getCommentObj = function(req, res) {
 
 exports.getSocialCommentsForEvent = function(req, res) {
 	if (!req.isAuthenticated()) { //Check if the user is authenticated
-		res.status(401).json({message: "You are not logged in"});
-		return;
+		return res.status(401).send({message: "You are not logged in"});
 	}
 	if(req.body.event_id == undefined) {
 		return res.status(400).send({message : "Event not specified."});
+	}
+	if(!canViewEvent(req.user, req.body.event_id, req.hasAuthorization)) {
+		return res.status(401).send({message : "You are not authorized to view comments for this event."});
 	}
 	var id = mongoose.Types.ObjectId(req.body.event_id);
 	var body = Comment.find({event_id: id,stream: 'social'});
@@ -89,10 +91,12 @@ exports.getSocialCommentsForEvent = function(req, res) {
 	//Hopefully, this won't encode the cursor itselt. At least I hope not...
 	//	will have to test this
 	body.exec(function(err,result) {
-		if (err) {res.status(400).send(err);return;}
-		else if (!result) {res.status(400).json({message: "No comments found!"});
+		if (err) {
+			return res.status(400).send({message : err});
+		} else if(!result.length) {
+			return res.status(400).send({message: "No comments found!"});
 		} else {
-			res.status(200).json(result);
+			return res.status(200).send(result);
 		}
 	});
 };
@@ -260,6 +264,43 @@ exports.uploadRecruiterCommentImage = function(req, res) {
 					});
 				} else {
 					fs.rename(files.file.path, path.normalize(__dirname + "../../../public/img/recruiter/" + fields.flowFilename), function(err) {
+						if(err) {
+							return res.status(400).send({message : err, err : errorHandler.getErrorMessage(err)});
+						} else {
+							return res.status(200).send({message : "Files uploaded!"});
+						}
+					});
+				}
+			}
+		});
+	}
+};
+
+/**
+* This controller is save images that are uploaded by any registered user on the memoboard
+* comment stream to a file on our server.
+*/
+exports.uploadSocialCommentImage = function(req, res) {
+	if(!req.isAuthenticated()) {
+		return res.status(401).send({message : "User is not logged in."});
+	} else {
+		var form = new formidable.IncomingForm({
+			keepExtensions : true,
+			uploadDir : path.normalize(__dirname + "../../../public/img/social")
+		});
+
+		form.parse(req, function(err, fields, files) {
+			if(!fields.event_id || !fields.flowFilename) {
+				fs.unlink(path.normalize(__dirname + "../../../public/img/social/" + files.file.name), function() {
+					return res.status(400).send({message : "Required field not set correctly."});
+				});
+			} else {
+				if(!canViewEvent(req.user, fields.event_id, req.hasAuthorization)) {
+					fs.unlink(path.normalize(__dirname + "../../../public/img/social/" + files.file.name), function() {
+						return res.status(401).send({message : "You are not authorized to view the comments for this event."});
+					});
+				} else {
+					fs.rename(files.file.path, path.normalize(__dirname + "../../../public/img/social/" + fields.flowFilename), function(err) {
 						if(err) {
 							return res.status(400).send({message : err, err : errorHandler.getErrorMessage(err)});
 						} else {

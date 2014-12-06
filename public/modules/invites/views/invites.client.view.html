@@ -7,10 +7,12 @@
 	<form id="invite" data-ng-submit="send()" class="frank-main-view">
 		<div id="from" class="invitation_field">
 			<strong>From: </strong>
+			<br />
 			<p id="recruiter_email">{{recruiter_email}}</p>
 		</div>
 		<div id="to" class="invitation_field">
 			<strong>To: </strong>
+			<br />
 			<div id="to_fields">
 				<input type="text" class="to_field" ng-model="invite.fName" placeholder="Frank" />
 				<input type="text" class="to_field" ng-model="invite.lName" placeholder="Karel" />
@@ -23,8 +25,8 @@
 		</div>
 		<br>
 		<div id="invitation_buttons">
-			<a id="previewbutton" class="btn btn-success invitation-button" id="invitation-preview-button" href="#" ng-click="togglePreview()"><i class="fa fa-eye"></i> Preview</a>
-			<button type="submit" value="Send" class="btn btn-primary btn-lg invitation-button" id="invitation-submit-button"><i class="fa fa-envelope-o"></i> Send</button>
+			<a id="previewbutton" class="btn invitation-button" id="invitation-preview-button" href="#" ng-click="togglePreview()"><i class="fa fa-eye"></i> Preview</a>
+			<button type="submit" value="Send" class="btn btn-lg invitation-button" id="invitation-submit-button"><i class="fa fa-envelope-o"></i> Send</button>
 		</div>
 	</form>
 	<div class="frank-invites-sidebar">

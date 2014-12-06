@@ -1,6 +1,5 @@
 body {
 	font-family: "Helvetica", sans-serif;
-	background-image: url("http://frank.jou.ufl.edu/recruiters/Pictures/background.jpg");
 	background-size: cover;
 	overflow-y : auto !important;
 	overflow-x : hidden;
@@ -39,6 +38,7 @@ li .disabled {
 	border: 1px solid #333232;
 	margin: 10px;
 	background-color: white;
+	max-width: 275px;
 }
 .homepage-comments {
 	float: right;
@@ -93,10 +93,11 @@ li .disabled {
 	right: -28px;
 }
 #frank-buttons-containter {
-	background-color: #E8E9EB;
 	height: 55vh;
-	width: 75vw;
+	width: 650px;
 	margin: 0 30px;
 	overflow: auto;
-	background-color: rgba(232, 233, 235, .8);
+	position: static;
+	float: left;
+	margin-left: 20vw;
 }
