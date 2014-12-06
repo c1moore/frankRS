@@ -1,5 +1,5 @@
-angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams', '$http',
-	function($scope, ngTableParams, $http) {
+angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams', '$http', 'eventSelector',
+	function($scope, ngTableParams, $http, eventSelector) {
             $scope.newCandidateEvents = [];
       	$scope.candidates = [];
             $scope.selectEvents = [];
@@ -11,6 +11,15 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
                   idProp: 'event_id',
                   displayProp: 'label'
             };
+
+            $scope.selectedEvent = eventSelector.selectedEvent;
+
+            //updated the selected event from the event selector service
+            $scope.$watch( function() {return eventSelector.selectedEvent},
+                  function(selectedEvent) {
+                        $scope.selectedEvent = selectedEvent;
+                  }
+            );
 
             $http.get('/events/enumerateAll').success(function(data) {
                   //formats the event data for the multiselect directive
@@ -45,9 +54,15 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
                               console.log(error);
                         });
                   }
-
+                  $scope.candidateForm.$setPristine(true);
                   $scope.newCandidate = {};
                   $scope.newCanidateEvents = [];
+            }
+
+            $scope.acceptCandidate = function(candidate) {
+                  $http.post('/candidate/setAccepted').success(function() {
+
+                  })
             }
 
             $scope.$watch("candidates", function() {
@@ -56,7 +71,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 
             $scope.tableParams = new ngTableParams({
             	page: 1,
-            	count: 10,
+            	count: 5,
             	}, {
             	getData: function($defer, params) {
             		$defer.resolve($scope.candidates.slice((params.page() - 1) * params.count(), params.page() * params.count()));
