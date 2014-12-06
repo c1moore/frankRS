@@ -30,6 +30,26 @@ exports.getCandidates = function(req, res) {
 	}
 }
 
+exports.getCandidatesbyEvent = function(req, res) {
+	if(!req.isAuthenticated()) {
+		return res.status(401).send({message : "User is not logged in."});
+	} else if(!req.hasAuthorization(req.user, ["admin"])) {
+		return res.status(401).send({message : "User does not have permission."});
+	} else if(!req.body.event_id) {
+		return res.status(400).send({message : "All required fields not specified."});
+	} else {
+		Candidate.find({event_id : mongoose.Types.ObjectId(req.body.event_id)}, function(err, results) {
+			if(err) {
+				return res.status(400).send({message : err});
+			} else if(!results.length) {
+				return res.status(400).send({message : "No candidates found."});
+			} else {
+				return res.status(200).send(results);
+			}
+		});
+	}
+}
+
  exports.getfName = function(req, res) {
  	var user = req.user;
  	if(!req.isAuthenticated())

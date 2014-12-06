@@ -1,10 +1,10 @@
 a {
-	color: mediumvioletred;
+	color: black;
 	cursor: pointer;
 }
 
 a:hover {
-	color: rgb(197, 78, 144);
+	color: #333232;
 }
 
 .dropdown-menu {
@@ -21,7 +21,7 @@ a:hover {
 }
 
 .leaderboard-container {
-	background-color: #F5F5F5;
+	background-color: white;
 	margin-top: 10px;
 	margin-left: 10px;
 	height: 575px;

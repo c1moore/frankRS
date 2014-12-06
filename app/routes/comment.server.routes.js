@@ -14,4 +14,5 @@ module.exports = function(app) {
 	app.route('/comments/searchByInterests').post(james_comment_routes.searchByInterests);
 	app.route('/comments/delete').post(james_comment_routes.delete);
 	app.route('/comments/uploadRecruiterImage').post(james_comment_routes.uploadRecruiterCommentImage);
+	app.route('/comments/uploadRecruiterImage').post(james_comment_routes.uploadSocialCommentImage);
 };
