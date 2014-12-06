@@ -22,18 +22,17 @@ var db = mongoose.connect(config.db, function(err) {
 // Init the express application
 var app = require('./config/express')(db);
 
+app.use(function(err, req, res, next) {
+  console.error(err);
+  res.send(401).json({your_message_buddy: "Nice try, idiot."});
+});
+
+
 // Bootstrap passport config
 require('./config/passport')();
 
 // Start the app by listening on <port>
 app.listen(config.port);
-
-// Capture unhandled controller exceptions
-// This should only happen if someone is tampering with the way we call our controllers...
-app.use(function(err, req, res, next) {
-  console.error(err);
-  res.send(401).json({your_message_buddy: "Nice try, idiot."});
-});
 
 // Expose app
 exports = module.exports = app;
