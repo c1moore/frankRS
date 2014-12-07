@@ -829,7 +829,7 @@ exports.deleteCandidate = function(req,res){
 		});
 	}
 	else
-		return res.status(401).send('User not Authorized');
+		return res.status(401).send({message : 'User not Authorized'});
 };
 
 exports.deleteCandidateByEvent = function(req, res) {
