@@ -4,20 +4,20 @@
 			<h2>Memo Board</h2>
 		</div>
 	</div>
-	<div ng-controller="memoboardCtrl" class="rows frank-comment-board">
-		<div class="col-md-9 frank-main-view">
+	<div ng-controller="memoboardCtrl" class="rows frank-comments-board">
+		<div class="col-md-9 frank-main-view frank-social-comments-board">
 			<div class="frank-social-comments">
 				<comment ng-repeat="comment in comments">
-					<comment-header author-name="{{comment.user_id._id}}" post-time="{{toHumanReadable(comment.date)}}" removable="{{removable(comment.user_id._id)}}" remove-address="/comments/delete" comment-id="{{comment._id}}" comments-arr="comments" arr-index="$index">
+					<comment-header author-name="{{comment.user_id.displayName}}" post-time="{{toHumanReadable(comment.date)}}" removable="{{removable(comment.user_id._id)}}" remove-address="/comments/delete" comment-id="{{comment._id}}" comments-arr="comments" arr-index="$index">
 					</comment-header>
 					<comment-body comment-body="comment.comment">
 					</comment-body>
 					<comment-footer interests="comment.interests">
 					</comment-footer>
 				</comment>
-				<hr id="frank-comment-editorDivider" />
-				<comment-editor comment-content="comment" expanded="editorExpanded" files="files" post-address="/comments/postCommentSocial" comments-arr="comments"></comment-editor>
 			</div>
+			<hr id="frank-comment-editorDivider" />
+			<comment-editor comment-content="comment" expanded="editorExpanded" files="files" post-address="/comments/postCommentSocial" comments-arr="comments" refresh="getComments()"></comment-editor>
 		</div>
 	</div>
 </section>

@@ -25,7 +25,7 @@ angular.module('leaderboard').controller('commentsCtrl', ['$scope', 'Authenticat
 		* Get all the comments from the database for recruiters for
 		* this event.
 		*/
-		var getComments = function() {
+		$scope.getComments = function() {
 			if(eventSelector.postEventId) {
 				$http.post('/comments/getRecruiterCommentsForEvent', {event_id : eventSelector.postEventId}).success(function(response) {
 					$scope.comments = response;
@@ -46,14 +46,14 @@ angular.module('leaderboard').controller('commentsCtrl', ['$scope', 'Authenticat
 		};
 
 		//Get comments when the page is first loaded.
-		$timeout(getComments);
+		$timeout($scope.getComments);
 		//Watch for changes in the selected event and update the comments accordingly.
 		$scope.$watch(function() {
 			return eventSelector.selectedEvent;
-		}, getComments);
+		}, $scope.getComments);
 
 		//Update comments every 1 minute.
-		$interval(getComments(), 60000);
+		$interval($scope.getComments(), 60000);
 
 		
 	}
