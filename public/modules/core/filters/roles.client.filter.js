@@ -27,6 +27,10 @@ angular.module("core").filter("roles", function(){
 		if (data === null || rolesNeeded === null) {
 			return []
 		}
+		//check if arrays are the same
+		else if (angular.equals(data,rolesNeeded)) {
+			return rolesNeeded;
+		}
 		//check if array of objects
 		else if (typeof(data[0]) === 'object') {
 			return data.filter(objectContaining);
