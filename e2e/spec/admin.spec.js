@@ -75,6 +75,8 @@ describe('Admin Page Protractor End-To-End Tests',function() {
 		element(by.model('newCandidate.fName')).sendKeys('George');
 		element(by.model('newCandidate.lName')).sendKeys('Bush');
 		element(by.model('newCandidate.email')).sendKeys('bagins_candidate@example.com');
+		element(by.model('newCandidate.note')).sendKeys("Four score and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal. Now we are engaged in a great civil war, testing whether that nation, or any nation so conceived and so dedicated, can long endure. We are met on a great battle-field of that war. We have come to dedicate a portion of that field, as a final resting place for those who here gave their lives that that nation might live. It is altogether fitting and proper that we should do this.");
+
 		expect(element(by.css('button[type="submit"]')).isEnabled()).toBe(true);
 		element(by.css('button[type="submit"]')).click();
                 browser.waitForAngular();
