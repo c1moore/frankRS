@@ -26,7 +26,7 @@
 						<label>Notes (Optional):</label>
 						<textarea name="notes" class="form-control" type="text" ng-model="newCandidate.note"/>
 					</div>
-					<button type="submit" class="btn btn-primary" ng-disabled="candidateForm.$invalid">+ Candidate</button>
+					<button type="submit" class="btn btn-primary" ng-disabled="candidateForm.$invalid || newCandidateEvents.length === 0">+ Candidate</button>
 				</form>
 			</div>
 		</div>
