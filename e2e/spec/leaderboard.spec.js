@@ -126,14 +126,14 @@ it('should be able to select demo event',function(){
     element(by.css('.frank-comment-editor-compressed')).click();
     browser.waitForAngular();
     //browser.driver.sleep(3000);
-    // browser.executeScript(scrollIntoView, element(by.css('.ta-scroll-window.ng-scope.ta-text.ta-editor.form-control div[ta-bind="ta-bind"]')));
+     browser.executeScript(scrollIntoView, element(by.css('.ta-scroll-window.ng-scope.ta-text.ta-editor.form-control div[ta-bind="ta-bind"]')));
 
     element(by.css('.ta-scroll-window.ng-scope.ta-text.ta-editor.form-control div[ta-bind="ta-bind"]')).sendKeys('Testing Comment Box');
         browser.waitForAngular();
 
     browser.waitForAngular();
   //  browser.driver.sleep(3000);
-      // browser.executeScript(scrollIntoView, element(by.css('.frank-comment-editor-submit input[type="submit"]')));
+       browser.executeScript(scrollIntoView, element(by.css('.frank-comment-editor-submit input[type="submit"]')));
     browser.waitForAngular();
 
     element(by.css('.frank-comment-editor-submit input[type="submit"]')).click();
