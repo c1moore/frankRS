@@ -121,7 +121,7 @@ it('should be able to select demo event',function(){
   it('should be able to add a comment',function(){
      // element(by.css('.frank-recruiter-comments.frank-recruiter-comments-expanded')).click();
      // browser.executeScript(scrollIntoView, element(by.id('frank-comment-editorDivider')));
-    browser.executeScript('window.scrollTo(720,0);');
+    browser.executeScript('window.scrollTo(1232,748);');
     browser.waitForAngular();
 
     element(by.css('.frank-comment-editor-compressed')).click();
