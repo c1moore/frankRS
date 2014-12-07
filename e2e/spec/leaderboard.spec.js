@@ -119,7 +119,9 @@ it('should be able to select demo event',function(){
     });
 
   it('should be able to add a comment',function(){
-    // browser.executeScript(scrollIntoView, element(by.css('.frank-comment-editor-compressed', 'Click to comment...')));
+     // element(by.css('.frank-recruiter-comments.frank-recruiter-comments-expanded')).click();
+     // browser.executeScript(scrollIntoView, element(by.id('frank-comment-editorDivider')));
+    browser.executeScript('window.scrollTo(720,0);');
     browser.waitForAngular();
 
     element(by.css('.frank-comment-editor-compressed')).click();
@@ -137,9 +139,12 @@ it('should be able to select demo event',function(){
 
     element(by.css('.frank-comment-editor-submit input[type="submit"]')).click();
     browser.waitForAngular();
+
+    expect(element(by.cssContainingText('.frank-comment-message .ng-binding p','Testing Comment Box')).isPresent());
+
+  //  expect.(element(by.css('.frank-comment-message .ng-binding p','Testing Comment Box')).isPresent());
   //  browser.driver.sleep(3000);
 
-    //<div id="taTextElement7067285159137100" contenteditable="true" ta-bind="ta-bind" ng-model="html" class="ng-isolate-scope ng-pristine ng-valid ta-bind"><p><br></p></div>
 });
 
   it('should be able to sign out',function() {
