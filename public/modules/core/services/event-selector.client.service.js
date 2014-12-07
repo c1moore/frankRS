@@ -61,6 +61,10 @@ angular.module('core').service('eventSelector', ['$rootScope', '$http', '$locati
 						thisService.selectedEvent = cache.getData('selectedEvent');
 						thisService.postEventId = cache.getData('eventId');
 					}
+					else {
+						thisService.selectedEvent = this.events[0].event_id.name;
+						thisService.postEventId = this.events[0].event_id._id;
+					}
 				}).error(function(error, status) {
 					thisService.selectedEvent = "Error";
 					console.log(error);
