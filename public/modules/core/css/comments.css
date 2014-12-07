@@ -31,6 +31,15 @@ i.fa.fa-remove.text-danger:hover {
 .frank-recruiter-comments-expanded {
 	height: 490px;
 }
+.frank-social-comments {
+	height: 575px;
+	overflow: auto;
+}
+.frank-social-comments-board {
+	background-color: white;
+	padding: 0;
+	margin-left: 25px;
+}
 .frank-comment {
 	word-wrap: break-word;
 	width: 99%;

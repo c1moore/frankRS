@@ -5,6 +5,7 @@ describe('e2e page loading tests', function() {
 
 
     it('should be able to sign in', function() {
+        browser.driver.manage().window().maximize();
         browser.get('http://localhost:3000/#!/');
         
         expect(ptor.getCurrentUrl()).toContain('signin');

@@ -87,6 +87,7 @@ exports.getSocialCommentsForEvent = function(req, res) {
 	}
 	var id = mongoose.Types.ObjectId(req.body.event_id);
 	var body = Comment.find({event_id: id,stream: 'social'});
+	body.populate('user_id', 'displayName -_id');
 	//Retrieve the comments, any authenticated user may view the social stream
 	//Hopefully, this won't encode the cursor itselt. At least I hope not...
 	//	will have to test this
@@ -113,7 +114,7 @@ exports.getRecruiterCommentsForEvent = function(req, res) {
 	} else {
 		var id = mongoose.Types.ObjectId(req.body.event_id);
 		var body = Comment.find({event_id: id, stream: 'recruiter'});
-		body.populate('user_id displayName -_id');
+		body.populate('user_id', 'displayName -_id');
 		//Retrieve the comments
 		body.exec(function(err,result) {
 			if (err) {

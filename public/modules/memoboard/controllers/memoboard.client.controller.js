@@ -30,7 +30,7 @@ angular.module('memoboard').controller('memoboardCtrl', ['$scope', 'Authenticati
 			return date.toLocaleDateString() + " " + date.toLocaleTimeString();
 		};
 
-		var getComments = function() {
+		$scope.getComments = function() {
 			if(eventSelector.postEventId) {
 				$http.post('/comments/getSocialCommentsForEvent', {event_id : eventSelector.postEventId}).success(function(response) {
 					$scope.comments = response;
@@ -45,15 +45,15 @@ angular.module('memoboard').controller('memoboardCtrl', ['$scope', 'Authenticati
 		};
 
 		//Get comments when the page is first loaded.
-		$timeout(getComments);
+		$timeout($scope.getComments);
 
 		//Watch for changes in the selected event and update the comments accordingly.
 		$scope.$watch(function() {
 			return eventSelector.selectedEvent;
-		}, getComments);
+		}, $scope.getComments);
 
 		//Update comments every 1 minute.
-		$interval(getComments(), 60000);
+		$interval($scope.getComments(), 60000);
 
 	}
 ]);
