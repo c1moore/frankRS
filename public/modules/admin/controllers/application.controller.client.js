@@ -75,6 +75,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
             	count: 5,
             	}, {
             	getData: function($defer, params) {
+                        params.total($scope.candidates.length);
             		$defer.resolve($scope.candidates.slice((params.page() - 1) * params.count(), params.page() * params.count()));
             	}
             });
