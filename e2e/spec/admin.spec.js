@@ -19,6 +19,10 @@ describe('Admin Page Protractor End-To-End Tests',function() {
 
 	ptor = protractor.getInstance();
 
+	it('should be able to maximize the browser', function() {
+		browser.driver.manage().window().maximize();
+	});
+
 	it('should be able to visit the sign in page',function() {
 		browser.get('http://localhost:3000/');
 		browser.waitForAngular();
@@ -90,7 +94,7 @@ describe('Admin Page Protractor End-To-End Tests',function() {
         });
 
         it('should be able to create a new event', function() {
-  		element(by.model('newEvent.name')).sendKeys('Project Demonstration For Instructor');
+  		element(by.model('newEvent.name')).sendKeys('000_Project Demonstration For Instructor');
                 element(by.model('newEvent.start_date')).sendKeys('12/12/2025');
                 element(by.model('newEvent.end_date')).sendKeys('12/30/2025');
                 element(by.model('newEvent.location')).sendKeys('CSE Building');
@@ -98,7 +102,7 @@ describe('Admin Page Protractor End-To-End Tests',function() {
 		browser.waitForAngular();
 		element(by.cssContainingText('a.ng-binding','Event')).click();
                 browser.waitForAngular();
-		expect(element(by.cssContainingText('td.ng-binding', 'Project Demonstration For Instructor'))
+		expect(element(by.cssContainingText('span.ng-binding', '000_Project Demonstration For Instructor'))
 			.isPresent()).toBeTruthy();
 	});
 
