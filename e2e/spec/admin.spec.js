@@ -89,6 +89,21 @@ describe('Admin Page Protractor End-To-End Tests',function() {
 		expect(element(by.cssContainingText('td.ng-binding', 'George Bush')).isPresent()).toBeTruthy();
 	});
 
+	 it('should not be able to add a new candidate without event selected', function() {
+                element(by.css('.dropdown-toggle.ng-binding.btn.btn-default')).click();
+                browser.waitForAngular();
+                element(by.cssContainingText('a[role="menuitem"]',' Project Demonstration')).click();
+                browser.waitForAngular();
+                element(by.cssContainingText('.container-fluid h2','Admin Page')).click();
+                browser.waitForAngular();
+                element(by.model('newCandidate.fName')).sendKeys('Alin');
+                element(by.model('newCandidate.lName')).sendKeys('Dobra');
+                element(by.model('newCandidate.email')).sendKeys('professor_candidate@example.com');
+                element(by.model('newCandidate.note')).sendKeys("Four score and seven years ago...");
+                expect(element(by.css('button[type="submit"]')).isEnabled()).toBe(false);
+        });
+
+
 	it('should be able to select the events tab', function() {
 		element(by.cssContainingText('a.ng-binding','Event')).click();
 		browser.waitForAngular();
