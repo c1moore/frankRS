@@ -234,6 +234,17 @@ describe('Express.js Comment Route Integration Tests:', function() {
 			});
 	});
 
+	it("should not be able to upload comment image when not signed in",function(done) {
+		request('http://localhost:3001')
+			.post('/comments/uploadRecruiterImage')
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.be.equal(401);
+				res.body.should.have.property('message');
+				done();
+			});
+	});
+
  	it("should be able to sign in as a regular user", function(done) {
  		agent
  			.post('http://localhost:3001/auth/signin')
