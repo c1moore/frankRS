@@ -839,7 +839,7 @@ exports.deleteCandidateByEvent = function(req, res) {
 		return res.status(401).send({message : "User does not have permission."});
 	} else {
 		var candidate_id = new mongoose.Types.ObjectId(req.body.candidate_id);
-		var event_id = new mongoose.Types.ObjectId(req.body.candidate_id);
+		var event_id = new mongoose.Types.ObjectId(req.body.event_id);
 
 		var query = Candidate.findOne({_id : candidate_id});
 		query.exec(function(err, result) {

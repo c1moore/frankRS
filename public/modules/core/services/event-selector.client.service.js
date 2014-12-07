@@ -52,6 +52,10 @@ angular.module('core').service('eventSelector', ['$rootScope', '$http', '$locati
 					return false;
 				}
 
+				
+				/*This request the available events from the db. If there already is a cache of the selected event,
+				this event is used as the currently selected event. If there is not a cache of events, it will use
+				the first available event in the events array from the db as the selected event. */
 				$http.get('/users/events').success(function(data) {
 					thisService.events = data;
 
@@ -60,6 +64,10 @@ angular.module('core').service('eventSelector', ['$rootScope', '$http', '$locati
 					if(cachedEvent && cachedId && thisService.events.length && checkEvent(cachedId)) {
 						thisService.selectedEvent = cache.getData('selectedEvent');
 						thisService.postEventId = cache.getData('eventId');
+					}
+					else {
+						thisService.selectedEvent = this.events[0].event_id.name;
+						thisService.postEventId = this.events[0].event_id._id;
 					}
 				}).error(function(error, status) {
 					thisService.selectedEvent = "Error";

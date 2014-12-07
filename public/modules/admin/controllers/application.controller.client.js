@@ -49,6 +49,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 
                         $http.post('/candidate/setCandidate',newCandidate).success(function() {
                               console.log("Candidate created");
+                              //refresh table view
                               $scope.getCandidates();
                         }).error(function(error) {
                               console.log(error);
@@ -60,11 +61,27 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
             }
 
             $scope.acceptCandidate = function(candidate) {
-                  $http.post('/candidate/setAccepted').success(function() {
+                  var postObject = {candidate_id:candidate._id, event_id:eventSelector.postEventId, accepted:true};
+                  $http.post('/candidate/setAccepted',postObject).success(function() {
+                        console.log("Candidate Accepted");
+                        //refresh table view
+                        $scope.getCandidates();
+                  }).error(function(error) {
+                        console.log(error);
+                  });
+            }
 
+            $scope.denyCandidate = function(candidate) {
+                  $http.post('/candidate/deleteCandidate/event',{candidate_id:candidate._id, event_id:eventSelector.postEventId}).success(function(){
+                        console.log("Candidate Deleted");
+                        //refresh table view
+                        $scope.getCandidates();
+                  }).error(function(error) {
+                        console.log(error);
                   })
             }
 
+            //this updates the table when the candidates variable is changed
             $scope.$watch("candidates", function() {
                   $scope.tableParams.reload();
             });
