@@ -76,7 +76,30 @@ describe('Admin Page Protractor End-To-End Tests',function() {
                 browser.waitForAngular();
 		browser.refresh();
 		browser.waitForAngular();
-		expect(element(by.cssContainingText('frank-main-view tbody tr td', 'George Bush')).isPresent());
+		element(by.cssContainingText('.dropdown-toggle','Select Event')).click();
+                browser.waitForAngular();
+                element(by.cssContainingText('.ng-binding','Project Demonstration')).click();
+                browser.waitForAngular();
+		expect(element(by.cssContainingText('td.ng-binding', 'George Bush')).isPresent()).toBeTruthy();
+	});
+
+	it('should be able to select the events tab', function() {
+		element(by.cssContainingText('a.ng-binding','Event')).click();
+		browser.waitForAngular();
+		expect(element(by.cssContainingText('.frank-main-view','Event List')).isPresent()).toBeTruthy();
+        });
+
+        it('should be able to create a new event', function() {
+  		element(by.model('newEvent.name')).sendKeys('Project Demonstration For Instructor');
+                element(by.model('newEvent.start_date')).sendKeys('12/12/2025');
+                element(by.model('newEvent.end_date')).sendKeys('12/30/2025');
+                element(by.model('newEvent.location')).sendKeys('CSE Building');
+		element(by.cssContainingText('button[type="submit"]','Add Event')).click();
+		browser.waitForAngular();
+		element(by.cssContainingText('a.ng-binding','Event')).click();
+                browser.waitForAngular();
+		expect(element(by.cssContainingText('td.ng-binding', 'Project Demonstration For Instructor'))
+			.isPresent()).toBeTruthy();
 	});
 
 	it('should be able to sign out for later tests',function() {
