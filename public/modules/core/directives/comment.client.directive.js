@@ -118,7 +118,8 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout', 'even
 				expanded : '=',
 				files : '=files',
 				postAddress : '@',
-				commentsArr : '='
+				commentsArr : '=',
+				refresh : '&'
 			},
 			template : "<form class='frank-comment-editor' ng-submit='postComment()'>" +
 							"<div class='frank-comment-editor-compressed' ng-click='toggleExpanded()' ng-hide='expanded'>Click to comment...</div>" +
@@ -182,7 +183,7 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout', 'even
 								commentWithImg += "<div class='frank-comment-pic-containter'><img class='frank-comment-pic' src='img/recruiter/" + $scope.uploader.flowInstance.files[i].name + "' /></div>";
 							}
 							$http.post($scope.postAddress, {comment : commentWithImg, event_id : eventSelector.postEventId}).success(function(response) {
-								$scope.commentsArr.push({
+								/*$scope.commentsArr.push({
 									user_id : {
 										displayName : Authentication.user.displayName
 									},
@@ -190,7 +191,8 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout', 'even
 									comment : commentWithImg,
 									date : now,
 									stream : 'recruiter'
-								});
+								});*/
+								$scope.refresh();
 								$scope.comment.content = "";
 								$scope.expanded = false;
 								$scope.uploader.flowInstance.cancel();

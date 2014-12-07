@@ -18,6 +18,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
             $scope.$watch( function() {return eventSelector.selectedEvent},
                   function(selectedEvent) {
                         $scope.selectedEvent = selectedEvent;
+                        $scope.getCandidates();
                   }
             );
 
@@ -29,7 +30,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
             });
 
             $scope.getCandidates = function() {
-                  $http.post('/candidate/getCandidates').success(function(data) {
+                  $http.post('/candidate/getCandidatesByEvent', {event_id:eventSelector.postEventId}).success(function(data) {
                         $scope.candidates = [];
                         $scope.candidates = data;
                   }).error(function(error) {
