@@ -854,7 +854,7 @@ exports.deleteCandidateByEvent = function(req, res) {
 						if(err) {
 							return res.status(400).send({message : err});
 						} else {
-							return res.status(200).send({result});
+							return res.status(200).send(result);
 						}
 					});
 				} else {
