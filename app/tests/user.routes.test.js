@@ -311,7 +311,7 @@ describe('Express.js User Route Unit Tests:', function() {
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(200);
-					console.log(res.body);
+					//console.log(res.body);
 					res.body.status.length.should.equal(4);
 					done();
 				});
@@ -348,7 +348,7 @@ describe('Express.js User Route Unit Tests:', function() {
 				.query({'event_id' : event1._id.toString()})
 				.end(function(err, res) {
 					should.not.exist(err);
-					console.log(res.body);
+					//console.log(res.body);
 					res.status.should.equal(200);
 					res.body.attending.should.equal(2);
 					res.body.invited.should.equal(1);
