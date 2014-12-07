@@ -17,7 +17,6 @@ var errorHandler = require('./errors'),
 	User = mongoose.model('User'),
 	Event = mongoose.model('Event'),
 	fs = require('fs'),
-//	mv = require('mv'),
 	path = require('path'),
 	formidable = require('formidable');
 
