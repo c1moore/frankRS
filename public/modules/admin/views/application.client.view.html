@@ -45,10 +45,10 @@
 						{{candidate.note}}
 					</td>
 					<td data-title="'Accept'" width="90">
-						<button class="btn btn-success" ng-click="addApplicant($index)">Accept</button>
+						<button class="btn btn-success" ng-click="acceptCandidate(candidate)">Accept</button>
 					</td>
 					<td data-title="'Deny'" width="90">
-						<button class="btn btn-danger" ng-click="removeApplicant($index)">Deny</button>
+						<button class="btn btn-danger" ng-click="denyCandidate(candidate)">Deny</button>
 					</td>
 				</tr>
 			</table>
