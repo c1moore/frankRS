@@ -52,7 +52,7 @@ class User:
     self.password = password
     self.provider = "local"
     self.organization = randomString(3,22)
-    self.interests = random.choice(INTERESTS)
+    self.interests = [random.choice(INTERESTS)]
     self.roles = [random.choice(ROLES)]
     cday = random.randint(1,28)
     cmonth = random.randint(1,12)

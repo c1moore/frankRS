@@ -33,7 +33,4 @@ app.route('/candidate/setCandidate').post(dan_candidate_routes.setCandidate);
 app.route('/candidate/deleteCandidate').post(dan_candidate_routes.deleteCandidate);
 app.route('/candidate/deleteCandidate/event').post(dan_candidate_routes.deleteCandidateByEvent);
 
-//Finish by binding//app.param('candidateId',candidate.candidateByID);
-
-
 };

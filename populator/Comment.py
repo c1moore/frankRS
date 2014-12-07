@@ -18,7 +18,7 @@ class Comment:
       comment = randomString(2,400,""" .!?@:;+-_*""")
     self.comment = comment
     if interests is None and stream is not 'recruiter':
-      interests = random.sample(INTERESTS,random.randint(0,len(INTERESTS)-2))
+      interests = random.sample(INTERESTS,random.randint(0,len(INTERESTS)//3))
     self.interests = interests
     if date is None:
       date = int(datetime.now().strftime('%s'))*1000
