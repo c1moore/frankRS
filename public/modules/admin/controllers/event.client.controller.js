@@ -25,9 +25,10 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 
 	  	$scope.tableParams = new ngTableParams({
         	page: 1,
-			count: 10,
+			count: 5,
         	}, {
         	getData: function($defer, params) {
+        		params.total($scope.events.length);
 				$defer.resolve($scope.events.slice((params.page() - 1) * params.count(), params.page() * params.count()));
         	}
         });
@@ -42,6 +43,8 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
         	$http.post('/events/create',newEvent).success(function() {
         		console.log('Event created');
         		getEvents();
+        	}).error(function(error) {
+        		console.log(error);
         	});
         	$scope.newEvent = null;
         	$scope.eventForm.$setPristine(true);

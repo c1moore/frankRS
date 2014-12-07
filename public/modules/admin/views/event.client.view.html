@@ -38,10 +38,10 @@
          </div>
       </div>
 
-      <div class="col-sm-8">
+      <div class="col-sm-8 frank-main-view">
          <h2>Event List</h2>
          <form name="editForm" novalidate>
-            <table ng-table="tableParams" class="table table-bordered frank-main-view">
+            <table ng-table="tableParams" class="table table-bordered">
                 <tr ng-repeat="event in $data">
                     <td data-title="'Name'">
                         <span ng-if="!event.$edit">{{event.name}}</span>
