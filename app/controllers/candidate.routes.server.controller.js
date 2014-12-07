@@ -42,7 +42,7 @@ exports.getCandidatesByEvent = function(req, res) {
 			{$match : {'events.event_id' : new mongoose.Types.ObjectId(req.body.event_id)}},
 			{$unwind : '$events'},
 			{$match : {"events.event_id" : new mongoose.Types.ObjectId(req.body.event_id)}}
-		], function(err, result) {
+		], function(err, results) {
 			if(err) {
 				return res.status(400).send({message : err});
 			} else if(!results.length) {
