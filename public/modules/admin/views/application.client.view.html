@@ -22,6 +22,10 @@
 						<input name="email" class="form-control" type="email" ng-model="newCandidate.email" required>
 						 <p ng-show="candidateForm.email.$invalid && !candidateForm.email.$pristine" class="help-block">Enter a valid email.</p>
 					</div>
+					<div class="form-group row">
+						<label>Notes (Optional):</label>
+						<textarea name="notes" class="form-control" type="text" ng-model="newCandidate.note"/>
+					</div>
 					<button type="submit" class="btn btn-primary" ng-disabled="candidateForm.$invalid">+ Candidate</button>
 				</form>
 			</div>
@@ -34,11 +38,11 @@
 					<td data-title="'Candidate'" width="200">
 						{{candidate.fName + ' ' + candidate.lName}}
 					</td>
-					<td data-title="'Status'" width="200">
-						{{candidate.status}}
+					<td data-title="'Status'" width="100">
+						{{candidate.events.status}}
 					</td>
 					<td data-title="'Notes'">
-						{{candidate.notes}}
+						{{candidate.note}}
 					</td>
 					<td data-title="'Accept'" width="90">
 						<button class="btn btn-success" ng-click="addApplicant($index)">Accept</button>

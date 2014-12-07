@@ -42,7 +42,6 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 
             $scope.addCandidate = function(newCandidate) {
                   if($scope.newCandidateEvents.length > 0) {
-                        newCandidate.note = "stuff";
                         newCandidate.events = [];
                         for (var i = 0; i < $scope.newCandidateEvents.length; i++) {
                               newCandidate.events.push($scope.newCandidateEvents[i].event_id);
