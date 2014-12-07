@@ -131,7 +131,7 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout', 'even
 							"</div>" +
 						"</form>",
 			link : function postLink($scope, element, attrs) {
-				$scope.expanded = false;
+				//$scope.expanded = false;
 				$scope.showOverlay = -1;
 
 				$scope.toggleExpanded = function() {
