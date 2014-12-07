@@ -133,8 +133,10 @@ exports.getRecruiterCommentsForEvent = function(req, res) {
 
 exports.postCommentSocial = function(req, res) {
 	if (!req.isAuthenticated()) { //Check if the user is authenticated
-		res.status(401).json({message: "You are not logged in"});
-		return;
+		return res.status(401).json({message: "You are not logged in"});
+	}
+	if(req.body.comment == undefined || req.body.event_id == undefined) {
+		return res.status(400).send({message : "Required field not specified."});
 	}
 	//Any authenticated user can post comments
 	//Technically, it's possible for a user to post comments to events they cannot view, but
@@ -144,16 +146,20 @@ exports.postCommentSocial = function(req, res) {
 	//	could be abused
 	var comment = req.body.comment;
 	var event_id = mongoose.Types.ObjectId(req.body.event_id);
-	var body = Comment.findOne({_id: id});
-	var interests = req.body.interests;
 	var user = req.user;
-	var newComment = new Comment({user_id: user._id,event_id: event_id,comment:comment,stream:'social',
-				interests:interests});
+
+	if(req.body.interests) {
+		var interests = req.body.interests;
+		var newComment = new Comment({user_id: user._id,event_id: event_id,comment:comment,stream:'social',interests:interests});
+	} else {
+		var newComment = new Comment({user_id: user._id,event_id: event_id,comment:comment,stream:'social'});
+	}
+
 	newComment.save(function(err) {
 		if (err) {
-			res.send(400).json(err);
+			return res.status(400).json({message : err});
 		} else {
-			res.send(200).json({comment_id: newComment._id});
+			return res.status(200).json({comment_id: newComment._id});
 		}
 	});
 };
