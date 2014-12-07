@@ -93,12 +93,13 @@ angular.module('core').directive('commentFooter', [
 			transclude : true,
 			replace : true,
 			scope : {
-				interests : '='
+				interests : '=',
+				interestsMapper : '='
 			},
 			template : "<div class='frank-comment-footer'>" +
 							"<div class='frank-comment-interests'>" +
 								"<div ng-repeat='interest in interests' class='frank-comment-footer-img-container'>" +
-									"<img src='interest.url' alt='interest.text' class='frank-comment-footer-img' />" +
+									"<img src='{{interestsMapper[interest]}}' alt='interest' class='frank-comment-footer-img' />" +
 								"</div>" +
 							"</div>" +
 						"</div>"

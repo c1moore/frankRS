@@ -16,8 +16,13 @@ from datetime import date as Date
 from time import mktime
 
 ROLES = ('admin', 'recruiter', 'attendee')
-INTERESTS = ('dogs','cats','music','elephants','DJ Evian','Foxes','Tor','minorities',
-		'dreams','eurodance','electric house','autophagy','999','my love is forever')
+INTERESTS = ('Arts','Child Development','Conservation','Corporate Social Responsibility',
+		'Corrections','Culture','Education','Entertainment','Environment','Food & Health',
+		'frank','Gender Equality','Health','Human Rights','Income Disparity','Inspiration',
+		'International Development','Media','Mental Health','Music','Politics',
+		'Poverty','Religion','Science','Social Media','Solutions Journalism',
+		'Special Needs','Technology','Tobacco','Travel','Violence Prevention',
+		'Water')
 
 hashfile = open('hashfile.dat','rb')
 salt = pickle.load(hashfile)
@@ -47,7 +52,7 @@ class User:
     self.password = password
     self.provider = "local"
     self.organization = randomString(3,22)
-    self.interests = random.choice(INTERESTS)
+    self.interests = [random.choice(INTERESTS)]
     self.roles = [random.choice(ROLES)]
     cday = random.randint(1,28)
     cmonth = random.randint(1,12)

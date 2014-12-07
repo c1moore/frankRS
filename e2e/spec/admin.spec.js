@@ -19,6 +19,10 @@ describe('Admin Page Protractor End-To-End Tests',function() {
 
 	ptor = protractor.getInstance();
 
+	it('should be able to maximize the browser', function() {
+		browser.driver.manage().window().maximize();
+	});
+
 	it('should be able to visit the sign in page',function() {
 		browser.get('http://localhost:3000/');
 		browser.waitForAngular();
@@ -71,6 +75,8 @@ describe('Admin Page Protractor End-To-End Tests',function() {
 		element(by.model('newCandidate.fName')).sendKeys('George');
 		element(by.model('newCandidate.lName')).sendKeys('Bush');
 		element(by.model('newCandidate.email')).sendKeys('bagins_candidate@example.com');
+		element(by.model('newCandidate.note')).sendKeys("Four score and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal. Now we are engaged in a great civil war, testing whether that nation, or any nation so conceived and so dedicated, can long endure. We are met on a great battle-field of that war. We have come to dedicate a portion of that field, as a final resting place for those who here gave their lives that that nation might live. It is altogether fitting and proper that we should do this.");
+
 		expect(element(by.css('button[type="submit"]')).isEnabled()).toBe(true);
 		element(by.css('button[type="submit"]')).click();
                 browser.waitForAngular();
@@ -90,7 +96,7 @@ describe('Admin Page Protractor End-To-End Tests',function() {
         });
 
         it('should be able to create a new event', function() {
-  		element(by.model('newEvent.name')).sendKeys('Project Demonstration For Instructor');
+  		element(by.model('newEvent.name')).sendKeys('000_Project Demonstration For Instructor');
                 element(by.model('newEvent.start_date')).sendKeys('12/12/2025');
                 element(by.model('newEvent.end_date')).sendKeys('12/30/2025');
                 element(by.model('newEvent.location')).sendKeys('CSE Building');
@@ -98,7 +104,7 @@ describe('Admin Page Protractor End-To-End Tests',function() {
 		browser.waitForAngular();
 		element(by.cssContainingText('a.ng-binding','Event')).click();
                 browser.waitForAngular();
-		expect(element(by.cssContainingText('td.ng-binding', 'Project Demonstration For Instructor'))
+		expect(element(by.cssContainingText('span.ng-binding', '000_Project Demonstration For Instructor'))
 			.isPresent()).toBeTruthy();
 	});
 
