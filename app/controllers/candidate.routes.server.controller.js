@@ -38,7 +38,11 @@ exports.getCandidatesByEvent = function(req, res) {
 	} else if(!req.body.event_id) {
 		return res.status(400).send({message : "All required fields not specified."});
 	} else {
-		Candidate.find({"events.event_id" : mongoose.Types.ObjectId(req.body.event_id)}, function(err, results) {
+		Candidate.aggregate([//{"events.event_id" : mongoose.Types.ObjectId(req.body.event_id)}, function(err, results) {
+			{$match : {'events.event_id' : new mongoose.Types.ObjectId(req.body.event_id)}},
+			{$unwind : '$events'},
+			{$match : {"events.event_id" : new mongoose.Types.ObjectId(req.body.event_id)}}
+		], function(err, result) {
 			if(err) {
 				return res.status(400).send({message : err});
 			} else if(!results.length) {
