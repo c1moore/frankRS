@@ -1,11 +1,16 @@
 
 describe('e2e leaderboard tests', function() {
     var delaylength = 500;
-      var ptor;
-        ptor = protractor.getInstance();
+    var ptor;
+    ptor = protractor.getInstance();
+
+    var scrollIntoView = function () {
+        arguments[0].scrollIntoView();
+    }
 
 
     it('should be able to sign in', function() {
+        browser.driver.manage().window().maximize();
         browser.get('http://localhost:3000/#!/');
       
         expect(ptor.getCurrentUrl()).toContain('signin');
@@ -86,13 +91,13 @@ it('should be able to select demo event',function(){
     });
 
     // it('should be able to sort the attending by attendee name', function(){
-    // element.all(by.model('params.filter()[th:"Attendee Name"]')).sendKeys('Alin');
-    // browser.waitForAngular();
-    // //browser.driver.sleep(2000);
-    // element.all(by.model('params.filter()[name]')).clear;
-    // browser.waitForAngular();
+    //     element.all(by.model('params.filter()[name:"Attendee Name"]')).sendKeys('A');
+    //     browser.waitForAngular();
+    //     //browser.driver.sleep(2000);
+    //     element.all(by.model('params.filter()[name]')).clear;
+    //     browser.waitForAngular();
 
-    // });
+    //     });
 
   it('should be able to get to the Invited tab', function() {
 
@@ -113,13 +118,29 @@ it('should be able to select demo event',function(){
 
     });
 
-//   it('should be able to add a comment',function(){
-//     element(by.css('.frank-comment-editor-compressed')).click();
-//     browser.waitForAngular();
-//     element(by.partialText("taTextElement")).sendKeys("this is a test");
-//     browser.waitForAngular();
-//     //<div id="taTextElement7067285159137100" contenteditable="true" ta-bind="ta-bind" ng-model="html" class="ng-isolate-scope ng-pristine ng-valid ta-bind"><p><br></p></div>
-// });
+  it('should be able to add a comment',function(){
+    // browser.executeScript(scrollIntoView, element(by.css('.frank-comment-editor-compressed', 'Click to comment...')));
+    browser.waitForAngular();
+
+    element(by.css('.frank-comment-editor-compressed')).click();
+    browser.waitForAngular();
+    //browser.driver.sleep(3000);
+    // browser.executeScript(scrollIntoView, element(by.css('.ta-scroll-window.ng-scope.ta-text.ta-editor.form-control div[ta-bind="ta-bind"]')));
+
+    element(by.css('.ta-scroll-window.ng-scope.ta-text.ta-editor.form-control div[ta-bind="ta-bind"]')).sendKeys('Testing Comment Box');
+        browser.waitForAngular();
+
+    browser.waitForAngular();
+  //  browser.driver.sleep(3000);
+      // browser.executeScript(scrollIntoView, element(by.css('.frank-comment-editor-submit input[type="submit"]')));
+    browser.waitForAngular();
+
+    element(by.css('.frank-comment-editor-submit input[type="submit"]')).click();
+    browser.waitForAngular();
+  //  browser.driver.sleep(3000);
+
+    //<div id="taTextElement7067285159137100" contenteditable="true" ta-bind="ta-bind" ng-model="html" class="ng-isolate-scope ng-pristine ng-valid ta-bind"><p><br></p></div>
+});
 
   it('should be able to sign out',function() {
         element(by.css('.dropdown-toggle span[data-ng-bind="authentication.user.fName"]')).click();
