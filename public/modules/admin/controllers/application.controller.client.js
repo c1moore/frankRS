@@ -81,6 +81,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
                   })
             }
 
+            //this updates the table when the candidates variable is changed
             $scope.$watch("candidates", function() {
                   $scope.tableParams.reload();
             });
