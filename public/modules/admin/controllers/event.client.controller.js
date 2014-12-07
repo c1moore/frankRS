@@ -1,5 +1,5 @@
-angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams', '$http', '$timeout',
-	function($scope, ngTableParams, $http, $timeout) {
+angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams', '$http', '$timeout', '$filter',
+	function($scope, ngTableParams, $http, $timeout, $filter) {
 		$scope.events = [];
 
 		$scope.test = function(event) {
@@ -26,11 +26,23 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 	  	$scope.tableParams = new ngTableParams({
         	page: 1,
 			count: 5,
-        	}, {
-        	getData: function($defer, params) {
-        		params.total($scope.events.length);
-				$defer.resolve($scope.events.slice((params.page() - 1) * params.count(), params.page() * params.count()));
-        	}
+			filter: {
+			        name:''
+			  },
+			  sorting: {
+			        name:'asc'
+			  }
+			}, {
+			getData: function($defer, params) {
+		        var filteredData = params.filter() ?
+		              $filter('filter')($scope.events, params.filter()) :
+		              $scope.events;
+		        var orderedData = params.sorting() ? 
+		              $filter('orderBy')(filteredData, params.orderBy()) : 
+		              $scope.events;
+		        params.total(orderedData.length);
+				$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+			}
         });
 
         $scope.$watch("events", function() {

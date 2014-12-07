@@ -41,9 +41,9 @@
       <div class="col-sm-8 frank-main-view">
          <h2>Event List</h2>
          <form name="editForm" novalidate>
-            <table ng-table="tableParams" class="table table-bordered">
+            <table ng-table="tableParams" show-filter="true" class="table table-bordered">
                 <tr ng-repeat="event in $data">
-                    <td data-title="'Name'">
+                    <td data-title="'Name'" sortable="'name'" filter="{'name':'text'}">
                         <span ng-if="!event.$edit">{{event.name}}</span>
                         <div ng-if="event.$edit">
                             <input class="form-control" type="text" ng-model="event.name" />
@@ -61,7 +61,7 @@
                            <input class="form-control" type="date" min="event.start_date" ng-model="event.end_date" required/>
                         </div>
                     </td>
-                    <td data-title="'Location'">
+                    <td data-title="'Location'" sortable="'location'" filter="{'location':'text'}">
                         <span ng-if="!event.$edit">{{event.location}}</span>
                         <div ng-if="event.$edit">
                             <input class="form-control" type="text" ng-model="event.location" />
@@ -70,7 +70,7 @@
                     <td data-title="'Remove'">
                         <input type="button" value="Remove" class="btn btn-default btn-xs" ng-click="deleteEvent(event)" />
                     </td>
-                    <td data-title="'Actions'" width="200">
+                    <td data-title="'Actions'" width="100">
                         <a ng-if="!event.$edit" href="" class="btn btn-default btn-xs" ng-click="event.$edit = true">Edit</a>
                         <a ng-if="event.$edit" href="" class="btn btn-primary btn-xs" ng-click="event.$edit = false; updateEvent(event)">Save</a>
                         <a ng-if="event.$edit" href="" class="btn btn-primary btn-xs" ng-click="event.$edit = false">Cancel</a>

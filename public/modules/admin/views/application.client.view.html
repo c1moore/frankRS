@@ -33,15 +33,15 @@
 
 		<div class="col-md-8 frank-main-view">
 			<h2>Pending Applications for {{selectedEvent}}</h2>
-			<table ng-table="tableParams" class="table table-bordered">
+			<table ng-table="tableParams" show-filter="true" class="table table-bordered">
 				<tr ng-repeat="candidate in $data">
-					<td data-title="'Candidate'" width="200">
+					<td data-title="'Candidate'" sortable="'fName'" filter="{'fName':'text'}" width="200">
 						{{candidate.fName + ' ' + candidate.lName}}
 					</td>
-					<td data-title="'Status'" width="100">
+					<td data-title="'Status'" sortable="'status'" filter="{'status':'text'}" width="100">
 						{{candidate.events.status}}
 					</td>
-					<td data-title="'Notes'">
+					<td data-title="'Notes'" sortable="'note'" filter="{'note':'text'}">
 						{{candidate.note}}
 					</td>
 					<td data-title="'Accept'" width="90">
