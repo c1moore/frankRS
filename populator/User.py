@@ -16,7 +16,7 @@ from datetime import date as Date
 from time import mktime
 
 ROLES = ('admin', 'recruiter', 'attendee')
-INTERESTS = ('Arts','Blog','Child Development','Conservation','Corporate Social Responsibility',
+INTERESTS = ('Arts','Child Development','Conservation','Corporate Social Responsibility',
 		'Corrections','Culture','Education','Entertainment','Environment','Food & Health',
 		'frank','Gender Equality','Health','Human Rights','Income Disparity','Inspiration',
 		'International Development','Media','Mental Health','Music','Politics',
