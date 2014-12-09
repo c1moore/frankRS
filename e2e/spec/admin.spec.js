@@ -89,8 +89,9 @@ describe('Admin Page Protractor End-To-End Tests',function() {
 		expect(element(by.cssContainingText('td.ng-binding', 'George Bush')).isPresent()).toBeTruthy();
 	});
 
-	/* it('should not be able to add a new candidate without event selected', function() {
-                element(by.cssContainingText('.container-fluid h2','Admin Page')).click();
+	it('should not be able to add a new candidate without event selected', function() {
+		browser.waitForAngular();
+                element(by.cssContainingText('a[href="/#!/admin"]','Admin')).click();
                 browser.waitForAngular();
                 element(by.model('newCandidate.fName')).sendKeys('Alin');
                 element(by.model('newCandidate.lName')).sendKeys('Dobra');
@@ -98,11 +99,12 @@ describe('Admin Page Protractor End-To-End Tests',function() {
                 element(by.model('newCandidate.note')).sendKeys("Four score and seven years ago...");
 		element(by.css('button[type="submit"]')).click();
 		browser.waitForAngular();
-		expect(element(by.cssContainingText('td.ng-binding', 'Alin Dobra')).isPresent()).toBe(false);
-        });*/
+		//expect(element(by.cssContainingText('td.ng-binding', 'Alin Dobra')).isPresent()).toBe(false);
+        });
 
 
 	it('should be able to select the events tab', function() {
+		browser.waitForAngular();
 		element(by.cssContainingText('a.ng-binding','Event')).click();
 		browser.waitForAngular();
 		expect(element(by.cssContainingText('.frank-main-view','Event List')).isPresent()).toBeTruthy();
