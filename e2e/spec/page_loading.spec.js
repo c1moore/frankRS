@@ -1,7 +1,7 @@
 describe('e2e page loading tests', function() {
     var delaylength = 500;
     var ptor;
-        ptor = protractor.getInstance();
+        ptor = browser;
 
 
     it('should be able to sign in', function() {
