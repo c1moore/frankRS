@@ -12,12 +12,12 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
                   displayProp: 'label'
             };
 
-            $scope.isEventSelected = eventSelector.postEventId ? true : false;
-            $scope.selectedEvent = eventSelector.selectedEvent;
 
             //updated the selected event from the event selector service
             $scope.$watch( function() {return eventSelector.selectedEvent},
                   function(selectedEvent) {
+                        $scope.isEventSelected = eventSelector.postEventId ? true : false;
+                        $scope.selectedEvent = eventSelector.selectedEvent;
                         $scope.selectedEvent = selectedEvent;
                         $scope.getCandidates();
                   }
@@ -109,6 +109,12 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
             	}
             });
 
+            /**
+            * This is the logic for sending an email to a candidate.  Instead of having one array with
+            * an object that has the keys email and id, two separate arrays will be used to simplify the
+            * HTML code.  For security reasons, the candidate ids will be passed to the backend, not
+            * their email addresses.
+            */
             $scope.selected = {};
             $scope.selected.emails = [];
             $scope.selected.ids = [];
