@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>You're going to frank 2015</title>
+		<title>You're going to {{event_name}}</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<style type="text/css">
@@ -10,11 +10,13 @@
 			}
 			
 			p {
+			  padding: 10px 20px;
 				text-align: left;
 				color: #E8E9EB;
 			}
 			
 			h2 {
+			  padding: 10px 20px;
 				text-align: left;
 			}
 			
@@ -38,18 +40,21 @@
 				<a href="http://frank.jou.ufl.edu/recruiters/emailinvite.html" target="_blank" style="margin-right: -475px; font-size:9px;">View in browser</a>
 				<br />
 				<hr />
-				<h1>Hey</br>{{name}}!</h1><hr/>
-				<h1><span style="font-size:52px">YOU'RE</span><br /><span style="font-size:39px;">GOING TO</span><br /><span style="color: #93C63D;">FRANK 2015</span></h1>
+				<h1>Hey</br>{{receiver_fname}}!</h1><hr/>
+				<h1><span style="font-size:52px">YOU'RE</span><br /><span style="font-size:39px;">GOING TO</span><br /><span style="color: #93C63D;">{{event_name}}</span></h1>
 				<hr />
+				<p>You have been personally selected by {{sender_email}} to attend this fantastic event!</p>
+				<p>They have even sent you this message: {{message}}</p>
+				<hr/>
 				<img src="http://frank.jou.ufl.edu/recruiters/Pictures/frank_logo.gif" style="-moz-transform: scale(0.5); -ms-transform: scale(0.5); -o-transform: scale(0.5); transform: scale(0.5); filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.9999619230641713, M12=-0.008726535498373935, M21=0.008726535498373935, M22=0.9999619230641713,SizingMethod='auto expand');" />
 				<hr />
 				<h1><span style="font-size:43px;">FEB 25-27</span><br /><span style="color:#93C63D;">GAINESVILLE</span><br /><span style="font-size:47px;">FLORIDA</span></h1>
 				<hr />
-				<div style="padding: 10px 20px;">
-					<h2>HERE IS YOUR TICKET FOR frank2015</h2>
+				<div>
+					<h2>HERE IS YOUR TICKET FOR {{event_name}}</h2>
 					<p>It's time to plan your pilgrimage to Gainesville. <span style="color:#C54E92;">Join leading minds who drive change by practicing it, studying it, and funding it.</span> The rabble-rousers, the do-gooders, those who look Goliath in the eye and say, "bring it."</p>
-					<p>At frank 2015, <span style="color: #93C63D;">we'll amplify what made frank 2014 great:</span> speakers who cut straight to the point, fresh voices, rising stars, great music, scholars, local fare, and one-on-one time with speakers.</p>
-					<p><a href="https://www.eventbrite.com/e/frank-2015-tickets-9065793031">Click here</a> grab your seat at frank 2015 before somebody else does.</p>
+					<p>At {{event_name}}, <span style="color: #93C63D;">we'll amplify what made frank 2014 great:</span> speakers who cut straight to the point, fresh voices, rising stars, great music, scholars, local fare, and one-on-one time with speakers.</p>
+					<p><a href="https://www.eventbrite.com/e/frank-2015-tickets-9065793031">Click here</a> grab your seat at <span style="color: #93C63D;">{{event_name}}</span> before somebody else does.</p>
 					<p>When you're ready to register, use this password: {{ password }}</p>
 					<p>Register now with a 15% discount by using the promotion code: franktime</p>
 					<p style="font-size:9px;">Participation at frank is by invitation, and this is yours.  See the agenda and get speaker updates at <a href="http://frank.jou.ufl.edu" target="_blank"><b>frank.jou.ufl.edu</b></a>.
