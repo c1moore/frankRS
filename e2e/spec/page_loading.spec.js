@@ -62,10 +62,13 @@ describe('e2e page loading tests', function() {
 
         expect(browser.getTitle()).toEqual('frank Recruiter System - Development Environment');
         element.all(by.css('.homeButtonContainer a[href="/#!/memoboard"]')).click();
+	try {
+    		driver.switchTo().alert().dismiss();
+	} catch (NoAlertPresentException ignored) {}
         browser.waitForAngular();
-
-
-        
+        try {
+                driver.switchTo().alert().dismiss();
+        } catch (NoAlertPresentException ignored) {}
         expect(ptor.getCurrentUrl()).toContain('memoboard');
 
     });
