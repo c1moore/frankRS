@@ -32,13 +32,14 @@ i.fa.fa-remove.text-danger:hover {
 	height: 490px;
 }
 .frank-social-comments {
-	height: 575px;
+	height: 48vh;
 	overflow: auto;
 }
 .frank-social-comments-board {
 	background-color: white;
 	padding: 0;
-	margin-left: 25px;
+	display: inline-block;
+	width: 100%;
 }
 .frank-comment {
 	word-wrap: break-word;
@@ -52,6 +53,10 @@ i.fa.fa-remove.text-danger:hover {
 .frank-comment-author {
 	font-weight: bolder;
 	max-width: 92%;
+}
+.frank-comments-board {
+	width: 50vw;
+	margin: auto;
 }
 .frank-comment-body {
 	padding: 7px;
@@ -108,6 +113,10 @@ i.fa.fa-remove.text-danger:hover {
 	font-size: 16px;
 	color: black;
 }
+.frank-comment-footer {
+	display: inline-block;
+	margin: 10px;
+}
 .frank-comment-footer-img-container {
 	width: 34px;
 	height: 34px;
@@ -132,10 +141,15 @@ i.fa.fa-remove.text-danger:hover {
 	height: 32px;
 	cursor: pointer;
 }
+.frank-comment-message {
+	color: #333232;
+}
 .frank-comment-pic {
 	width: 17vw;
 	padding: 5px;
 	background-color: #DCDCC6;
+	display: block;
+	margin: auto;
 }
 .frank-comment-pic-container {
 	margin-top: 5px;
@@ -162,12 +176,12 @@ i.fa.fa-remove.text-danger:hover {
 	height: 73px;
 	min-height: 73px !important;
 }
-.ta-toolbar button[type='button'] {
+.ta-toolbar .btn-group button[type='button'] {
 	width: 30px;
 	height: 30px;
 	padding: 0;
 }
-.ta-toolbar span {
+.ta-toolbar .btn-group .btn {
 	width: 30px;
 	height: 30px;
 	padding: 0;
@@ -176,6 +190,9 @@ i.fa.fa-remove.text-danger:hover {
 .ta-toolbar {
 	width: 96%;
 	margin: auto;
+}
+.ta-toolbar .multiSelect {
+	float: right;
 }
 
 #frank-comment-editorDivider {

@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('memoboard').controller('memoboardCtrl', ['$scope', 'Authentication', 'eventSelector', '$http', '$timeout', '$window', '$interval',
-	function($scope, Authentication, eventSelector, $http, $timeout, $window, $interval) {
+angular.module('memoboard').controller('memoboardCtrl', ['$scope', 'Authentication', 'eventSelector', '$http', '$timeout', '$window', '$interval', '$location',
+	function($scope, Authentication, eventSelector, $http, $timeout, $window, $interval, $location) {
 		$scope.authentication = Authentication;
 		/*
 		* If the user is not logged in, they should be redirected to the sigin page.
@@ -89,5 +89,12 @@ angular.module('memoboard').controller('memoboardCtrl', ['$scope', 'Authenticati
 			"Violence Prevention" : "img/interests/violence_prevention.png",
 			"Water" : "img/interests/water.png"
 		};
+
+		$scope.interestsSelector = [];
+		angular.forEach($scope.interests, function(value, key) {
+			$scope.interestsSelector.push({icon : "<img src='" + value + "' />", name : key, ticked : false});
+		});
+
+		$scope.selectedInterests = [];
 	}
 ]);
