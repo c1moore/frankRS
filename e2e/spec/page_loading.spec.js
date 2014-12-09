@@ -52,7 +52,9 @@ describe('e2e page loading tests', function() {
 		expect(browser.getTitle()).toEqual('frank Recruiter System - Development Environment');
 		element.all(by.css('.homeButtonContainer a[href="/#!/invite"]')).click();
 		browser.waitForAngular();
+        browser.sleep(5000);
 
+        ptor.actions().sendKeys(protractor.Key.ESCAPE).perform();
 
 	   
 		expect(ptor.getCurrentUrl()).toContain('invite');
@@ -67,9 +69,9 @@ describe('e2e page loading tests', function() {
 
       
         browser.waitForAngular();
-        browser.sleep(5000);
+        //browser.sleep(5000);
 
-        ptor.actions().sendKeys(protractor.Key.ESCAPE).perform();
+       // ptor.actions().sendKeys(protractor.Key.ESCAPE).perform();
         expect(ptor.getCurrentUrl()).toContain('memoboard');
 	});
    it('should be able to sign out',function() {
