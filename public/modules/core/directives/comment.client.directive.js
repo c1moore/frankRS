@@ -120,7 +120,10 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout', 'even
 				files : '=files',
 				postAddress : '@',
 				commentsArr : '=',
-				refresh : '&'
+				refresh : '&',
+				interestsEnabled : '@',
+				interests : '=?',
+				selectedInterests : '=?'
 			},
 			template : "<form class='frank-comment-editor' ng-submit='postComment()'>" +
 							"<div class='frank-comment-editor-compressed' ng-click='toggleExpanded()' ng-hide='expanded'>Click to comment...</div>" +
@@ -129,6 +132,7 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout', 'even
 								"<span class='btn btn-default frank-comment-editor-img-uploader' flow-btn><i class='fa fa-camera'></i></span>" +
 								"<div class='frank-comment-editor-preview-container'><div class='frank-comment-editor-preview' ng-repeat='file in $flow.files'><img class='frank-comment-editor-preview-img' flow-img='file' ng-mouseover='showOverlay = $index' /><div ng-class='{\"frank-comment-editor-preview-overlay\" : showOverlay===$index, \"frank-comment-editor-preview-overlay-hidden\" : showOverlay!==$index}' ng-click='file.cancel()' ng-mouseleave='showOverlay = -1'><i class='fa fa-remove'></i></div></div></div>" +
 								"<div class='frank-comment-editor-submit' ng-class='{\"frank-comment-editor-submit-higher\" : uploader.flowInstance.files.length}'><input type='submit' value='Post' class='btn btn-primary' /></div>" +
+								"<div ng-if='interestsEnabled' multi-select='' input-model='interests' max-height='72px' output-model='comment.interests' button-label='icon name' item-label='icon name' tick-property='ticked' selection-mode='multiple' max-labels='2' helper-elements='none reset filter' default-label='Select Tag...'></div>" +
 							"</div>" +
 						"</form>",
 			link : function postLink($scope, element, attrs) {
@@ -139,8 +143,13 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout', 'even
 					$scope.expanded = !$scope.expanded;
 				};
 
-				var imgbut = angular.element(".frank-comment-editor-img-uploader").detach();
-				angular.element(".ta-toolbar .btn-group:last").append(imgbut);
+				$timeout(function() {
+					var imgbut = angular.element(".frank-comment-editor-img-uploader").detach();
+					angular.element(".ta-toolbar .btn-group:last").append(imgbut);
+					var multiselect = angular.element(".multiSelect").detach();
+					angular.element(".ta-toolbar").append(multiselect);
+					angular.element(".ta-toolbar .multiSelect").removeAttr("type");
+				});
 				
 				//Remove the disabled attributes from the textAngular toolbar.  This is mainly for styling.
 				angular.element(".ta-toolbar button").removeAttr("ng-disabled");
@@ -161,6 +170,10 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout', 'even
 				$scope.uploader = {};
 				$scope.comment = {};
 				$scope.newComment = $scope.comment.content = "";
+				
+				if($scope.interestsEnabled) {
+					$scope.comment.interests = $scope.selectedInterests;
+				}
 
 				$scope.postComment = function() {
 					if($scope.uploader.flowInstance.getSize() > 2097152) {
@@ -181,22 +194,26 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout', 'even
 						$scope.flowComplete = function() {
 							var commentWithImg = $scope.comment.content;
 							for(var i=0; i<$scope.uploader.flowInstance.files.length; i++) {
-								commentWithImg += "<div class='frank-comment-pic-containter'><img class='frank-comment-pic' src='img/recruiter/" + $scope.uploader.flowInstance.files[i].name + "' /></div>";
+								commentWithImg += "<div class='frank-comment-pic-container'><img class='frank-comment-pic' src='img/recruiter/" + $scope.uploader.flowInstance.files[i].name + "' /></div>";
 							}
-							$http.post($scope.postAddress, {comment : commentWithImg, event_id : eventSelector.postEventId}).success(function(response) {
-								/*$scope.commentsArr.push({
-									user_id : {
-										displayName : Authentication.user.displayName
-									},
-									event_id : eventSelector.postEventId,
-									comment : commentWithImg,
-									date : now,
-									stream : 'recruiter'
-								});*/
+
+							var interestsArr = [];
+							if($scope.interestsEnabled) {
+								for(var i=0; i<$scope.comment.interests.length; i++) {
+									interestsArr.push($scope.comment.interests[i].name);
+								}
+							}
+
+							$http.post($scope.postAddress, {comment : commentWithImg, event_id : eventSelector.postEventId, interests : interestsArr}).success(function(response) {
 								$scope.refresh();
 								$scope.comment.content = "";
 								$scope.expanded = false;
 								$scope.uploader.flowInstance.cancel();
+								if($scope.interestsEnabled) {
+									for(var i=0; i<$scope.interests.length; i++) {
+										$scope.interests[i].ticked = false;
+									}
+								}
 							}).error(function(response, status) {
 								$window.alert(status + " " + response.message);
 							});
