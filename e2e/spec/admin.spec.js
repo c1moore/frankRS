@@ -17,7 +17,7 @@ var event1, event2, event1d, ptor;
 
 describe('Admin Page Protractor End-To-End Tests',function() {
 
-	ptor = browser;
+	ptor = protractor.getInstance();
 
 	it('should be able to maximize the browser', function() {
 		browser.driver.manage().window().maximize();
