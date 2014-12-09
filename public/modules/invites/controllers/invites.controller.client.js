@@ -110,7 +110,13 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 			var request = {event_id : $scope.invite.event_id};
 			$http.post('/recruiter/attendees', request).success(function(response) {
 				$scope.attendees.list = response;
-				$scope.attendees.error = '';
+
+				if(response.length) {
+					$scope.attendees.error = '';
+				} else {
+					$scope.attendees.error = "Looks like nobody you invited has accepted your request.  Keep trying, eventually you'll find the right people.";
+				}
+
 			}).error(function(response, status) {
 				$scope.attendees.list = [];
 				if(status === 401) {
@@ -126,7 +132,12 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 			
 			$http.post('/recruiter/invitees', request).success(function(response) {
 				$scope.invitees.list = response;
-				$scope.invitees.error = '';
+				
+				if(response.length)
+					$scope.invitees.error = '';
+				else
+					$scope.invitees.error = "How will anybody have be able to enjoy " + eventSelector.selectedEvent + " without wonderful people like you inviting them?  You should invite more people.";
+			
 			}).error(function(response, status) {
 				$scope.invitees.list = [];
 				if(status === 401) {
@@ -136,13 +147,18 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 						$location.path('/');
 					}
 				} else if(status === 400) {
-					$scope.invitees.error = "How will anybody have be able to enjoy {{$scope.invite.event_name}} without wonderful people like you inviting them?  You should invite more people.";
+					$scope.invitees.error = "How will anybody have be able to enjoy " + eventSelector.selectedEvent + " without wonderful people like you inviting them?  You should invite more people.";
 				}
 			});
 
 			$http.post('/recruiter/almosts', request).success(function(response) {
 				$scope.almosts.list = response;
-				$scope.almosts.error = '';
+
+				if(response.length)
+					$scope.almosts.error = '';
+				else
+					$scope.almosts.error = "Nobody has chosen somebody else's invitation over your invitation.  Looks like somebody is popular.";
+
 			}).error(function(response, status) {
 				$scope.almosts.list = [];
 				if(status === 401) {
