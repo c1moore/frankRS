@@ -515,3 +515,44 @@ exports.create = function(req, res) {
 	}
 };
 
+exports.recruiterStatus = function(req, res) {
+	try {
+		if (!req.isAuthenticated()) { //Must be logged in
+			return res.status(401).json({message: "You are not logged in"});
+		}
+
+		//Find and return all events in the collection
+		var query = Event.find({});
+		query.exec(function(err,result) {
+			if (err) {
+				return res.status(400).send({message : err});
+			} else if (!result.length) {
+				return res.status(400).json({message: "No events found?!"});
+			} else {
+				var eventsResult = [];
+				for(var i=0; i<result.length; i++) {
+
+					eventsResult[i] = {};
+					eventsResult[i] = result[i];
+
+					var j = 0;
+					for(; j<req.user.status.length; j++) {
+						if(result[i]._id.toString() === req.user.status[j].event_id.toString()) {
+							eventsResult[i].recruiter = true;
+							break;
+						}
+					}
+
+					if(j === req.user.status.length) {
+						eventsResult[i].recruiter = false;
+					}
+				}
+
+				res.status(200).send(eventsResult);
+			}
+		});
+	} catch(err) {
+		console.log(err);
+		res.status(500).send();
+	}
+};
