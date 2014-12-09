@@ -11,7 +11,8 @@ var errorHandler = require('../errors'),
 	Event = mongoose.model('Event'),
 	config = require('../../../config/config'),
 	crypto = require('crypto'),
-	async = require('async');
+	async = require('async'),
+	path = require('path');
 
 /*
 * Helper function to search through one of the lists (invitee, attendee, almost) and return only those users who are attending the
@@ -672,9 +673,15 @@ exports.sendInvitation = function(req, res) {
 							* accordingly.
 							*/
 							function(invitee, callback) {
-								res.render('templates/invitation-email', {
-									name: req.body.fName,
-									event: req.body.event_name,
+								var fileName = req.body.event_name.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()\[\]'\\@+"|<>?]/g,"");
+								fileName = fileName.replace(/\s{2,}/g," ");
+								fileName = fileName.replace(/ /g, "_");
+
+								var filepath = path.normalize(__dirname + "/../../views/templates/preview/" + fileName.toLowerCase());
+
+								res.render(filepath, {
+									receiver_name: req.body.fName,
+									event_name: req.body.event_name,
 									message: req.body.message
 								}, function(err, emailHTML) {
 									mailOptions.html = emailHTML;
