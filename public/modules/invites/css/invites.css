@@ -286,8 +286,7 @@ animation:0.5s flipInX ease;
   margin: auto;
 }
 #invite {
-  max-height: 475px;
-  min-height: 375px;
+  min-height: 465px;
   height: 60vh;
   position: absolute;
   margin-left: 5%;
