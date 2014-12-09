@@ -33,13 +33,13 @@ module.exports = {
 	},
 	mailer: {
 		//from: process.env.MAILER_FROM || 'MAILER_FROM',
-		from: "development.tester1@gmail.com",
+		from: "1development.testing@gmail.com",
 		options: {
 			//service: process.env.MAILER_SERVICE_PROVIDER || 'MAILER_SERVICE_PROVIDER',
 			service: "gmail",
 			auth: {
 				//user: process.env.MAILER_EMAIL_ID || 'MAILER_EMAIL_ID',
-				user: "development.tester1@gmail.com",
+				user: "1development.testing@gmail.com",
 				//pass: process.env.MAILER_PASSWORD || 'MAILER_PASSWORD'
 				pass: "#1password"
 			}
