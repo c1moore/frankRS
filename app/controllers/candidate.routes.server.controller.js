@@ -38,7 +38,11 @@ exports.getCandidatesByEvent = function(req, res) {
 	} else if(!req.body.event_id) {
 		return res.status(400).send({message : "All required fields not specified."});
 	} else {
-		Candidate.find({"events.event_id" : mongoose.Types.ObjectId(req.body.event_id)}, function(err, results) {
+		Candidate.aggregate([//{"events.event_id" : mongoose.Types.ObjectId(req.body.event_id)}, function(err, results) {
+			{$match : {'events.event_id' : new mongoose.Types.ObjectId(req.body.event_id)}},
+			{$unwind : '$events'},
+			{$match : {"events.event_id" : new mongoose.Types.ObjectId(req.body.event_id)}}
+		], function(err, results) {
 			if(err) {
 				return res.status(400).send({message : err});
 			} else if(!results.length) {
@@ -801,34 +805,68 @@ exports.setCandidate = function(req,res){
  	}
 };
 
- 	exports.deleteCandidate = function(req,res){
- 		if(!req.isAuthenticated())
- 			return res.status(401).send("User is not logged in");
- 		if (req.hasAuthorization(req.user, ["admin"])){
- 			var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
- 			var query = Candidate.findOne({_id:candidate_id });
- 			query.exec(function(err,result){
- 				if(err){
- 					res.status(400).send(err);
- 				}
- 				else if(!result){
- 					res.status(400).json("No candidate found!");
- 				}
- 				else{
- 				//result.note = req.body.note;
+exports.deleteCandidate = function(req,res){
+	if(!req.isAuthenticated())
+		return res.status(401).send({message : "User is not logged in."});
+	if (req.hasAuthorization(req.user, ["admin"])){
+		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
+		var query = Candidate.findOne({_id:candidate_id });
+		query.exec(function(err,result){
+			if(err){
+				res.status(400).send({message : err});
+			} else if(!result) {
+				res.status(400).send({message : "No candidate found!"});
+			} else {
+				result.remove(function(err, result) {
+					if(err) {
+						res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
+					} else {
+						return res.status(200).send(result);
+					}
 
- 				result.remove(function(err, result) {
- 					if(err) {
- 						res.status(400).send({'message' : errorHandler.getErrorMessage(err)});
- 					} else {
- 						return res.status(200).send(result);
- 					}
+				});
+			}
+		});
+	}
+	else
+		return res.status(401).send({message : 'User not Authorized'});
+};
 
- 				});
- 			}
- 		});
- 		}
- 		else
- 			return res.status(401).send('User not Authorized');
+exports.deleteCandidateByEvent = function(req, res) {
+	if(!req.isAuthenticated()) {
+		return res.status(401).send({message : "User is not logged in."});
+	} else if(!req.hasAuthorization(req.user, ["admin"])) {
+		return res.status(401).send({message : "User does not have permission."});
+	} else {
+		var candidate_id = new mongoose.Types.ObjectId(req.body.candidate_id);
+		var event_id = new mongoose.Types.ObjectId(req.body.event_id);
 
- 	};
+		var query = Candidate.findOne({_id : candidate_id});
+		query.exec(function(err, result) {
+			if(err) {
+				return res.status(400).send({message : err});
+			} else if(!result) {
+				return res.status(400).send({message : "No candidate found!"});
+			} else {
+				result.events.pull({event_id : event_id});
+				if(!result.events.length) {
+					result.remove(function(err, result) {
+						if(err) {
+							return res.status(400).send({message : err});
+						} else {
+							return res.status(200).send(result);
+						}
+					});
+				} else {
+					result.save(function(err) {
+						if(err) {
+							return res.status(400).send({message : err});
+						} else {
+							return res.status(200).send(result);
+						}
+					});
+				}
+			}
+		});
+	}
+};

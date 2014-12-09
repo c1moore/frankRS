@@ -1,5 +1,5 @@
-angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams', '$http', '$timeout',
-	function($scope, ngTableParams, $http, $timeout) {
+angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams', '$http', '$timeout', '$filter',
+	function($scope, ngTableParams, $http, $timeout, $filter) {
 		$scope.events = [];
 
 		$scope.test = function(event) {
@@ -25,11 +25,24 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 
 	  	$scope.tableParams = new ngTableParams({
         	page: 1,
-			count: 10,
-        	}, {
-        	getData: function($defer, params) {
-				$defer.resolve($scope.events.slice((params.page() - 1) * params.count(), params.page() * params.count()));
-        	}
+			count: 5,
+			filter: {
+			        name:''
+			  },
+			  sorting: {
+			        name:'asc'
+			  }
+			}, {
+			getData: function($defer, params) {
+		        var filteredData = params.filter() ?
+		              $filter('filter')($scope.events, params.filter()) :
+		              $scope.events;
+		        var orderedData = params.sorting() ? 
+		              $filter('orderBy')(filteredData, params.orderBy()) : 
+		              $scope.events;
+		        params.total(orderedData.length);
+				$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+			}
         });
 
         $scope.$watch("events", function() {
@@ -42,6 +55,8 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
         	$http.post('/events/create',newEvent).success(function() {
         		console.log('Event created');
         		getEvents();
+        	}).error(function(error) {
+        		console.log(error);
         	});
         	$scope.newEvent = null;
         	$scope.eventForm.$setPristine(true);

@@ -1,5 +1,5 @@
-angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams', '$http', 'eventSelector',
-	function($scope, ngTableParams, $http, eventSelector) {
+angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams', '$http', 'eventSelector', '$filter',
+	function($scope, ngTableParams, $http, eventSelector, $filter) {
             $scope.newCandidateEvents = [];
       	$scope.candidates = [];
             $scope.selectEvents = [];
@@ -42,7 +42,6 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 
             $scope.addCandidate = function(newCandidate) {
                   if($scope.newCandidateEvents.length > 0) {
-                        newCandidate.note = "stuff";
                         newCandidate.events = [];
                         for (var i = 0; i < $scope.newCandidateEvents.length; i++) {
                               newCandidate.events.push($scope.newCandidateEvents[i].event_id);
@@ -50,6 +49,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 
                         $http.post('/candidate/setCandidate',newCandidate).success(function() {
                               console.log("Candidate created");
+                              //refresh table view
                               $scope.getCandidates();
                         }).error(function(error) {
                               console.log(error);
@@ -61,11 +61,27 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
             }
 
             $scope.acceptCandidate = function(candidate) {
-                  $http.post('/candidate/setAccepted').success(function() {
+                  var postObject = {candidate_id:candidate._id, event_id:eventSelector.postEventId, accepted:true};
+                  $http.post('/candidate/setAccepted',postObject).success(function() {
+                        console.log("Candidate Accepted");
+                        //refresh table view
+                        $scope.getCandidates();
+                  }).error(function(error) {
+                        console.log(error);
+                  });
+            }
 
+            $scope.denyCandidate = function(candidate) {
+                  $http.post('/candidate/deleteCandidate/event',{candidate_id:candidate._id, event_id:eventSelector.postEventId}).success(function(){
+                        console.log("Candidate Deleted");
+                        //refresh table view
+                        $scope.getCandidates();
+                  }).error(function(error) {
+                        console.log(error);
                   })
             }
 
+            //this updates the table when the candidates variable is changed
             $scope.$watch("candidates", function() {
                   $scope.tableParams.reload();
             });
@@ -73,9 +89,22 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
             $scope.tableParams = new ngTableParams({
             	page: 1,
             	count: 5,
+                  filter: {
+                        fName:''
+                  },
+                  sorting: {
+                        fName:'asc'
+                  }
             	}, {
             	getData: function($defer, params) {
-            		$defer.resolve($scope.candidates.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+                        var filteredData = params.filter() ?
+                              $filter('filter')($scope.candidates, params.filter()) :
+                              $scope.candidates;
+                        var orderedData = params.sorting() ? 
+                              $filter('orderBy')(filteredData, params.orderBy()) : 
+                              $scope.candidates;
+                        params.total(orderedData.length);
+            		$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
             	}
             });
   }])

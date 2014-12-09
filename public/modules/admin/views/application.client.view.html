@@ -22,29 +22,34 @@
 						<input name="email" class="form-control" type="email" ng-model="newCandidate.email" required>
 						 <p ng-show="candidateForm.email.$invalid && !candidateForm.email.$pristine" class="help-block">Enter a valid email.</p>
 					</div>
+					<div class="form-group row">
+						<label>Notes (Optional):</label>
+						<textarea name="notes" class="form-control" type="text" ng-model="newCandidate.note"/>
+					</div>
 					<button type="submit" class="btn btn-primary" ng-disabled="candidateForm.$invalid">+ Candidate</button>
 				</form>
 			</div>
 		</div>
 
-		<div class="col-md-8">
+		<div class="col-md-8 frank-main-view">
 			<h2>Pending Applications for {{selectedEvent}}</h2>
-			<table ng-table="tableParams" class="table table-bordered frank-main-view">
+			<table ng-table="tableParams" show-filter="true" class="table table-bordered">
 				<tr ng-repeat="candidate in $data">
-					<td data-title="'Candidate'" width="200">
+					<td data-title="'Candidate'" sortable="'fName'" filter="{'fName':'text'}" width="200">
 						{{candidate.fName + ' ' + candidate.lName}}
 					</td>
-					<td data-title="'Status'" width="200">
-						{{candidate.status}}
+					<td data-title="'Status'" sortable="'status'" filter="{'status':'text'}" width="100">
+						{{candidate.events.status}}
 					</td>
-					<td data-title="'Notes'">
-						{{candidate.notes}}
+					<td data-title="'Notes'" sortable="'note'" filter="{'note':'text'}">
+						{{candidate.note}}
 					</td>
-					<td data-title="'Accept'" width="90">
-						<button class="btn btn-success" ng-click="addApplicant($index)">Accept</button>
+					<td data-title="'Accept'" width="90" class="text-center">
+						<button ng-if="!candidate.events.accepted" class="btn btn-success" ng-click="acceptCandidate(candidate)">Accept</button>
+						<span ng-if="candidate.events.accepted" class="glyphicon glyphicon-ok"></span>
 					</td>
 					<td data-title="'Deny'" width="90">
-						<button class="btn btn-danger" ng-click="removeApplicant($index)">Deny</button>
+						<button class="btn btn-danger" ng-click="denyCandidate(candidate)">Deny</button>
 					</td>
 				</tr>
 			</table>

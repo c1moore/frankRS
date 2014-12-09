@@ -19,6 +19,10 @@ describe('Admin Page Protractor End-To-End Tests',function() {
 
 	ptor = protractor.getInstance();
 
+	it('should be able to maximize the browser', function() {
+		browser.driver.manage().window().maximize();
+	});
+
 	it('should be able to visit the sign in page',function() {
 		browser.get('http://localhost:3000/');
 		browser.waitForAngular();
@@ -71,12 +75,52 @@ describe('Admin Page Protractor End-To-End Tests',function() {
 		element(by.model('newCandidate.fName')).sendKeys('George');
 		element(by.model('newCandidate.lName')).sendKeys('Bush');
 		element(by.model('newCandidate.email')).sendKeys('bagins_candidate@example.com');
+		element(by.model('newCandidate.note')).sendKeys("Four score and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal. Now we are engaged in a great civil war, testing whether that nation, or any nation so conceived and so dedicated, can long endure. We are met on a great battle-field of that war. We have come to dedicate a portion of that field, as a final resting place for those who here gave their lives that that nation might live. It is altogether fitting and proper that we should do this.");
+
 		expect(element(by.css('button[type="submit"]')).isEnabled()).toBe(true);
 		element(by.css('button[type="submit"]')).click();
                 browser.waitForAngular();
 		browser.refresh();
 		browser.waitForAngular();
-		expect(element(by.cssContainingText('frank-main-view tbody tr td', 'George Bush')).isPresent()).toBeTruthy();
+		element(by.cssContainingText('.dropdown-toggle','Select Event')).click();
+                browser.waitForAngular();
+                element(by.cssContainingText('.ng-binding','Project Demonstration')).click();
+                browser.waitForAngular();
+		expect(element(by.cssContainingText('td.ng-binding', 'George Bush')).isPresent()).toBeTruthy();
+	});
+
+	 it('should not be able to add a new candidate without event selected', function() {
+                element(by.css('.dropdown-toggle.ng-binding.btn.btn-default')).click();
+                browser.waitForAngular();
+                element(by.cssContainingText('a[role="menuitem"]',' Project Demonstration')).click();
+                browser.waitForAngular();
+                element(by.cssContainingText('.container-fluid h2','Admin Page')).click();
+                browser.waitForAngular();
+                element(by.model('newCandidate.fName')).sendKeys('Alin');
+                element(by.model('newCandidate.lName')).sendKeys('Dobra');
+                element(by.model('newCandidate.email')).sendKeys('professor_candidate@example.com');
+                element(by.model('newCandidate.note')).sendKeys("Four score and seven years ago...");
+                expect(element(by.css('button[type="submit"]')).isEnabled()).toBe(false);
+        });
+
+
+	it('should be able to select the events tab', function() {
+		element(by.cssContainingText('a.ng-binding','Event')).click();
+		browser.waitForAngular();
+		expect(element(by.cssContainingText('.frank-main-view','Event List')).isPresent()).toBeTruthy();
+        });
+
+        it('should be able to create a new event', function() {
+  		element(by.model('newEvent.name')).sendKeys('000_Project Demonstration For Instructor');
+                element(by.model('newEvent.start_date')).sendKeys('12/12/2025');
+                element(by.model('newEvent.end_date')).sendKeys('12/30/2025');
+                element(by.model('newEvent.location')).sendKeys('CSE Building');
+		element(by.cssContainingText('button[type="submit"]','Add Event')).click();
+		browser.waitForAngular();
+		element(by.cssContainingText('a.ng-binding','Event')).click();
+                browser.waitForAngular();
+		expect(element(by.cssContainingText('span.ng-binding', '000_Project Demonstration For Instructor'))
+			.isPresent()).toBeTruthy();
 	});
 
 	it('should be able to visit the event tab',function() {

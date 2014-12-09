@@ -67,7 +67,6 @@
 				event2.save(function() {
 					event3.save(function(err){
 						event4.save(function(err){
-					//	console.log(err);
 					user = new User({
 						fName: 'Test',
 						lName: 'ing',
@@ -140,7 +139,6 @@
 					guest1=agent.agent();
 					acceptedCandidate.save(function(err,res){
 
-
 					candidate3.save(function(err,res){
 						//console.log(err);
 			
@@ -207,8 +205,6 @@
  	.expect(200);
  	done();
  });
-
-
 
 
  describe('Admin route tests:', function() {
@@ -893,6 +889,52 @@ it('Should not have changed the attendee user to a recruiter for the whan status
  		});
  	});
  });
+
+//Added by henfredemars 6 Dec 2014
+
+it("attendees should not be able to delete candidates", function(done) {
+	candidate1.save(function(err) {
+		attendee1
+			.post('http://localhost:3001/candidate/deleteCandidate')
+			.send({candidate_id: candidate1._id})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.be.equal(401);
+				//res.should.have.property('message');
+				done();
+			});
+	});
+});
+
+it("attendees should not be able to delete candidates by event either", function(done) {
+        candidate1.save(function(err) {
+                attendee1
+                        .post('http://localhost:3001/candidate/deleteCandidate/event')
+                        .send({candidate_id: candidate1._id, event_id: undefined})
+                        .end(function(err, res) {
+                                should.not.exist(err);
+                                res.status.should.be.equal(401);
+				//res.should.have.property('message');
+                                done();
+                        });
+        });
+});
+
+/*it("admins should be able to delete any candidate", function(done) {
+	candidate1.save(function(err) {
+		user1
+			.post('http://localhost:3001/candidate/deleteCandidate')
+			.send({candidate_id: candidate1._id})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.be.equal(200);
+				done();
+			});
+	});
+});*/
+
+
+//End henfredemars addition 6 Dec 2014
 
  it("attendees should NOT be able to get the candidate getUser_id", function(done) {
  		candidate1.save(function(err) {

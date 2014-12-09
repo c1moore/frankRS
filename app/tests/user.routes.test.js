@@ -85,7 +85,7 @@ describe('Express.js User Route Unit Tests:', function() {
 							fName : 'Calvin',
 							lName : 'Moore',
 							displayName : 'Moore, Calvin',
-							email : 'calvin@example.com',
+							email : 'calvin_cen3031.0.boom0625@spamgourmet.com',
 							roles : ['attendee'],
 							status : [{'event_id':event1._id, 'attending':true, 'recruiter':true}, {'event_id':event2._id, 'attending':false, 'recruiter':true}, {'event_id':event3._id, 'attending':true, 'recruiter':true}, {'event_id':event4._id, 'attending':true, 'recruiter':false}],
 							password : 'password',
@@ -96,7 +96,7 @@ describe('Express.js User Route Unit Tests:', function() {
 							fName : 'Nother',
 							lName : 'Name',
 							displayName : 'Name, Nother',
-							email : 'nother.name@example.com',
+							email : 'nother_name_cen3031.0.boom0625@spamgourmet.com',
 							roles : ['attendee'],
 							status : [],
 							password : 'password',
@@ -107,7 +107,7 @@ describe('Express.js User Route Unit Tests:', function() {
 							fName : 'Example',
 							lName : 'Name',
 							displayName : 'Name, Example',
-							email : 'example.name@example.com',
+							email : 'example_name_cen3031.0.boom0625@spamgourmet.com',
 							roles : ['attendee', 'recruiter'],
 							status : [{'event_id':event1._id, 'attending':true, 'recruiter':true}],
 							attendeeList : [{'user_id' : user2._id, 'event_id' : event1._id}],
@@ -120,7 +120,7 @@ describe('Express.js User Route Unit Tests:', function() {
 							fName : 'My',
 							lName : 'Name',
 							displayName : 'Name, My',
-							email : 'myname@email.com',
+							email : 'myname_cen3031.0.boom0625@spamgourmet.com',
 							roles : ['admin'],
 							password : 'password',
 							status : [{event_id : event1._id, attending : false, recruiter : false}],
@@ -131,7 +131,7 @@ describe('Express.js User Route Unit Tests:', function() {
 							fName : 'Calvin',
 							lName : 'Moore',
 							displayName : 'Moore, Calvin',
-							email : 'test@example.com',
+							email : 'test_cen3031.0.boom0625@spamgourmet.com',
 							roles : ['recruiter'],
 							status : [{'event_id':event1._id, 'attending':true, 'recruiter':true}, {'event_id':event2._id, 'attending':false, 'recruiter':true}, {'event_id':event3._id, 'attending':true, 'recruiter':true}, {'event_id':event4._id, 'attending':true, 'recruiter':false}],
 							rank : [{'event_id':event1._id, 'place':1}, {'event_id':event2._id, 'place':2}, {'event_id':event3._id, 'place':3}],
@@ -189,7 +189,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		var tempUser = new User({
 			fName : 'Temp',
 			lName : 'User',
-			email : 'tempuser123@gmail.com',
+			email : 'tempuser123_cen3031.0.boom0625@spamgourmet.com',
 			password : '123password',
 			login_enabled : false,
 			roles : ['attendee']
@@ -311,7 +311,7 @@ describe('Express.js User Route Unit Tests:', function() {
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(200);
-					console.log(res.body);
+					//console.log(res.body);
 					res.body.status.length.should.equal(4);
 					done();
 				});
@@ -348,7 +348,7 @@ describe('Express.js User Route Unit Tests:', function() {
 				.query({'event_id' : event1._id.toString()})
 				.end(function(err, res) {
 					should.not.exist(err);
-					console.log(res.body);
+					//console.log(res.body);
 					res.status.should.equal(200);
 					res.body.attending.should.equal(2);
 					res.body.invited.should.equal(1);
@@ -979,7 +979,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					var tempagent = agent.agent();
 					tempagent
 						.post('http://localhost:3001/invitation/accept')
-						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Anthony', 'invitee_lName' : 'Moore', 'invitee_email' : 'a.moore@example.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.email})
+						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Anthony', 'invitee_lName' : 'Moore', 'invitee_email' : 'a.moore_cen3031.0.boom0625@spamgourmet.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.email})
 						.end(function(err, res) {
 							should.not.exist(err);
 							res.status.should.equal(200);
@@ -989,7 +989,7 @@ describe('Express.js User Route Unit Tests:', function() {
 								(oldRectr.almostList.length === rectr.almostList.length).should.be.true;
 								User.count({}, function(err, fcount) {
 									fcount.should.be.greaterThan(scount);
-									User.findOne({email : 'a.moore@example.com'}, function(err, newUser) {
+									User.findOne({email : 'a.moore_cen3031.0.boom0625@spamgourmet.com'}, function(err, newUser) {
 										newUser.status.length.should.equal(1);
 										for(var i=0; i<newUser.status.length; i++) {
 											if(newUser.status[i].event_id.toString() === event1._id.toString()) {
@@ -1014,7 +1014,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					var tempagent = agent.agent();
 					tempagent
 						.post('http://localhost:3001/invitation/accept')
-						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_lName' : 'Moore', 'invitee_email' : 'a.moore@example.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.email})
+						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_lName' : 'Moore', 'invitee_email' : 'a.moore_cen3031.0.boom0625@spamgourmet.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.email})
 						.end(function(err, res) {
 							should.not.exist(err);
 							res.status.should.equal(400);
@@ -1031,7 +1031,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					var tempagent = agent.agent();
 					tempagent
 						.post('http://localhost:3001/invitation/accept')
-						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Moore', 'invitee_email' : 'a.moore@example.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.email})
+						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Moore', 'invitee_email' : 'a.moore_cen3031.0.boom0625@spamgourmet.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.email})
 						.end(function(err, res) {
 							should.not.exist(err);
 							res.status.should.equal(400);
@@ -1133,7 +1133,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					var tempagent = agent.agent();
 					tempagent
 						.post('http://localhost:3001/invitation/accept')
-						.send({'invitee_fName' : 'Anthony', 'invitee_lName' : 'Moore', 'invitee_email' : 'a.moore@example.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.email})
+						.send({'invitee_fName' : 'Anthony', 'invitee_lName' : 'Moore', 'invitee_email' : 'a.moore_cen3031.0.boom0625@spamgourmet.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.email})
 						.end(function(err, res) {
 							should.not.exist(err);
 							res.status.should.equal(400);
