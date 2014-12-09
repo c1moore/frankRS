@@ -138,8 +138,6 @@ angular.module('core').service('eventSelector', ['$rootScope', '$http', '$locati
 			}
 		}
 
-		console.log($window.user);
-
 		if($window.user != "") {
 			thisService.eventSelect();
 		}

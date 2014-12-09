@@ -26,13 +26,14 @@
 						<label>Notes (Optional):</label>
 						<textarea name="notes" class="form-control" type="text" ng-model="newCandidate.note"/>
 					</div>
-					<button type="submit" class="btn btn-primary" ng-disabled="candidateForm.$invalid">+ Candidate</button>
+					<button type="submit" class="btn btn-primary" ng-disabled="candidateForm.$invalid || newCandidateEvents.length === 0">+ Candidate</button>
 				</form>
 			</div>
 		</div>
 
 		<div class="col-md-8 frank-main-view">
-			<h2>Pending Applications for {{selectedEvent}}</h2>
+			<h2 ng-if="isEventSelected">Pending Applications for {{selectedEvent}}</h2>
+			<h2 ng-if="!isEventSelected" class="text-danger">Please select an event (in the top right-hand corner).</h2>
 			<table ng-table="tableParams" show-filter="true" class="table table-bordered">
 				<tr ng-repeat="candidate in $data">
 					<td data-title="'Candidate'" sortable="'fName'" filter="{'fName':'text'}" width="200">

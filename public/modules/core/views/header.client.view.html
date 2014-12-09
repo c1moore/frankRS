@@ -16,13 +16,16 @@
 					<a href="/#!/admin">Admin</a>
 				</li>
 				<li ui-route="/invite" ng-class="{active: $uiRoute}" ng-hide="hideLink(inviteRoles)">
-					<a href="/#!/invite">Invitations</a>
+					<a href="/#!/invite">Control Room</a>
 				</li>
 				<li ui-route="/leaderboard" ng-class="{active: $uiRoute}" ng-hide="hideLink(leaderboardRoles)">
 					<a href="/#!/leaderboard">Leaderboard</a>
 				</li>
 				<li ui-route="/memoboard" ng-class="{active: $uiRoute}" ng-hide="hideLink(memoRoles)">
 					<a href="/#!/memoboard">Memo Board</a>
+				</li>
+				<li ui-route="/events" ng-class="{active: $uiRoute}" ng-hide="hideLink(eventsRoles)">
+					<a href="/#!/events">Recruiter Request</a>
 				</li>
 		</ul>
 
@@ -54,9 +57,6 @@
 				<ul class="dropdown-menu">
 					<li>
 						<a href="/#!/settings/profile">Edit Profile</a>
-					</li>
-					<li>
-						<a href="/#!/settings/accounts">Manage Social Accounts</a>
 					</li>
 					<li data-ng-show="authentication.user.provider === 'local'">
 						<a href="/#!/settings/password">Change Password</a>

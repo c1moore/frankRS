@@ -30,19 +30,19 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 		$scope.data = {
 			buttons: [
 				{name:"Admin Page", description:"A place where admins can fulfill their fantasies of being all-powerful.", link:'/#!/admin', roles:['admin']},
-				{name:"Leaderboard", description:"See how your friends and competitors rank against you.", link:'/#!/leaderboard', roles:['recruiter','admin'], image: "http://frank.jou.ufl.edu/recruiters/Pictures/but4.jpg"},
 				{name:"Control Room", description:"Send out your invitations and see your invitation stats.", link:'/#!/invite', roles:['recruiter','admin'], image: "http://frank.jou.ufl.edu/recruiters/Pictures/but3.jpg"},
-				{name:"Recruiter Enrollment Form", description:"Think you got what it takes to be a recruiter for frank?  Then sign up here.  Warning: we only accept the best.", link:'#', roles:['admin', 'recruiter', 'attendee']},
-				{name:"Memo Board", description:"Take a look at what people are saying about the events you are attending and weigh in on the chatter.", link:'/#!/memoboard', roles:['admin', 'recruiter', 'attendee']}
+				{name:"Leaderboard", description:"See how your friends and competitors rank against you.", link:'/#!/leaderboard', roles:['recruiter','admin'], image: "http://frank.jou.ufl.edu/recruiters/Pictures/but4.jpg"},
+				{name:"Memo Board", description:"Take a look at what people are saying about the events you are attending and weigh in on the chatter.", link:'/#!/memoboard', roles:['admin', 'recruiter', 'attendee']},
+				{name:"Request to Become a Recruiter", description:"Think you got what it takes to be a recruiter for frank?  Then sign up here.  Warning: we only accept the best.", link:'#', roles:['admin', 'recruiter', 'attendee'], titleId:"recruiter-request-button-title"}
 			],
 			comments: ["Comment 1", "Comment 2"]
 		};
 
 		//changes button width based on the number of buttons the user can see
-		$scope.buttonsWidth = 100/($filter('roles')($scope.data.buttons,$scope.userRoles)).length
+		/*$scope.buttonsWidth = 100/($filter('roles')($scope.data.buttons,$scope.userRoles)).length;*/
 
 		$scope.displayComments = true;
-		$scope.buttonsGrid = "col-md-10";
+		/*$scope.buttonsGrid = "col-md-10";
 
 		$scope.toggleComments = function(){
 			$scope.displayComments = !$scope.displayComments;
@@ -52,7 +52,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 			else if (!$scope.displayComments) {
 				$scope.buttonsGrid = "col-md-12";
 			}
-		};
+		};*/
 
 		$scope.showComments = function() {
 			if (comments.length === 0) {
