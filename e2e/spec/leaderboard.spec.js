@@ -3,6 +3,7 @@ describe('e2e leaderboard tests', function() {
 	var ptor;
 	ptor = browser;
 
+
 	var scrollIntoView = function () {
 		arguments[0].scrollIntoView();
 	}
