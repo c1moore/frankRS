@@ -1,4 +1,4 @@
-<section class="admin-application"	
+<section class="admin-application">
 	<div class="row" ng-controller="applicationController">    
 		<div class="col-md-4">
 			<div class="well">
@@ -31,13 +31,19 @@
 			</div>
 		</div>
 
-		<div class="col-md-8 frank-main-view">
+		<div class="col-md-8">
 			<h2 ng-if="isEventSelected">Pending Applications for {{selectedEvent}}</h2>
 			<h2 ng-if="!isEventSelected" class="text-danger">Please select an event (in the top right-hand corner).</h2>
 			<table ng-table="tableParams" show-filter="true" class="table table-bordered">
 				<tr ng-repeat="candidate in $data">
+					<td data-title="'Send Message'" width="50">
+						<input type="checkbox" ng-click="setSelected(candidate._id, candidate.email)" />
+					</td>
 					<td data-title="'Candidate'" sortable="'fName'" filter="{'fName':'text'}" width="200">
 						{{candidate.fName + ' ' + candidate.lName}}
+					</td>
+					<td data-title="'Email'">
+						{{candidate.email}}
 					</td>
 					<td data-title="'Status'" sortable="'status'" filter="{'status':'text'}" width="100">
 						{{candidate.events.status}}
@@ -54,6 +60,36 @@
 					</td>
 				</tr>
 			</table>
+		</div>
+		<div class="col-md-12 frank-main-view">
+			<form class="frank-admin-email-form" ng-submit="sendMessages()">
+				<label>To
+					<br />
+					<div class="frank-admin-email-to">
+						<span ng-repeat="email in selected.emails" class="frank-admin-emails">{{email}}</span>
+					</div>
+				</label>
+				<br />
+				<label>Subject
+					<br />
+					<input type="text" id="frank-admin-email-subject" ng-model="email.subject" />
+				</label>
+				<br />
+				<label>Message
+					<br />
+					<textarea id="frank-admin-email-message" ng-model="email.message" rows="12" cols="50" />
+				</label>
+				<br />
+				<button role="submit" class="btn invitation-button" id="admin-email-submit"><i class="fa fa-envelope-o"></i>Send</button>
+				<br />
+	            <div class="alert alert-danger" role="alert" ng-if="email.error">
+	              <span ng-repeat="mess in email.errmess">
+	                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+	                {{mess}}
+	                <br />
+	              </span>
+	            </div>
+			</form>
 		</div>
 	</div>
 </section>

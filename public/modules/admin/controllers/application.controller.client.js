@@ -1,5 +1,5 @@
-angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams', '$http', 'eventSelector', '$filter',
-	function($scope, ngTableParams, $http, eventSelector, $filter) {
+angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams', '$http', 'eventSelector', '$filter', '$window', '$location',
+	function($scope, ngTableParams, $http, eventSelector, $filter, $window, $location) {
             $scope.newCandidateEvents = [];
       	$scope.candidates = [];
             $scope.selectEvents = [];
@@ -108,4 +108,65 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
             		$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
             	}
             });
-  }])
+
+            $scope.selected = {};
+            $scope.selected.emails = [];
+            $scope.selected.ids = [];
+            $scope.email = {};
+            $scope.email.errmess = [];
+            $scope.setSelected = function(_id, email) {
+                for(var i=0; i<$scope.selected.ids.length; i++) {
+                    if($scope.selected.ids[i] === _id) {
+                        $scope.selected.ids.splice(i, 1);
+                        $scope.selected.emails.splice(i, 1);
+                        return;
+                    }
+                }
+
+                $scope.selected.ids.push(_id);
+                $scope.selected.emails.push(email);
+            };
+
+            $scope.sendMessages = function() {
+                $scope.email.error = false;
+                $scope.email.errmess = [];
+
+                if(!$scope.email.message) {
+                    $scope.email.error = true;
+                    $scope.email.errmess.push("Message is required.");
+                }
+                if(!$scope.selected.ids.length) {
+                    $scope.email.error = true;
+                    $scope.email.errmess.push("At least one recipient is required.");
+                }
+
+                if(!$scope.email.error) {
+                    var body = {
+                        candidate_ids : $scope.selected.ids,
+                        subject : $scope.email.subject,
+                        message : $scope.email.message
+                    };
+                    $http.post('/admin/send', body).success(function(response) {
+                        $scope.selected = {};
+                        $scope.selected.emails = [];
+                        $scope.selected.ids = [];
+                        $scope.email = {};
+                        $scope.email.errmess = [];
+                        
+                        $window.alert("Emails sent!");
+                    }).error(function(response, status) {
+                        console.log(response.message);
+                        if(status === 401) {
+                            if(response.message === "User is not logged in.") {
+                                $location.path('/signin');
+                            } else {
+                                $location.path('/');
+                            }
+                        } else if(status === 400) {
+                            $window.alert("There was an error sending the message.  Please try again later.");
+                        }
+                    });
+                }
+            };
+    }
+]);
