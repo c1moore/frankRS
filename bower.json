@@ -21,6 +21,7 @@
 		"font-awesome": "~4.2.0",
 		"textAngular": "~1.2.2",
 		"angularjs-dropdown-multiselect": "~1.5.2",
-		"angular-input-date": "~1.0.4"
+		"angular-input-date": "~1.0.4",
+		"angular-multi-select": "~2.0.2"
 	}
 }

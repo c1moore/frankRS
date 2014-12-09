@@ -2,10 +2,57 @@
 	padding-left:10px;
 	padding-right:10px;
 }
-
 .admin-container {
 	background-color: #F5F5F5;
 	margin-top: 10px;
 	margin-left: 10px;
 	height: 575px;
+}
+.frank-admin-email-form {
+	width: 60vw;
+	background-color: white;
+	min-height: 200px;
+	padding: 50px;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	margin: auto;
+}
+.frank-admin-emails {
+	display: inline-block;
+	background-color: #E8E9EB;
+	border-radius: 10px;
+	padding: 3px;
+	margin-left: 5px;
+	margin-bottom: 2px;
+}
+.frank-admin-email-to {
+	display: inline-block;
+	border: 1px solid rgb(169, 169, 169);
+	min-width: 45vw;
+	max-width: 75vw;
+	min-height: 30px;
+	vertical-align: middle;
+	padding: 4px;
+	border-radius: 5px;
+	background-color: white;
+}
+.tab-content {
+	margin-top: 5px;
+}
+#admin-email-submit {
+  background-color: rgb(115, 201, 45);
+  border-radius: 0;
+  margin-left: 75%;
+}
+#frank-admin-email-subject {
+	min-width: 45vw;
+	min-height: 30px;
+	border-radius: 5px;
+	border-style: ridge;
+}
+#frank-admin-email-message {
+	border-radius: 5px;
+	border-style: ridge;
+	min-width: 45vw;
+	min-height: 150px;
 }

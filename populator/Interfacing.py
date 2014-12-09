@@ -11,10 +11,8 @@ def ask(msg):
   response = input(msg)
   if (response=="yes" or response=="Yes" or response=="YES" or 
 	response=="y" or response=="Y"):
-    print("User accepted the demo user (demo@example.com)")
     return True
   else:
-    print("User rejected the demo user (demo@example.com)")
     return False
 
 def getRandomSeed():
@@ -37,8 +35,8 @@ def getNumAttendees():
     else:
       return numAttendees
 
-def getInjectDemoUser():
-  return ask("Inject the demo user?: ")
+def getInjectTestUsers():
+  return ask("Inject test users?: ")
 
 def getNumRecruiters():
   while True:

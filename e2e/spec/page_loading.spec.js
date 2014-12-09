@@ -1,7 +1,8 @@
 describe('e2e page loading tests', function() {
-	var delaylength = 500;
-	var ptor;
-		ptor = protractor.getInstance();
+
+    var delaylength = 500;
+    var ptor;
+        ptor = browser;
 
 
 	it('should be able to sign in', function() {
@@ -60,6 +61,7 @@ describe('e2e page loading tests', function() {
 	it('should be able to get to the memoboard page', function() {
 	browser.navigate().back();
 
+<<<<<<< HEAD
 		expect(browser.getTitle()).toEqual('frank Recruiter System - Development Environment');
 		element.all(by.css('.homeButtonContainer a[href="/#!/memoboard"]')).click();
 		browser.waitForAngular();
@@ -67,9 +69,22 @@ describe('e2e page loading tests', function() {
 
 		
 		expect(ptor.getCurrentUrl()).toContain('memoboard');
+=======
+        expect(browser.getTitle()).toEqual('frank Recruiter System - Development Environment');
+        element.all(by.css('.homeButtonContainer a[href="/#!/memoboard"]')).click();
+	try {
+    		driver.switchTo().alert().dismiss();
+	} catch (NoAlertPresentException ignored) {}
+        browser.waitForAngular();
+        try {
+                driver.switchTo().alert().dismiss();
+        } catch (NoAlertPresentException ignored) {}
+        expect(ptor.getCurrentUrl()).toContain('memoboard');
+>>>>>>> dev
 
 	});
    it('should be able to sign out',function() {
+<<<<<<< HEAD
 		element(by.css('.dropdown-toggle span[data-ng-bind="authentication.user.fName"]')).click();
 		browser.waitForAngular();
 		element(by.css('.dropdown-menu a[href="/auth/signout"]')).click();
@@ -83,3 +98,18 @@ describe('e2e page loading tests', function() {
 		expect(ptor.getCurrentUrl()).toContain('signin');
 	});
 });
+=======
+        element(by.css('.dropdown-toggle span[data-ng-bind="authentication.user.fName"]')).click();
+        browser.waitForAngular();
+        element(by.css('.dropdown-menu a[href="/auth/signout"]')).click();
+        browser.waitForAngular();
+        expect(ptor.getCurrentUrl()).toContain('signin');
+    });
+
+    it('should be able to visit the sign in page',function() {
+        browser.get('http://localhost:3000/');
+        browser.waitForAngular();
+        expect(ptor.getCurrentUrl()).toContain('signin');
+    });
+});
+>>>>>>> dev

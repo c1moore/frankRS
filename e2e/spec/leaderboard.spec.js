@@ -1,7 +1,11 @@
 
 describe('e2e leaderboard tests', function() {
 	var ptor;
+<<<<<<< HEAD
 	ptor = protractor.getInstance();
+=======
+	ptor = browser;
+>>>>>>> dev
 
 	var scrollIntoView = function () {
 		arguments[0].scrollIntoView();

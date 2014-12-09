@@ -19,7 +19,7 @@ angular.module('leaderboard').controller('commentsCtrl', ['$scope', 'Authenticat
 			var date = new Date(parseInt(time));
 
 			return date.toLocaleDateString() + " " + date.toLocaleTimeString();
-		}
+		};
 
 		/**
 		* Get all the comments from the database for recruiters for

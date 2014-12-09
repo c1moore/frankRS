@@ -37,95 +37,97 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		var invitedApi = $resource('/leaderboard/invitees',{event_id: eventSelector.postEventId}, {'getTable':{method:'POST', isArray:true}});
 		// var attendingApi = $resource('/modules/leaderboard/tests/MOCK_ATTENDEE_DATA.json');
 		// var invitedApi = $resource('/modules/leaderboard/tests/MOCK_INVITEE_DATA.json');
-		var testApi = $resource('/modules/leaderboard/tests/MOCK_DATA.json');
+		// var testApi = $resource('/modules/leaderboard/tests/MOCK_DATA.json');
 
-		$scope.mainTableParams = new ngTableParams({
-        	page: 1,            // show first page
-        	count: 10,           // count per page
-        	filter: $scope.mainTableFilter,
-        	/*{
-        		displayName:''	//set the initial filter to nothing for name
-        	},*/
-        	sorting: {
-        		place:'asc'		// set the initial sorting to be place asc
-        	}
-    		}, {
-        	total: 0, // length of data
-        	getData: function($defer, params) {
-        		mainApi.getTable({event_id:eventSelector.postEventId}, function(data) {
-	            	var filteredData = params.filter() ?
-	            		$filter('filter')(data, params.filter()) :
-	            		data;
-	            	var orderedData = params.sorting() ? 
-	            		$filter('orderBy')(filteredData, params.orderBy()) : 
-	            		data;
-	           
-	           		//get the max invited and attending
-	            	var maxInvitedFilter = $filter('orderBy')(data,'invited', 'reverse');
-	            	$scope.maxInvited = maxInvitedFilter[0].invited;
+		var getTables = function() {
+			$scope.mainTableParams = new ngTableParams({
+	        	page: 1,            // show first page
+	        	count: 10,           // count per page
+	        	filter: $scope.mainTableFilter,
+	        	/*{
+	        		displayName:''	//set the initial filter to nothing for name
+	        	},*/
+	        	sorting: {
+	        		place:'asc'		// set the initial sorting to be place asc
+	        	}
+	    		}, {
+	        	total: 0, // length of data
+	        	getData: function($defer, params) {
+	        		mainApi.getTable({event_id:eventSelector.postEventId}, function(data) {
+		            	var filteredData = params.filter() ?
+		            		$filter('filter')(data, params.filter()) :
+		            		data;
+		            	var orderedData = params.sorting() ? 
+		            		$filter('orderBy')(filteredData, params.orderBy()) : 
+		            		data;
+		           
+		           		//get the max invited and attending
+		            	var maxInvitedFilter = $filter('orderBy')(data,'invited', 'reverse');
+		            	$scope.maxInvited = maxInvitedFilter[0].invited;
 
-	            	var maxAttendingFilter = $filter('orderBy')(data,'attending', 'reverse');
-	            	$scope.maxAttending = maxAttendingFilter[0].attending;
+		            	var maxAttendingFilter = $filter('orderBy')(data,'attending', 'reverse');
+		            	$scope.maxAttending = maxAttendingFilter[0].attending;
 
-	            	params.total(orderedData.length); //set total recalculation for paganation
-	            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
-	            });
-        	},
-   			$scope: { $data: {}}
-		});
+		            	params.total(orderedData.length); //set total recalculation for paganation
+		            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+		            });
+	        	},
+	   			$scope: { $data: {}}
+			});
 
-		$scope.attendingTableParams = new ngTableParams({
-        	page: 1,            // show first page
-        	count: 10,           // count per page
-        	filter: {
-        		attendeeName:''	//set the initial filter to nothing for name
-        	},
-        	sorting: {
-        		attendeeName:'asc'		// set the initial sorting to be displayName asc
-        	}
-    		}, {
-        	total: 0, // length of data
-        	getData: function($defer, params) {
-            	attendingApi.getTable({event_id:eventSelector.postEventId}, function(data){
-	            	var filteredData = params.filter() ?
-	            		$filter('filter')(data, params.filter()) :
-	            		data;
-	            	var orderedData = params.sorting() ? 
-	            		$filter('orderBy')(filteredData, params.orderBy()) : 
-	            		data;
+			$scope.attendingTableParams = new ngTableParams({
+	        	page: 1,            // show first page
+	        	count: 10,           // count per page
+	        	filter: {
+	        		attendeeName:''	//set the initial filter to nothing for name
+	        	},
+	        	sorting: {
+	        		attendeeName:'asc'		// set the initial sorting to be displayName asc
+	        	}
+	    		}, {
+	        	total: 0, // length of data
+	        	getData: function($defer, params) {
+	            	attendingApi.getTable({event_id:eventSelector.postEventId}, function(data){
+		            	var filteredData = params.filter() ?
+		            		$filter('filter')(data, params.filter()) :
+		            		data;
+		            	var orderedData = params.sorting() ? 
+		            		$filter('orderBy')(filteredData, params.orderBy()) : 
+		            		data;
 
-	            	params.total(orderedData.length); //set total recalculation for paganation
-	            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
-	            });
-        	}
-		});
+		            	params.total(orderedData.length); //set total recalculation for paganation
+		            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+		            });
+	        	}
+			});
 
-		$scope.invitedTableParams = new ngTableParams({
-        	page: 1,            // show first page
-        	count: 10,           // count per page
-        	filter: {
-        		inviteeName:''	//set the initial filter to nothing for name
-        	},
-        	sorting: {
-        		inviteeName:'asc'		// set the initial sorting to be displayName asc
-        	}
-    		}, {
-        	total: 0, // length of data
-        	getData: function($defer, params) {
-            	invitedApi.getTable(params.url,{event_id: eventSelector.postEventId}, function(data){
-	            	var filteredData = params.filter() ?
-	            		$filter('filter')(data, params.filter()) :
-	            		data;
-	            	var orderedData = params.sorting() ? 
-	            		$filter('orderBy')(filteredData, params.orderBy()) : 
-	            		data;
+			$scope.invitedTableParams = new ngTableParams({
+	        	page: 1,            // show first page
+	        	count: 10,           // count per page
+	        	filter: {
+	        		inviteeName:''	//set the initial filter to nothing for name
+	        	},
+	        	sorting: {
+	        		inviteeName:'asc'		// set the initial sorting to be displayName asc
+	        	}
+	    		}, {
+	        	total: 0, // length of data
+	        	getData: function($defer, params) {
+	            	invitedApi.getTable(params.url,{event_id: eventSelector.postEventId}, function(data){
+		            	var filteredData = params.filter() ?
+		            		$filter('filter')(data, params.filter()) :
+		            		data;
+		            	var orderedData = params.sorting() ? 
+		            		$filter('orderBy')(filteredData, params.orderBy()) : 
+		            		data;
 
 
-	            	params.total(orderedData.length); //set total recalculation for paganation
-	            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
-	            });
-        	}
-		});
+		            	params.total(orderedData.length); //set total recalculation for paganation
+		            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+		            });
+	        	}
+			});
+		};
 
 		$scope.smallRankHeader = false;
 		var getStats = function() {
@@ -152,26 +154,26 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 			}
 		};
 
-		getStats();
-
-
-
+		var tablesSet = false;		//Will be used to determine if the tables have already been set previously.  If they have, simply reload the tables when a change is made.  If not, set them.
 		$scope.$watch(
 			function() {
 				return eventSelector.selectedEvent;
 			},
 			function() {
-				getStats();
+				if(eventSelector.postEventId) {
+					getStats();
 
-				$timeout(function() {
-        			// $scope.mainTableParams.settings().$scope = $scope;
-        			// $scope.attendingTableParams.settings().$scope = $scope;
-        			// $scope.invitedTableParams.settings().$scope = $scope;
-
-					$scope.mainTableParams.reload();
-					$scope.attendingTableParams.reload();
-					$scope.invitedTableParams.reload();
-				});
+					if(tablesSet) {
+						$timeout(function() {
+							$scope.mainTableParams.reload();
+							$scope.attendingTableParams.reload();
+							$scope.invitedTableParams.reload();
+						});
+					} else {
+						getTables();
+						tablesSet = true;
+					}
+				}
 			}
 		);
 	}

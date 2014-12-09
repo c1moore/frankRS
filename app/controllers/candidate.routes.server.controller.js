@@ -9,7 +9,10 @@
  mongoose = require('mongoose'),
  User = mongoose.model('User'),
  Event = mongoose.model('Event'),
- Candidate = mongoose.model('Candidate');
+ Candidate = mongoose.model('Candidate'),
+ nodemailer = require("nodemailer"),
+ smtpPool = require('nodemailer-smtp-pool'),
+ config = require('../../config/config');
 
 
 exports.getCandidates = function(req, res) {
@@ -868,5 +871,71 @@ exports.deleteCandidateByEvent = function(req, res) {
 				}
 			}
 		});
+	}
+};
+
+/**
+* This function sends an email that the admin creates to a set of candidates.  The set
+* can have one or more candidates in it.  Since the set could be very large, nodemailer-smtp-pool
+* will be used to pool the emails.  Even though an admin can only view applicants for only one
+* event at a time, this function does not consider this, it will be the responsibility of the
+* admin to mention which event the email is referencing, if necessary.
+*
+* @param candidates - array of candidate IDs that will receive this email.
+* @param subject - the subject of the email
+* @param message - the message of the email
+*/
+
+exports.sendCandidateEmail = function(req, res) {
+	try {
+		if(!req.isAuthenticated()) {
+			return res.status(401).send({message : "User is not logged in."});
+		} else if(!req.hasAuthorization(req.user, ["admin"])) {
+			return res.status(401).send({message : "User does not have permission."});
+		} else if(!req.body.candidate_ids.length) {
+			return res.status(400).send({message : "At least one email is required."});
+		} else if(!req.body.message) {
+			return res.status(400).send({message : "Required field not specified."});
+		} else {
+			var candidateIds = [];
+			for(var i=0; i<req.body.candidate_ids.length; i++) {
+				candidateIds.push(mongoose.Types.ObjectId(req.body.candidate_ids[i]));
+			}
+
+			Candidate.aggregate([
+				{$match : {_id : {$in : candidateIds}}},
+				{$project : {'_id' : 0, 'email' : 1}}
+			], function(err, result) {
+				if(err) {
+					return res.status(400).send({message : err});
+				} else if(!result.length) {
+					return res.status(400).send({message : "No emails found."});
+				} else {
+					var emails = [];
+					for(var i=0; i<result.length; i++) {
+						emails.push(result[i].email);
+					}
+
+					var smtpTransport = nodemailer.createTransport(smtpPool(config.mailer.options));
+					smtpTransport.sendMail({
+						to : emails,
+						from : "frank@jou.ufl.edu",
+						sender : "frank@jou.ufl.edu",
+						replyTo : "frank@jou.ufl.edu",
+						subject : req.body.subject,
+						html : req.body.message
+					}, function(err) {
+						if(err) {
+							return res.status(400).send({message : err});
+						} else {
+							return res.status(200).send({message : "Email(s) sent!"});
+						}
+					});
+				}
+			});
+		}
+	} catch(err) {
+		console.log(err);
+		return res.status(500).send();
 	}
 };
