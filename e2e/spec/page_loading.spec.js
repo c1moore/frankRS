@@ -64,16 +64,16 @@ describe('e2e page loading tests', function() {
 
         expect(browser.getTitle()).toEqual('frank Recruiter System - Development Environment');
         element.all(by.css('.homeButtonContainer a[href="/#!/memoboard"]')).click();
-	try {
-    		driver.switchTo().alert().dismiss();
-	} catch (NoAlertPresentException) {}
+
+      
         browser.waitForAngular();
-        try {
-                driver.switchTo().alert().dismiss();
-        } catch (NoAlertPresentException) {}
+        browser.sleep(5000);
+
+        ptor.actions().sendKeys(protractor.Key.ESCAPE).perform();
         expect(ptor.getCurrentUrl()).toContain('memoboard');
 	});
    it('should be able to sign out',function() {
+        ptor.actions().sendKeys(protractor.Key.ESCAPE).perform();
 
         element(by.css('.dropdown-toggle span[data-ng-bind="authentication.user.fName"]')).click();
         browser.waitForAngular();
