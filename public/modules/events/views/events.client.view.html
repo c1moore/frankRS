@@ -1,4 +1,4 @@
-<section class="events-page" ng-controller="eventController">
+<section class="events-page" ng-controller="userEventCtrl">
 	<div class="jumbotron text-center">
 		<div class="container-fluid">
 			<h2>Events</h2>
@@ -12,8 +12,8 @@
 			<td data-title="'Location'" sortable="'status'" filter="{'status':'text'}" width="100">
 				{{event.location}}
 			</td>
-			<td data-title="'Attending'" width="90">
-				<button class="btn btn-danger" ng-click="denyCandidate(candidate)">Deny</button>
+			<td data-title="'Apply to be a Recruiter'" width="90">
+				<span ng-if="!checkAttending(event)" class="glyphicon glyphicon-ok"></span>
 			</td>
 		</tr>
 	</table>
