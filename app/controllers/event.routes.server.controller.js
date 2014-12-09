@@ -538,7 +538,7 @@ exports.recruiterStatus = function(req, res) {
 					var j = 0;
 					for(; j<req.user.status.length; j++) {
 						if(result[i]._id.toString() === req.user.status[j].event_id.toString()) {
-							eventsResult[i].recruiter = true;
+							eventsResult[i].recruiter = req.user.status[j].recruiter;
 							break;
 						}
 					}
