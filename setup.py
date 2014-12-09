@@ -38,9 +38,9 @@ def main():
   res = ask("Would you like to install required bower packages?: ")
   if res:
       system("bower install")
-  res = ask("Would you like to install protractor?: ")
+  res = ask("Would you like to setup protractor?: ")
   if res:
-    system("sudo npm install -g protractor")
+    system("sudo npm install -g protractor@1.4.0")
     system("sudo webdriver-manager update")
   print("Done!")
 
