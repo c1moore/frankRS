@@ -7,7 +7,7 @@ angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams',
 		}
 
 		var getEvents = function() {
-			$http.get('/events/enumerateAll').success(function(data) {
+			$http.post('/events/user/allEvents').success(function(data) {
 				$scope.events = [];
 				$scope.events = data;
 			}).error(function(error) {

@@ -13,7 +13,7 @@
 				{{event.location}}
 			</td>
 			<td data-title="'Apply to be a Recruiter'" width="90">
-				<span ng-if="!checkAttending(event)" class="glyphicon glyphicon-ok"></span>
+				<span ng-if="event.recruiter" class="glyphicon glyphicon-ok"></span>
 			</td>
 		</tr>
 	</table>
