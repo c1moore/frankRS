@@ -12,6 +12,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
                   displayProp: 'label'
             };
 
+            $scope.isEventSelected = eventSelector.postEventId ? true : false;
             $scope.selectedEvent = eventSelector.selectedEvent;
 
             //updated the selected event from the event selector service
