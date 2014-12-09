@@ -1,0 +1,19 @@
+Changes to css as designated by the frank designers
+
+Home Page:
+  - Change "a" to #333232
+  - Take away background
+  - Central tiles under each other; 2 tiles/row centered
+  - No background for buttons
+  - Change "user posts" to green
+Leaderboard Page: 
+  - Background of boards set to white
+  - Dotted line to separate messages
+  - Unround any edges
+  - Un-gradient the "messages" titlebox
+  - Change "message" background to white
+Invite Page:
+  - Remove background
+  - Put "To" and "From" on top of text boxes rather than side to side
+  - Change "send" button to green and flatten it
+  - Change "preview" button to frank pink and flatten
