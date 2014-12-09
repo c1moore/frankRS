@@ -39,6 +39,8 @@ li .disabled {
 	margin: 10px;
 	background-color: white;
 	max-width: 275px;
+	height: 268px;
+	vertical-align: middle;
 }
 .homepage-comments {
 	float: right;
@@ -48,6 +50,8 @@ li .disabled {
 .homepage-nav-buttons {
 	height: 28vmin;
 	width: 35vmin;
+	max-width: 250px;
+	max-height: 200px;
 }
 .jumbotron {
 	padding:20px;
@@ -93,11 +97,14 @@ li .disabled {
 	right: -28px;
 }
 #frank-buttons-containter {
-	height: 55vh;
+	/*height: 55vh;
 	width: 650px;
 	margin: 0 30px;
 	overflow: auto;
 	position: static;
 	float: left;
-	margin-left: 20vw;
+	margin-left: 20vw;*/
+}
+#recruiter-request-button-title {
+	font-size: 17px;
 }

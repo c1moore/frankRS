@@ -8,13 +8,13 @@
 	</div>
 
 
-	<button type="button" ng-click="toggleComments()" ng-show="!displayComments" class="btn btn-primary btn-md pull-right comments-sidebar">
+	<!-- <button type="button" ng-click="toggleComments()" ng-show="!displayComments" class="btn btn-primary btn-md pull-right comments-sidebar">
     	<span class="glyphicon glyphicon-chevron-left"></span>
     	<span class="sidebar-hidden-text">Comments</span>
-    </button>
+    </button> -->
 
 	<div class="container-fluid">
-		<div class="row">
+		<div>
 			<!-- app launcher area -->
 			<div ng-class="buttonsGrid" id="frank-buttons-containter" class="frank-main-view">
 					<!-- these divs col values will generatgoogle mapse dynamicaly through angular -->
@@ -23,14 +23,14 @@
 							<a href="{{button.link}}">
 								<img src="{{button.image}}" class="homepage-nav-buttons" alt="Place holder">
 								<div class="caption">
-									<h3>{{button.name}}</h3>
+									<h3 id="{{button.titleId}}">{{button.name}}</h3>
 								</div>
 							</a>
 						</div>
 					</div>
 			</div>
 
-			<div ng-show='displayComments' class="panel panel-primary col-md-2 homepage-comments">
+			<!-- <div ng-show='displayComments' class="panel panel-primary col-md-2 homepage-comments">
 				
 				<div class="panel-heading">
     				User Comments
@@ -43,16 +43,7 @@
     				<p ng-repeat="comment in data.comments">{{comment}}</p>
   				</div>
   				
-			</div>
-
-			<!-- <div class="col-md-2"">
-				<button type="button" ng-click="toggleComments()" ng-show="!displayComments" class="btn btn-primary btn-md pull-right comments-sidebar">
-			    	<span class="glyphicon glyphicon-chevron-left"></span>
-			    	<span class="sidebar-hidden-text">Comments</span>
-			    </button>
 			</div> -->
 		</div>
 	</div>
-
-	<!--sound cloud player will go here -->
 </section>
