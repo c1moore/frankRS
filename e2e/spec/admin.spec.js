@@ -121,6 +121,30 @@ describe('Admin Page Protractor End-To-End Tests',function() {
 			.isPresent()).toBeTruthy();
 	});
 
+	it('should be able to visit the event tab',function() {
+		element(by.cssContainingText('.nav.nav-tabs li a','Event')).click();
+		browser.waitForAngular();
+		expect(element(by.cssContainingText('.col-sm-8','Event List')).isDisplayed()).toBeTruthy();
+        });
+
+	it('should be able to add a new event', function() {
+		element(by.model('newEvent.name')).sendKeys('Super Cool Event');
+		element(by.model('newEvent.start_date')).sendKeys('12/12/2025');
+		element(by.model('newEvent.end_date')).sendKeys('12/20/2025');
+		element(by.model('newEvent.location')).sendKeys('CSE Building');
+		element(by.cssContainingText('button[type="submit"]','Add Event')).click();
+		browser.waitForAngular();
+		browser.refresh();
+		browser.waitForAngular();
+		element(by.cssContainingText('.nav.nav-tabs li a','Event')).click();
+                browser.waitForAngular();
+                expect(element(by.cssContainingText('.col-sm-8','Event List')).isDisplayed()).toBeTruthy();
+		browser.waitForAngular();
+		expect(element(by.cssContainingText('frank-main-view tbody tr td[data-title="Name"]',
+			'Super Cool Event')).isPresent()).toBeTruthy();
+	});
+		
+
 	it('should be able to sign out for later tests',function() {
                 element(by.css('.dropdown-toggle span[data-ng-bind="authentication.user.fName"]')).click();
                 browser.waitForAngular();
@@ -128,7 +152,6 @@ describe('Admin Page Protractor End-To-End Tests',function() {
                 browser.waitForAngular();
                 expect(ptor.getCurrentUrl()).toContain('signin');
         });
-
 
 });
 		

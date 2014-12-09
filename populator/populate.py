@@ -33,12 +33,36 @@ def injectDemoUser():
   demo.save()
   return demo
 
-def injectDemoEventFor(demo):
+def injectTestCandidates():
+  c0 = Candidate()
+  c1 = Candidate()
+  c2 = Candidate()
+  c0.randomize()
+  c1.randomize()
+  c2.randomize()
+  c0.email = 'demo@example.com'
+  c1.email = 'testCandidate1@example.com'
+  c2.email = 'testCandidate2@example.com'
+  c0.fName += '_ctest'
+  c1.fName += '_ctest'
+  c2.fName += '_ctest'
+  c0.lName += '_ctest'
+  c1.lName += '_ctest'
+  c2.lName += '_ctest'
+  c0.save()
+  c1.save()
+  c2.save()
+  return (c0,c1,c2)
+
+def injectDemoEventFor(demo,c0,c1,c2):
   event = Event()
   event.randomize()
   event.name = "Project Demonstration"
   event.location = "CSE Building"
   demo.recruitFor(event)
+  c0.addEvent(event)
+  c1.addEvent(event)
+  c2.addEvent(event)
   event.save() #Redundant, but I want to save it again
   return event
 
@@ -69,14 +93,20 @@ def main():
   candidates = []
   events = []
   comments = []
-  usingDemoUser = getInjectDemoUser()
-  if usingDemoUser:
+  usingTestUsers = getInjectTestUsers()
+  if usingTestUsers:
     demo = injectDemoUser()
     recruiters.append(demo)
     attendees.append(demo)
+    c0,c1,c2 = injectTestCandidates()
     admins.append(demo)
-    demoEvent = injectDemoEventFor(demo)
+    demoEvent = injectDemoEventFor(demo,c0,c1,c2)
     events.append(demoEvent)
+    candidates.append(c0)
+    candidates.append(c1)
+    candidates.append(c2)
+    print("User accepted the demo user (demo@example.com)")
+    [print("User accepted test candidate %s" % c.email) for c in candidates]
   print("\nGenerating objects (this may take some time)...")
   #Make events
   for i in range(numEvents):
@@ -84,7 +114,7 @@ def main():
     event.randomize()
     event.save()
     events.append(event)
-  if usingDemoUser:
+  if usingTestUsers:
     if len(events)==0:
       raise RuntimeError("No events exist to add to the demo user--Demo must have events!")
     demoEvents = random.sample(events,random.randint(1,maxEventsPerRecruiter))
