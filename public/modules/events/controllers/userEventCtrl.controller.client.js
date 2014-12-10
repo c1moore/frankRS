@@ -46,7 +46,7 @@ angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams',
 		$scope.launch = function(event) {
 			dlg = dialogs.confirm("Please confirm", "Apply to be a recruiter for " + event.name + "?");
 			dlg.result.then(function(btn){
-				$http.post("candidate/setCandidate", event).success(function() {
+				$http.post("candidate/setCandidate", {event_id:event.event_id}).success(function() {
 					console.log("You have applied");
 					event.appliead = true;
 				}).error(function(error) {
