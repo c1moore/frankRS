@@ -770,7 +770,11 @@ exports.setCandidate = function(req,res){
 		* them.  Since attendees/recruiters can only make requests to be a candidate for themselves, we can use the req.user object for all the information.
 		*/
 
-		Candidate.findOne({_id : req.user._id}, function(err, candidate) {
+		if(!req.body.event_id) {
+			return res.status(400).send({message : "All required fields not specified."});
+		}
+
+		Candidate.findOne({email : req.user.email}, function(err, candidate) {
 			if(err) {
 				return res.status(400).send({message : err});
 			} else if(!candidate) {
@@ -779,8 +783,8 @@ exports.setCandidate = function(req,res){
 		 			fName: req.user.fName,
 		 			lName: req.user.lName,
 		 			email: req.user.email,
-		 			user_id : req.user._id,
-		 			events : [{event_id : req.body.event_id, accepted : false, status : 'volunteer'}]
+		 			user_id : new mongoose.Types.ObjectId(req.user._id),
+		 			events : [{event_id : new mongoose.Types.ObjectId(req.body.event_id), accepted : false, status : 'volunteer'}]
 		 		});
 
 		 		newCandidate.save(function(err){
@@ -792,7 +796,7 @@ exports.setCandidate = function(req,res){
 		 		});
 		 	} else {
 		 		//The user was already a candidate, add this event to their list.
-		 		candidate.addToSet({event_id : req.body.events[0], accepted : false, status : 'volunteer'});
+		 		candidate.events.addToSet({event_id : new mongoose.Types.ObjectId(req.body.event_id), accepted : false, status : 'volunteer'});
 
 		 		candidate.save(function(err) {
 		 			if(err) {
