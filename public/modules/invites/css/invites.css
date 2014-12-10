@@ -28,6 +28,10 @@
   background-color: #E8E9EB;
   z-index: -1;
 }
+.frank-invites-sidebar table {
+  border-spacing: 3px;
+  border-collapse: separate;
+}
 .frank-invite-sidebar-search {
   width: 90%;
   margin-left: 16px;
@@ -83,6 +87,8 @@ color:black;
   height: 28px;
   background: transparent;
   width: 12vw;
+  margin-left: -4px;
+  padding-left: 4px;
 }
 
 .to_field.ng-pristine.ng-valid {
@@ -313,7 +319,6 @@ animation:0.5s flipInX ease;
   height: 30px;
   background-color: white;
   border-radius: 5px;
-
 }
 #header {
   text-align:center;
@@ -347,6 +352,12 @@ body {
 #previewbutton {
   background-color: rgb(197, 78, 144);
   border-radius: 0;
+}
+.invitation_fName {
+  border-bottom-left-radius: 4px;
+  border-top-left-radius: 4px;
+  margin-left: -1px;
+  border-left: 1px solid rgb(169, 169, 169);
 }
 #invitation-submit-button {
   background-color: rgb(115, 201, 45);
