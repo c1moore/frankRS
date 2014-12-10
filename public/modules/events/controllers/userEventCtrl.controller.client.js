@@ -44,7 +44,7 @@ angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams',
 		});
 
 		$scope.launch = function(event) {
-			dlg = dialogs.confirm("Please confirm", "Apply to be a recruiter for " + event.name);
+			dlg = dialogs.confirm("Please confirm", "Apply to be a recruiter for " + event.name + "?");
 			dlg.result.then(function(btn){
 				
 			})
