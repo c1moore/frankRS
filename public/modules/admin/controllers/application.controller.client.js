@@ -162,6 +162,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
                         $scope.selected.ids = [];
                         $scope.email = {};
                         $scope.email.errmess = [];
+                        $scope.selectedCandidates = [];
                         
                         $window.alert("Emails sent!");
 
@@ -178,7 +179,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
                         } else if(status === 400) {
                             $window.alert("There was an error sending the message.  Please try again later.");
                         }
-
+                        
                         usSpinnerService.stop('spinner-2');
                         $scope.sending = false;
                     });
