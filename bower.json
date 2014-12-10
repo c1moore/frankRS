@@ -23,6 +23,7 @@
 		"angularjs-dropdown-multiselect": "~1.5.2",
 		"angular-input-date": "~1.0.4",
 		"angular-multi-select": "~2.0.2",
-		"angular-dialog-service": "~5.2.5"
+		"angular-dialog-service": "~5.2.5",
+		"angular-spinner": "~0.5.1"
 	}
 }

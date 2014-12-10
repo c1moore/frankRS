@@ -26,7 +26,8 @@
 		<br>
 		<div id="invitation_buttons">
 			<a id="previewbutton" class="btn invitation-button" id="invitation-preview-button" href="#" ng-click="togglePreview()"><i class="fa fa-eye"></i> Preview</a>
-			<button type="submit" value="Send" class="btn btn-lg invitation-button" id="invitation-submit-button" ng-disabled="invite.$invalid"><i class="fa fa-envelope-o"></i> Send</button>
+			<button type="submit" value="Send" class="btn btn-lg invitation-button" id="invitation-submit-button" ng-disabled="invite.$invalid" ng-hide="sending"><i class="fa fa-envelope-o"></i> Send</button>
+			<span us-spinner="{lines:13, length:5, width:2, radius:7}" spinner-key="spinner-1" ng-show="sending"></span>
 		</div>
 	</form>
 	<div class="frank-invites-sidebar">

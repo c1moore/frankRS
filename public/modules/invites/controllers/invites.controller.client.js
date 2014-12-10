@@ -1,7 +1,7 @@
 'use strict'; // :)
 
-angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication', '$location', 'eventSelector', '$http', '$window', '$modal', 'cacheService', 'previewService',
-	function($scope, Authentication, $location, eventSelector, $http, $window, $modal, cacheService, previewService) {
+angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication', '$location', 'eventSelector', '$http', '$window', '$modal', 'cacheService', 'previewService', 'usSpinnerService',
+	function($scope, Authentication, $location, eventSelector, $http, $window, $modal, cacheService, previewService, usSpinnerService) {
 		$scope.authentication = Authentication;
 
 		/*
@@ -72,7 +72,10 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 			}
 		);
 
+		$scope.sending = false;
 		$scope.send = function() {
+			$scope.sending = true;
+			usSpinnerService.spin('spinner-1');
 			angular.element("#invitation-submit-button").addClass("disabled");
 			$http.post('/invitation/send', $scope.invite).success(function(response) {
 				$window.alert(response.message);
@@ -86,11 +89,17 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 				angular.element("#invitation-submit-button").removeClass("disabled");
 
 				getSideTables();
+
+				usSpinnerService.stop('spinner-1');
+				$scope.sending = false;
 			}).error(function(response) {
 				$window.alert(response.message);
 				console.log(response.message);
 
 				angular.element("#invitation-submit-button").removeClass("disabled");
+				
+				usSpinnerService.stop('spinner-1');
+				$scope.sending = false;
 			});
 		};
 

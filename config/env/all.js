@@ -42,7 +42,10 @@ module.exports = {
 				'public/lib/ng-flow/dist/ng-flow-standalone.js',
 				'public/lib/angular-input-date/src/angular-input-date.js',
 				'public/lib/angular-multi-select/angular-multi-select.js',
-				'public/lib/angular-dialog-service/example/js/dialogs.js'
+				'public/lib/angular-dialog-service/example/js/dialogs.js',
+				'public/lib/spin.js/spin.js',
+				'public/lib/spin.js/jquery.spin.js',
+				'public/lib/angular-spinner/angular-spinner.js'
 			]
 		},
 		css: [
