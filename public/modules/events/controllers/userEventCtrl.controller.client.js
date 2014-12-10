@@ -1,8 +1,7 @@
 angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams', '$http', 'eventSelector', '$filter', 'dialogs', 'Authentication',
 	function($scope, ngTableParams, $http, eventSelector, $filter, dialogs, Authentication) {
 		$scope.user = Authentication;
-		$scope.events = [];
-		$scope.userEvents = [];
+		console.log($scope.user);
 		$scope.test = function(event) {
 			console.log(event);
 		}
@@ -47,7 +46,12 @@ angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams',
 		$scope.launch = function(event) {
 			dlg = dialogs.confirm("Please confirm", "Apply to be a recruiter for " + event.name + "?");
 			dlg.result.then(function(btn){
-				
+				$http.post("candidate/setCandidate", event).success(function() {
+					console.log("You have applied");
+					event.appliead = true;
+				}).error(function(error) {
+					console.log(error);
+				})
 			})
 		}
 	}
