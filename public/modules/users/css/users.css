@@ -21,6 +21,7 @@ form.signin.form-horizontal {
 
 .forgot-password {
 	width: 144px;
+	min-width: 144px;
 	margin: auto;
 }
 
@@ -33,6 +34,7 @@ form.signin.form-horizontal {
 
 .frank-signin-container {
 	width: 16.6666666vw;
+	min-width: 225px;
 	margin: 50px auto;
 	background-color: #E8E9EB;
 	height: 50vh;
@@ -40,4 +42,12 @@ form.signin.form-horizontal {
 	box-shadow: 1px 1px 1px 1px #333232;
 	max-height: 300px;
 	min-height: 250px;
+}
+
+.frank-signin-form-element {
+	min-width: 195px;
+}
+
+.text-center.form-group.frank-signin-submit {
+	min-width: 200px;
 }
