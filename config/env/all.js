@@ -17,7 +17,8 @@ module.exports = {
 				'public/lib/bootstrap/dist/css/bootstrap-theme.css',
 				'public/lib/ng-table/ng-table.css',
 				'public/lib/font-awesome/css/font-awesome.min.css',
-				'public/lib/angular-multi-select/angular-multi-select.css'
+				'public/lib/angular-multi-select/angular-multi-select.css',
+				'public/lib/angular-dialog-service/dist/dialogs.min.css'
 			],
 			js: [
 				'public/lib/jquery/dist/jquery.min.js',
@@ -40,7 +41,8 @@ module.exports = {
 				'public/lib/ng-flow/dist/ng-flow.js',
 				'public/lib/ng-flow/dist/ng-flow-standalone.js',
 				'public/lib/angular-input-date/src/angular-input-date.js',
-				'public/lib/angular-multi-select/angular-multi-select.js'
+				'public/lib/angular-multi-select/angular-multi-select.js',
+				'public/lib/angular-dialog-service/example/js/dialogs.js'
 			]
 		},
 		css: [
