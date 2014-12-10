@@ -62,6 +62,7 @@ describe('User Model Unit Tests:', function() {
 				salt: 'abc123',
 				rank: [{'event_id': event._id, 'place': 1}],
 				provider: 'local',
+				organization: 'organ',
 				login_enabled: false
 			});
 			user2 = new User({
@@ -74,6 +75,7 @@ describe('User Model Unit Tests:', function() {
 				salt: 'abc123',
 				rank: [{'event_id': event._id, 'place': 1}],
 				provider: 'local',
+				organization: 'organ',
 				login_enabled: false
 			});
 

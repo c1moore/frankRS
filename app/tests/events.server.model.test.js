@@ -13,7 +13,7 @@ var should = require('should'),
 /**
 * Global Variabls used for testing
 */
-var event1, event2, event3;
+var event1, event2, event1d;
 
 /**
 *  Test functionality of Events
@@ -24,7 +24,15 @@ describe('Event Model Unit Tests',function() {
 	describe('Method Save',function(){
 		beforeEach(function(done){
 			event1 = new events({
-				name:  'testing123',
+				name:  'testing1231',
+				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
+				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+				location: 'UF',
+				schedule: 'www.google.com'
+			});
+
+			event1d = new events({
+				name:  'testing1231',
 				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
 				location: 'UF',
@@ -32,7 +40,7 @@ describe('Event Model Unit Tests',function() {
 			});
 
 			event2 = new events({
-					name:  'testing123',
+					name:  'testing1232',
 					start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 					end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
 					location: 'UF',
@@ -47,8 +55,9 @@ describe('Event Model Unit Tests',function() {
 		});
 
 		it('should fail to save an existing event again',function(done){
-			event1.save(function(err1,obj,num){
-				return event2.save(function(err){
+			event1.save(function(err){
+				should.not.exist(err);
+				event1d.save(function(err){
 					should.exist(err);
 					done();
 				});
@@ -186,6 +195,7 @@ describe('Event Model Unit Tests',function() {
 		afterEach(function(done){
 			event1.remove();
 			event2.remove();
+			event1d.remove();
 			done();
 		});
 	});

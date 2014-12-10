@@ -1,31 +1,40 @@
 <section>
-	<div class="container">
-		<div class="dropdown">
-			<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
-				Select Event
-				<span class="caret"></span>
-			</button>
-			<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-				<li role="presentation"><a role="menuitem" tabindex="-1" href="#">frank</a></li>
-				<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Another action</a></li>
-				<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Something else here</a></li>
-			</ul>
+	<div class="jumbotron text-center">
+		<div class="container-fluid">
+			<h2>Recruiter Leaderboard</h2>
 		</div>
-
-		<tabset>
-			<tab heading="Score">
-				<ng-include src="'/modules/leaderboard/views/score.client.view.html'"></ng-include>
-			</tab>
-			<tab heading="Leaderboard" ng-controller="LeaderboardTablesCtrl">
-				<ng-include src="'/modules/leaderboard/views/maintable.client.view.html'"></ng-include>
-			</tab>
-			<tab heading="Attending" ng-controller="LeaderboardTablesCtrl">
-				<ng-include src="'/modules/leaderboard/views/attending.client.view.html'"></ng-include>
-			</tab>
-			<tab heading="Invited" ng-controller="LeaderboardTablesCtrl">
-				<ng-include src="'/modules/leaderboard/views/invited.client.view.html'"></ng-include>
-			</tab>
-		</tabset>
-
+	</div>
+	<div ng-controller="LeaderboardTablesCtrl" class="rows">
+		<div class="col-md-9 leaderboard-container frank-main-view">
+			<tabset>
+				<tab active="initialTab" heading="Score">
+					<ng-include src="'/modules/leaderboard/views/score.client.view.html'"></ng-include>
+				</tab>
+				<tab heading="Leaderboard">
+					<ng-include src="'/modules/leaderboard/views/maintable.client.view.html'"></ng-include>
+				</tab>
+				<tab heading="Attending">
+					<ng-include src="'/modules/leaderboard/views/attending.client.view.html'"></ng-include>
+				</tab>
+				<tab heading="Invited">
+					<ng-include src="'/modules/leaderboard/views/invited.client.view.html'"></ng-include>
+				</tab>
+			</tabset>
+		</div>
+	</div>
+	<div ng-controller="commentsCtrl" class="frank-comment-board frank-recruiter-comment-board frank-main-view">
+		<div class="frank-recruiter-comment-header">
+			<h3 class="frank-recruiter-comment-title">Message Board</h3>
+		</div>
+		<div class="frank-recruiter-comments" ng-class="{'frank-recruiter-comments-compressed' : editorExpanded, 'frank-recruiter-comments-expanded' : !editorExpanded}">
+			<comment ng-repeat="comment in comments">
+				<comment-header author-name="{{comment.user_id.displayName}}" post-time="{{toHumanReadable(comment.date)}}" removable="{{removable(comment.user_id._id)}}" remove-address="/comments/delete" comment-id="{{comment._id}}" comments-arr="comments" arr-index="$index">
+				</comment-header>
+				<comment-body comment-body="comment.comment">
+				</comment-body>
+			</comment>
+		</div>
+		<hr id="frank-comment-editorDivider" />
+		<comment-editor comment-content="comment" expanded="editorExpanded" files="files" post-address="/comments/postCommentRecruiter" comments-arr="comments" refresh="getComments()"></comment-editor>
 	</div>
 </section>

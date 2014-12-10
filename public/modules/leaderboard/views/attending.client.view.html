@@ -1,13 +1,13 @@
 <table ng-table="attendingTableParams" show-filter="true" class="table table-bordered leaderboard">
 	<tr ng-repeat="user in $data">
-		<td data-title="'Name'" sortable="'displayName'" filter="{'displayName':'text'}">
-			{{user.displayName}}
+		<td data-title="'Attendee Name'" sortable="'attendeeName'" filter="{'attendeeName':'text'}">
+			{{user.attendeeName}}
 		</td>
-		<td data-title="'Recruiter'" sortable="'recuiterName'" filter="{'recruiterName':'text'}">
-			{{user.recuiterName}}
+		<td data-title="'Recruiter Name'" sortable="'recruiterName'" filter="{'recruiterName':'text'}">
+			{{user.recruiterName}}
 		</td>
-		<td data-title="'Orginization'" sortable="'orginization'" filter="{'orginization':'text'}">
-			{{user.orginization}}
+		<td data-title="'Organization'" sortable="'orginization'" filter="{'orginization':'text'}">
+			{{user.organization}}
 		</td>
 	</tr>
 </table>

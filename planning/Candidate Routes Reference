@@ -1,0 +1,137 @@
+Candidate Routes Reference
+
+Only admins are able to get candidate data and/or change it.
+
+Recruiters and attendees can volunteer to be a recruiter.
+
+
+/candidate/getfName
+	Expects 
+		.post(~//candidate/getfNamel)
+		.send({candidate_id: candidate_id})
+	Returns
+		fName
+
+/candidate/getlName
+	Expects 
+		.post(~//candidate/getlName)
+		.send({candidate_id: candidate_id})
+	Returns
+		lName
+
+/candidate/getEmail
+	Expects 
+		.post(~//candidate/getEmail)
+		.send({candidate_id: candidate_id})
+	Returns
+		email
+
+/candidate/getEvents
+	Expects 
+		.post(~//candidate/getEvents)
+		.send({candidate_id: candidate_id})
+	Returns
+		an array of objects.
+		events[i].event_id to get eventID
+		events[i].accepted to get the accepted status
+		events[i].status to get the status of the candidate for that event
+		events[i].name to get the name of the event
+		events[i].start_date to get the start date of the event
+
+/candidate/getNote
+	Expects 
+		.post(~//candidate/getNote)
+		.send({candidate_id: candidate_id})
+	Returns
+		note
+
+
+/candidate/getUser_id
+	Expects
+		.post(~//candidate/getUser_id)
+		.send({candidate_id: candidate_id})
+	Returns
+		user_id
+
+	String field that holds the user ID of the candidate.
+
+/candidate/setfName
+	Expects 
+		.post(~//candidate/setfName)
+		.send({candidate_id: candidate_id,fName:'string x'})
+
+	Changes the candidate fname to x if the user is an admin
+
+
+/candidate/setlName
+	Expects 
+		.post(~//candidate/setlName)
+		.send({candidate_id: candidate_id,lName:'string x'})
+
+		Changes the candidate lname to x if the user is an admin
+
+
+/candidate/setEmail
+	Expects 
+		.post(~//candidate/setEmail)
+		.send({candidate_id: candidate_id,fName:'string x@x.com'})
+
+	Changes the candidate email to x@x.com if the user is an admin
+
+
+
+/candidate/setStatus
+	Expects 
+		.post(~//candidate/setStatus)
+		.send({candidate_id: candidate_id,event_id:'x',status:string 'accepted/invited/volunteer'})
+
+	Changes status to a specific event in the candidate file to accepted or invited or volunteer.  Those are the only choices to change it to.
+
+	If the candidate's accepted field is 'true' then it will change their role to recruiter for the event and their roles.
+
+	If the candidate is not already a user, then it will create a new user with the information from the candidate fields. The default password is their fName + lName.
+
+		
+/candidate/setEvent
+	Expects 
+		.post(~//candidate/setEvent)
+		.send({candidate_id: candidate_id,newEvent:{event_id:event_id,accepted: boolean true/false,status:accepted/invited/volunteer'}})
+
+	Adds a new event to the candidate.  Lets you set the accepted and status field manually.  Default for accepted is false and default for status is volunteer.
+
+
+/candidate/setAccepted
+	Expects 
+		.post(~//candidate/setAccepted)
+		.send({candidate_id: candidate_id,event_id:event_id, accepted:string true/false})
+
+	Changes the accepted field in a specific event for a candidate to boolean true or false. 
+
+	If the candidate's status field is set to 'accepted' then it will change their role to recruiter for the event and their roles.
+
+	If the candidate is not already a user, then it will create a new user with the information from the candidate fields. The default password is their fName + lName.
+
+
+/candidate/setNote
+	Expects 
+		.post(~//candidate/setNote)
+		.send({candidate_id: candidate_id,note:'string'})_
+
+	Changes the candidate note to string.  Have to be an admin.
+
+/candidate/setCandidate
+	Expects 
+		.post(~//candidate/setCandidate)
+		.send({fName:'string',lName:'string',email:'string@string.string',status:volunteer/invited/accepted, event_id: event_id,accept_Key:true/false,note:'string', user_id:  user_id})
+
+	NOTE: this also works for recruiters/attendees.  It only requires their fName, lName, email, and newEvent.  The rest of the fields will be handled by the backend.  If the other items are included they will be ignored.  (So that an attendee can not set them selves as accepted to be a recruiter for a specific event)
+
+	This is the only candidate route that works for recruites/attendees.  The rest are Admin only.
+
+
+/candidate/deleteCandidate
+	Expects 
+		.post(~//candidate/deleteCandidate)
+		.send({candidate_id: candidate_id})
+
+	deletes candidate from the database.

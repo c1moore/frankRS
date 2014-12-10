@@ -75,6 +75,11 @@ var ListSchema = new Schema({
 	event_id: {type: mongoose.Schema.Types.ObjectId, ref:'Event'}
 }, {_id:false});
 
+//mongoose.model('List', ListSchema);
+//var List = mongoose.model('List');
+//List.ensureIndexes({user_id:1, event_id:1}, {sparse:true, unique:"User already a member of list for specified event."});
+//ListSchema.index({user_id:1, event_id:1}, {sparse:true, unique:"User already a member of list for specified event."});
+
 /*
 * This schema is used for the status array in the User schema.  This list specifies all the events a certain user is invited to attend, whether or not
 * the user is attending, and whether or not the user is a recruiter for this event (as opposed to just an attendee).
@@ -132,7 +137,16 @@ var UserSchema = new Schema({
 	},
 	provider: {
 		type: String,
-		validate: [validateRequired, 'Provider required.']
+		validate: [validateRequired, 'Provider required']
+	},
+	organization: {
+		type: String,
+	},
+	interests: {
+		type: [String]
+		//Mongoose.js converts assignments of incorrect type to string arrays. I have tested that it
+		//	provides this functionality. A test that such an assignment should fail is
+		//	unnecessary
 	},
 	providerData: {},
 	additionalProvidersData: {},
@@ -224,3 +238,5 @@ UserSchema.methods.authenticate = function(password) {
 };
 
 mongoose.model('User', UserSchema);
+
+exports = UserSchema;

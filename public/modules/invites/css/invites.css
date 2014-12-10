@@ -1,3 +1,72 @@
+.animate-container {
+  width: 100%;
+}
+.frank-invite-hr {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.frank-invite-preview-modal {
+  width: 650px;
+  height: 425px;
+  margin: auto;
+}
+.frank-invite-preview-modal .modal-dialog{
+  margin: 0;
+}
+.frank-invite-preview-modal .modal-body {
+  width: 568px;
+  height: 250px;
+  overflow: auto;
+}
+.frank-invites-sidebar{
+  position: fixed;
+  height: 100vh;
+  width: 325px;
+  right: 0;
+  top: 0;
+  margin-top: -30px;
+  background-color: #E8E9EB;
+  z-index: -1;
+}
+.frank-invites-sidebar table {
+  border-spacing: 3px;
+  border-collapse: separate;
+}
+.frank-invite-sidebar-search {
+  width: 90%;
+  margin-left: 16px;
+  margin-top: 5px;
+}
+.frank-invite-sidebar-title {
+  color: white;
+  background-color: #333232;
+  width: 100%;
+  text-align: center;
+  vertical-align: middle;
+  height: 25px;
+  font-size: 18px;
+}
+.frank-invite-sidebar-total {
+  width: 100%;
+}
+.frank-invite-table-container {
+  height: 100px;
+  overflow: auto;
+}
+.invitation-button {
+  height: 45px;
+  width: 120px;
+  padding: 10px;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: white;
+}
+.invitation_field {
+  height:25px;
+  margin-left: 6vw;
+  display: inline-table;
+}
 .preview {
   background:purple;
   height:50%;
@@ -8,240 +77,331 @@
   margin-right:50%;
   z-index:100;
   border-radius:10px;
-  color:black;
+color:black;
+}
+.to_field {
+  border: none;
+  border-right: 1px solid rgb(169, 169, 169);
+  border-top: 1px solid rgb(169, 169, 169);
+  border-bottom: 1px solid rgb(169, 169, 169);
+  height: 28px;
+  background: transparent;
+  width: 12vw;
+  margin-left: -4px;
+  padding-left: 4px;
+}
+
+.to_field.ng-pristine.ng-valid {
+  border-top: none;
+  border-bottom: none;
 }
 
 /* when hiding the thing */
 /* .ng-hide-add         { 
-  -webkit-animation:0.5s lightSpeedOut ease; 
-  animation:0.5s lightSpeedOut ease; 
+-webkit-animation:0.5s lightSpeedOut ease; 
+animation:0.5s lightSpeedOut ease; 
 }
 
 
 .ng-hide-remove      { 
-  -webkit-animation:0.5s flipInX ease; 
-  animation:0.5s flipInX ease; 
+-webkit-animation:0.5s flipInX ease; 
+animation:0.5s flipInX ease; 
 }
 
 @-webkit-keyframes flipInX {
-  0% {
-    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
-    transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
-    -webkit-transition-timing-function: ease-in;
-    transition-timing-function: ease-in;
-    opacity: 0;
-  }
+0% {
+  -webkit-transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+  transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+  -webkit-transition-timing-function: ease-in;
+  transition-timing-function: ease-in;
+  opacity: 0;
+}
 
-  40% {
-    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, -20deg);
-    transform: perspective(400px) rotate3d(1, 0, 0, -20deg);
-    -webkit-transition-timing-function: ease-in;
-    transition-timing-function: ease-in;
-  }
+40% {
+  -webkit-transform: perspective(400px) rotate3d(1, 0, 0, -20deg);
+  transform: perspective(400px) rotate3d(1, 0, 0, -20deg);
+  -webkit-transition-timing-function: ease-in;
+  transition-timing-function: ease-in;
+}
 
-  60% {
-    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, 10deg);
-    transform: perspective(400px) rotate3d(1, 0, 0, 10deg);
-    opacity: 1;
-  }
+60% {
+  -webkit-transform: perspective(400px) rotate3d(1, 0, 0, 10deg);
+  transform: perspective(400px) rotate3d(1, 0, 0, 10deg);
+  opacity: 1;
+}
 
-  80% {
-    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, -5deg);
-    transform: perspective(400px) rotate3d(1, 0, 0, -5deg);
-  }
+80% {
+  -webkit-transform: perspective(400px) rotate3d(1, 0, 0, -5deg);
+  transform: perspective(400px) rotate3d(1, 0, 0, -5deg);
+}
 
-  100% {
-    -webkit-transform: perspective(400px);
-    transform: perspective(400px);
-  }
+100% {
+  -webkit-transform: perspective(400px);
+  transform: perspective(400px);
+}
 }
 
 @keyframes flipInX {
-  0% {
-    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
-    -ms-transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
-    transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
-    -webkit-transition-timing-function: ease-in;
-    transition-timing-function: ease-in;
-    opacity: 0;
-  }
+0% {
+  -webkit-transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+  -ms-transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+  transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+  -webkit-transition-timing-function: ease-in;
+  transition-timing-function: ease-in;
+  opacity: 0;
+}
 
-  40% {
-    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, -20deg);
-    -ms-transform: perspective(400px) rotate3d(1, 0, 0, -20deg);
-    transform: perspective(400px) rotate3d(1, 0, 0, -20deg);
-    -webkit-transition-timing-function: ease-in;
-    transition-timing-function: ease-in;
-  }
+40% {
+  -webkit-transform: perspective(400px) rotate3d(1, 0, 0, -20deg);
+  -ms-transform: perspective(400px) rotate3d(1, 0, 0, -20deg);
+  transform: perspective(400px) rotate3d(1, 0, 0, -20deg);
+  -webkit-transition-timing-function: ease-in;
+  transition-timing-function: ease-in;
+}
 
-  60% {
-    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, 10deg);
-    -ms-transform: perspective(400px) rotate3d(1, 0, 0, 10deg);
-    transform: perspective(400px) rotate3d(1, 0, 0, 10deg);
-    opacity: 1;
-  }
+60% {
+  -webkit-transform: perspective(400px) rotate3d(1, 0, 0, 10deg);
+  -ms-transform: perspective(400px) rotate3d(1, 0, 0, 10deg);
+  transform: perspective(400px) rotate3d(1, 0, 0, 10deg);
+  opacity: 1;
+}
 
-  80% {
-    -webkit-transform: perspective(400px) rotate3d(1, 0, 0, -5deg);
-    -ms-transform: perspective(400px) rotate3d(1, 0, 0, -5deg);
-    transform: perspective(400px) rotate3d(1, 0, 0, -5deg);
-  }
+80% {
+  -webkit-transform: perspective(400px) rotate3d(1, 0, 0, -5deg);
+  -ms-transform: perspective(400px) rotate3d(1, 0, 0, -5deg);
+  transform: perspective(400px) rotate3d(1, 0, 0, -5deg);
+}
 
-  100% {
-    -webkit-transform: perspective(400px);
-    -ms-transform: perspective(400px);
-    transform: perspective(400px);
-  }
+100% {
+  -webkit-transform: perspective(400px);
+  -ms-transform: perspective(400px);
+  transform: perspective(400px);
+}
 }
 
 
 @-webkit-keyframes lightSpeedOut {
-  0% {
-    opacity: 1;
-  }
+0% {
+  opacity: 1;
+}
 
-  100% {
-    -webkit-transform: translate3d(100%, 0, 0) skewX(30deg);
-    transform: translate3d(100%, 0, 0) skewX(30deg);
-    opacity: 0;
-  }
+100% {
+  -webkit-transform: translate3d(100%, 0, 0) skewX(30deg);
+  transform: translate3d(100%, 0, 0) skewX(30deg);
+  opacity: 0;
+}
 }
 
 @keyframes lightSpeedOut {
-  0% {
-    opacity: 1;
-  }
+0% {
+  opacity: 1;
+}
 
-  100% {
-    -webkit-transform: translate3d(100%, 0, 0) skewX(30deg);
-    -ms-transform: translate3d(100%, 0, 0) skewX(30deg);
-    transform: translate3d(100%, 0, 0) skewX(30deg);
-    opacity: 0;
-  }
+100% {
+  -webkit-transform: translate3d(100%, 0, 0) skewX(30deg);
+  -ms-transform: translate3d(100%, 0, 0) skewX(30deg);
+  transform: translate3d(100%, 0, 0) skewX(30deg);
+  opacity: 0;
+}
 }
 
 .animate-container {
-    background:white;
-    border:1px solid black;
-    list-style:none;
-    margin:0;
-    padding:0 10px;
-    border-radius:10px;
-  }
+  background:white;
+  border:1px solid black;
+  list-style:none;
+  margin:0;
+  padding:0 10px;
+  border-radius:10px;
+}
 
 .animate-container2 {
-    background:white;
-    border:1px solid black;
-    list-style:none;
-    margin:0;
-    padding:0 10px;
-    border-radius:10px;
-  }
+  background:white;
+  border:1px solid black;
+  list-style:none;
+  margin:0;
+  padding:0 10px;
+  border-radius:10px;
+}
 
 
-  .animate-repeat {
-    line-height:40px;
-    list-style:none;
-    box-sizing:border-box;
-  }
-  
-  .animate-repeat2 {
-    line-height:40px;
-    list-style:none;
-    box-sizing:border-box;
-  }
+.animate-repeat {
+  line-height:40px;
+  list-style:none;
+  box-sizing:border-box;
+}
 
-  .animate-repeat.ng-move,
-  .animate-repeat.ng-enter,
-  .animate-repeat.ng-leave {
-    -webkit-transition:all linear 0.5s;
-    transition:all linear 0.5s;
-  }
+.animate-repeat2 {
+  line-height:40px;
+  list-style:none;
+  box-sizing:border-box;
+}
 
-  .animate-repeat.ng-leave.ng-leave-active,
-  .animate-repeat.ng-move,
-  .animate-repeat.ng-enter {
-    opacity:0;
-    max-height:0;
-  }
+.animate-repeat.ng-move,
+.animate-repeat.ng-enter,
+.animate-repeat.ng-leave {
+  -webkit-transition:all linear 0.5s;
+  transition:all linear 0.5s;
+}
 
-  .animate-repeat.ng-leave,
-  .animate-repeat.ng-move.ng-move-active,
-  .animate-repeat.ng-enter.ng-enter-active {
-    opacity:1;
-    max-height:40px;
-  }
-  
-  .animate-repeat2.ng-move,
-  .animate-repeat2.ng-enter,
-  .animate-repeat2.ng-leave {
-    -webkit-transition:all linear 0.5s;
-    transition:all linear 0.5s;
-  }
+.animate-repeat.ng-leave.ng-leave-active,
+.animate-repeat.ng-move,
+.animate-repeat.ng-enter {
+  opacity:0;
+  max-height:0;
+}
 
-  .animate-repeat2.ng-leave.ng-leave-active,
-  .animate-repeat2.ng-move,
-  .animate-repeat2.ng-enter {
-    opacity:0;
-    max-height:0;
-  }
+.animate-repeat.ng-leave,
+.animate-repeat.ng-move.ng-move-active,
+.animate-repeat.ng-enter.ng-enter-active {
+  opacity:1;
+  max-height:40px;
+}
 
-  .animate-repeat2.ng-leave,
-  .animate-repeat2.ng-move.ng-move-active,
-  .animate-repeat2.ng-enter.ng-enter-active {
-    opacity:1;
-    max-height:40px;
-  } */
-  
-  #invites {
-    margin-left:70%;
-    margin-top:50%;
-    position:absolute;
-    margin-right:5%;
-    height:200px;
-    overflow:auto;
-    width:250px;
-  }
-  #accepted {
-    position:absolute;
-    margin-left:70%;
-    margin-right:5%;
-    margin-top:10%;
-    overflow:auto;
-    height:200px;
-    width:250px;
-  }
-  #invite {
-    border:1px solid black;
-    height:90%;
-    position:absolute;
-    margin-left:5%;
-    width:55%;
-    border-radius:10px;
-    box-shadow: 10px 10px 5px black;
-  }
-  #from {
-    border:1px solid black;
-    margin-left:5%;
-    margin-right:5%;
-    margin-top:5%;
-    border-radius:5px;
-    height:25px;
-  }
-  #to {
-    border:1px solid black;
-    margin-top:10%;
-    height:70%;
-    position:relative;
-    margin-left:5%;
-    margin-right:5%;
-    border-radius:10px;
-  }
-  #header {
-    text-align:center;
-    position:relative;
-  }
-  body {
-    background-color:#F5F5F5;
-    overflow:hidden;
-  }
+.animate-repeat2.ng-move,
+.animate-repeat2.ng-enter,
+.animate-repeat2.ng-leave {
+  -webkit-transition:all linear 0.5s;
+  transition:all linear 0.5s;
+}
+
+.animate-repeat2.ng-leave.ng-leave-active,
+.animate-repeat2.ng-move,
+.animate-repeat2.ng-enter {
+  opacity:0;
+  max-height:0;
+}
+
+.animate-repeat2.ng-leave,
+.animate-repeat2.ng-move.ng-move-active,
+.animate-repeat2.ng-enter.ng-enter-active {
+  opacity:1;
+  max-height:40px;
+} */
+
+#invites {
+  top: 220px;
+  right:-335px;
+}
+#accepted {
+}
+#from {
+  margin-top: 15px;
+}
+#invitation_buttons {
+  width: 244px;
+  margin: auto;
+}
+#invite {
+  min-height: 465px;
+  height: 60vh;
+  position: absolute;
+  margin-left: 5%;
+  width: 60vw;
+  background-color: white;
+  margin-top: 10px;
+}
+#invitee_email {
+  width: 19vw;
+}
+/*#to {
+  border:1px solid black;
+  margin-top:10%;
+  height:70%;
+  position:relative;
+  margin-left:5%;
+  margin-right:5%;
+  border-radius:10px;
+}*/
+#to_fields {
+  display: inline-block;
+  border: 1px solid rgb(169, 169, 169);
+  width: 45vw;
+  height: 30px;
+  background-color: white;
+  border-radius: 5px;
+}
+#header {
+  text-align:center;
+  position:relative;
+}
+#message {
+  margin-top: 15px;
+  margin-left: 6vw;
+}
+#p_message {
+  width: 45vw;
+  max-height: 250px;
+  min-height: 185px;
+  height: 30vh;
+  resize: none;
+  border-radius: 5px;
+}
+#recruiter_email {
+  display: inline-block;
+  border: 1px solid rgb(169, 169, 169);
+  width: 45vw;
+  height: 30px;
+  vertical-align: middle;
+  padding: 4px;
+  border-radius: 5px;
+  background-color: white;
+}
+body {
+  background-color:#F5F5F5;
+}
+#previewbutton {
+  background-color: rgb(197, 78, 144);
+  border-radius: 0;
+}
+.invitation_fName {
+  border-bottom-left-radius: 4px;
+  border-top-left-radius: 4px;
+  margin-left: -1px;
+  border-left: 1px solid rgb(169, 169, 169);
+}
+#invitation-submit-button {
+  background-color: rgb(115, 201, 45);
+  border-radius: 0;
+}
+
+
+/*Overwritten Angular-Bootstrap*/
+.modal-dialog {
+  margin-top: 30vh;
+}
+.modal.ui-draggable {
+  position: relative;
+}
+.panel-group .panel + .panel{
+  margin-top: 0;
+}
+.panel-default > .panel-heading {
+  background-image: -webkit-linear-gradient(top, #3c3c3c 0%, #222 100%);
+  background-image: -o-linear-gradient(top, #3c3c3c 0%, #222 100%);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#3c3c3c), to(#222));
+  background-image: linear-gradient(to bottom, #3c3c3c 0%, #222 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff3c3c3c', endColorstr='#ff222222', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+  background-repeat: repeat-x;
+  color: #E8E9EB;
+}
+.panel-default > .panel-heading:hover {
+  color: white;
+}
+.panel-default > .panel-heading a:hover {
+  color: white;
+  text-decoration: none;
+}
+
+.frank-invite-preview-modal .modal-dialog {
+  width: 625px;
+}
+.frank-invite-preview-modal .modal-body {
+  width: 100%;
+  height: 280px;
+}
+
+/*Overwritten jQuery-UI*/
+.ui-draggable-handle {
+  cursor: pointer;
+}

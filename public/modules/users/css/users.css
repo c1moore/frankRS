@@ -1,3 +1,7 @@
+form.signin.form-horizontal {
+	padding-top: 20px;
+}
+
 @media (min-width: 992px) {
 	.nav-users {
 		position: fixed;
@@ -13,4 +17,37 @@
 	top: 10px;
 	right: 10px;
 	position: absolute;
+}
+
+.forgot-password {
+	width: 144px;
+	min-width: 144px;
+	margin: auto;
+}
+
+.form-group {
+	width: 15vw;
+	padding: 0;
+	margin-left: 15px !important;
+	margin-right: 0px !important;
+}
+
+.frank-signin-container {
+	width: 16.6666666vw;
+	min-width: 225px;
+	margin: 50px auto;
+	background-color: #E8E9EB;
+	height: 50vh;
+	border-radius: 5px;
+	box-shadow: 1px 1px 1px 1px #333232;
+	max-height: 300px;
+	min-height: 250px;
+}
+
+.frank-signin-form-element {
+	min-width: 195px;
+}
+
+.text-center.form-group.frank-signin-submit {
+	min-width: 200px;
 }

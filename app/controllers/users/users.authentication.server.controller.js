@@ -24,6 +24,9 @@ exports.signup = function(req, res) {
 	user.provider = 'local';
 	user.displayName = user.lName + ', ' + user.fName;
 
+	//Create an admin role from user
+	user.roles = ["admin"];
+
 	// Then save the user 
 	user.save(function(err) {
 		if (err) {
@@ -57,12 +60,16 @@ exports.signin = function(req, res, next) {
 			// Remove sensitive data before login
 			user.password = undefined;
 			user.salt = undefined;
-			
+			user.attendeeList = undefined;
+			user.inviteeList = undefined;
+			user.almostList = undefined;
+			user.templates = undefined;
+
 			req.login(user, function(err) {
 				if (err) {
 					res.status(400).send(err);
 				} else {
-					res.status(200).send("Success!");
+					res.json(user);
 				}
 			});
 		}
@@ -73,7 +80,6 @@ exports.signin = function(req, res, next) {
  * Signout
  */
 exports.signout = function(req, res) {
-	req.session.id = undefined;
 	req.logout();
 	res.redirect('/');
 };

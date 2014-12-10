@@ -13,7 +13,7 @@ var validateRequired = function(prop) {
 };
 
 var validateIds = function(prop) {
-	return (prop.attendee && prop.attendee.length && prop.eventid && prop.eventid.length);
+	return (prop.attendee && prop.attendee.length && prop.event_id && prop.event_id.length);
 };
 
 /**
@@ -25,7 +25,7 @@ var AttendeesSchema = new Schema({
 		ref: 'User',
 		validate: [validateRequired, 'User ID is required.']
 	},
-	eventid : {
+	event_id : {
 		type: Schema.Types.ObjectId,
 		ref: 'Event',
 		validate: [validateRequired, 'Event ID is required.']
@@ -36,8 +36,10 @@ var AttendeesSchema = new Schema({
 	}
 });
 
-AttendeesSchema.index({attendee:1, eventid:1}, {unique: true});
+AttendeesSchema.index({attendee:1, event_id:1}, {unique: true});
 
 AttendeesSchema.plugin(idvalidator);
 
 mongoose.model('Attendees', AttendeesSchema);
+
+exports = AttendeesSchema;

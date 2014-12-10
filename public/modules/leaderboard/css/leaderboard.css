@@ -1,3 +1,52 @@
+a {
+	color: black;
+	cursor: pointer;
+}
+
+a:hover {
+	color: #333232;
+}
+
+.dropdown-menu {
+	float: left;
+}
+
+.frank-event-select {
+	background-image: -webkit-linear-gradient(top, #f0ad4e 0%, #ec971f 100%);
+	background-image: -o-linear-gradient(top, #f0ad4e 0%, #ec971f 100%);
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#f0ad4e), to(#ec971f));
+	background-image: linear-gradient(to bottom, #f0ad4e 0%, #ec971f 100%);
+	background-repeat: repeat-x;
+	border-color: #eea236;
+}
+
+.leaderboard-container {
+	background-color: white;
+	margin-top: 10px;
+	margin-left: 10px;
+	height: 575px;
+}
+
+.ng-table-counts {
+	display: none;
+}
+
+.ng-table th.sortable div:after, .ng-table th.sortable div:before {
+	border-color: #fff transparent;
+}
+
+.ng-table th.sortable div:before {
+	border-top: 4px solid #fff;
+}
+
+.ng-table th.sortable.sort-desc, .ng-table th.sortable.sort-asc {
+	background-color: rgba(25, 25, 25, .70);
+}
+
+.ng-table th.sortable.sort-desc div:after {
+	border-top: 4px solid #fff;
+}
+
 .table .progress {
 	margin-bottom:0;
 }
@@ -5,6 +54,11 @@
 .table {
 	margin-bottom:0;
 	border-collapse: separate;
+}
+
+th.header {
+	background-color: #333232;
+	color: white;
 }
 
 .pagination {
@@ -26,4 +80,46 @@
 .progress-bar {
 	.background-image: none;
 	.background-color: #c54e92;
+}
+
+.ranktitle {
+	font-size:2em;
+	margin-bottom:0px;
+}
+
+.eventSelector {
+	padding-top:0px;
+}
+
+.score-section  {
+	margin-top:20px;
+}
+
+.score-section h1 {
+	margin:0px;
+}
+
+.rank-container {
+	margin-left:auto;
+	margin-right:auto;
+	width:200px;
+	height:200px;
+	background-color:#93c63d;
+}
+
+.rank-container h1 {
+	margin:0px;
+	font-size:150px;
+	text-align:center;
+	line-height:200px;
+	font-weight:bold;
+	color:#ffffff;
+}
+
+.frank-rank-smaller h1{
+	font-size: 110px !important;
+}
+
+#stats {
+	font-size:3em;
 }

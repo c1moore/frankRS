@@ -41,7 +41,7 @@ var EventSchema = new Schema({
 	}
 });
 
-EventSchema.index({name:1, start_date:1, end_date:1, location:1}, {unique:true});
+EventSchema.index({name:1}, {unique:true});
 
 EventSchema.pre('validate', function(next) {
 	if(this.start_date > this.end_date){
@@ -60,3 +60,5 @@ EventSchema.pre('validate', function(next) {
 });
 
 mongoose.model('Event', EventSchema);
+
+exports = EventSchema;

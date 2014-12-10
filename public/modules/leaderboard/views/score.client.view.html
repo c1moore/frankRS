@@ -1,3 +1,15 @@
-<section>
-	
+<section class="score-section" ng-controller="LeaderboardTablesCtrl">
+	<div class="rows">
+		<div class="col-md-4">
+			<div class="rank-container" ng-class="{'frank-rank-smaller' : smallRankHeader}"><h1>{{userScore}}</h1></div>
+		</div>
+		<div class="col-md-8">
+			<h1 id="stats">Stats</h1>
+			<div class="well">
+				<p>Number Invited: {{userInvites}}</p>
+				<p>Number Attending: {{userAttendees}}</p>
+				<p>Ratio of Attending to Invited: {{getRatio()}}</p>
+			</div>
+		</div>
+	</div>
 </section>

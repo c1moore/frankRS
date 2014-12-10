@@ -82,23 +82,23 @@ describe('Attendees Model Unit Tests:', function() {
 			
 			attendee1 = new Attendees ({
 				attendee : user._id,
-				eventid : event1._id,
+				event_id : event1._id,
 				time : ctime
 			});
 			attendee2u = new Attendees ({
 				attendee : user2._id,
-				eventid : event1._id,
+				event_id : event1._id,
 				time : ctime
 			});
 			attendee3e = new Attendees ({
 				attendee : user._id,
-				eventid : event2._id,
+				event_id : event2._id,
 				time : ctime
 			});
 
 			duplicate = new Attendees ({
 				attendee : user._id,
-				eventid : event1._id,
+				event_id : event1._id,
 				time : ctime
 			});
 
@@ -139,7 +139,7 @@ describe('Attendees Model Unit Tests:', function() {
 		});
 
 		it('should fail to save when event id is not valid', function(done) {
-			attendee1.eventid = mongoose.Types.ObjectId();
+			attendee1.event_id = mongoose.Types.ObjectId();
 			attendee1.save(function(err) {
 				should.exist(err);
 				done();
@@ -163,7 +163,7 @@ describe('Attendees Model Unit Tests:', function() {
 		});
 
 		it('should fail to save without an event id', function(done) {
-			attendee1.eventid = null;
+			attendee1.event_id = null;
 			attendee1.save(function(err) {
 				should.exist(err);
 				done();
@@ -183,10 +183,10 @@ describe('Attendees Model Unit Tests:', function() {
 
 		it('should allow getting the event id', function(done) {
 			attendee1.save(function() {
-				var query = Attendees.findOne({'eventid' : attendee1.eventid});
+				var query = Attendees.findOne({'event_id' : attendee1.event_id});
 				query.exec(function(err, result) {
-					(result.eventid === undefined).should.be.false;
-					(result.eventid.toString()).should.equal(attendee1.eventid.toString());
+					(result.event_id === undefined).should.be.false;
+					(result.event_id.toString()).should.equal(attendee1.event_id.toString());
 					done();
 				});
 			});
@@ -204,10 +204,7 @@ describe('Attendees Model Unit Tests:', function() {
 		});
 
 		afterEach(function(done) {
-			attendee1.remove();
-			duplicate.remove();
-			attendee2u.remove();
-			attendee3e.remove();
+			Attendees.remove().exec();
 			done();
 		});
 	});

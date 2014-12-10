@@ -15,9 +15,13 @@ module.exports = {
 			css: [
 				'public/lib/bootstrap/dist/css/bootstrap.css',
 				'public/lib/bootstrap/dist/css/bootstrap-theme.css',
-				'public/lib/ng-table/ng-table.css'
+				'public/lib/ng-table/ng-table.css',
+				'public/lib/font-awesome/css/font-awesome.min.css',
+				'public/lib/angular-multi-select/angular-multi-select.css',
+				'public/lib/angular-dialog-service/dist/dialogs.min.css'
 			],
 			js: [
+				'public/lib/jquery/dist/jquery.min.js',
 				'public/lib/angular/angular.js',
 				'public/lib/angular-resource/angular-resource.js', 
 				'public/lib/angular-cookies/angular-cookies.js', 
@@ -27,7 +31,21 @@ module.exports = {
 				'public/lib/angular-ui-router/release/angular-ui-router.js',
 				'public/lib/angular-ui-utils/ui-utils.js',
 				'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
-				'public/lib/ng-table/ng-table.js'
+				'public/lib/ng-table/ng-table.js',
+				'public/lib/lodash/dist/lodash.js',
+				'public/lib/jquery-ui/jquery-ui.min.js',
+				'public/lib/angularjs-dropdown-multiselect/src/angularjs-dropdown-multiselect.js',
+				'public/lib/textAngular/src/textAngular-sanitize.js',
+				'public/lib/textAngular/src/textAngular.js',
+				'public/lib/textAngular/src/textAngularSetup.js',
+				'public/lib/ng-flow/dist/ng-flow.js',
+				'public/lib/ng-flow/dist/ng-flow-standalone.js',
+				'public/lib/angular-input-date/src/angular-input-date.js',
+				'public/lib/angular-multi-select/angular-multi-select.js',
+				'public/lib/angular-dialog-service/example/js/dialogs.js',
+				'public/lib/spin.js/spin.js',
+				'public/lib/spin.js/jquery.spin.js',
+				'public/lib/angular-spinner/angular-spinner.js'
 			]
 		},
 		css: [

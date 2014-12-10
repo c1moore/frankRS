@@ -19,17 +19,19 @@ module.exports = function() {
 			}, function(err, user) {
 				if (err) {
 					return done(err);
-				} else if (!user || !user.authenticate(password)) {
+				} else if (!user) {
 					return done(null, false, {
-						message: 'Email or password is unknown.'
+						message: 'Unknown user or invalid password'
+					});
+				} else if (!user.authenticate(password)) {
+					return done(null, false, {
+						message: 'Unknown user or invalid password'
+					});
+				} else if(!user.login_enabled) {
+					return done(null, false, {
+						message : 'User cannot log into account yet.  You must sign up to attend the event to which you were invited.'
 					});
 				} else {
-					/*if (!user.authenticate(password)) {
-						return done(null, false, {
-							message: 'Invalid password'
-						});
-					}*/
-
 					return done(null, user);
 				}
 			});

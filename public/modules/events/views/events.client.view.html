@@ -1,0 +1,22 @@
+<section class="events-page" ng-controller="userEventCtrl">
+	<div class="jumbotron text-center">
+		<div class="container-fluid">
+			<h2>Events</h2>
+		</div>
+	</div>
+	<table ng-table="tableParams" show-filter="true" class="table table-bordered frank-recruiter-signup-table frank-main-view">
+		<tr ng-repeat="event in $data">
+			<td data-title="'Event'" sortable="'name'" filter="{'event':'text'}" width="200">
+				{{event.name}}
+			</td>
+			<td data-title="'Location'" sortable="'status'" filter="{'status':'text'}" width="100">
+				{{event.location}}
+			</td>
+			<td data-title="'Apply to be a Recruiter'" width="90" class="text-center">
+				<span ng-if="event.recruiter" class="glyphicon glyphicon-ok"></span>
+				<span ng-if="event.applied && !event.recruiter">{{capitalize(event.applied, true)}}</span>
+				<button ng-if="!event.recruiter && !event.applied" href="" class="btn btn-success btn-xs" ng-click="launch(event)">Apply</button>
+			</td>
+		</tr>
+	</table>
+</section>

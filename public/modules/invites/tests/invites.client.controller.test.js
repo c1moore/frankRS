@@ -1,7 +1,7 @@
 'use strict';
 
 (function() {
-	describe('inviteController', function() {
+	describe('invitesCtrl', function() {
 		beforeEach(module(ApplicationConfiguration.applicationModuleName));
 
 		beforeEach(inject(function($controller, $rootScope) {

@@ -6,17 +6,26 @@
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
 		</button>
-		<a href="/#!/" class="navbar-brand">frank Recruiter System</a>
+		<a href="/#!/" class="navbar-brand"><img src="/modules/core/img/brand/logo_header.png" /> Recruiter System</a>
 	</div>
 
 	<!--Collection of links-->
 	<nav class="collapse navbar-collapse" collapse="!isCollapsed" role="navigation">
 		<ul class="nav navbar-nav">
-				<li ui-route="/invite" ng-class="{active: $uiRoute}">
-					<a href="/#!/invite">Invitations</a>
+				<li ui-route="/admin" ng-class="{active: $uiRoute}" ng-hide="hideLink(adminRoles)">
+					<a href="/#!/admin">Admin</a>
 				</li>
-				<li ui-route="/leaderboard" ng-class="{active: $uiRoute}">
+				<li ui-route="/invite" ng-class="{active: $uiRoute}" ng-hide="hideLink(inviteRoles)">
+					<a href="/#!/invite">Control Room</a>
+				</li>
+				<li ui-route="/leaderboard" ng-class="{active: $uiRoute}" ng-hide="hideLink(leaderboardRoles)">
 					<a href="/#!/leaderboard">Leaderboard</a>
+				</li>
+				<li ui-route="/memoboard" ng-class="{active: $uiRoute}" ng-hide="hideLink(memoRoles)">
+					<a href="/#!/memoboard">Memo Board</a>
+				</li>
+				<li ui-route="/events" ng-class="{active: $uiRoute}" ng-hide="hideLink(eventsRoles)">
+					<a href="/#!/events">Recruiter Request</a>
 				</li>
 		</ul>
 
@@ -35,9 +44,6 @@
 			</li>
 		</ul>
 		<ul class="nav navbar-nav navbar-right" data-ng-hide="authentication.user">
-			<li ui-route="/signup" ng-class="{active: $uiRoute}">
-				<a href="/#!/signup">Sign Up</a>
-			</li>
 			<li class="divider-vertical"></li>
 			<li ui-route="/signin" ng-class="{active: $uiRoute}">
 				<a href="/#!/signin">Sign In</a>
@@ -46,14 +52,11 @@
 		<ul class="nav navbar-nav navbar-right" data-ng-show="authentication.user">
 			<li class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-					<span data-ng-bind="authentication.user.displayName"></span> <b class="caret"></b>
+					<span data-ng-bind="authentication.user.fName"></span> <b class="caret"></b>
 				</a>
 				<ul class="dropdown-menu">
 					<li>
 						<a href="/#!/settings/profile">Edit Profile</a>
-					</li>
-					<li>
-						<a href="/#!/settings/accounts">Manage Social Accounts</a>
 					</li>
 					<li data-ng-show="authentication.user.provider === 'local'">
 						<a href="/#!/settings/password">Change Password</a>
@@ -62,6 +65,27 @@
 					<li>
 						<a href="/auth/signout">Signout</a>
 					</li>
+				</ul>
+			</li>
+		</ul>
+		<ul class="nav navbar-nav navbar-right" ng-hide="eventSelector.hideEventSelector()">
+			<li class="dropdown">
+				<a href='' class="dropdown-toggle" data-toggle="dropdown">
+					<span data-ng-bind="eventSelector.selectedEvent"></span> <b class="caret"></b>
+				</a>
+				<ul class="dropdown-menu" ng-if="eventSelector.admin">
+						<li ng-repeat="event in eventSelector.events">
+							<a href="" ng-click="eventSelector.changeEvent(event)">{{event.name}}</a>
+						</li>
+				</ul>
+				<ul class="dropdown-menu frank-main-view" ng-if="!eventSelector.admin">
+						<li ng-repeat="event in eventSelector.events" ng-if="eventSelector.numRecruiting > 0">
+							<a href="" ng-click="eventSelector.changeEvent(event)" ng-if="event.recruiter">{{event.event_id.name}}</a>
+						</li>
+						<li class="divider" ng-if="eventSelector.showDivider()"></li>
+						<li ng-repeat="event in eventSelector.events" ng-class="{disabled : eventSelector.nresDisabled}">
+							<a href="" ng-click="eventSelector.changeEvent(event)" ng-if="!event.recruiter">{{event.event_id.name}}</a>
+						</li>
 				</ul>
 			</li>
 		</ul>
