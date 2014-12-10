@@ -9,11 +9,16 @@
 		// Load the main application module
 		beforeEach(module(ApplicationConfiguration.applicationModuleName));
 
-		beforeEach(inject(function($controller, $rootScope) {
+		beforeEach(inject(function($controller, $rootScope, Authentication, $injector) {
 			scope = $rootScope.$new();
+			Authentication = $injector.get('Authentication');
+			Authentication.user = {
+				roles : ["admin", "recruiter", "attendee"]
+			};
 
 			HomeController = $controller('HomeController', {
-				$scope: scope
+				$scope: scope,
+				Authentication : Authentication
 			});
 		}));
 
@@ -23,18 +28,18 @@
 
 		it('should expect comments to be true', function() {
 			expect(scope.displayComments).toBeTruthy();
-			expect(scope.buttonsGrid).toEqual("col-md-10");
+			//expect(scope.buttonsGrid).toEqual("col-md-10");
 		});
 
 		it('should change comments to change to false', function() {
 			scope.toggleComments();
 			expect(scope.displayComments).not.toBeTruthy();
-			expect(scope.buttonsGrid).toEqual("col-md-12");
+			//expect(scope.buttonsGrid).toEqual("col-md-12");
 		});
 
 		it('should return a width of 50', function() {
-			scope.userRoles = ['recruiter'];
-			expect(scope.buttonsWidth).toEqual(50);
+			scope.authentication.user.roles = ['recruiter'];
+			expect(scope.data.buttons.length).toEqual(5);
 		})
 	});
 })();

@@ -42,7 +42,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 		/*$scope.buttonsWidth = 100/($filter('roles')($scope.data.buttons,$scope.userRoles)).length;*/
 
 		$scope.displayComments = true;
-		/*$scope.buttonsGrid = "col-md-10";
+		/*$scope.buttonsGrid = "col-md-10";*/
 
 		$scope.toggleComments = function(){
 			$scope.displayComments = !$scope.displayComments;
@@ -52,7 +52,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 			else if (!$scope.displayComments) {
 				$scope.buttonsGrid = "col-md-12";
 			}
-		};*/
+		};
 
 		$scope.showComments = function() {
 			if (comments.length === 0) {

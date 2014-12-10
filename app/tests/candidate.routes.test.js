@@ -761,7 +761,7 @@ it('Should not have changed the attendee user to a recruiter for the whan status
  it("attendee should be able to volunteer as a new candidate", function(done) {
  	attendee1
  	.post('http://localhost:3001/candidate/setCandidate')
- 	.send({events: [event1._id]})
+ 	.send({event_id: event1._id})
  	.end(function(err,res) {
  		if (err) throw err;
  		res.status.should.equal(200);
@@ -1111,7 +1111,7 @@ it("attendees should not be able to delete candidates by event either", function
  it("attendee should be able to volunteer as a new candidate", function(done) {
  	recruiter1
  	.post('http://localhost:3001/candidate/setCandidate')
- 	.send({events: [event1._id]})
+ 	.send({event_id: event1._id})
  	.end(function(err,res) {
  		if (err) throw err;
  		//console.log(err);
