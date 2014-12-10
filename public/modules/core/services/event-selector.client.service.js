@@ -66,8 +66,8 @@ angular.module('core').service('eventSelector', ['$rootScope', '$http', '$locati
 						thisService.postEventId = cache.getData('eventId');
 					}
 					else {
-						thisService.selectedEvent = this.events[0].event_id.name;
-						thisService.postEventId = this.events[0].event_id._id;
+						thisService.selectedEvent = thisService.events[0].name;
+						thisService.postEventId = thisService.events[0]._id;
 					}
 				}).error(function(error, status) {
 					thisService.selectedEvent = "Error";
@@ -110,6 +110,9 @@ angular.module('core').service('eventSelector', ['$rootScope', '$http', '$locati
 						thisService.selectedEvent = cache.getData('selectedEvent');
 						thisService.postEventId = cache.getData('eventId');
 						thisService.recruiterEvent = cache.getData('recruiterEvent');
+					} else {
+						thisService.selectedEvent = thisService.events[0].name;
+						thisService.postEventId = thisService.events[0]._id;
 					}
 				}).error(function(error, status) {
 					if(status === 401) {
