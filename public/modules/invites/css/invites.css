@@ -382,6 +382,14 @@ body {
   text-decoration: none;
 }
 
+.frank-invite-preview-modal .modal-dialog {
+  width: 625px;
+}
+.frank-invite-preview-modal .modal-body {
+  width: 100%;
+  height: 280px;
+}
+
 /*Overwritten jQuery-UI*/
 .ui-draggable-handle {
   cursor: pointer;
