@@ -8,13 +8,21 @@
 
 		// Load the main application module
 		beforeEach(module(ApplicationConfiguration.applicationModuleName));
+		//beforeEach(module('Authentication'));
 
-		beforeEach(inject(function($controller, $rootScope) {
+		beforeEach(inject(function($controller, $rootScope, Authentication, $injector) {
 			scope = $rootScope.$new();
+			Authentication = $injector.get('Authentication');
+			Authentication.user = {
+				roles : ["admin", "recruiter", "attendee"]
+			};
 
 			HeaderController = $controller('HeaderController', {
-				$scope: scope
+				$scope: scope,
+				Authentication : Authentication
 			});
+
+			//scope.authentication.user.roles = ["attendee"];
 		}));
 
 		it('should expose the authentication service', function() {
@@ -22,13 +30,13 @@
 		});
 
 		it('should return return true for user with only attendee Role', function() {
-			scope.userRoles = ['attendee'];
-			expect(scope.hideLink(scope.leaderboardRoles)).toBeTruthy()
+			scope.authentication.user.roles = ["attendee"];
+			expect(scope.hideLink(scope.leaderboardRoles)).toBeTruthy();
 		});
 
 		it('should return return false for user with recruiter and/or admin Role(s)', function() {
-			scope.userRoles = ['recruiter','admin'];
-			expect(scope.hideLink(scope.leaderboardRoles)).toEqual(false)
+			scope.authentication.user.roles = ['recruiter','admin'];
+			expect(scope.hideLink(scope.leaderboardRoles)).toEqual(false);
 		});
 	});
 })();
