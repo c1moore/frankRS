@@ -7,7 +7,8 @@
 var errorHandler = require('./errors'),
 	mongoose = require('mongoose'),
 	User = mongoose.model('User'),
-	Event = mongoose.model('Event');
+	Event = mongoose.model('Event'),
+	Candidate = mongoose.model('Candidate');
 
 var canViewEvent = function(user,event_id,hasAuthorization) {
 	try {
@@ -523,32 +524,73 @@ exports.recruiterStatus = function(req, res) {
 
 		//Find and return all events in the collection
 		var query = Event.find({});
-		query.exec(function(err,result) {
+		query.exec(function(err,events) {
 			if (err) {
 				return res.status(400).send({message : err});
-			} else if (!result.length) {
+			} else if (!events.length) {
 				return res.status(400).json({message: "No events found?!"});
 			} else {
-				var eventsResult = [];
-				for(var i=0; i<result.length; i++) {
+				var query = Candidate.findOne({email : req.user.email});
+				query.exec(function(err, candidate) {
+					if(err) {
+						return res.status(400).send({message : err});
+					} else if(!candidate) {
+						var eventsResult = [];
+						for(var i=0; i<events.length; i++) {
 
-					eventsResult[i] = {};
-					eventsResult[i] = result[i].toObject();
+							eventsResult[i] = {};
+							eventsResult[i] = events[i].toObject();
+							eventsResult[i].applied = false;
 
-					var j = 0;
-					for(; j<req.user.status.length; j++) {
-						if(result[i]._id.toString() === req.user.status[j].event_id.toString()) {
-							eventsResult[i].recruiter = req.user.status[j].recruiter;
-							break;
+							var j = 0;
+							for(; j<req.user.status.length; j++) {
+								if(events[i]._id.toString() === req.user.status[j].event_id.toString()) {
+									eventsResult[i].recruiter = req.user.status[j].recruiter;
+									break;
+								}
+							}
+
+							if(j === req.user.status.length) {
+								eventsResult[i].recruiter = false;
+							}
 						}
-					}
 
-					if(j === req.user.status.length) {
-						eventsResult[i].recruiter = false;
-					}
-				}
+						res.status(200).send(eventsResult);
+					} else {
+						var eventsResult = [];
+						for(var i=0; i<events.length; i++) {
 
-				res.status(200).send(eventsResult);
+							eventsResult[i] = {};
+							eventsResult[i] = events[i].toObject();
+							eventsResult[i].applied = false;
+
+							var j = 0;
+							for(; j<req.user.status.length; j++) {
+								if(events[i]._id.toString() === req.user.status[j].event_id.toString()) {
+									eventsResult[i].recruiter = req.user.status[j].recruiter;
+									break;
+								}
+							}
+
+							if(j === req.user.status.length) {
+								eventsResult[i].recruiter = false;
+							}
+
+							for(j=0; j<candidate.events.length; j++) {
+								if(candidate.events[j].event_id.toString() === events[i]._id.toString()) {
+									eventsResult[i].applied = candidate.events[j].status;
+									break;
+								}
+							}
+
+							if(j === candidate.events.length) {
+								eventsResult[i].applied = false;
+							}
+						}
+
+						res.status(200).send(eventsResult);
+					}
+				});
 			}
 		});
 	} catch(err) {
