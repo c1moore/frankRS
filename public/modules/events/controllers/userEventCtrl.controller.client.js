@@ -1,5 +1,5 @@
-angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams', '$http', 'eventSelector', '$filter',
-	function($scope, ngTableParams, $http, eventSelector, $filter) {
+angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams', '$http', 'eventSelector', '$filter', 'dialogs',
+	function($scope, ngTableParams, $http, eventSelector, $filter, dialogs) {
 		$scope.events = [];
 		$scope.userEvents = [];
 		$scope.test = function(event) {
@@ -42,5 +42,12 @@ angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams',
         $scope.$watch("events", function() {
 			$scope.tableParams.reload();
 		});
+
+		$scope.launch = function(event) {
+			dlg = dialogs.confirm("Please confirm", "Apply to be a recruiter for " + event.name);
+			dlg.result.then(function(btn){
+				
+			})
+		}
 	}
 ]);
