@@ -62,6 +62,9 @@ li .disabled {
 	width: 100%;
 	bottom: -20px;
 }
+.multiSounds__sound {
+	height: 20px !important;
+}
 .undecorated-link:hover {
 	text-decoration: none;
 }

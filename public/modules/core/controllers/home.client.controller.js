@@ -33,7 +33,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 				{name:"Control Room", description:"Send out your invitations and see your invitation stats.", link:'/#!/invite', roles:['recruiter','admin'], image: "http://frank.jou.ufl.edu/recruiters/Pictures/but3.jpg"},
 				{name:"Leaderboard", description:"See how your friends and competitors rank against you.", link:'/#!/leaderboard', roles:['recruiter','admin'], image: "http://frank.jou.ufl.edu/recruiters/Pictures/but4.jpg"},
 				{name:"Memo Board", description:"Take a look at what people are saying about the events you are attending and weigh in on the chatter.", link:'/#!/memoboard', roles:['admin', 'recruiter', 'attendee'], image: "http://i.imgur.com/9UYHlAy.jpg"},
-				{name:"Request to Become a Recruiter", description:"Think you got what it takes to be a recruiter for frank?  Then sign up here.  Warning: we only accept the best.", link:'#', roles:['admin', 'recruiter', 'attendee'], titleId:"recruiter-request-button-title", image: "http://i.imgur.com/CSPFqYn.jpg"}
+				{name:"Request to Become a Recruiter", description:"Think you got what it takes to be a recruiter for frank?  Then sign up here.  Warning: we only accept the best.", link:'#', roles:['recruiter', 'attendee'], titleId:"recruiter-request-button-title", image: "http://i.imgur.com/CSPFqYn.jpg"}
 			],
 			comments: ["Comment 1", "Comment 2"]
 		};
