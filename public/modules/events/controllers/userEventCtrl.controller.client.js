@@ -1,5 +1,6 @@
-angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams', '$http', 'eventSelector', '$filter', 'dialogs',
-	function($scope, ngTableParams, $http, eventSelector, $filter, dialogs) {
+angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams', '$http', 'eventSelector', '$filter', 'dialogs', 'Authentication',
+	function($scope, ngTableParams, $http, eventSelector, $filter, dialogs, Authentication) {
+		$scope.user = Authentication.user;
 		$scope.events = [];
 		$scope.userEvents = [];
 		$scope.test = function(event) {
@@ -46,6 +47,7 @@ angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams',
 		$scope.launch = function(event) {
 			dlg = dialogs.confirm("Please confirm", "Apply to be a recruiter for " + event.name + "?");
 			dlg.result.then(function(btn){
+				$http.post('/candidate/setCandidate', {authentication.fName})
 				
 			})
 		}
