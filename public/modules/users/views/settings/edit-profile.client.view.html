@@ -4,23 +4,23 @@
 		<form name="userForm" data-ng-submit="updateUserProfile(userForm.$valid)" class="signin form-horizontal" autocomplete="off">
 			<fieldset>
 				<div class="form-group">
-					<label for="firstName">First Name</label>
-					<input type="text" id="firstName" name="firstName" class="form-control" data-ng-model="user.firstName" placeholder="First Name">
+					<label for="fName">First Name</label>
+					<input type="text" id="fName" name="fName" class="form-control" data-ng-model="user.fName" placeholder="First Name" required />
 				</div>
 				<div class="form-group">
-					<label for="lastName">Last Name</label>
-					<input type="text" id="lastName" name="lastName" class="form-control" data-ng-model="user.lastName" placeholder="Last Name">
+					<label for="lName">Last Name</label>
+					<input type="text" id="lName" name="lName" class="form-control" data-ng-model="user.lName" placeholder="Last Name" required />
 				</div>
 				<div class="form-group">
 					<label for="email">Email</label>
-					<input type="email" id="email" name="email" class="form-control" data-ng-model="user.email" placeholder="Email">
+					<input type="email" id="email" name="email" class="form-control" data-ng-model="user.email" placeholder="Email" required />
 				</div>
 				<div class="form-group">
 					<label for="email">Organization</label>
-					<input type="text" id="organization" name="organization" class="form-control" data-ng-model="user.organization" placeholder="Organization">
+					<input type="text" id="organization" name="organization" class="form-control" data-ng-model="user.organization" placeholder="Organization" required />
 				</div>
 				<div class="text-center form-group">
-					<button type="submit" class="btn btn-large btn-primary">Save Profile</button>
+					<button type="submit" class="btn btn-large btn-primary" ng-disabled="userForm.$invalid">Save Profile</button>
 				</div>
 				<div data-ng-show="success" class="text-center text-success">
 					<strong>Profile Saved Successfully</strong>
