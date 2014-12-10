@@ -83,6 +83,8 @@ color:black;
   height: 28px;
   background: transparent;
   width: 12vw;
+  margin-left: -4px;
+  padding-left: 4px;
 }
 
 .to_field.ng-pristine.ng-valid {
@@ -313,7 +315,6 @@ animation:0.5s flipInX ease;
   height: 30px;
   background-color: white;
   border-radius: 5px;
-
 }
 #header {
   text-align:center;
