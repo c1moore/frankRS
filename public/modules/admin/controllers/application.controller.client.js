@@ -1,5 +1,5 @@
-angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams', '$http', 'eventSelector', '$filter', '$window', '$location',
-	function($scope, ngTableParams, $http, eventSelector, $filter, $window, $location) {
+angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams', '$http', 'eventSelector', '$filter', '$window', '$location', 'usSpinnerService',
+	function($scope, ngTableParams, $http, eventSelector, $filter, $window, $location, usSpinnerService) {
             $scope.newCandidateEvents = [];
       	$scope.candidates = [];
             $scope.selectEvents = [];
@@ -120,6 +120,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
             $scope.selected.ids = [];
             $scope.email = {};
             $scope.email.errmess = [];
+            $scope.sending = false;
             $scope.setSelected = function(_id, email) {
                 for(var i=0; i<$scope.selected.ids.length; i++) {
                     if($scope.selected.ids[i] === _id) {
@@ -147,6 +148,9 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
                 }
 
                 if(!$scope.email.error) {
+                    $scope.sending = true;
+                    usSpinnerService.spin('spinner-2');
+
                     var body = {
                         candidate_ids : $scope.selected.ids,
                         subject : $scope.email.subject,
@@ -160,6 +164,9 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
                         $scope.email.errmess = [];
                         
                         $window.alert("Emails sent!");
+
+                        usSpinnerService.stop('spinner-2');
+                        $scope.sending = false;
                     }).error(function(response, status) {
                         console.log(response.message);
                         if(status === 401) {
@@ -171,6 +178,9 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
                         } else if(status === 400) {
                             $window.alert("There was an error sending the message.  Please try again later.");
                         }
+
+                        usSpinnerService.stop('spinner-2');
+                        $scope.sending = false;
                     });
                 }
             };

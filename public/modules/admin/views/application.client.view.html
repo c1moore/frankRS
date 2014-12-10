@@ -61,8 +61,8 @@
 				</tr>
 			</table>
 		</div>
-		<div class="col-md-12 frank-main-view">
-			<form class="frank-admin-email-form" ng-submit="sendMessages()">
+		<div class="col-md-12 frank-main-view" ng-show="selected.emails.length">
+			<form class="frank-admin-email-form" name="frankAdminEmail" ng-submit="sendMessages()">
 				<label>To
 					<br />
 					<div class="frank-admin-email-to">
@@ -77,10 +77,10 @@
 				<br />
 				<label>Message
 					<br />
-					<textarea id="frank-admin-email-message" ng-model="email.message" rows="12" cols="50" />
+					<textarea id="frank-admin-email-message" ng-model="email.message" rows="12" cols="50" required />
 				</label>
 				<br />
-				<button role="submit" class="btn invitation-button" id="admin-email-submit"><i class="fa fa-envelope-o"></i>Send</button>
+				<button role="submit" class="btn invitation-button" id="admin-email-submit" ng-disabled="frankAdminEmail.$invalid"><i class="fa fa-envelope-o"></i>Send</button>
 				<br />
 	            <div class="alert alert-danger" role="alert" ng-if="email.error">
 	              <span ng-repeat="mess in email.errmess">
