@@ -715,10 +715,8 @@ exports.setNote = function(req,res){
 exports.setCandidate = function(req,res){
 	if(!req.isAuthenticated()) {
 		return res.status(401).send({message : "User is not logged in."});
-	} else if(req.body.events == undefined || req.body.events.length === 0) {
-		return res.status(400).send({message : 'A required field is not specified.  Nice going.'});
 	} else if(req.hasAuthorization(req.user, ["admin"])) {
-		if(req.body.fName == undefined || req.body.lName == undefined || req.body.email == undefined) {
+		if(req.body.fName == undefined || req.body.lName == undefined || req.body.email == undefined || req.body.events == undefined || req.body.events.length === 0) {
 			return res.status(400).send({message : 'A required field is not specified.  Nice going.'});
 		}
 
