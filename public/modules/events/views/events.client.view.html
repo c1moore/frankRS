@@ -14,7 +14,7 @@
 			</td>
 			<td data-title="'Apply to be a Recruiter'" width="90" class="text-center">
 				<span ng-if="event.recruiter" class="glyphicon glyphicon-ok"></span>
-				<button ng-if="!event.recruiter" href="" class="btn btn-success btn-xs" ng-click="launch(event)">Apply</button>
+				<button ng-if="!event.recruiter" href="" class="btn btn-success btn-xs" ng-click="launch(event)" ng-disabled="event.applied">Apply</button>
 			</td>
 		</tr>
 	</table>
