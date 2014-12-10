@@ -31,6 +31,19 @@
 			expect(scope.displayComments).not.toBeTruthy();
 			expect(scope.buttonsGrid).toEqual("col-md-12");
 		});
+		
+		it('should return 5', function() {
+			expect(scope.buttons).toEqual(5);
+		});
+		
+		it('should return the right named views', function() {
+			expect(scope.names).toEqual(["Admin Page", "Memo Board", "Leaderboard", "Control Room", "Request to Become a Recruiter"]);
+		});
+		
+		it('should return no users', function() {
+			scope.comments.length(0);
+			expect(scope.showComments).toEqual("No users");
+		});
 
 		it('should return a width of 50', function() {
 			scope.userRoles = ['recruiter'];
