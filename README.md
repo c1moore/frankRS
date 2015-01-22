@@ -5,3 +5,22 @@ cen3031project
 
 **Notes**
 >Please change supersecretpassword in config before deployment
+
+**Contributors**
+<ul>
+  <li>
+    Calvin Moore (c1moore)
+  </li>
+  <li>
+    Dalton Verhagen (daltonv)
+  </li>
+  <li>
+    James Bird (<a href="" target="_blank">henfredemars</a>)
+  </li>
+  <li>
+    Dan Pickle (dtp130)
+  </li>
+  <li>
+    Domnic Kotwica (dkotwica)
+  </li>
+</ul>
