@@ -1,0 +1,13 @@
+.frank-recruiter-signup-modal .modal-header{
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+}
+.frank-recruiter-signup-modal .modal-content{
+	width: 530px;
+	margin: auto;
+}
+.frank-recruiter-signup-table {
+	width: 90vw;
+	margin: auto;
+	background-color: white;
+}
