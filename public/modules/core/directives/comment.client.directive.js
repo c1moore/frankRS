@@ -131,7 +131,7 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout', 'even
 								"<div text-angular ng-model='comment.content' ta-toolbar=\"[['undo', 'redo'], ['ul', 'ol', 'quote'], ['bold', 'italics', 'underline'], ['insertLink', 'insertVideo']]\" ></div>" +
 								"<span class='btn btn-default frank-comment-editor-img-uploader' flow-btn><i class='fa fa-camera'></i></span>" +
 								"<div class='frank-comment-editor-preview-container'><div class='frank-comment-editor-preview' ng-repeat='file in $flow.files'><img class='frank-comment-editor-preview-img' flow-img='file' ng-mouseover='showOverlay = $index' /><div ng-class='{\"frank-comment-editor-preview-overlay\" : showOverlay===$index, \"frank-comment-editor-preview-overlay-hidden\" : showOverlay!==$index}' ng-click='file.cancel()' ng-mouseleave='showOverlay = -1'><i class='fa fa-remove'></i></div></div></div>" +
-								"<div class='frank-comment-editor-submit' ng-class='{\"frank-comment-editor-submit-higher\" : uploader.flowInstance.files.length}'><input type='submit' value='Post' class='btn btn-primary' ng-disabled='!eventSelector.postEventId' /></div>" +
+								"<div class='frank-comment-editor-submit' ng-class='{\"frank-comment-editor-submit-higher\" : uploader.flowInstance.files.length}'><input type='submit' value='Post' class='btn btn-primary' ng-disabled=\"!eventSelector.postEventId\" /></div>" +
 								"<div ng-if='interestsEnabled' multi-select='' input-model='interests' max-height='72px' output-model='comment.interests' button-label='icon name' item-label='icon name' tick-property='ticked' selection-mode='multiple' max-labels='2' helper-elements='none reset filter' default-label='Select Tag...'></div>" +
 							"</div>" +
 						"</form>",
@@ -170,6 +170,7 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout', 'even
 				$scope.uploader = {};
 				$scope.comment = {};
 				$scope.newComment = $scope.comment.content = "";
+				$scope.eventSelector = eventSelector;
 				
 				if($scope.interestsEnabled) {
 					$scope.comment.interests = $scope.selectedInterests;
