@@ -248,6 +248,10 @@ exports.searchByInterests = function(req, res) {
 * comment stream to a file on our server.
 */
 exports.uploadRecruiterCommentImage = function(req, res) {
+	var basePath = path.normalize(__dirname + "../../../public/img/recruiter/");
+	if(!fs.existsSync(basePath)) {
+		fs.mkdirSync(basePath, 766);
+	}
 	if(!req.isAuthenticated()) {
 		return res.status(401).send({message : "User is not logged in."});
 	} else if(!req.hasAuthorization(req.user, ['admin', 'recruiter'])) {
@@ -255,21 +259,25 @@ exports.uploadRecruiterCommentImage = function(req, res) {
 	} else {
 		var form = new formidable.IncomingForm({
 			keepExtensions : true,
-			uploadDir : path.normalize(__dirname + "../../../public/img/recruiter")
+			uploadDir : basePath
+		});
+
+		form.on('error', function(err) {
+			return res.status(400).send({message : err});
 		});
 
 		form.parse(req, function(err, fields, files) {
 			if(!fields.event_id || !fields.flowFilename) {
-				fs.unlink(path.normalize(__dirname + "../../../public/img/recruiter/" + files.file.name), function() {
+				fs.unlink(files.file.path, function() {
 					return res.status(400).send({message : "Required field not set correctly."});
 				});
 			} else {
 				if(!canViewEvent(req.user, fields.event_id, req.hasAuthorization) || !isRecruitEvent(req.user, fields.event_id, req.hasAuthorization)) {
-					fs.unlink(path.normalize(__dirname + "../../../public/img/recruiter/" + files.file.name), function() {
+					fs.unlink(files.file.path, function() {
 						return res.status(401).send({message : "You are not authorized to view the comments for this event."});
 					});
 				} else {
-					fs.rename(files.file.path, path.normalize(__dirname + "../../../public/img/recruiter/" + fields.flowFilename), function(err) {
+					fs.rename(files.file.path, path.normalize(basePath + fields.flowFilename), function(err) {
 						if(err) {
 							return res.status(400).send({message : err, err : errorHandler.getErrorMessage(err)});
 						} else {

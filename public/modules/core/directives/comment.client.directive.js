@@ -127,7 +127,7 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout', 'even
 			},
 			template : "<form class='frank-comment-editor' ng-submit='postComment()'>" +
 							"<div class='frank-comment-editor-compressed' ng-click='toggleExpanded()' ng-hide='expanded'>Click to comment...</div>" +
-							"<div class='frank-comment-editor-expanded' ng-show='expanded' flow-init flow-name='uploader.flowInstance' flow-file-added='!!{jpg:1,gif:1,png:1,tiff:1,jpeg:1}[$file.getExtension()]' flow-complete='flowComplete()'>" +
+							"<div class='frank-comment-editor-expanded' ng-show='expanded' flow-init flow-name='uploader.flowInstance' flow-file-added='!!{jpg:1,gif:1,png:1,tiff:1,jpeg:1}[$file.getExtension()]' flow-complete='flowComplete()' flow-file-error='flowError()'>" +
 								"<div text-angular ng-model='comment.content' ta-toolbar=\"[['undo', 'redo'], ['ul', 'ol', 'quote'], ['bold', 'italics', 'underline'], ['insertLink', 'insertVideo']]\" ></div>" +
 								"<span class='btn btn-default frank-comment-editor-img-uploader' flow-btn><i class='fa fa-camera'></i></span>" +
 								"<div class='frank-comment-editor-preview-container'><div class='frank-comment-editor-preview' ng-repeat='file in $flow.files'><img class='frank-comment-editor-preview-img' flow-img='file' ng-mouseover='showOverlay = $index' /><div ng-class='{\"frank-comment-editor-preview-overlay\" : showOverlay===$index, \"frank-comment-editor-preview-overlay-hidden\" : showOverlay!==$index}' ng-click='file.cancel()' ng-mouseleave='showOverlay = -1'><i class='fa fa-remove'></i></div></div></div>" +
@@ -191,33 +191,42 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout', 'even
 						$scope.uploader.flowInstance.opts.testChunks = false;
 						$scope.uploader.flowInstance.opts.permanentErrors = [400, 401, 404, 415, 500, 501];
 
+						var flowErr = false;
+						$scope.flowError = function() {
+							flowErr = true;
+
+							$window.alert("There was an error uploading your images.  Only <b>images</b> smaller than 2MB are allowed.");
+						};
+
 						//TODO: Add an .error() event and a var.  If there was an error, set the var to false and do not add the comment to db.
 						$scope.flowComplete = function() {
-							var commentWithImg = $scope.comment.content;
-							for(var i=0; i<$scope.uploader.flowInstance.files.length; i++) {
-								commentWithImg += "<div class='frank-comment-pic-container'><img class='frank-comment-pic' src='img/recruiter/" + $scope.uploader.flowInstance.files[i].name + "' /></div>";
-							}
-
-							var interestsArr = [];
-							if($scope.interestsEnabled) {
-								for(var i=0; i<$scope.comment.interests.length; i++) {
-									interestsArr.push($scope.comment.interests[i].name);
+							if(!flowErr) {
+								var commentWithImg = $scope.comment.content;
+								for(var i=0; i<$scope.uploader.flowInstance.files.length; i++) {
+									commentWithImg += "<div class='frank-comment-pic-container'><img class='frank-comment-pic' src='img/recruiter/" + $scope.uploader.flowInstance.files[i].name + "' /></div>";
 								}
-							}
 
-							$http.post($scope.postAddress, {comment : commentWithImg, event_id : eventSelector.postEventId, interests : interestsArr}).success(function(response) {
-								$scope.refresh();
-								$scope.comment.content = "";
-								$scope.expanded = false;
-								$scope.uploader.flowInstance.cancel();
+								var interestsArr = [];
 								if($scope.interestsEnabled) {
-									for(var i=0; i<$scope.interests.length; i++) {
-										$scope.interests[i].ticked = false;
+									for(var i=0; i<$scope.comment.interests.length; i++) {
+										interestsArr.push($scope.comment.interests[i].name);
 									}
 								}
-							}).error(function(response, status) {
-								$window.alert(status + " " + response.message);
-							});
+
+								$http.post($scope.postAddress, {comment : commentWithImg, event_id : eventSelector.postEventId, interests : interestsArr}).success(function(response) {
+									$scope.refresh();
+									$scope.comment.content = "";
+									$scope.expanded = false;
+									$scope.uploader.flowInstance.cancel();
+									if($scope.interestsEnabled) {
+										for(var i=0; i<$scope.interests.length; i++) {
+											$scope.interests[i].ticked = false;
+										}
+									}
+								}).error(function(response, status) {
+									$window.alert(status + " " + response.message);
+								});
+							}
 						};
 
 						$scope.uploader.flowInstance.upload();
