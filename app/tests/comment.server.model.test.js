@@ -11,7 +11,7 @@ var should = require('should'),
  	http = require('http'),
  	superagent = require('superagent'),
  	Comment = mongoose.model('Comment'),
-	Event = mongoose.model('Event'),
+	Evnt = mongoose.model('Event'),
  	User = mongoose.model('User'),
  	config = require('../../config/config'),
  	request = require('supertest');
@@ -25,14 +25,24 @@ var comment1, event1, recruiter;
  * Unit tests
  */
 describe('Comment Model Unit Tests:', function() {
-	beforeEach(function(done) {
-		User.remove().exec(); //Prevent earlier failed tests from poisoning us
-		Event.remove().exec();
+	before(function(done) {
+		//Remove all data from database so any previous tests that did not do this won't affect these tests.
 		Comment.remove().exec();
-		event1 = new Event({
+		Evnt.remove().exec();
+		User.remove().exec();
+
+		done();
+	});
+
+	beforeEach(function(done) {
+		var millisInMonth = new Date(1970, 0, 31, 11, 59, 59).getTime();			//Number of milliseconds in a typical month.
+		var startDate = new Date(Date.now() + millisInMonth).getTime();				//Start date for 1 month from now.
+		var endDate = new Date(Date.now() + millisInMonth + 86400000).getTime();	//Event lasts 1 day.
+
+		event1 = new Evnt({
 			name:  'testing123',
- 			start_date: new Date(2140,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
- 			end_date:  new Date(2150,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+ 			start_date: startDate,
+ 			end_date:  endDate,
  			location: 'UF',
  			schedule: 'www.google.com'
  		});
@@ -155,9 +165,18 @@ describe('Comment Model Unit Tests:', function() {
 	});
 
 	afterEach(function(done) {
-		event1.remove();
-		recruiter.remove();
-		comment1.remove();
+		event1.remove(function(err) {
+			if(err)
+				return done(err);
+		});
+		recruiter.remove(function(err) {
+			if(err)
+				return done(err);
+		});
+		comment1.remove(function(err) {
+			if(err)
+				return done(err);
+		});
  		done();
 	});
 });

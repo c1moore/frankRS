@@ -10,7 +10,7 @@ var should = require('should'),
 	mongoose = require('mongoose'),
  	http = require('http'),
  	superagent = require('superagent'),
- 	Event = mongoose.model('Event'),
+ 	Evnt = mongoose.model('Event'),
  	User = mongoose.model('User'),
  	config = require('../../config/config'),
  	request = require('supertest');
@@ -37,7 +37,7 @@ describe('Express.js Event Route Integration Tests:', function() {
 	before(function(done) {
 		User.remove().exec(); //Prevent earlier failed tests from poisoning us
 		Event.remove().exec();
-		event1 = new Event({
+		event1 = new Evnt({
 			name:  'testing1231',
  			start_date: new Date(2140,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
  			end_date:  new Date(2150,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
@@ -45,7 +45,7 @@ describe('Express.js Event Route Integration Tests:', function() {
  			schedule: 'www.google.com'
  		});
 
- 		event2 = new Event({
+ 		event2 = new Evnt({
  			name:  'testing1232',
  			start_date: new Date(2140,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
  			end_date:  new Date(2150,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec

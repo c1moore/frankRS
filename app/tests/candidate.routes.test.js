@@ -12,7 +12,7 @@
 	agent=require('superagent'),
 	Candidate = mongoose.model('Candidate'),
 	User = mongoose.model('User'),
-	Event = mongoose.model('Event'),
+	Evnt = mongoose.model('Event'),
 
 	config = require('../../config/config'),
 	request = require('supertest');
@@ -33,7 +33,7 @@
 	describe('Candidate Route Integration Tests:', function() {
 
 		before(function(done){
-			event1 = new Event({
+			event1 = new Evnt({
 				name:  'testing1231',
 				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
@@ -41,21 +41,21 @@
 				schedule: 'www.google.com'
 			});
 
-			event2 = new Event({
+			event2 = new Evnt({
 				name:  'testing1232',
 					start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 					end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
 					location: 'SFCC',
 					schedule: 'www.google.com'
 				});
-			event3 = new Event({
+			event3 = new Evnt({
 				name:  'testing1233',
 					start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 					end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
 					location: 'Orlando',
 					schedule: 'www.google.com'
 				});
-			event4 = new Event({
+			event4 = new Evnt({
 				name:  'testing1234',
 					start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 					end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec

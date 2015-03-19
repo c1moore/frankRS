@@ -13,7 +13,7 @@ var should = require('should'),
 	request = require('supertest'),
 	agent = require('superagent'),
 	User = mongoose.model('User'),
-	Event = mongoose.model('Event');
+	Evnt = mongoose.model('Event');
 
 /**
  * Globals
@@ -45,7 +45,7 @@ var checkRecruiterEvents = function(events) {
  */
 describe('Express.js User Route Unit Tests:', function() {
 	before(function(done) {
-  		event1 = new Event({
+  		event1 = new Evnt({
 			name:  'Test Event',
 			start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 			end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
@@ -53,7 +53,7 @@ describe('Express.js User Route Unit Tests:', function() {
 			schedule: 'www.google.com'
 		});
 
-		event2 = new Event({
+		event2 = new Evnt({
 			name:  'Event2',
 			start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 			end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
@@ -61,7 +61,7 @@ describe('Express.js User Route Unit Tests:', function() {
 			schedule: 'www.google.com'
 		});
 
-		event3 = new Event({
+		event3 = new Evnt({
 			name:  'Event3',
 			start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 			end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
@@ -69,7 +69,7 @@ describe('Express.js User Route Unit Tests:', function() {
 			schedule: 'www.google.com'
 		});
 
-		event4 = new Event({
+		event4 = new Evnt({
 			name:  'Event4',
 			start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 			end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec

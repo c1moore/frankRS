@@ -7,7 +7,7 @@
  */
 var should = require('should'),
 	mongoose = require('mongoose'),
-	Event = mongoose.model('Event'),
+	Evnt = mongoose.model('Event'),
 	User = mongoose.model('User');
 
 /**
@@ -39,7 +39,7 @@ var ranksEqual = function(arr1, arr2) {
 describe('User Model Unit Tests:', function() {
 
 	before(function(done) {
-		event = new Event({
+		event = new Evnt({
 			name:  'UserTestEvent',
 			start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 			end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
@@ -279,7 +279,7 @@ describe('User Model Unit Tests:', function() {
 		});
 
 		it('should show an error when trying to save to one of the lists without a proper user id.', function(done) {
-			var event1 = new Event({
+			var event1 = new Evnt({
 				name:  'attendeeteste2',
 				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
@@ -305,7 +305,7 @@ describe('User Model Unit Tests:', function() {
 		});
 
 		it('should be able to save properly when a proper user and event id are given to one of the lists', function(done) {
-			var event1 = new Event({
+			var event1 = new Evnt({
 				name:  'attendeeteste2',
 				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
@@ -329,7 +329,7 @@ describe('User Model Unit Tests:', function() {
 		});
 
 		it('should be able to save properly when a proper event id is passed to the status array', function(done) {
-			var event1 = new Event({
+			var event1 = new Evnt({
 				name:  'attendeeteste2',
 				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
@@ -349,7 +349,7 @@ describe('User Model Unit Tests:', function() {
 		});
 
 		it('should fail to save when all fields of the status array are not defined.', function(done) {
-			var event1 = new Event({
+			var event1 = new Evnt({
 				name:  'attendeeteste2',
 				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
 				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec

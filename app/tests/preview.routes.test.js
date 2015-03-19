@@ -12,7 +12,7 @@ var should = require('should'),
 	request = require('supertest'),
 	agent = require('superagent'),
 	User = mongoose.model('User'),
-	Event = mongoose.model('Event');
+	Evnt = mongoose.model('Event');
 
 /**
 * Globals
@@ -24,7 +24,7 @@ var user, user2, event1,
 
 describe('Functional tests for preview controllers/routes:', function() {
 	before(function(done) {
-		event1 = new Event({
+		event1 = new Evnt({
 			name : 'Test Event',
 			location : 'UF',
 			start_date : new Date(2020, 1, 1, 10, 0, 0).getTime(),

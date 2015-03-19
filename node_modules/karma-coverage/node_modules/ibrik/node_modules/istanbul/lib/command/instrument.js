@@ -5,6 +5,7 @@
 
 var path = require('path'),
     mkdirp = require('mkdirp'),
+    once = require('once'),
     async = require('async'),
     fs = require('fs'),
     filesFor = require('../util/file-matcher').filesFor,
@@ -15,12 +16,11 @@ var path = require('path'),
     util = require('util'),
     Command = require('./index'),
     Collector = require('../collector'),
-    flowControl = require('../util/flow-control'),
-    configuration = require('../configuration'),
+    configuration = require('../config'),
     verbose;
 
 
-/**
+/*
  * Chunk file size to use when reading non JavaScript files in memory
  * and copying them over when using complete-copy flag.
  */
@@ -61,7 +61,7 @@ function processFiles(instrumenter, inputDir, outputDir, relativeNames) {
                 oDir = path.dirname(outputFile),
                 readStream, writeStream;
 
-            callback = flowControl.callOnce(callback);
+            callback = once(callback);
             mkdirp.sync(oDir);
 
             if (fs.statSync(inputFile).isDirectory()) {
