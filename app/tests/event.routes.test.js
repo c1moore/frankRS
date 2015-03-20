@@ -33,7 +33,7 @@ function arraysEqual(array0,array1) {
 /**
  * Unit tests
  */
-describe('Express.js Event Route Integration Tests:', function() {
+describe('Event Route Integration Tests:', function() {
 	before(function(done) {
 		User.remove().exec(); //Prevent earlier failed tests from poisoning us
 		Evnt.remove().exec();
@@ -62,38 +62,39 @@ describe('Express.js Event Route Integration Tests:', function() {
  			schedule: 'www.google.com'
  		});
 
-		user = new User({
- 			fName: 'Full',
- 			lName: 'Name',
- 			roles: ['attendee'],
- 			displayName: 'Full Name',
- 			email: 'test@test.com',
- 			password: 'password',
- 			status: [{event_id: event1._id, attending:false, recruiter:false}],
- 			salt: 'abc123',
- 			rank: [],
- 			provider: 'local',
- 			login_enabled: true
- 		});
-
-		userAdmin = new User({
- 			fName: 'Full',
- 			lName: 'Name',
- 			roles: ['admin'],
- 			displayName: 'Full Name',
- 			email: 'admin@test.com',
- 			password: 'password',
- 			status: [{event_id: event1._id, attending:false, recruiter:false}],
- 			salt: 'abc123',
- 			rank: [],
- 			provider: 'local',
- 			login_enabled: true
- 		});
-
  		event1.save(function(err){
 			if(err) throw err;
 			event2.save(function(err){
 				if(err) throw err;
+
+				user = new User({
+		 			fName: 'Full',
+		 			lName: 'Name',
+		 			roles: ['attendee'],
+		 			displayName: 'Full Name',
+		 			email: 'test@test.com',
+		 			password: 'password',
+		 			status: [{event_id: event1._id, attending:false, recruiter:false}],
+		 			salt: 'abc123',
+		 			rank: [],
+		 			provider: 'local',
+		 			login_enabled: true
+		 		});
+
+				userAdmin = new User({
+		 			fName: 'Full',
+		 			lName: 'Name',
+		 			roles: ['admin'],
+		 			displayName: 'Full Name',
+		 			email: 'admin@test.com',
+		 			password: 'password',
+		 			status: [{event_id: event1._id, attending:false, recruiter:false}],
+		 			salt: 'abc123',
+		 			rank: [],
+		 			provider: 'local',
+		 			login_enabled: true
+		 		});
+
 				user.save(function(err){
 					if(err) throw err;
 					userAdmin.save(function(err){
