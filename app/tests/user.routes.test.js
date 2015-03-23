@@ -18,7 +18,7 @@ var should = require('should'),
 /**
  * Globals
  */
-var user, user2, user3, user4, user5, event1, event2, event3, event4,
+var user, user2, user3, user4, user5, user6, event1, event2, event3, event4,
 	useragent = agent.agent(), useragent2 = agent.agent();
 
 /*
@@ -45,42 +45,67 @@ var checkRecruiterEvents = function(events) {
  */
 describe('Express.js User Route Unit Tests:', function() {
 	before(function(done) {
-  		event1 = new Evnt({
+		//Remove all data from database so any previous tests that did not do this won't affect these tests.
+		User.remove(function() {
+			Evnt.remove(function() {
+				done();
+			});
+		});
+	});
+
+	beforeEach(function(done) {
+  		var millisInMonth = new Date(1970, 0, 31, 11, 59, 59).getTime();			//Number of milliseconds in a typical month.
+		var startDate = new Date(Date.now() + millisInMonth).getTime();				//Start date for 1 month from now.
+		var endDate = new Date(Date.now() + millisInMonth + 86400000).getTime();	//Event lasts 1 day.
+
+		event1 = new Evnt({
 			name:  'Test Event',
-			start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
-			end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+			start_date: startDate,
+			end_date:  endDate,
 			location: 'UF',
 			schedule: 'www.google.com'
 		});
 
 		event2 = new Evnt({
 			name:  'Event2',
-			start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
-			end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+			start_date: startDate,
+			end_date:  endDate,
 			location: 'SFCC',
 			schedule: 'www.google.com'
 		});
 
 		event3 = new Evnt({
 			name:  'Event3',
-			start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
-			end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+			start_date: startDate,
+			end_date:  endDate,
 			location: 'SFCC',
 			schedule: 'www.google.com'
 		});
 
 		event4 = new Evnt({
 			name:  'Event4',
-			start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
-			end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+			start_date: startDate,
+			end_date:  endDate,
 			location: 'SFCC',
 			schedule: 'www.google.com'
 		});
 
-		event1.save(function() {
-			event2.save(function() {
-				event3.save(function() {
-					event4.save(function() {
+		event1.save(function(err) {
+			if(err)
+				return done(err);
+
+			event2.save(function(err) {
+				if(err)
+					return done(err);
+
+				event3.save(function(err) {
+					if(err)
+						return done(err);
+
+					event4.save(function(err) {
+						if(err)
+							return done(err);
+
 						user2 = new User({
 							fName : 'Calvin',
 							lName : 'Moore',
@@ -127,6 +152,17 @@ describe('Express.js User Route Unit Tests:', function() {
 							login_enabled : true
 						});
 
+						user6 = new User({
+							fName : 'Nother',
+							lName : 'Name',
+							displayName : 'Name, Nother',
+							email : 'nother_name2_cen3031.0.boom0625@spamgourmet.com',
+							roles : ['attendee'],
+							status : [],
+							password : 'password',
+							login_enabled : true
+						});
+
 						user = new User({
 							fName : 'Calvin',
 							lName : 'Moore',
@@ -143,16 +179,53 @@ describe('Express.js User Route Unit Tests:', function() {
 						});
 
 						user2.save(function(err) {
+							if(err)
+								return done(err);
+
 							user3.save(function(err) {
+								if(err)
+									return done(err);
+
 								user4.save(function(err) {
+									if(err)
+										return done(err);
+
 									user5.save(function(err) {
-										user.save(function(err) {
-											useragent2
-												.post('http://localhost:3001/auth/signin')
-												.send({'email' : user2.email, 'password' : 'password'})
-												.end(function(err, res) {
-													done(err);
-												});
+										if(err)
+											return done(err);
+
+										user6.save(function(err) {
+											if(err)
+												return done(err);
+
+											user.save(function(err) {
+												if(err)
+													return done(err);
+
+												useragent2
+													.post('http://localhost:3001/auth/signin')
+													.send({'email' : user2.email, 'password' : 'password'})
+													.end(function(err, res) {
+														if(err)
+															return done(err);
+
+														if(res.status !== 200)
+															return done(new Error("useragent2 could not log in."));
+
+														useragent
+															.post('http://localhost:3001/auth/signin')
+															.send({'email' : user.email, 'password' : 'password'})
+															.end(function(err, res) {
+																if(err)
+																	return done(err);
+
+																if(res.status !== 200)
+																	return done(new Error("useragent2 could not log in."));
+
+																done();
+															});
+													});
+											});
 										});
 									});
 								});
@@ -170,17 +243,6 @@ describe('Express.js User Route Unit Tests:', function() {
 			.expect(200)
 			.end(function(err, res) {
 				done(err);
-			});
-	});
-
-	it('should be able to log in.', function(done) {
-		useragent
-			.post('http://localhost:3001/auth/signin')
-			.send({'email' : user.email, 'password' : 'password'})
-			.end(function(err, res) {
-         		should.not.exist(err);
-          		res.status.should.equal(200);
-				done();
 			});
 	});
 
@@ -311,7 +373,6 @@ describe('Express.js User Route Unit Tests:', function() {
 				.end(function(err, res) {
 					should.not.exist(err);
 					res.status.should.equal(200);
-					//console.log(res.body);
 					res.body.status.length.should.equal(4);
 					done();
 				});
@@ -348,7 +409,6 @@ describe('Express.js User Route Unit Tests:', function() {
 				.query({'event_id' : event1._id.toString()})
 				.end(function(err, res) {
 					should.not.exist(err);
-					//console.log(res.body);
 					res.status.should.equal(200);
 					res.body.attending.should.equal(2);
 					res.body.invited.should.equal(1);
@@ -701,7 +761,40 @@ describe('Express.js User Route Unit Tests:', function() {
 			});
 		});
 
-		it('should send an invitation and update the recruiter\'s rank and inviteeList accordingly when an invitee is already in the database, but not not even invited the event, without adding a new user.', function(done) {
+		it('should send an invitation and update the recruiter\'s rank and inviteeList accordingly when an invitee is already in the database, but has not been invited invited the event, without adding a new user.', function(done) {
+			this.timeout(10000);
+			User.count({}, function(err, scount) {
+				useragent
+					.post('http://localhost:3001/invitation/send')
+					.send({'fName' : user6.fName, 'lName' : user6.lName, 'email' : user6.email, 'event_id' : event1._id, 'event_name' : event1.name})
+					.end(function(err, res) {
+						should.not.exist(err);
+						res.status.should.equal(200);
+						res.body.message.should.equal("Invitation has been sent to " + user6.fName + "!");
+						
+						User.findOne({_id : user._id}, function(err, rectr) {
+							should.not.exist(err);
+
+							User.count({}, function(err, fcount) {
+								fcount.should.equal(scount);
+
+								User.findOne({_id : user6._id}, function(err, newUser3) {
+									newUser3.status.length.should.be.greaterThan(user6.status.length);
+
+
+									(user.attendeeList.length === rectr.attendeeList.length).should.be.true;
+									(user.almostList.length === rectr.almostList.length).should.be.true;
+									user.inviteeList.length.should.be.lessThan(rectr.inviteeList.length);
+
+									done();
+								});
+							});
+						});
+					});
+			});
+		});
+
+		it('should send an invitation, but not add an invitee to the inviteeList when this invitee has already been invited by this recruiter..', function(done) {
 			this.timeout(10000);
 			User.count({}, function(err, scount) {
 				useragent
@@ -710,14 +803,22 @@ describe('Express.js User Route Unit Tests:', function() {
 					.end(function(err, res) {
 						should.not.exist(err);
 						res.status.should.equal(200);
+						res.body.message.should.equal("Invitation has been sent to " + user3.fName + "!");
+						
 						User.findOne({_id : user._id}, function(err, rectr) {
-							(user.inviteeList.length < rectr.inviteeList.length).should.be.true;
-							(user.attendeeList.length === rectr.attendeeList.length).should.be.true;
-							(user.almostList.length === rectr.almostList.length).should.be.true;
+							should.not.exist(err);
+
 							User.count({}, function(err, fcount) {
 								fcount.should.equal(scount);
+
 								User.findOne({_id : user3._id}, function(err, newUser3) {
 									newUser3.status.length.should.be.greaterThan(user3.status.length);
+
+
+									(user.attendeeList.length === rectr.attendeeList.length).should.be.true;
+									(user.almostList.length === rectr.almostList.length).should.be.true;
+									user.inviteeList.length.should.be.equal(rectr.inviteeList.length);
+
 									done();
 								});
 							});
@@ -1421,18 +1522,18 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 	});
 
-	after(function(done) {
-		User.remove().exec();
-		Event.remove().exec();
-		//event1.remove();
-		//event2.remove();
-		//event3.remove();
-		//event4.remove();
-		//user.remove();
-		//user2.remove();
-		//user3.remove();
-		//user4.remove();
-		done();
+	afterEach(function(done) {
+		User.remove(function(err) {
+			if(err)
+				return done(err);
+
+			Evnt.remove(function(err) {
+				if(err)
+					return done(err);
+
+				done();
+			});
+		});
 	});
 
 });

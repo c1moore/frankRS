@@ -23,9 +23,9 @@ var event1, event2, event1d,
 describe('Event Model Unit Tests',function() {
 	before(function(done) {
 		//Remove all data from database so any previous tests that did not do this won't affect these tests.
-		Evnt.remove().exec();
-
-		done();
+		Evnt.remove(function() {
+			done();
+		});
 	});
 
 	describe('Method Save',function(){
@@ -212,10 +212,22 @@ describe('Event Model Unit Tests',function() {
 		});
 	
 		afterEach(function(done){
-			event1.remove();
-			event2.remove();
-			event1d.remove();
-			done();
+			event1.remove(function(err) {
+				if(err)
+					return done(err);
+
+				event2.remove(function(err) {
+					if(err)
+						return done(err);
+
+					event1d.remove(function(err) {
+						if(err)
+							return done(err);
+
+						done();
+					})
+				})
+			});
 		});
 	});
 });

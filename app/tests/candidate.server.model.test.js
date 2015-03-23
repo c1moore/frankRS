@@ -21,10 +21,11 @@ var candidate1, duplicate;
 describe('Candidate Model Unit Tests:', function() {
 	before(function(done) {
 		//Remove all data from database so any previous tests that did not do this won't affect these tests.
-		candidate.remove().exec();
-		Evnt.remove().exec();
-
-		done();
+		candidate.remove(function() {
+			Evnt.remove(function() {
+				done();
+			});
+		});
 	});
 
 	describe('Method Save', function() {
@@ -168,13 +169,14 @@ describe('Candidate Model Unit Tests:', function() {
 			candidate1.remove(function(err) {
 				if(err)
 					return done(err);
-			});
-			duplicate.remove(function(err) {
-				if(err)
-					return done(err);
-			});
+				
+				duplicate.remove(function(err) {
+					if(err)
+						return done(err);
 
-			done();
+					done();
+				});
+			});
 		});
 	});
 });

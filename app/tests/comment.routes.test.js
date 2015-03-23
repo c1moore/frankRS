@@ -39,10 +39,16 @@ function arraysEqual(array0,array1) {
 describe('Comment Route Integration Tests:', function() {
 	before(function(done) {
 		//Remove all data from database so any previous tests that did not do this won't affect these tests.
-		User.remove().exec();
-		Evnt.remove().exec();
-		Comment.remove().exec();
+		User.remove(function() {
+			Evnt.remove(function() {
+				Comment.remove(function() {
+					done();
+				});				
+			});
+		});
+	});
 
+	before(function(done) {
 		var millisInMonth = new Date(1970, 0, 31, 11, 59, 59).getTime();			//Number of milliseconds in a typical month.
 		var startDate = new Date(Date.now() + millisInMonth).getTime();				//Start date for 1 month from now.
 		var endDate = new Date(Date.now() + millisInMonth + 86400000).getTime();	//Event lasts 1 day.
@@ -359,16 +365,18 @@ describe('Comment Route Integration Tests:', function() {
 		User.remove(function(err) {
 			if(err)
 				return done(err);
-		});
-		Evnt.remove(function(err) {
-			if(err)
-				return done(err);
-		});
-		Comment.remove(function(err) {
-			if(err)
-				return done(err);
-		});
 
- 		done();
+			Evnt.remove(function(err) {
+				if(err)
+					return done(err);
+				
+				Comment.remove(function(err) {
+					if(err)
+						return done(err);
+
+			 		done();
+				});
+			});
+		});
 	});
 });

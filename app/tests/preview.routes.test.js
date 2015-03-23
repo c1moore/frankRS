@@ -25,10 +25,11 @@ var user, user2, event1,
 describe('Functional tests for preview controllers/routes:', function() {
 	before(function(done) {
 		//Remove all data from database so any previous tests that did not do this won't affect these tests.
-		User.remove().exec();
-		Evnt.remove().exec();
-
-		done();
+		User.remove(function() {
+			Evnt.remove(function() {
+				done();
+			});
+		});
 	});
 
 	beforeEach(function(done) {
@@ -78,7 +79,7 @@ describe('Functional tests for preview controllers/routes:', function() {
 								return done(err);
 
 							if(res.status !== 200)
-								return done("useragent could not log in.");
+								return done(new Error("useragent could not log in."));
 
 							useragent2
 								.post('http://localhost:3001/auth/signin')
@@ -87,7 +88,7 @@ describe('Functional tests for preview controllers/routes:', function() {
 									if(err)
 										return done(err);
 									if(res.status !== 200)
-										return done("useragent could not log in.");
+										return done(new Error("useragent2 could not log in."));
 
 									done();
 								});
@@ -201,13 +202,13 @@ describe('Functional tests for preview controllers/routes:', function() {
 		Evnt.remove(function(err) {
 			if(err)
 				return done(err);
-		});
 
-		User.remove(function(err) {
-			if(err)
-				return done(err);
-		});
+			User.remove(function(err) {
+				if(err)
+					return done(err);
 
-		done();
+				done();
+			});
+		});
 	});
 });

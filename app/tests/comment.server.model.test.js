@@ -27,11 +27,13 @@ var comment1, event1, recruiter;
 describe('Comment Model Unit Tests:', function() {
 	before(function(done) {
 		//Remove all data from database so any previous tests that did not do this won't affect these tests.
-		Comment.remove().exec();
-		Evnt.remove().exec();
-		User.remove().exec();
-
-		done();
+		User.remove(function() {
+			Evnt.remove(function() {
+				Comment.remove(function() {
+					done();
+				});				
+			});
+		});
 	});
 
 	beforeEach(function(done) {
@@ -168,15 +170,18 @@ describe('Comment Model Unit Tests:', function() {
 		event1.remove(function(err) {
 			if(err)
 				return done(err);
+
+			recruiter.remove(function(err) {
+				if(err)
+					return done(err);
+
+				comment1.remove(function(err) {
+					if(err)
+						return done(err);
+			 		
+			 		done();
+				});
+			});
 		});
-		recruiter.remove(function(err) {
-			if(err)
-				return done(err);
-		});
-		comment1.remove(function(err) {
-			if(err)
-				return done(err);
-		});
- 		done();
 	});
 });

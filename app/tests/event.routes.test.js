@@ -35,10 +35,12 @@ function arraysEqual(array0,array1) {
  */
 describe('Event Route Integration Tests:', function() {
 	before(function(done) {
-		User.remove().exec(); //Prevent earlier failed tests from poisoning us
-		Evnt.remove().exec();
-
-		done();
+		//Remove all data from database so any previous tests that did not do this won't affect these tests.
+		User.remove(function() {
+			Evnt.remove(function() {
+				done();			
+			});
+		});
 	});
 
 	beforeEach(function(done) {
@@ -547,12 +549,12 @@ describe('Event Route Integration Tests:', function() {
 						res.status.should.be.equal(200);
 
 						if(res.body.length !== numEvents) {
-							return done("Too few/many events returned.");
+							return done(new Error("Too few/many events returned."));
 						}
 
 						for(var i=0; i < res.body.length; i++) {
 							if(res.body[i]._id.toString() !== event1._id.toString() && res.body[i]._id.toString() !== event2._id.toString()) {
-								return done("Returned IDs are incorrect.");
+								return done(new Error("Returned IDs are incorrect."));
 							}
 						}
 
@@ -1357,7 +1359,7 @@ describe('Event Route Integration Tests:', function() {
 							if(result)
 								return done();
 
-							return done("New event not actually created.");
+							return done(new Error("New event not actually created."));
 						});
 					});
 			});
@@ -1393,15 +1395,23 @@ describe('Event Route Integration Tests:', function() {
 							if(result.length === 2)
 								return done();
 
-							return done("Event was created.");
+							return done(new Error("Event was created."));
 						});
 					});
 			});
 	});
 
 	afterEach(function(done) {
-		Evnt.remove().exec();
-		User.remove().exec();
- 		done();
+		Evnt.remove(function(err) {
+			if(err)
+				return done(err);
+
+			User.remove(function(err) {
+				if(err)
+					return done(err);
+
+				done();
+			});
+		});
 	});
 });
