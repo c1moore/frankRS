@@ -8,7 +8,6 @@ angular.module('users').config(['$httpProvider',
 			function($q, $location, Authentication, $window) {
 				return {
 					responseError: function(rejection) {
-						console.log(rejection);
 						switch (rejection.status) {
 							case 401:
 								/**
