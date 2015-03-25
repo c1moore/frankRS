@@ -166,7 +166,7 @@ describe('Comment Route Integration Tests:', function() {
 				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
-				res.body.message.should.be.equal("You are not logged in");
+				res.body.message.should.be.equal("User is not logged in.");
 				done();
 			});
 	});
@@ -178,7 +178,7 @@ describe('Comment Route Integration Tests:', function() {
 				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
-				res.body.message.should.be.equal("You are not logged in");
+				res.body.message.should.be.equal("User is not logged in.");
 				done();
 			});
 	});
@@ -190,7 +190,7 @@ describe('Comment Route Integration Tests:', function() {
 				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
-				res.body.message.should.be.equal("You are not logged in");
+				res.body.message.should.be.equal("User is not logged in.");
 				done();
 			});
 	});
@@ -203,7 +203,7 @@ describe('Comment Route Integration Tests:', function() {
 				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
-				res.body.message.should.be.equal("You are not logged in");
+				res.body.message.should.be.equal("User is not logged in.");
 				done();
 			});
 	});
@@ -216,7 +216,7 @@ describe('Comment Route Integration Tests:', function() {
 				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
-				res.body.message.should.be.equal("You are not logged in");
+				res.body.message.should.be.equal("User is not logged in.");
 				done();
 			});
 	});
@@ -228,7 +228,7 @@ describe('Comment Route Integration Tests:', function() {
 				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
-				res.body.message.should.be.equal("You are not logged in");
+				res.body.message.should.be.equal("User is not logged in.");
 				done();
 			});
 	});
@@ -241,7 +241,7 @@ describe('Comment Route Integration Tests:', function() {
 				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
-				res.body.message.should.be.equal("You are not logged in");
+				res.body.message.should.be.equal("User is not logged in.");
 				done();
 			});
 	});
