@@ -12,7 +12,7 @@ var should = require('should'),
 	request = require('supertest'),
 	agent = require('superagent'),
 	User = mongoose.model('User'),
-	Event = mongoose.model('Event');
+	Evnt = mongoose.model('Event');
 
 /**
 * Globals
@@ -24,11 +24,24 @@ var user, user2, event1,
 
 describe('Functional tests for preview controllers/routes:', function() {
 	before(function(done) {
-		event1 = new Event({
+		//Remove all data from database so any previous tests that did not do this won't affect these tests.
+		User.remove(function() {
+			Evnt.remove(function() {
+				done();
+			});
+		});
+	});
+
+	beforeEach(function(done) {
+		var millisInMonth = new Date(1970, 0, 31, 11, 59, 59).getTime();			//Number of milliseconds in a typical month.
+		var startDate = new Date(Date.now() + millisInMonth).getTime();				//Start date for 1 month from now.
+		var endDate = new Date(Date.now() + millisInMonth + 86400000).getTime();	//Event lasts 1 day.
+
+		event1 = new Evnt({
 			name : 'Test Event',
 			location : 'UF',
-			start_date : new Date(2020, 1, 1, 10, 0, 0).getTime(),
-			end_date : new Date(2020, 12, 12, 12, 0, 0).getTime()
+			start_date : startDate,
+			end_date : endDate
 		});
 
 		user = new User({
@@ -46,23 +59,39 @@ describe('Functional tests for preview controllers/routes:', function() {
 			login_enabled : true
 		});
 
-		event1.save(function() {
-			user.save(function() {
-				user2.save(function() {
+		event1.save(function(err) {
+			if(err)
+				return done(err);
+
+			user.save(function(err) {
+				if(err)
+					return done(err);
+
+				user2.save(function(err) {
+					if(err)
+						return done(err);
+
 					useragent
 						.post('http://localhost:3001/auth/signin')
 						.send({email : user.email, password : 'password'})
 						.end(function(err, res) {
 							if(err)
-								done(err);
-							else {
-								useragent2
-									.post('http://localhost:3001/auth/signin')
-									.send({email : user2.email, password : 'password'})
-									.end(function(err, res) {
-										done(err);
-									});
-							}
+								return done(err);
+
+							if(res.status !== 200)
+								return done(new Error("useragent could not log in."));
+
+							useragent2
+								.post('http://localhost:3001/auth/signin')
+								.send({email : user2.email, password : 'password'})
+								.end(function(err, res) {
+									if(err)
+										return done(err);
+									if(res.status !== 200)
+										return done(new Error("useragent2 could not log in."));
+
+									done();
+								});
 						});
 				});
 			});
@@ -99,7 +128,7 @@ describe('Functional tests for preview controllers/routes:', function() {
 	it('should return an error message when the event_id and event_name does not match.', function(done) {
 		useragent
 			.get('http://localhost:3001/preview/invitation')
-			.query({event_name : "Test Event", event_id : event1._id.toString()})
+			.query({event_name : "Test Event 2", event_id : event1._id.toString()})
 			.end(function(err, res) {
 				should.not.exist(err);
 				res.status.should.equal(401);
@@ -108,7 +137,7 @@ describe('Functional tests for preview controllers/routes:', function() {
 			});
 	});
 
-	it('should return an error message when the user does not have permissions.', function(done) {
+	it('should return an error message when the user does not have the proper permissions.', function(done) {
 		useragent2
 			.get('http://localhost:3001/preview/invitation')
 			.query({event_name : event1.name, event_id : event1._id.toString()})
@@ -169,9 +198,17 @@ describe('Functional tests for preview controllers/routes:', function() {
 			});
 	});
 
-	after(function(done) {
-		Event.remove().exec();
-		User.remove().exec();
-		done();
+	afterEach(function(done) {
+		Evnt.remove(function(err) {
+			if(err)
+				return done(err);
+
+			User.remove(function(err) {
+				if(err)
+					return done(err);
+
+				done();
+			});
+		});
 	});
 });

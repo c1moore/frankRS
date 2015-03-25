@@ -8,42 +8,53 @@
 var should = require('should'),
 	mongoose = require('mongoose'),
 	assert = require('assert'),
-	events = mongoose.model('Event');
+	Evnt = mongoose.model('Event');
 
 /**
 * Global Variabls used for testing
 */
-var event1, event2, event1d;
+var event1, event2, event1d,
+	startDate;
 
 /**
 *  Test functionality of Events
 */
 
 describe('Event Model Unit Tests',function() {
+	before(function(done) {
+		//Remove all data from database so any previous tests that did not do this won't affect these tests.
+		Evnt.remove(function() {
+			done();
+		});
+	});
 
 	describe('Method Save',function(){
 		beforeEach(function(done){
-			event1 = new events({
+			var millisInMonth = new Date(1970, 0, 31, 11, 59, 59).getTime();			//Number of milliseconds in a typical month.
+			startDate = new Date(Date.now() + millisInMonth).getTime();				//Start date for 1 month from now.
+			var endDate = new Date(Date.now() + millisInMonth + 86400000).getTime();	//Event lasts 1 day.
+
+			event1 = new Evnt({
 				name:  'testing1231',
-				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
-				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+				start_date: startDate,
+				end_date:  endDate,
 				location: 'UF',
 				schedule: 'www.google.com'
 			});
 
-			event1d = new events({
+			event1d = new Evnt({
 				name:  'testing1231',
-				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
-				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+				start_date: startDate,
+				end_date:  endDate,
 				location: 'UF',
 				schedule: 'www.google.com'
 			});
 
-			event2 = new events({
-					name:  'testing1232',
-					start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
-					end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
-					location: 'UF',
+			event2 = new Evnt({
+				name:  'testing1232',
+				start_date: startDate,
+				end_date:  endDate,
+				location: 'UF',
 				schedule: 'www.google.com'
 			});
 			
@@ -59,6 +70,7 @@ describe('Event Model Unit Tests',function() {
 				should.not.exist(err);
 				event1d.save(function(err){
 					should.exist(err);
+					err.code.should.equal(11000);
 					done();
 				});
 			});
@@ -74,8 +86,7 @@ describe('Event Model Unit Tests',function() {
 
 		it('should allow getting the event name',function(done){
 			event1.save(function() {
-				var query = events.findOne({'name': event1.name});
-				query.exec(function (err, result) {
+				var query = Evnt.findOne({'name': event1.name}, function (err, result) {
 					(result.name === undefined).should.be.false;
 					(result.name).should.be.equal(event1.name);
 					done();
@@ -85,7 +96,7 @@ describe('Event Model Unit Tests',function() {
 
 		it('should allow getting the event start date',function(done){
 			event1.save(function() {
-				var query = events.findOne({'start_date': event1.start_date});
+				var query = Evnt.findOne({'start_date': event1.start_date});
 				query.exec(function (err, result) {
 					(result.start_date === undefined).should.be.false;
 					(result.start_date).should.be.equal(event1.start_date);
@@ -96,7 +107,7 @@ describe('Event Model Unit Tests',function() {
 
 		it('should allow getting the event end date',function(done){
 			event1.save(function() {
-				var query = events.findOne({'end_date': event1.end_date});
+				var query = Evnt.findOne({'end_date': event1.end_date});
 				query.exec(function (err, result) {
 					(result.end_date === undefined).should.be.false;
 					(result.end_date).should.be.equal(event1.end_date);
@@ -107,7 +118,7 @@ describe('Event Model Unit Tests',function() {
 
 		it('should allow getting the event location',function(done){
 			event1.save(function() {
-				var query = events.findOne({'location': event1.location});
+				var query = Evnt.findOne({'location': event1.location});
 				query.exec(function (err, result) {
 					(result.location === undefined).should.be.false;
 					(result.location).should.be.equal(event1.location);
@@ -118,7 +129,7 @@ describe('Event Model Unit Tests',function() {
 
 		it('should allow getting the event schedule',function(done){
 			event1.save(function() {
-				var query = events.findOne({'schedule': event1.schedule});
+				var query = Evnt.findOne({'schedule': event1.schedule});
 				query.exec(function (err, result) {
 					(result.schedule === undefined).should.be.false;
 					(result.schedule).should.be.equal(event1.schedule);
@@ -130,8 +141,9 @@ describe('Event Model Unit Tests',function() {
 
 		it('should be able to show an error when trying to save without a name', function(done) {
 			event1.name = '';
-			return event1.save(function(err, obj, num) {
+			event1.save(function(err, obj, num) {
 				should.exist(err);
+				err.message.should.equal("Validation failed");
 				done();
 			});
 		});
@@ -140,6 +152,7 @@ describe('Event Model Unit Tests',function() {
 			event1.start_date= '';
 			return event1.save(function(err) {
 				should.exist(err);
+				err.message.should.equal("Validation failed");
 				done();
 			});
 		});
@@ -148,6 +161,7 @@ describe('Event Model Unit Tests',function() {
 			event1.end_date= '';
 			return event1.save(function(err, obj) {
 				should.exist(err);
+				err.message.should.equal("Validation failed");
 				done();
 			});
 		});
@@ -156,6 +170,7 @@ describe('Event Model Unit Tests',function() {
 			event1.location= '';
 			return event1.save(function(err, obj) {
 				should.exist(err);
+				err.message.should.equal("Validation failed");
 				done();
 			});
 		});
@@ -164,6 +179,7 @@ describe('Event Model Unit Tests',function() {
 			event1.start_date= new Date(2013,10,20,10,0,0).getTime();
 			return event1.save(function(err) {
 				should.exist(err);
+				err.message.should.equal("Validation failed");
 				done();
 			});
 		});
@@ -172,6 +188,7 @@ describe('Event Model Unit Tests',function() {
 			event1.end_date= new Date(2013,10,20,10,0,0).getTime();
 			return event1.save(function(err) {
 				should.exist(err);
+				err.message.should.equal("Validation failed");
 				done();
 			});
 		});
@@ -180,23 +197,37 @@ describe('Event Model Unit Tests',function() {
 			event1.end_date= 'this is not a date';
 			return event1.save(function(err) {
 				should.exist(err);
+				err.name.should.equal("CastError");
 				done();
 			});
 		});
 
 		it('should be able to show an error when trying to save with an end date before the start date', function(done) {
-			event1.end_date=  new Date(2014,11,20,10,0,0).getTime();
+			event1.end_date=  new Date(startDate - 50000).getTime();
 			return event1.save(function(err) {
 				should.exist(err);
+				err.message.should.equal("Validation failed");
 				done();
 			});
 		});
 	
 		afterEach(function(done){
-			event1.remove();
-			event2.remove();
-			event1d.remove();
-			done();
+			event1.remove(function(err) {
+				if(err)
+					return done(err);
+
+				event2.remove(function(err) {
+					if(err)
+						return done(err);
+
+					event1d.remove(function(err) {
+						if(err)
+							return done(err);
+
+						done();
+					})
+				})
+			});
 		});
 	});
 });

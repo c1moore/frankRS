@@ -7,8 +7,8 @@
  */
 var should = require('should'),
 	mongoose = require('mongoose'),
+	Evnt = mongoose.model('Event'),
 	User = mongoose.model('User'),
-	Event = mongoose.model('Event'),
 	Attendees = mongoose.model('Attendees');
 
 /**
@@ -19,28 +19,47 @@ var attendee1, attendee2u, attendee3e,
 	user,  user2,
 	event1, event2;
 
+console.log("Test");
+
 /**
  * Unit tests
  */
 describe('Attendees Model Unit Tests:', function() {
 	before(function(done) {
+		//Remove all data from database so any previous tests that did not do this won't affect these tests.
+		User.remove(function() {
+			Evnt.remove(function() {
+				Attendees.remove(function() {
+					done();
+				});				
+			});
+		});
+	});
 
-		event1 = new Event({
+	before(function(done) {
+		var millisInMonth = new Date(1970, 0, 31, 11, 59, 59).getTime();			//Number of milliseconds in a typical month.
+		var startDate = new Date(Date.now() + millisInMonth).getTime();				//Start date for 1 month from now.
+		var endDate = new Date(Date.now() + millisInMonth + 86400000).getTime();	//Event lasts 1 day.
+
+		event1 = new Evnt({
 			name:  'attendeetest',
-			start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
-			end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+			start_date: startDate,
+			end_date:  endDate,
 			location: 'UF',
 			schedule: 'www.google.com'
 		});
-		event2 = new Event({
+		event2 = new Evnt({
 			name:  'attendeeteste2',
-			start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
-			end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+			start_date: startDate,
+			end_date:  endDate,
 			location: 'UF',
 			schedule: 'www.google.com'
 		});
 
-		event1.save(function() {
+		event1.save(function(err) {
+			if(err)
+				return done(err);
+
 			user = new User({
 				fName: 'Full',
 				lName: 'Name',
@@ -66,10 +85,16 @@ describe('Attendees Model Unit Tests:', function() {
 				login_enabled: false
 			});
 
-			user.save(function() {
+			user.save(function(err) {
+				if(err)
+					return done(err);
+
 				user2.save(function(err) {
+					if(err)
+						return done(err);
+
 					event2.save(function(err) {
-						done();
+						done(err);
 					});
 				});
 			});
@@ -204,16 +229,31 @@ describe('Attendees Model Unit Tests:', function() {
 		});
 
 		afterEach(function(done) {
-			Attendees.remove().exec();
-			done();
+			Attendees.remove(done);
 		});
 	});
 
 	after(function(done) {
-		user.remove();
-		event1.remove();
-		user2.remove();
-		event2.remove();
-		done();
+		user.remove(function(err) {
+			if(err)
+				return done(err);
+
+			event1.remove(function(err) {
+				if(err)
+					return done(err);
+
+				user2.remove(function(err) {
+					if(err)
+						return done(err);
+					
+					event2.remove(function(err) {
+						if(err)
+							return done(err);
+		
+						done();
+					});
+				});
+			});
+		});
 	});
 });

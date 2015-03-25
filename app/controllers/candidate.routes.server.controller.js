@@ -60,7 +60,7 @@ exports.getCandidatesByEvent = function(req, res) {
  exports.getfName = function(req, res) {
  	var user = req.user;
  	if(!req.isAuthenticated())
- 		return res.status(401).send("User is not logged in");
+ 		return res.status(401).send({'message' : 'User is not logged in.'});
 
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidate_id = mongoose.Types.ObjectId(req.body.candidate_id);
@@ -74,13 +74,13 @@ exports.getCandidatesByEvent = function(req, res) {
  		});
  	}
  	else
- 		return res.status(401).send("User not Authorized");
+ 		return res.status(401).send({message : "User does not have permission."});
  };
 
  exports.getlName= function(req, res) {
  	var user = req.user;
  	if(!req.isAuthenticated())
- 		return res.status(401).send("User is not logged in");
+ 		return res.status(401).send({'message' : 'User is not logged in.'});
 
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidate_id = mongoose.Types.ObjectId(req.body.candidate_id);
@@ -94,11 +94,11 @@ exports.getCandidatesByEvent = function(req, res) {
  		});
  	}
  	else
- 		return res.status(401).send("User not Authorized");
+ 		return res.status(401).send({message : "User does not have permission."});
  };
  exports.getEmail= function(req, res) {
  	if(!req.isAuthenticated())
- 		return res.status(401).send("User is not logged in");
+ 		return res.status(401).send({'message' : 'User is not logged in.'});
 
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
@@ -114,7 +114,7 @@ exports.getCandidatesByEvent = function(req, res) {
  		});
  	}
  	else
- 		return res.status(401).send("User not Authorized");
+ 		return res.status(401).send({message : "User does not have permission."});
 
  };
 /* exports.getStatus= function(req, res) {
@@ -135,11 +135,11 @@ exports.getCandidatesByEvent = function(req, res) {
  		});
  	}
  	else
- 		return res.status(401).send("User not Authorized");
+ 		return res.status(401).send("User does not have permission.");
  };*/
  exports.getEvents= function(req, res) {
  	if(!req.isAuthenticated())
- 		return res.status(401).send("User is not logged in");
+ 		return res.status(401).send({'message' : 'User is not logged in.'});
 
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
@@ -158,12 +158,12 @@ exports.getCandidatesByEvent = function(req, res) {
  		});
  	}
  	else
- 		return res.status(401).send("User not Authorized");
+ 		return res.status(401).send({message : "User does not have permission."});
  };
 
  exports.getNote= function(req, res) {
  	if(!req.isAuthenticated())
- 		return res.status(401).send("User is not logged in");
+ 		return res.status(401).send({'message' : 'User is not logged in.'});
 
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
@@ -179,12 +179,12 @@ exports.getCandidatesByEvent = function(req, res) {
  		});
  	}
  	else
- 		return res.status(401).send("User not Authorized");
+ 		return res.status(401).send({message : "User does not have permission."});
  };
 
  exports.getUser_id= function(req, res) {
  	if(!req.isAuthenticated())
- 		return res.status(401).send("User is not logged in");
+ 		return res.status(401).send({'message' : 'User is not logged in.'});
 
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
@@ -200,13 +200,13 @@ exports.getCandidatesByEvent = function(req, res) {
  		});
  	}
  	else
- 		return res.status(401).send("User not Authorized");
+ 		return res.status(401).send({message : "User does not have permission."});
  };
 
  
  exports.setfName = function(req,res){
  	if(!req.isAuthenticated())
- 		return res.status(401).send("User is not logged in");
+ 		return res.status(401).send({'message' : 'User is not logged in.'});
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id:candidate_id });
@@ -239,12 +239,12 @@ exports.getCandidatesByEvent = function(req, res) {
  });
  	}
  	else
- 		return res.status(401).send('User not Authorized');
+ 		return res.status(401).send({message : 'User does not have permission.'});
 
  };
  exports.setlName = function(req,res){
  	if(!req.isAuthenticated())
- 		return res.status(401).send("User is not logged in");
+ 		return res.status(401).send({'message' : 'User is not logged in.'});
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id:candidate_id });
@@ -277,12 +277,12 @@ exports.getCandidatesByEvent = function(req, res) {
  });
  	}
  	else
- 		return res.status(401).send('User not Authorized');
+ 		return res.status(401).send({message : 'User does not have permission.'});
 
  };
  exports.setEmail = function(req,res){
  	if(!req.isAuthenticated())
- 		return res.status(401).send("User is not logged in");
+ 		return res.status(401).send({'message' : 'User is not logged in.'});
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id:candidate_id });
@@ -315,7 +315,7 @@ exports.getCandidatesByEvent = function(req, res) {
  });
  	}
  	else
- 		return res.status(401).send('User not Authorized');
+ 		return res.status(401).send({message : 'User does not have permission.'});
 
  };
 
@@ -331,7 +331,7 @@ exports.getCandidatesByEvent = function(req, res) {
 */
 exports.setEventStatus = function(req,res) {
 	if(!req.isAuthenticated()) {
-		return res.status(401).send({message : "User is not logged in"});
+		return res.status(401).send({'message' : 'User is not logged in.'});
 	} else if(req.body.candidate_id == undefined || req.body.event_id == undefined || req.body.status == undefined) {
 		return res.status(400).send({message : 'A required field is not specified.  Nice going.'});
 	} else if(req.hasAuthorization(req.user, ["admin"])) {
@@ -443,7 +443,7 @@ exports.setEventStatus = function(req,res) {
 			}
 		});
 	} else {
-		return res.status(401).send({message : 'User is not authorized.'});
+		return res.status(401).send({message : 'User does not have permission.'});
 	}
 };
 
@@ -456,7 +456,7 @@ exports.setEventStatus = function(req,res) {
 */
 exports.addEvent = function(req,res){
 	if(!req.isAuthenticated()) {
-		return res.status(401).send({message : "User is not logged in"});
+		return res.status(401).send({'message' : 'User is not logged in.'});
 	} else if(req.body.candidate_id == undefined || req.body.event_id == undefined) {
 		return res.status(400).send({message : "A required field is not specified.  Nice going."});
 	} else if(req.hasAuthorization(req.user, ["admin"])) {
@@ -483,7 +483,7 @@ exports.addEvent = function(req,res){
 		});
 	}
 	else {
-		return res.status(401).send('User not Authorized');
+		return res.status(401).send({message : 'User does not have permission.'});
 	}
 };
 
@@ -533,7 +533,7 @@ exports.addEvent = function(req,res){
 // 		});
 // 	}
 // 	else {
-// 		return res.status(401).send('User not Authorized');
+// 		return res.status(401).send('User does not have permission.');
 // 	}
 // };
 
@@ -663,13 +663,13 @@ exports.setEventAccepted = function(req,res){
 			}
 		});
 	} else {
-		return res.status(401).send({message : 'User not authorized.'});
+		return res.status(401).send({message : 'User does not have permission.'});
 	}
 };
 
 exports.setNote = function(req,res){
 	if(!req.isAuthenticated())
-		return res.status(401).send("User is not logged in");
+		return res.status(401).send({'message' : 'User is not logged in.'});
 	if (req.hasAuthorization(req.user, ["admin"])){
 		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
 		var query = Candidate.findOne({_id:candidate_id });
@@ -695,7 +695,7 @@ exports.setNote = function(req,res){
 		});
 	}
 	else
-		return res.status(401).send('User not Authorized');
+		return res.status(401).send({message : 'User does not have permission.'});
 
 };
 
@@ -834,7 +834,7 @@ exports.deleteCandidate = function(req,res){
 		});
 	}
 	else
-		return res.status(401).send({message : 'User not Authorized'});
+		return res.status(401).send({message : 'User does not have permission.'});
 };
 
 exports.deleteCandidateByEvent = function(req, res) {

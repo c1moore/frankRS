@@ -7,7 +7,7 @@
  */
 var should = require('should'),
 	mongoose = require('mongoose'),
-	Event = mongoose.model('Event'),
+	Evnt = mongoose.model('Event'),
 	User = mongoose.model('User');
 
 /**
@@ -39,10 +39,14 @@ var ranksEqual = function(arr1, arr2) {
 describe('User Model Unit Tests:', function() {
 
 	before(function(done) {
-		event = new Event({
+		var millisInMonth = new Date(1970, 0, 31, 11, 59, 59).getTime();			//Number of milliseconds in a typical month.
+		var startDate = new Date(Date.now() + millisInMonth).getTime();				//Start date for 1 month from now.
+		var endDate = new Date(Date.now() + millisInMonth + 86400000).getTime();	//Event lasts 1 day.
+
+		event = new Evnt({
 			name:  'UserTestEvent',
-			start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
-			end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+			start_date: startDate,
+			end_date:  endDate,
 			location: 'UF',
 			schedule: 'www.google.com'
 		});
@@ -88,8 +92,12 @@ describe('User Model Unit Tests:', function() {
 
 		it('should fail to save an existing user again', function(done) {
 			user.save(function(err1) {
+				if(err1)
+					return done(err1);
+
 				return user2.save(function(err2) {
 					should.exist(err2);
+					err2.code.should.equal(11000);
 					done();
 				});	
 			});
@@ -97,8 +105,12 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the first name', function(done) {
 			user.save(function(err) {
+				if(err)
+					return done(err);
+
 				var query = User.findOne({'fName' : user.fName});
 				query.exec(function(err, result) {
+					should.not.exist(err);
 					(result.fName === undefined).should.be.false;
 					result.fName.should.equal(user.fName);
 					done();
@@ -108,8 +120,12 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the last name', function(done) {
 			user.save(function(err) {
+				if(err)
+					return done(err);
+
 				var query = User.findOne({'lName' : user.lName});
 				query.exec(function(err, result) {
+					should.not.exist(err);
 					(result.lName === undefined).should.be.false;
 					(result.lName).should.be.equal(user.lName);
 					done();
@@ -120,8 +136,12 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the email', function(done) {
 			user.save(function(err) {
+				if(err)
+					return done(err);
+
 				var query = User.findOne({'email':user.email});
 				query.exec(function(err,result) {
+					should.not.exist(err);
 					(result.email === undefined).should.be.false;
 					(result.email).should.be.equal(user.email);
 					done();
@@ -131,8 +151,12 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the password', function(done) {
 			user.save(function(err) {
+				if(err)
+					return done(err);
+
 				var query = User.findOne({'password':user.password});
 				query.exec(function(err,result) {
+					should.not.exist(err);
 					(result.password === undefined).should.be.false;
 					(result.password).should.be.equal(user.password);
 					done();
@@ -142,8 +166,12 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the password salt', function(done) {
 			user.save(function(err) {
+				if(err)
+					return done(err);
+
 				var query = User.findOne({'salt':user.salt});
 				query.exec(function(err,result) {
+					should.not.exist(err);
 					(result.salt===undefined).should.be.false;
 					(result.salt).should.be.equal(user.salt);
 					done();
@@ -153,8 +181,12 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the roles', function(done) {
 			user.save(function(err) {
+				if(err)
+					return done(err);
+
 				var query = User.findOne({'roles':user.roles});
 				query.exec(function(err,result) {
+					should.not.exist(err);
 					(result.roles===undefined).should.be.false;
 					(arraysEqual(result.roles,user.roles)).should.be.equal(true);
 					done();
@@ -164,8 +196,12 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the status', function(done) {
 			user.save(function(err) {
+				if(err)
+					return done(err);
+
 				var query = User.findOne({'status':user.status});
 				query.exec(function(err,result) {
+					should.not.exist(err);
 					(result.status===undefined).should.be.false;
 					(arraysEqual(result.status,user.status)).should.be.equal(true);
 					done();
@@ -175,8 +211,12 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the rank', function(done) {
 			user.save(function(err) {
+				if(err)
+					return done(err);
+
 				var query = User.findOne({'_id':user._id});
 				query.exec(function(err,result) {
+					should.not.exist(err);
 					(result.rank===undefined).should.be.false;
 					(ranksEqual(result.rank, user.rank)).should.be.equal(true);
 					done();
@@ -186,8 +226,12 @@ describe('User Model Unit Tests:', function() {
 		
 		it('should allow getting the login_enabled', function(done) {
 			user.save(function(err) {
+				if(err)
+					return done(err);
+
 				var query = User.findOne({'login_enabled':user.login_enabled});
 				query.exec(function(err,result) {
+					return done(err);
 					(result.login_enabled===undefined).should.be.false;
 					(result.login_enabled).should.be.equal(user.login_enabled);
 					done();
@@ -197,8 +241,12 @@ describe('User Model Unit Tests:', function() {
 
 		it('should allow getting the templates', function(done) {
 			user.save(function(err) {
+				if(err)
+					return done(err);
+
 				var query = User.findOne({'templates':user.templates});
 				query.exec(function(err,result) {
+					should.not.exist(err);
 					(result.templates===undefined).should.be.false;
 					(arraysEqual(result.templates,user.templates)).should.be.equal(true);
 					done();
@@ -210,6 +258,7 @@ describe('User Model Unit Tests:', function() {
 			user.fName = '';
 			return user.save(function(err) {
 				should.exist(err);
+				err.message.should.equal("Validation failed");
 				done();
 			});
 		});
@@ -218,6 +267,7 @@ describe('User Model Unit Tests:', function() {
 			user.lName = '';
 			return user.save(function(err) {
 				should.exist(err);
+				err.message.should.equal("Validation failed");
 				done();
 			});
 		});
@@ -226,6 +276,7 @@ describe('User Model Unit Tests:', function() {
 			user.email = '';
 			return user.save(function(err) {
 				should.exist(err);
+				err.message.should.equal("Validation failed");
 				done();
 			});
 		});
@@ -234,6 +285,7 @@ describe('User Model Unit Tests:', function() {
 			user.password = '';
 			return user.save(function(err) {
 				should.exist(err);
+				err.message.should.equal("Validation failed");
 				done();
 			});
 		});
@@ -242,6 +294,7 @@ describe('User Model Unit Tests:', function() {
 			user.roles = [];
 			return user.save(function(err) {
 				should.exist(err);
+				err.message.should.equal("Validation failed");
 				done();
 			});
 		});
@@ -250,6 +303,7 @@ describe('User Model Unit Tests:', function() {
 			user.login_enabled = undefined;
 			return user.save(function(err) {
 				should.exist(err);
+				err.message.should.equal("Validation failed");
 				done();
 			});
 		});
@@ -258,6 +312,7 @@ describe('User Model Unit Tests:', function() {
 			user.email = 'This is clearly not an email address';
 			return user.save(function(err) {
 				should.exist(err);
+				err.message.should.equal("Validation failed");
 				done();
 			});
 		});
@@ -266,6 +321,7 @@ describe('User Model Unit Tests:', function() {
 			user.email = 'invalid@';
 			return user.save(function(err) {
 				should.exist(err);
+				err.message.should.equal("Validation failed");
 				done();
 			});
 		});
@@ -274,25 +330,17 @@ describe('User Model Unit Tests:', function() {
 			user.roles = ['giant sabertooth tiger','attendee'];
 			return user.save(function(err) {
 				should.exist(err);
+				err.message.should.equal("Validation failed");
 				done();
 			});
 		});
 
 		it('should show an error when trying to save to one of the lists without a proper user id.', function(done) {
-			var event1 = new Event({
-				name:  'attendeeteste2',
-				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
-				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
-				location: 'UF',
-				schedule: 'www.google.com'
-			});
-
-			user.attendeeList = [{user_id : user2._id, event_id : event1._id}];
+			user.attendeeList = [{user_id : mongoose.Types.ObjectId(), event_id : event._id}];
 			user.save(function(err) {
 				should.exist(err);
-				event1.remove(function() {
-					done();
-				});
+				err.message.should.equal("Validation failed");
+				done();
 			});
 		});
 
@@ -300,71 +348,42 @@ describe('User Model Unit Tests:', function() {
 			user.attendeeList = [{user_id : user._id, event_id : mongoose.Types.ObjectId()}];
 			user.save(function(err) {
 				should.exist(err);
+				err.message.should.equal("Validation failed");
 				done();
 			});
 		});
 
 		it('should be able to save properly when a proper user and event id are given to one of the lists', function(done) {
-			var event1 = new Event({
-				name:  'attendeeteste2',
-				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
-				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
-				location: 'UF',
-				schedule: 'www.google.com'
-			});
-
 			user2.email = 'user2@email.com';
 
-			event1.save(function() {
-				user2.save(function() {
-					user.attendeeList = [{user_id : user2._id, event_id : event1._id}];
-					user.save(function(err, result) {
-						should.exist(result);
-						event1.remove(function() {
-							done();
-						});
-					});
+			user2.save(function(err) {
+				if(err)
+					return done(err);
+
+				user.attendeeList = [{user_id : user2._id, event_id : event._id}];
+				user.save(function(err, result) {
+					should.not.exist(err);
+					should.exist(result);
+					done();
 				});
 			});
 		});
 
 		it('should be able to save properly when a proper event id is passed to the status array', function(done) {
-			var event1 = new Event({
-				name:  'attendeeteste2',
-				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
-				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
-				location: 'UF',
-				schedule: 'www.google.com'
-			});
-
-			event1.save(function() {
-				user.attendeeList = [{event_id : event1._id, attending : true, recruiter : false}];
-				user.save(function(err, result) {
-					should.exist(result);
-					event1.remove(function() {
-						done();
-					});
-				});
+			user.attendeeList = [{event_id : event._id, attending : true, recruiter : false}];
+			user.save(function(err, result) {
+				should.not.exist(err);
+				should.exist(result);
+				done();
 			});
 		});
 
 		it('should fail to save when all fields of the status array are not defined.', function(done) {
-			var event1 = new Event({
-				name:  'attendeeteste2',
-				start_date: new Date(2014,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
-				end_date:  new Date(2015,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
-				location: 'UF',
-				schedule: 'www.google.com'
-			});
-
-			event1.save(function() {
-				user.attendeeList = [{event_id : event1._id, attending : true}];
-				user.save(function(err, result) {
-					should.exist(result);
-					event1.remove(function() {
-						done();
-					});
-				});
+			user.attendeeList = [{event_id : event._id, attending : true}];
+			user.save(function(err, result) {
+				should.not.exist(err);
+				should.exist(result);
+				done();
 			});
 		});
 
@@ -372,14 +391,23 @@ describe('User Model Unit Tests:', function() {
 			user.status = [{event_id : mongoose.Types.ObjectId(), attending : true, recruiter: false}];
 			user.save(function(err) {
 				should.exist(err);
+				err.message.should.equal("Validation failed");
 				done();
 			});
 		});
 
 		afterEach(function(done) {
-			user.remove();
-			user2.remove();
-			done();
+			user.remove(function(err) {
+				if(err)
+					return done(err);
+
+				user2.remove(function(err) {
+					if(err)
+						return done(err);
+
+					done();
+				});
+			});
 		});
 	});
 

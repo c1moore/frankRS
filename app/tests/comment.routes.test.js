@@ -11,7 +11,7 @@ var should = require('should'),
  	http = require('http'),
  	superagent = require('superagent'),
  	Comment = mongoose.model('Comment'),
-	Event = mongoose.model('Event'),
+	Evnt = mongoose.model('Event'),
  	User = mongoose.model('User'),
  	config = require('../../config/config'),
  	request = require('supertest');
@@ -36,15 +36,27 @@ function arraysEqual(array0,array1) {
 /**
  * Unit tests
  */
-describe('Express.js Comment Route Integration Tests:', function() {
+describe('Comment Route Integration Tests:', function() {
 	before(function(done) {
-		User.remove().exec(); //Prevent earlier failed tests from poisoning us
-		Event.remove().exec();
-		Comment.remove().exec();
-		event1 = new Event({
+		//Remove all data from database so any previous tests that did not do this won't affect these tests.
+		User.remove(function() {
+			Evnt.remove(function() {
+				Comment.remove(function() {
+					done();
+				});				
+			});
+		});
+	});
+
+	before(function(done) {
+		var millisInMonth = new Date(1970, 0, 31, 11, 59, 59).getTime();			//Number of milliseconds in a typical month.
+		var startDate = new Date(Date.now() + millisInMonth).getTime();				//Start date for 1 month from now.
+		var endDate = new Date(Date.now() + millisInMonth + 86400000).getTime();	//Event lasts 1 day.
+
+		event1 = new Evnt({
 			name:  'testing123',
- 			start_date: new Date(2140,11,30,10,0,0).getTime(), //year, month, day, hour, minute, millisec
- 			end_date:  new Date(2150,11,30,10,0,0).getTime(),  //month is zero based.  11 = dec
+ 			start_date: startDate,
+ 			end_date:  endDate,
  			location: 'UF',
  			schedule: 'www.google.com'
  		});
@@ -305,6 +317,7 @@ describe('Express.js Comment Route Integration Tests:', function() {
 			.post('http://localhost:3001/comments/getCommentObj')
 			.send({comment_id: comment1._id.toString()})
 			.end(function(err, res) {
+				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
 				done();
@@ -316,6 +329,7 @@ describe('Express.js Comment Route Integration Tests:', function() {
 			.post('http://localhost:3001/comments/getCommentObj')
 			.send({comment_id: comment1._id.toString()})
 			.end(function(err, res) {
+				should.not.exist(err);
 				res.status.should.be.equal(401);
 				res.body.should.have.property('message');
 				done();
@@ -327,6 +341,7 @@ describe('Express.js Comment Route Integration Tests:', function() {
 			.post('http://localhost:3001/comments/getCommentObj')
 			.send({comment_id: comment1._id.toString()})
 			.end(function(err, res) {
+				should.not.exist(err);
 				res.status.should.be.equal(200);
 				res.body.should.have.property('_id');
 				done();
@@ -338,6 +353,7 @@ describe('Express.js Comment Route Integration Tests:', function() {
 			.post('http://localhost:3001/comments/getCommentObj')
 			.send({comment_id: comment1._id.toString()})
 			.end(function(err, res) {
+				should.not.exist(err);
 				res.status.should.be.equal(200);
 				res.body.should.have.property('_id');
 				done();
@@ -346,9 +362,21 @@ describe('Express.js Comment Route Integration Tests:', function() {
 	
 
 	after(function(done) {
-		User.remove().exec(); //Prevent earlier failed tests from poisoning us
-		Event.remove().exec();
-		Comment.remove().exec();
- 		done();
+		User.remove(function(err) {
+			if(err)
+				return done(err);
+
+			Evnt.remove(function(err) {
+				if(err)
+					return done(err);
+				
+				Comment.remove(function(err) {
+					if(err)
+						return done(err);
+
+			 		done();
+				});
+			});
+		});
 	});
 });
