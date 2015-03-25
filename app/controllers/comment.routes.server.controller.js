@@ -24,8 +24,7 @@ var errorHandler = require('./errors'),
 var canViewComment = function(user,hasAuthorization,comment) {
 	if (comment.stream=='social') return true;
 	if (hasAuthorization(user,['admin'])) return true;
-	if (hasAuthorization(user,['recruiter']) && comment.stream=='recruiter' && isRecruitEvent(
-		user,comment.event_id,hasAuthorization)) return true;
+	if (hasAuthorization(user,['recruiter']) && comment.stream=='recruiter' && isRecruitEvent(user,comment.event_id,hasAuthorization)) return true;
 	return false;
 };
 
@@ -56,7 +55,7 @@ var isRecruitEvent = function(user,eventID,hasAuthorization) {
 
 exports.getCommentObj = function(req, res) {
 	if (!req.isAuthenticated()) { //Check if the user is authenticated
-		res.status(401).json({message: "You are not logged in"});
+		res.status(401).json({message: "User is not logged in."});
 		return;
 	}
 	var id = mongoose.Types.ObjectId(req.body.comment_id);
@@ -76,13 +75,13 @@ exports.getCommentObj = function(req, res) {
 
 exports.getSocialCommentsForEvent = function(req, res) {
 	if (!req.isAuthenticated()) { //Check if the user is authenticated
-		return res.status(401).send({message: "You are not logged in"});
+		return res.status(401).send({message: "User is not logged in."});
 	}
 	if(req.body.event_id == undefined) {
 		return res.status(400).send({message : "Event not specified."});
 	}
 	if(!canViewEvent(req.user, req.body.event_id, req.hasAuthorization)) {
-		return res.status(401).send({message : "You are not authorized to view comments for this event."});
+		return res.status(401).send({message : "User does not have permission."});
 	}
 	var id = mongoose.Types.ObjectId(req.body.event_id);
 	var query = Comment.find({event_id: id,stream: 'social'});
@@ -107,7 +106,7 @@ exports.getSocialCommentsForEvent = function(req, res) {
 */
 exports.getRecruiterCommentsForEvent = function(req, res) {
 	if (!req.isAuthenticated()) { //Check if the user is authenticated
-		return res.status(401).json({message: "You are not logged in"});
+		return res.status(401).json({message: "User is not logged in."});
 	} else 	if(req.body.event_id == undefined) {
 		return res.status(400).send({message : "Event not specified."});
 	} else {
@@ -123,7 +122,7 @@ exports.getRecruiterCommentsForEvent = function(req, res) {
 			} else if(!req.hasAuthorization(req.user,['recruiter','admin'])) {
 				return res.status(401).json({message: "User does not have permission."});
 			} else if(!canViewEvent(req.user, id, req.hasAuthorization) || !isRecruitEvent(req.user, id, req.hasAuthorization)) {
-				res.status(401).json({message: "You are not authorized to view the comments of this event"});
+				res.status(401).json({message: "User does not have permission."});
 			} else {
 				res.status(200).json(result);
 			}
@@ -133,7 +132,7 @@ exports.getRecruiterCommentsForEvent = function(req, res) {
 
 exports.postCommentSocial = function(req, res) {
 	if (!req.isAuthenticated()) { //Check if the user is authenticated
-		return res.status(401).json({message: "You are not logged in"});
+		return res.status(401).json({message: "User is not logged in."});
 	}
 	if(req.body.comment == undefined || req.body.event_id == undefined) {
 		return res.status(400).send({message : "Required field not specified."});
@@ -166,7 +165,7 @@ exports.postCommentSocial = function(req, res) {
 
 exports.postCommentRecruiter = function(req, res) {
 	if (!req.isAuthenticated()) { //Check if the user is authenticated
-		return res.status(401).send({message: "You are not logged in"});
+		return res.status(401).send({message: "User is not logged in."});
 	}
 
 	if(!req.body.comment || !req.body.event_id) {
@@ -179,7 +178,7 @@ exports.postCommentRecruiter = function(req, res) {
 	var commentObj = {user_id: new mongoose.Types.ObjectId(user._id), event_id: new mongoose.Types.ObjectId(event_id), comment: comment, stream:'recruiter'};
 
 	if (!canViewComment(user,req.hasAuthorization,commentObj)) {
-		return res.status(401).send({message: 'You do not have permissions to post that comment'});
+		return res.status(401).send({message: 'You do not have permission to write comments to this event.'});
 	} else {
 		var newComment = new Comment(commentObj);
 		newComment.save(function(err) {
@@ -194,7 +193,7 @@ exports.postCommentRecruiter = function(req, res) {
 
 exports.delete = function(req, res) {
 	if(!req.isAuthenticated()) { //Check if the user is authenticated
-		return res.status(401).json({message: "You are not logged in"});
+		return res.status(401).json({message: "User is not logged in."});
 	} else if(!req.body.comment_id) {
 		return res.status(400).send({message : "Missing required fields."});
 	}
@@ -206,7 +205,7 @@ exports.delete = function(req, res) {
 		if (err) {res.status(400).send(err);return;}
 		else if (!result) {res.status(400).send({message: "No comment found!"});
 		} else if (req.user._id!=result.user_id && !req.hasAuthorization(req.user,['admin'])) {
-			res.status(401).send({message: "You must be the comment author or admin to delete"});
+			res.status(401).send({message: "You do not have permission to delete this comment (only admins and authors can delete comments)."});
 		} else {
 			result.remove(function(err) {
 				if(err) {
@@ -221,13 +220,13 @@ exports.delete = function(req, res) {
 
 exports.searchByInterests = function(req, res) {
 	if (!req.isAuthenticated()) { //Check if the user is authenticated
-		res.status(401).json({message: "You are not logged in"});
+		res.status(401).json({message: "User is not logged in."});
 		return;
 	}
 	var id = mongoose.Types.ObjectId(req.body.event_id);
 	var interest = req.body.interest;
 	if (!canViewEvent(req.user,id,req.hasAuthorization)) {
-		res.status(401).send({message: "You do not have permission to perform this search"});
+		res.status(401).send({message: "User does not have permission."});
 		return;
 	}
 	var query = Comment.find({event_id: id,interest: interest});
@@ -255,7 +254,7 @@ exports.uploadRecruiterCommentImage = function(req, res) {
 	if(!req.isAuthenticated()) {
 		return res.status(401).send({message : "User is not logged in."});
 	} else if(!req.hasAuthorization(req.user, ['admin', 'recruiter'])) {
-		return res.status(401).send({message : "User does not have permission."});
+		return res.status(401).send({message : "You do not have permission to write comments to this event."});
 	} else {
 		var form = new formidable.IncomingForm({
 			keepExtensions : true,
@@ -311,7 +310,7 @@ exports.uploadSocialCommentImage = function(req, res) {
 			} else {
 				if(!canViewEvent(req.user, fields.event_id, req.hasAuthorization)) {
 					fs.unlink(path.normalize(__dirname + "../../../public/img/social/" + files.file.name), function() {
-						return res.status(401).send({message : "You are not authorized to view the comments for this event."});
+						return res.status(401).send({message : "User does not have permission."});
 					});
 				} else {
 					fs.rename(files.file.path, path.normalize(__dirname + "../../../public/img/social/" + fields.flowFilename), function(err) {

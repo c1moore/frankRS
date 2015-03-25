@@ -120,7 +120,7 @@ describe('Event Route Integration Tests:', function() {
  			.expect(401)
  			.end(function(err, res) {
  				should.not.exist(err);
- 				res.body.message.should.equal("You are not logged in");
+ 				res.body.message.should.equal("User is not logged in.");
  				done();
  			});
  	});
@@ -132,7 +132,7 @@ describe('Event Route Integration Tests:', function() {
  			.expect(401)
  			.end(function(err, res) {
  				should.not.exist(err);
- 				res.body.message.should.equal("You are not logged in");
+ 				res.body.message.should.equal("User is not logged in.");
  				done();
  			});
 
@@ -145,7 +145,7 @@ describe('Event Route Integration Tests:', function() {
  			.expect(401)
  			.end(function(err, res) {
  				should.not.exist(err);
- 				res.body.message.should.equal("You are not logged in");
+ 				res.body.message.should.equal("User is not logged in.");
  				done();
  			});
 
@@ -158,7 +158,7 @@ describe('Event Route Integration Tests:', function() {
  			.expect(401)
  			.end(function(err, res) {
  				should.not.exist(err);
- 				res.body.message.should.equal("You are not logged in");
+ 				res.body.message.should.equal("User is not logged in.");
  				done();
  			});
  	});
@@ -170,7 +170,7 @@ describe('Event Route Integration Tests:', function() {
  			.expect(401)
  			.end(function(err, res) {
  				should.not.exist(err);
- 				res.body.message.should.equal("You are not logged in");
+ 				res.body.message.should.equal("User is not logged in.");
  				done();
  			});
 
@@ -183,7 +183,7 @@ describe('Event Route Integration Tests:', function() {
  			.expect(401)
  			.end(function(err, res) {
  				should.not.exist(err);
- 				res.body.message.should.equal("You are not logged in");
+ 				res.body.message.should.equal("User is not logged in.");
  				done();
  			});
  	});
@@ -195,7 +195,7 @@ describe('Event Route Integration Tests:', function() {
  			.expect(401)
  			.end(function(err, res) {
  				should.not.exist(err);
- 				res.body.message.should.equal("You are not logged in");
+ 				res.body.message.should.equal("User is not logged in.");
  				done();
  			});
 
@@ -391,7 +391,7 @@ describe('Event Route Integration Tests:', function() {
 		 				should.not.exist(err);
 						res.status.should.be.equal(401);
 						res.body.should.have.property('message');
-						res.body.message.should.be.equal('Access Denied. This incident will be reported.');
+						res.body.message.should.be.equal('User does not have permission.');
 		 				done();
 		 			});
 		 	});
@@ -768,7 +768,7 @@ describe('Event Route Integration Tests:', function() {
 							.end(function(err,res) {
 								should.not.exist(err);
 								res.status.should.be.equal(401);
-								res.body.message.should.equal("Access denied");
+								res.body.message.should.equal("User does not have permission.");
 								agentAdmin
 									.get('http://localhost:3001/events/getName')
 									.query({event_id: event1._id.toString()})
@@ -969,7 +969,7 @@ describe('Event Route Integration Tests:', function() {
 					.end(function(err,res) {
 						should.not.exist(err);
 						res.status.should.be.equal(401);
-						res.body.message.should.equal("Access denied");
+						res.body.message.should.equal("User does not have permission.");
 						agent
 							.get('http://localhost:3001/events/getEndDate')
 							.query({event_id: event1._id.toString()})
@@ -1060,7 +1060,7 @@ describe('Event Route Integration Tests:', function() {
 					.end(function(err,res) {
 						should.not.exist(err);
 						res.status.should.be.equal(401);
-						res.body.message.should.equal("Access denied");
+						res.body.message.should.equal("User does not have permission.");
 						agent
 							.get('http://localhost:3001/events/getLocation')
 							.query({event_id: event1._id.toString()})
@@ -1154,7 +1154,7 @@ describe('Event Route Integration Tests:', function() {
 							.end(function(err,res) {
 								should.not.exist(err);
 								res.status.should.be.equal(401);
-								res.body.message.should.equal("Access denied");
+								res.body.message.should.equal("User does not have permission.");
 
 								agentAdmin
 									.get('http://localhost:3001/events/getSchedule')
@@ -1187,7 +1187,7 @@ describe('Event Route Integration Tests:', function() {
 					.end(function(err,res) {
 						should.not.exist(err);
 						res.status.should.be.equal(401);
-						res.body.message.should.equal("Access denied");
+						res.body.message.should.equal("User does not have permission.");
 
 						agent
 							.get('http://localhost:3001/events/getSchedule')
@@ -1257,7 +1257,7 @@ describe('Event Route Integration Tests:', function() {
 					.end(function(err,res) {
 						should.not.exist(err);
 						res.status.should.be.equal(401);
-						res.body.message.should.equal("Access denied");
+						res.body.message.should.equal("User does not have permission.");
 
 						agent
 							.get('http://localhost:3001/events/getName')
@@ -1287,7 +1287,7 @@ describe('Event Route Integration Tests:', function() {
 					.end(function(err,res) {
 						should.not.exist(err);
 						res.status.should.be.equal(401);
-						res.body.message.should.equal("Access denied");
+						res.body.message.should.equal("User does not have permission.");
 
 						agent
 							.get('http://localhost:3001/events/getName')
@@ -1386,7 +1386,7 @@ describe('Event Route Integration Tests:', function() {
 						should.not.exist(err);
 						res.status.should.be.equal(401);
 						res.body.should.have.property('message');
-						res.body.message.should.equal("Access denied");
+						res.body.message.should.equal("User does not have permission.");
 
 						Evnt.find({}, function(err, result) {
 							if(err)

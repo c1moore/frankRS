@@ -128,15 +128,15 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 
 			}).error(function(response, status) {
 				$scope.attendees.list = [];
-				if(status === 401) {
-					if(response.message === "User is not logged in.") {
-						$location.path('/signin');
-					} else {
-						$location.path('/');
-					}
-				} else if(status === 400) {
-					$scope.attendees.error = "Looks like nobody you invited has accepted your request.  Keep trying, eventually you'll find the right people.";
-				}
+				// if(status === 401) {
+				// 	if(response.message === "User is not logged in.") {
+				// 		$location.path('/signin');
+				// 	} else {
+				// 		$location.path('/');
+				// 	}
+				// } else if(status === 400) {
+				// 	$scope.attendees.error = "Looks like nobody you invited has accepted your request.  Keep trying, eventually you'll find the right people.";
+				// }
 			});
 			
 			$http.post('/recruiter/invitees', request).success(function(response) {
@@ -149,15 +149,15 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 			
 			}).error(function(response, status) {
 				$scope.invitees.list = [];
-				if(status === 401) {
-					if(response.message === "User is not logged in.") {
-						$location.path('/signin');
-					} else {
-						$location.path('/');
-					}
-				} else if(status === 400) {
-					$scope.invitees.error = "How will anybody have be able to enjoy " + eventSelector.selectedEvent + " without wonderful people like you inviting them?  You should invite more people.";
-				}
+				// if(status === 401) {
+				// 	if(response.message === "User is not logged in.") {
+				// 		$location.path('/signin');
+				// 	} else {
+				// 		$location.path('/');
+				// 	}
+				// } else if(status === 400) {
+				// 	$scope.invitees.error = "How will anybody have be able to enjoy " + eventSelector.selectedEvent + " without wonderful people like you inviting them?  You should invite more people.";
+				// }
 			});
 
 			$http.post('/recruiter/almosts', request).success(function(response) {
@@ -170,15 +170,15 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 
 			}).error(function(response, status) {
 				$scope.almosts.list = [];
-				if(status === 401) {
-					if(response.message === "User is not logged in.") {
-						$location.path('/signin');
-					} else {
-						$location.path('/');
-					}
-				} else if(status === 400) {
-					$scope.almosts.error = "Nobody has chosen somebody else's invitation over your invitation.  Looks like somebody is popular.";
-				}
+				// if(status === 401) {
+				// 	if(response.message === "User is not logged in.") {
+				// 		$location.path('/signin');
+				// 	} else {
+				// 		$location.path('/');
+				// 	}
+				// } else if(status === 400) {
+				// 	$scope.almosts.error = "Nobody has chosen somebody else's invitation over your invitation.  Looks like somebody is popular.";
+				// }
 			});
 		} else {
 			$scope.attendees.error = "You have not selected an event.  You can do so in the top right-hand corner.";
@@ -228,25 +228,25 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 										"</div>";
 		}).error(function(response, status) {
 			previewOptions = {};
-			if(status === 401) {
-				if(response.message === "User is not logged in.") {
-					$location.path('/signin');
-				} else {
-					$location.path('/');
-				}
-			} else if(status === 400) {
-				previewOptions.template = response.message;//"There was an error getting the template.  Please try refreshing the page or selecting an event in the top right-hand corner.";
+			// if(status === 401) {
+			// 	if(response.message === "User is not logged in.") {
+			// 		$location.path('/signin');
+			// 	} else {
+			// 		$location.path('/');
+			// 	}
+			// } else if(status === 400) {
+			// 	previewOptions.template = response.message;//"There was an error getting the template.  Please try refreshing the page or selecting an event in the top right-hand corner.";
 				
-				previewOptions.template = "<div class='modal-header'>" +
-												"<h3 class='modal-title'>{{eventSelector.selectedEvent}} Invitation Preview</h3>" +
-											"</div>" +
-											"<div class='modal-body' style='overflow: auto;'>" +
-												previewOptions.template +
-											"</div>" +
-											"<div class='modal-footer'>" +
-												"<button class='btn btn-primary' ng-click='closePreview()'>Got it!</button>" +
-											"</div>";
-			}
+			// 	previewOptions.template = "<div class='modal-header'>" +
+			// 									"<h3 class='modal-title'>{{eventSelector.selectedEvent}} Invitation Preview</h3>" +
+			// 								"</div>" +
+			// 								"<div class='modal-body' style='overflow: auto;'>" +
+			// 									previewOptions.template +
+			// 								"</div>" +
+			// 								"<div class='modal-footer'>" +
+			// 									"<button class='btn btn-primary' ng-click='closePreview()'>Got it!</button>" +
+			// 								"</div>";
+			// }
 		});
 	};
 
