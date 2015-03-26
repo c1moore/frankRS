@@ -6,7 +6,8 @@ var errorHandler = require('./errors'),
 	config = require('../../config/config'),
 	async = require('async'),
 	path = require('path'),
-	fs = require('fs');
+	fs = require('fs'),
+	_ = require('lodash');
 
 exports.getPreviewTemplate = function(req, res) {
 	if(!req.isAuthenticated()) {
@@ -40,23 +41,27 @@ exports.getPreviewTemplate = function(req, res) {
 					var query = User.findOne({_id : req.user._id});
 					query.populate('status.event_id');
 					query.exec(function(err, result) {
-						if(err)
-							callback(err, null);
-						else {
-							var i=0;
-							for(; i<result.status.length; i++) {
-								if((result.status[i].event_id._id.toString() === req.query.event_id.toString()) && (result.status[i].event_id.name === req.query.event_name)) {
-									if(result.status[i].recruiter) {
-										callback(null, true);
-									} else {
-										callback(null, false);
+						if(_.intersection(result.roles, ["admin"]).length) {
+							callback(null, true);
+						} else {
+							if(err)
+								callback(err, null);
+							else {
+								var i=0;
+								for(; i<result.status.length; i++) {
+									if((result.status[i].event_id._id.toString() === req.query.event_id.toString()) && (result.status[i].event_id.name === req.query.event_name)) {
+										if(result.status[i].recruiter) {
+											callback(null, true);
+										} else {
+											callback(null, false);
+										}
+										break;
 									}
-									break;
 								}
-							}
 
-							if(i===result.status.length) {
-								callback(null, false);
+								if(i===result.status.length) {
+									callback(null, false);
+								}
 							}
 						}
 					});

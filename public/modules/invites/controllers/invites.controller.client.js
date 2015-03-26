@@ -55,10 +55,12 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 				return eventSelector.selectedEvent;
 			},
 			function() {
-				angular.element("#invitation-submit-button").removeClass("disabled");
-				angular.element("#invitation-preview-button").removeClass("disabled");
-				$scope.invite.event_name = eventSelector.selectedEvent;
-				getPreview();
+				if(eventSelector.postEventId) {
+					angular.element("#invitation-submit-button").removeClass("disabled");
+					angular.element("#invitation-preview-button").removeClass("disabled");
+					$scope.invite.event_name = eventSelector.selectedEvent;
+					getPreview();
+				}
 			}
 		);
 
@@ -94,7 +96,6 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 				$scope.sending = false;
 			}).error(function(response) {
 				$window.alert(response.message);
-				console.log(response.message);
 
 				angular.element("#invitation-submit-button").removeClass("disabled");
 				
@@ -128,6 +129,13 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 
 			}).error(function(response, status) {
 				$scope.attendees.list = [];
+				//Since the http interceptor handles 401 cases, simply display a message despite the error code.
+				if(status === 400) {
+					$scope.attendees.error = "Looks like nobody you invited has accepted your request.  Keep trying, eventually you'll find the right people.";
+				} else {
+					$scope.attendees.error = response.message;		//If the interceptor has not redirected the user, this message may contain helpful information.
+				}
+
 				// if(status === 401) {
 				// 	if(response.message === "User is not logged in.") {
 				// 		$location.path('/signin');
@@ -149,6 +157,13 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 			
 			}).error(function(response, status) {
 				$scope.invitees.list = [];
+				
+				if(status === 400) {
+					$scope.invitees.error = "How will anybody have be able to enjoy " + eventSelector.selectedEvent + " without wonderful people like you inviting them?  You should invite more people.";
+				} else {
+					$scope.attendees.error = response.message;
+				}
+
 				// if(status === 401) {
 				// 	if(response.message === "User is not logged in.") {
 				// 		$location.path('/signin');
@@ -170,6 +185,13 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 
 			}).error(function(response, status) {
 				$scope.almosts.list = [];
+				
+				if(status === 400) {
+					$scope.invitees.error = "Nobody has chosen somebody else's invitation over your invitation.  Looks like somebody is popular.";
+				} else {
+					$scope.attendees.error = response.message;
+				}
+
 				// if(status === 401) {
 				// 	if(response.message === "User is not logged in.") {
 				// 		$location.path('/signin');
@@ -228,6 +250,19 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 										"</div>";
 		}).error(function(response, status) {
 			previewOptions = {};
+
+			previewOptions.template = response.message;
+			
+			previewOptions.template = "<div class='modal-header'>" +
+											"<h3 class='modal-title'>{{eventSelector.selectedEvent}} Invitation Preview</h3>" +
+										"</div>" +
+										"<div class='modal-body' style='overflow: auto;'>" +
+											previewOptions.template +
+										"</div>" +
+										"<div class='modal-footer'>" +
+											"<button class='btn btn-primary' ng-click='closePreview()'>Got it!</button>" +
+										"</div>";
+
 			// if(status === 401) {
 			// 	if(response.message === "User is not logged in.") {
 			// 		$location.path('/signin');

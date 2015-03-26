@@ -110,6 +110,39 @@ describe('Functional tests for preview controllers/routes:', function() {
 			});
 	});
 
+	it('should return the contents of template invitation when user has admin privileges.', function(done) {
+		var admin = new User({
+			email : 'admin@email.com',
+			roles : ['admin'],
+			password : 'password',
+			login_enabled : true
+		});
+
+		admin.save(function(err, result) {
+			if(err)	return done(err);
+
+			useragent
+				.post('http://localhost:3001/auth/signin')
+				.send({email : admin.email, password : 'password'})
+				.end(function(err, res) {
+					if(err)	return done(err);
+
+					if(res.status !== 200)
+						return done(new Error("useragent2 could not log in."));
+
+					useragent
+						.get('http://localhost:3001/preview/invitation')
+						.query({event_name : event1.name, event_id : event1._id.toString()})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(200);
+							res.body.preview.should.equal("This is a test to {{determine}} whether <or not> this method can truly return everything \"I expect \" it to 'contain.'  I hope it does; however, I have been wrong before.");
+							done();
+						});
+				});
+		});
+	});
+
 	it('should be able to find and return the proper file despite extra punctuation.', function(done) {
 		event1.name = "'Test ! Event !@#$%^&*() _2";
 		event1.save(function() {
