@@ -53,7 +53,8 @@ describe('Candidate Route Integration Tests:', function() {
 			start_date: startDate,
 			end_date:  endDate,
 			location: 'UF',
-			schedule: 'www.google.com'
+			schedule: 'www.google.com',
+			capacity: 50
 		});
 
 		event2 = new Evnt({
@@ -61,7 +62,8 @@ describe('Candidate Route Integration Tests:', function() {
 			start_date: startDate,
 			end_date:  endDate,
 			location: 'SFCC',
-			schedule: 'www.google.com'
+			schedule: 'www.google.com',
+			capacity: 50
 		});
 
 		event3 = new Evnt({
@@ -69,7 +71,8 @@ describe('Candidate Route Integration Tests:', function() {
 			start_date: startDate,
 			end_date:  endDate,
 			location: 'Orlando',
-			schedule: 'www.google.com'
+			schedule: 'www.google.com',
+			capacity: 50
 		});
 
 		event4 = new Evnt({
@@ -77,7 +80,8 @@ describe('Candidate Route Integration Tests:', function() {
 			start_date: startDate,
 			end_date:  endDate,
 			location: 'Tampa',
-			schedule: 'www.google.com'
+			schedule: 'www.google.com',
+			capacity: 50
 		});
 
 		event1.save(function(err) {

@@ -20,10 +20,11 @@ class Event:
     self.location = randomString(2,10,' ')
     self.start_date = randomTimeInMS()+round(time.time()*1000)
     self.end_date = randomTimeInMS(self.start_date)
+    self.capacity = random.randint(0, 500)
 
   def valid(self):
     return (hasattr(self,'name') and hasattr(self,'schedule') and hasattr(self,'location') and
-		hasattr(self,'start_date') and hasattr(self,'end_date'))
+		hasattr(self,'start_date') and hasattr(self,'end_date') and hasattr(self, 'capacity'))
 
   def save(self):
     members = inspect.getmembers(self)

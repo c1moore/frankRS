@@ -58,7 +58,8 @@ describe('Comment Route Integration Tests:', function() {
  			start_date: startDate,
  			end_date:  endDate,
  			location: 'UF',
- 			schedule: 'www.google.com'
+ 			schedule: 'www.google.com',
+			capacity: 50
  		});
 
 		recruiter = new User({

@@ -226,6 +226,34 @@ exports.getName = function(req, res) {
 	}
 };
 
+exports.getCapacity = function(req, res) {
+	try {
+		if(req.query.event_id == undefined) {
+			return res.status(400).send({message : 'Required field not specified.'});
+		}
+		if (!req.isAuthenticated()) { //Must be logged in
+			res.status(401).json({message: "User is not logged in."});
+			return;
+		//Must have permission to make requests on this ID
+		} else if (!canViewEvent(req.user,req.query.event_id,req.hasAuthorization)) {
+			res.status(401).json({message: "You do not have permission to request this ID"});
+			return;
+		}
+
+		var event_id = mongoose.Types.ObjectId(req.query.event_id);
+		var query = Event.findOne({_id: event_id});
+
+		query.exec(function(err,result) {
+			if (err) res.status(400).send(err);
+			else if (!result) res.status(400).json({message: "Event not found."});
+			else res.status(200).json({capacity: result.capacity});
+		});
+	} catch (err) {
+		console.log(err);
+		res.status(500);
+	}
+};
+
 //Setter routes
 
 exports.setStartDate = function(req, res) {
@@ -246,7 +274,7 @@ exports.setStartDate = function(req, res) {
 		query.exec(function(err,result) {
 			theResult = result;
 			if (err) res.status(400).send(err);
-			else if (!theResult) res.status(400).json({message: "No event object with that ID"});
+			else if (!theResult) res.status(400).json({message: "Event not found."});
 			else {
 				result.start_date = new_start_date;
 				result.save(function(err) {
@@ -282,7 +310,7 @@ exports.setEndDate = function(req, res) {
 		query.exec(function(err,result) {
 			theResult = result;
 			if (err) res.status(400).send(err);
-			else if (!theResult) res.status(400).json({message: "No event object with that ID"});
+			else if (!theResult) res.status(400).json({message: "Event not found."});
 			else {
 				result.end_date = new_end_date;
 				result.save(function(err) {
@@ -318,7 +346,7 @@ exports.setLocation = function(req, res) {
 		query.exec(function(err,result) {
 			theResult = result;
 			if (err) res.status(400).send(err);
-			else if (!theResult) res.status(400).json({message: "No event object with that ID"});
+			else if (!theResult) res.status(400).json({message: "Event not found."});
 			else {
 				result.location = new_location;
 				result.save(function(err) {
@@ -358,7 +386,7 @@ exports.setEventObj = function(req, res) {
 		}
 		var query = Event.findOne({_id: event_id});
 		var theResult;
-		var validKeys = ["name","schedule","location","start_date","end_date"];
+		var validKeys = ["name","schedule","location","start_date","end_date", "capacity"];
 		query.exec(function(err,result) {
 			theResult = result;
 			if (err) res.status(400).send(err);
@@ -409,7 +437,7 @@ exports.setSchedule = function(req, res) {
 		query.exec(function(err,result) {
 			theResult = result;
 			if (err) res.status(400).send(err);
-			else if (!theResult) res.status(400).json({message: "No event object with that ID"});
+			else if (!theResult) res.status(400).json({message: "Event not found."});
 			else {
 				result.schedule = new_schedule;
 				result.save(function(err) {
@@ -444,9 +472,49 @@ exports.setName = function(req, res) {
 		query.exec(function(err,result) {
 			theResult = result;
 			if (err) res.status(400).send(err);
-			else if (!theResult) res.status(400).json({message: "No event object with that ID"});
+			else if (!theResult) res.status(400).json({message: "Event not found."});
 			else {
 				result.name = new_name;
+				result.save(function(err) {
+					if (err) {
+						res.status(400).send(err);
+						return;
+					}
+					res.status(200).send();
+				});
+			}
+		});
+	} catch (err) {
+		console.log(err);
+		res.status(500);
+	}
+};
+
+exports.setCapacity = function(req, res) {
+	try {
+		//Since capacity can be 0 and capacity could be a string, convert it to a number and check if it is NaN.  Just checking isNaN may give unexpected results.
+		if(!req.body.event_id || req.body.capacity == null || isNaN(new Number(req.body.capacity))) {
+			res.status(400).send({message : 'Required fields not specified.'});
+			return;
+		}
+		if (!req.isAuthenticated()) { //Must be logged in
+			res.status(401).json({message: "User is not logged in."});
+			return;
+		//Must have permission to make requests on this ID
+		} else if (!req.hasAuthorization(req.user,["admin"])) {
+			res.status(401).json({message: "User does not have permission."});
+			return;
+		}
+
+		var event_id = mongoose.Types.ObjectId(req.body.event_id);
+		var new_capacity = req.body.capacity;
+		var query = Event.findOne({_id: event_id});
+
+		query.exec(function(err,result) {
+			if (err) res.status(400).send(err);
+			else if (!result) res.status(400).json({message: "Event not found."});
+			else {
+				result.capacity = new_capacity;
 				result.save(function(err) {
 					if (err) {
 						res.status(400).send(err);
@@ -478,7 +546,7 @@ exports.delete = function(req, res) {
 		query.exec(function(err,result) {
 			theResult = result;
 			if (err) res.status(400).send(err);
-			else if (!theResult) res.status(400).json({message: "No event object with that ID"});
+			else if (!theResult) res.status(400).json({message: "Event not found."});
 			else {
 				result.remove();
 				res.status(200).send();
@@ -500,8 +568,14 @@ exports.create = function(req, res) {
 			res.status(401).json({message: "User does not have permission."});
 			return;
 		}
-		var eventObj = {name: req.body.name,start_date: req.body.start_date,end_date: req.body.end_date,
-					location: req.body.location,schedule: req.body.schedule};
+		var eventObj = {
+			name: 		req.body.name,
+			start_date: req.body.start_date,
+			end_date: 	req.body.end_date,
+			location: 	req.body.location,
+			schedule: 	req.body.schedule,
+			capacity: 	req.body.capacity
+		};
 		var newEvent = new Event(eventObj);
 		newEvent.save(function (err) {
 			if (err) {

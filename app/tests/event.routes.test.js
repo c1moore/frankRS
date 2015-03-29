@@ -53,7 +53,8 @@ describe('Event Route Integration Tests:', function() {
  			start_date: startDate,
  			end_date: endDate,
  			location: 'UF',
- 			schedule: 'www.google.com'
+ 			schedule: 'www.google.com',
+			capacity: 50
  		});
 
  		event2 = new Evnt({
@@ -61,7 +62,8 @@ describe('Event Route Integration Tests:', function() {
  			start_date: startDate,
  			end_date: endDate,
  			location: 'UF2',
- 			schedule: 'www.google.com'
+ 			schedule: 'www.google.com',
+			capacity: 50
  		});
 
  		event1.save(function(err){
@@ -135,7 +137,6 @@ describe('Event Route Integration Tests:', function() {
  				res.body.message.should.equal("User is not logged in.");
  				done();
  			});
-
  	});
 
  	it("should not be able to get the event name when not signed in", function(done) {
@@ -148,7 +149,6 @@ describe('Event Route Integration Tests:', function() {
  				res.body.message.should.equal("User is not logged in.");
  				done();
  			});
-
  	});
 
  	it("should not be able to get the event end date when not signed in", function(done) {
@@ -173,7 +173,6 @@ describe('Event Route Integration Tests:', function() {
  				res.body.message.should.equal("User is not logged in.");
  				done();
  			});
-
  	});
 
  	it("should not be able to get the event schedule when not signed in", function(done) {
@@ -198,7 +197,18 @@ describe('Event Route Integration Tests:', function() {
  				res.body.message.should.equal("User is not logged in.");
  				done();
  			});
+ 	});
 
+ 	it("should not be able to get the event capacity when not signed in", function(done) {
+ 		request('http://localhost:3001')
+ 			.get('/events/capacity')
+ 			.query({event_id: event1._id.toString()})
+ 			.expect(401)
+ 			.end(function(err, res) {
+ 				should.not.exist(err);
+ 				res.body.message.should.equal("User is not logged in.");
+ 				done();
+ 			});
  	});
 
 	it("should not be able to sign in without a password", function(done) {
@@ -210,7 +220,7 @@ describe('Event Route Integration Tests:', function() {
 				res.status.should.be.equal(400);
        			done();
  			});
-     	});
+    });
 
  	it("should be able to sign in correctly", function(done) {
  		agent
@@ -221,7 +231,7 @@ describe('Event Route Integration Tests:', function() {
 				res.status.should.be.equal(200);
        			done();
  			});
-     	});
+    });
 
  	it('should now be able to enumerate events when signed in', function(done) {
  		agent
@@ -264,7 +274,7 @@ describe('Event Route Integration Tests:', function() {
 			});
  	});
 
-	 it("should now be able to get the event start date when signed in", function(done) {
+	it("should now be able to get the event start date when signed in", function(done) {
  		agent
  			.post('http://localhost:3001/auth/signin')
  			.send({email: user.email, password: 'password'})
@@ -343,6 +353,27 @@ describe('Event Route Integration Tests:', function() {
 						res.status.should.be.equal(200);
 						res.body.should.have.property('schedule');
 						res.body.schedule.should.equal(event1.schedule);
+		 				done();
+		 			});
+		 	});
+ 	});
+
+	it("should now be able to get the event capacity when signed in", function(done) {
+ 		agent
+ 			.post('http://localhost:3001/auth/signin')
+ 			.send({email: user.email, password: 'password'})
+ 			.end(function (err, res) {
+ 				if(err)
+ 					return done(err);
+
+		 		agent //IMPORTANT: Agent does not support expect, use should
+		 			.get('http://localhost:3001/events/capacity')
+		 			.query({event_id: event1._id.toString()})
+		 			.end(function(err,res) {
+		 				should.not.exist(err);
+						res.status.should.be.equal(200);
+						res.body.should.have.property('capacity');
+						res.body.capacity.should.equal(event1.capacity);
 		 				done();
 		 			});
 		 	});
@@ -523,6 +554,27 @@ describe('Event Route Integration Tests:', function() {
 		 	});
  	});
 
+	it("should not be able to access event capacity if the user shouldn't know about that event", function(done) {
+ 		agent
+ 			.post('http://localhost:3001/auth/signin')
+ 			.send({email: user.email, password: 'password'})
+ 			.end(function (err, res) {
+ 				if(err)
+ 					return done(err);
+
+		 		agent //IMPORTANT: Agent does not support expect, use should
+		 			.get('http://localhost:3001/events/capacity')
+					.query({event_id: event2._id.toString()})
+		 			.end(function(err,res) {
+		 				should.not.exist(err);
+						res.status.should.be.equal(401);
+						res.body.should.have.property('message');
+						res.body.message.should.equal("You do not have permission to request this ID");
+		 				done();
+		 			});
+		 	});
+ 	});
+
 	it("should be able to login as admin",function(done) {
 		agentAdmin
 			.post('http://localhost:3001/auth/signin')
@@ -532,7 +584,7 @@ describe('Event Route Integration Tests:', function() {
 				res.status.should.be.equal(200);
        				done();
  			});
-     	});
+    });
 
 	it("should be able to enumerate all events when admin", function(done) {
 		agentAdmin
@@ -688,6 +740,27 @@ describe('Event Route Integration Tests:', function() {
 		 	});
  	});
 
+	it("should be able to access any event capacity if admin", function(done) {
+ 		agentAdmin
+			.post('http://localhost:3001/auth/signin')
+			.send({email: userAdmin.email, password: 'password'})
+ 			.end(function (err, res) {
+ 				if(err)
+ 					return done(err);
+
+		 		agentAdmin //IMPORTANT: Agent does not support expect, use should
+		 			.get('http://localhost:3001/events/capacity')
+					.query({event_id: event2._id.toString()})
+		 			.end(function(err,res) {
+		 				should.not.exist(err);
+						res.status.should.be.equal(200);
+						res.body.should.have.property('capacity');
+						res.body.capacity.should.equal(event2.capacity);
+		 				done();
+		 			});
+		 	});
+ 	});
+
 	//Post tests
 	
 	it("should be able to set the name if admin", function(done) {
@@ -777,6 +850,129 @@ describe('Event Route Integration Tests:', function() {
 										res.status.should.be.equal(200);
 										res.body.should.have.property('name');
 										res.body.name.should.be.equal("testing1231");
+										done();
+									});
+							});
+					});
+			});
+	});
+
+	it("should be able to set the capacity if admin", function(done) {
+		agentAdmin
+			.post('http://localhost:3001/auth/signin')
+			.send({email: userAdmin.email, password: 'password'})
+ 			.end(function (err, res) {
+ 				if(err)
+ 					return done(err);
+
+		 		agentAdmin
+					.post('http://localhost:3001/events/capacity')
+					.send({event_id: event2._id.toString(), capacity:0})
+					.end(function(err,res) {
+						should.not.exist(err);
+						res.status.should.be.equal(200);
+						agentAdmin
+							.get('http://localhost:3001/events/capacity')
+							.query({event_id: event2._id.toString()})
+							.end(function(err,res) {
+								should.not.exist(err);
+								res.status.should.be.equal(200);
+								res.body.should.have.property('capacity');
+								res.body.capacity.should.be.equal(0);
+								done();
+							});
+					});
+			});
+	});
+
+	it("should not be able to set invalid capacity (null) if admin", function(done) {
+		agentAdmin
+			.post('http://localhost:3001/auth/signin')
+			.send({email: userAdmin.email, password: 'password'})
+ 			.end(function (err, res) {
+ 				if(err)
+ 					return done(err);
+
+		 		agentAdmin
+					.post('http://localhost:3001/events/capacity')
+					.send({event_id: event2._id.toString(), capacity: null})
+					.end(function(err,res) {
+						should.not.exist(err);
+						res.status.should.be.equal(400);
+						res.body.message.should.equal("Required fields not specified.");
+						agentAdmin
+							.get('http://localhost:3001/events/capacity')
+							.query({event_id: event2._id.toString()})
+							.end(function(err,res) {
+								should.not.exist(err);
+								res.status.should.be.equal(200);
+								res.body.should.have.property('capacity');
+								res.body.capacity.should.be.equal(event2.capacity);
+								done();
+							});
+					});
+			});
+	});
+
+	it("should not be able to set invalid capacity (-1) if admin", function(done) {
+		agentAdmin
+			.post('http://localhost:3001/auth/signin')
+			.send({email: userAdmin.email, password: 'password'})
+ 			.end(function (err, res) {
+ 				if(err)
+ 					return done(err);
+
+		 		agentAdmin
+					.post('http://localhost:3001/events/capacity')
+					.send({event_id: event2._id.toString(), capacity: -1})
+					.end(function(err,res) {
+						should.not.exist(err);
+						res.status.should.be.equal(400);
+						res.body.message.should.equal("Validation failed");
+						agentAdmin
+							.get('http://localhost:3001/events/capacity')
+							.query({event_id: event2._id.toString()})
+							.end(function(err,res) {
+								should.not.exist(err);
+								res.status.should.be.equal(200);
+								res.body.should.have.property('capacity');
+								res.body.capacity.should.be.equal(event2.capacity);
+								done();
+							});
+					});
+			});
+	});
+
+	it("should not be able to set capacity if user", function(done) {
+		agent
+ 			.post('http://localhost:3001/auth/signin')
+ 			.send({email: user.email, password: 'password'})
+ 			.end(function (err, res) {
+ 				if(err)
+ 					return done(err);
+
+		 		agentAdmin
+					.post('http://localhost:3001/auth/signin')
+					.send({email: userAdmin.email, password: 'password'})
+		 			.end(function (err, res) {
+		 				if(err)
+		 					return done(err);
+
+				 		agent
+							.post('http://localhost:3001/events/capacity')
+							.send({event_id: event1._id.toString(), capacity: 111})
+							.end(function(err,res) {
+								should.not.exist(err);
+								res.status.should.be.equal(401);
+								res.body.message.should.equal("User does not have permission.");
+								agentAdmin
+									.get('http://localhost:3001/events/capacity')
+									.query({event_id: event1._id.toString()})
+									.end(function(err,res) {
+										should.not.exist(err);
+										res.status.should.be.equal(200);
+										res.body.should.have.property('capacity');
+										res.body.capacity.should.be.equal(event1.capacity);
 										done();
 									});
 							});
@@ -1345,7 +1541,8 @@ describe('Event Route Integration Tests:', function() {
 						start_date:	new Date().getTime()+100000,
 						end_date: 	new Date().getTime()+1000000,
 						location: 	"asdf",
-						schedule: 	"asdf"
+						schedule: 	"asdf",
+						capacity: 	50
 					})
 					.end(function(err,res) {
 						should.not.exist(err);

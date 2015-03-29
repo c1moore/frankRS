@@ -41,7 +41,8 @@ describe('Functional tests for preview controllers/routes:', function() {
 			name : 'Test Event',
 			location : 'UF',
 			start_date : startDate,
-			end_date : endDate
+			end_date : endDate,
+			capacity: 50
 		});
 
 		user = new User({

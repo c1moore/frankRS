@@ -9,7 +9,10 @@ var mongoose = require('mongoose'),
 //Validation functions
 
 var validateRequired = function(property) {
-	return (property && property.length);
+	if(property === 0)
+		return property.toString().length;
+	
+	return (property && property.toString().length);
 };
 
 /**
@@ -19,25 +22,35 @@ var EventSchema = new Schema({
 	name: {
 		type: String,
 		trim: true,
+		required: true,
 		validate: [validateRequired, 'Name is required.']
 	},
 	start_date: {
 		type: Number,
+		required: true,
 		validate: [validateRequired, 'Start date is required.']
 	},
 	end_date: {
 		type: Number,
+		required: true,
 		validate: [validateRequired, 'End date is required.']
 	},
 	location: {
 		type: String,
 		trim: true,
+		required: true,
 		validate: [validateRequired, 'Location is required.']
 	},
 	schedule: {
 		type: String,
 		trim: true,
 		default: 'No schedule specified'
+	},
+	capacity: {
+		type: Number,
+		min: 0,
+		required: true,
+		validate: [validateRequired, 'Capacity is required.']
 	}
 });
 
