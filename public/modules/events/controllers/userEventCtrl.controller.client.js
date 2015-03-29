@@ -1,19 +1,31 @@
 angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams', '$http', 'eventSelector', '$filter', 'dialogs', 'Authentication', '$timeout', '$window',
 	function($scope, ngTableParams, $http, eventSelector, $filter, dialogs, Authentication, $timeout, $window) {
 		$scope.user = Authentication;
-		console.log($scope.user);
-		$scope.test = function(event) {
-			console.log(event);
-		}
+		
+		$scope.dpOpen = false;
+		$scope.openDatepicker = function($event) {
+			$event.preventDefault();
+			$event.stopPropagation();
+
+			$scope.dpOpen = true;
+		};
 
 		var getEvents = function() {
 			$http.post('/events/user/allEvents').success(function(data) {
 				$scope.events = [];
 				$scope.events = data;
+
+				for(var i=0; i < $scope.events.length; i++) {
+					//This is what is searched when the user tries to filter the table.  Two different formats are used to increase chances of returning what the user wants: (day_of_week, Month day, Year) & (M/d/yyyy)
+					$scope.events[i].date = $filter('date')($scope.events[i].start_date, "EEEE, MMMM d, yyyy") + " - " + $filter('date')($scope.events[i].end_date, "EEEE, MMMM d, yyyy") + " " + $filter('date')($scope.events[i].start_date, "M/d/yyyy") + " - " + $filter('date')($scope.events[i].end_date, "M/d/yyyy");
+
+					$scope.events[i].start_date = $filter('date')($scope.events[i].start_date, "EEE, MMM d, yyyy");
+					$scope.events[i].end_date = $filter('date')($scope.events[i].end_date, "EEE, MMM d, yyyy");
+				}
 			}).error(function(error) {
 				console.log(error);
 			});
-		}
+		};
 		getEvents();
 
 
@@ -34,8 +46,14 @@ angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams',
 		        var orderedData = params.sorting() ? 
 		              $filter('orderBy')(filteredData, params.orderBy()) : 
 		              $scope.events;
-		        params.total(orderedData.length);
-				$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+
+		        if(orderedData) {
+		        	params.total(orderedData.length);
+					$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+				} else {
+					params.total(0);
+					$defer.resolve(null);
+				}
 			}
         });
 

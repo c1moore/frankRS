@@ -1,20 +1,24 @@
 <section class="events-page" ng-controller="userEventCtrl">
 	<div class="jumbotron text-center">
 		<div class="container-fluid">
-			<h2>Events</h2>
+			<h2>Recruiter Training Room</h2>
+			<p style="margin-bottom: 0;">Request to become a recruiter for one of our upcoming events.</p>
 		</div>
 	</div>
 	<table ng-table="tableParams" show-filter="true" class="table table-bordered frank-recruiter-signup-table frank-main-view">
 		<tr ng-repeat="event in $data">
-			<td data-title="'Event'" sortable="'name'" filter="{'event':'text'}" width="200">
+			<td data-title="'Event'" sortable="'name'" filter="{'name':'text'}">
 				{{event.name}}
 			</td>
-			<td data-title="'Location'" sortable="'status'" filter="{'status':'text'}" width="100">
+			<td data-title="'Dates'" sortable="'start_date'" filter="{'date' : 'text'}">
+				<b>{{event.start_date}}</b> &#8211; <b>{{event.end_date}}</b>
+			</td>
+			<td data-title="'Location'" sortable="'location'" filter="{'location':'text'}">
 				{{event.location}}
 			</td>
-			<td data-title="'Apply to be a Recruiter'" width="90" class="text-center">
+			<td data-title="'Status'" class="text-center">
 				<span ng-if="event.recruiter" class="glyphicon glyphicon-ok"></span>
-				<span ng-if="event.applied && !event.recruiter">{{capitalize(event.applied, true)}}</span>
+				<span ng-if="event.applied && !event.recruiter"><em>{{capitalize(event.applied, true)}}</em></span>
 				<button ng-if="!event.recruiter && !event.applied" href="" class="btn btn-success btn-xs" ng-click="launch(event)">Apply</button>
 			</td>
 		</tr>

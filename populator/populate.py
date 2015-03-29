@@ -59,6 +59,7 @@ def injectDemoEventFor(demo,c0,c1,c2):
   event.randomize()
   event.name = "Project Demonstration"
   event.location = "CSE Building"
+  event.capacity = 0
   demo.recruitFor(event)
   c0.addEvent(event)
   c1.addEvent(event)

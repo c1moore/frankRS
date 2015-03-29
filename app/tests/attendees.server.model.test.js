@@ -46,14 +46,16 @@ describe('Attendees Model Unit Tests:', function() {
 			start_date: startDate,
 			end_date:  endDate,
 			location: 'UF',
-			schedule: 'www.google.com'
+			schedule: 'www.google.com',
+			capacity: 50
 		});
 		event2 = new Evnt({
 			name:  'attendeeteste2',
 			start_date: startDate,
 			end_date:  endDate,
 			location: 'UF',
-			schedule: 'www.google.com'
+			schedule: 'www.google.com',
+			capacity: 50
 		});
 
 		event1.save(function(err) {

@@ -34,13 +34,15 @@ describe('Candidate Model Unit Tests:', function() {
 				fName : 'Full',
 				lName : 'Name',
 				email : 'test@test.com',
-				status : 'volunteer'
+				status : 'volunteer',
+				capacity: 50
 			});
 			duplicate = new candidate({
 				fName : 'Full',
 				lName : 'Name',
 				email : 'test@test.com',
-				status : 'volunteer'
+				status : 'volunteer',
+				capacity: 50
 			});
 
 			done();
@@ -138,7 +140,8 @@ describe('Candidate Model Unit Tests:', function() {
 				start_date: startDate,
 				end_date:  endDate,
 				location: 'UF',
-				schedule: 'www.google.com'
+				schedule: 'www.google.com',
+				capacity: 50
 			});
 
 			event1.save(function(err) {

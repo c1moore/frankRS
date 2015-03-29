@@ -23,4 +23,6 @@ module.exports = function(app) {
 	app.route('/events/delete').post(james_event_routes.delete);
 	app.route('/events/create').post(james_event_routes.create);
 	app.route('/events/user/allEvents').post(james_event_routes.recruiterStatus);
+	app.route('/events/capacity').get(james_event_routes.getCapacity);
+	app.route('/events/capacity').post(james_event_routes.setCapacity);
 };
