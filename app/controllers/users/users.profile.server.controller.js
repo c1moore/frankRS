@@ -17,14 +17,20 @@ exports.update = function(req, res) {
 	var user = req.user;
 	var message = null;
 
-	// For security measurement we remove the roles from the req.body object
+	// For security measurement we remove fields that could be used to comprise the system or to cheat from the req.body object
 	delete req.body.roles;
+	delete req.body.login_enabled;
+	delete req.body.rank;
+	delete req.body.almostList;
+	delete req.body.attendeeList;
+	delete req.body.inviteeList;
+	delete req.body.status;
 
 	if (user) {
 		// Merge existing user
 		user = _.extend(user, req.body);
 		user.updated = Date.now();
-		user.displayName = user.firstName + ' ' + user.lastName;
+		user.displayName = user.lName + ', ' + user.fName;
 
 		user.save(function(err) {
 			if (err) {
@@ -43,7 +49,7 @@ exports.update = function(req, res) {
 		});
 	} else {
 		res.status(400).send({
-			message: 'User is not signed in'
+			message: 'User is not logged in.'
 		});
 	}
 };
