@@ -16,8 +16,12 @@
 					<input type="email" id="email" name="email" class="form-control" data-ng-model="user.email" placeholder="Email" required />
 				</div>
 				<div class="form-group">
-					<label for="email">Organization</label>
+					<label for="organization">Organization</label>
 					<input type="text" id="organization" name="organization" class="form-control" data-ng-model="user.organization" placeholder="Organization" required />
+				</div>
+				<div class="form-group">
+					<label for="interests">Interests</label>
+					<div id='interests' name='interests' multi-select='' input-model='interestsSelector' max-height='250px' output-model='user.interests' button-label='icon name' item-label='icon name' tick-property='ticked' selection-mode='multiple' max-labels='1' helper-elements='none reset filter' default-label='Select...'></div>
 				</div>
 				<div class="text-center form-group">
 					<button type="submit" class="btn btn-large btn-primary" ng-disabled="userForm.$invalid">Save Profile</button>

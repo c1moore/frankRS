@@ -48,6 +48,10 @@ form.signin.form-horizontal {
 	min-width: 195px;
 }
 
+.signin .multiSelectButton {
+	text-align: left !important;
+}
+
 .text-center.form-group.frank-signin-submit {
 	min-width: 200px;
 }
