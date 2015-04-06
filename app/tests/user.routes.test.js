@@ -127,7 +127,7 @@ describe('Express.js User Route Unit Tests:', function() {
 							displayName : 'Name, Nother',
 							email : 'nother_name_cen3031.0.boom0625@spamgourmet.com',
 							roles : ['attendee'],
-							status : [],
+							status : [{event_id : event1._id, attending: false, recruiter : false}],
 							password : 'password',
 							login_enabled : true
 						});
@@ -757,7 +757,12 @@ describe('Express.js User Route Unit Tests:', function() {
 								fcount.should.equal(scount);
 								User.findOne({_id : user5._id}, function(err, newUser5) {
 									newUser5.status.length.should.equal(user5.status.length);
-									done();
+
+									Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+										newEvnt.invited.should.equal(event1.invited);
+
+										done();
+									});
 								});
 							});
 						});
@@ -765,7 +770,7 @@ describe('Express.js User Route Unit Tests:', function() {
 			});
 		});
 
-		it('should send an invitation and update the recruiter\'s rank and inviteeList accordingly when an invitee is already in the database, but has not been invited invited the event, without adding a new user.', function(done) {
+		it('should send an invitation and update the recruiter\'s rank and inviteeList and the number invited to the event accordingly when an invitee is already in the database, but has not been invited to the event, without adding a new user.', function(done) {
 			this.timeout(10000);
 			User.count({}, function(err, scount) {
 				useragent
@@ -790,7 +795,11 @@ describe('Express.js User Route Unit Tests:', function() {
 									(user.almostList.length === rectr.almostList.length).should.be.true;
 									user.inviteeList.length.should.be.lessThan(rectr.inviteeList.length);
 
-									done();
+									Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+										newEvnt.invited.should.equal(event1.invited + 1);
+
+										done();
+									});
 								});
 							});
 						});
@@ -798,7 +807,7 @@ describe('Express.js User Route Unit Tests:', function() {
 			});
 		});
 
-		it('should send an invitation, but not add an invitee to the inviteeList when this invitee has already been invited by this recruiter..', function(done) {
+		it('should send an invitation, but not add an invitee to the inviteeList or increment the number invited to the event when this invitee has already been invited by this recruiter.', function(done) {
 			this.timeout(10000);
 			User.count({}, function(err, scount) {
 				useragent
@@ -816,14 +825,18 @@ describe('Express.js User Route Unit Tests:', function() {
 								fcount.should.equal(scount);
 
 								User.findOne({_id : user3._id}, function(err, newUser3) {
-									newUser3.status.length.should.be.greaterThan(user3.status.length);
+									newUser3.status.length.should.be.equal(user3.status.length);
 
 
 									(user.attendeeList.length === rectr.attendeeList.length).should.be.true;
 									(user.almostList.length === rectr.almostList.length).should.be.true;
 									user.inviteeList.length.should.be.equal(rectr.inviteeList.length);
 
-									done();
+									Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+										newEvnt.invited.should.equal(event1.invited);
+
+										done();
+									});
 								});
 							});
 						});
@@ -831,7 +844,7 @@ describe('Express.js User Route Unit Tests:', function() {
 			});
 		});
 
-		it('should send an invitation, create a new user, and update the recruiter\'s rank and inviteeList accordingly when an invitee is not in the db yet.', function(done) {
+		it('should send an invitation, create a new user, and update the recruiter\'s rank and inviteeList and the number invited to the event accordingly when an invitee is not in the db yet.', function(done) {
 			this.timeout(10000);
 			User.count({}, function(err, scount) {
 				useragent
@@ -848,7 +861,12 @@ describe('Express.js User Route Unit Tests:', function() {
 								fcount.should.be.greaterThan(scount);
 								User.findOne({email : 'h.m.murdock95@gmail.com'}, function(err, newUser3) {
 									newUser3.status.length.should.equal(1);
-									done();
+
+									Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+										newEvnt.invited.should.equal(event1.invited + 1);
+
+										done();
+									});
 								});
 							});
 						});
@@ -856,7 +874,7 @@ describe('Express.js User Route Unit Tests:', function() {
 			});
 		});
 
-		it('should not send an invitation, but update the recruiter\'s almostList when that user is attending.', function(done) {
+		it('should not send an invitation or update the number invited to the event, but update the recruiter\'s almostList when that user is attending.', function(done) {
 			User.findOne({_id : user._id}, function(err, oldRectr) {
 				useragent
 					.post('http://localhost:3001/invitation/send')
@@ -869,7 +887,12 @@ describe('Express.js User Route Unit Tests:', function() {
 							(oldRectr.inviteeList.length === rectr.inviteeList.length).should.be.true;
 							(oldRectr.attendeeList.length === rectr.attendeeList.length).should.be.true;
 							(oldRectr.almostList.length < rectr.almostList.length).should.be.true;
-							done();
+
+							Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+								newEvnt.invited.should.equal(event1.invited);
+
+								done();
+							});
 						});
 					});
 			});
@@ -883,7 +906,12 @@ describe('Express.js User Route Unit Tests:', function() {
 					should.not.exist(err);
 					res.status.should.equal(401);
 					res.body.message.should.equal("User does not have permission.");
-					done();
+
+					Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+						newEvnt.invited.should.equal(event1.invited);
+
+						done();
+					});
 				});
 		});
 
@@ -896,7 +924,12 @@ describe('Express.js User Route Unit Tests:', function() {
 					should.not.exist(err);
 					res.status.should.equal(401);
 					res.body.message.should.equal("User is not logged in.");
-					done();
+
+					Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+						newEvnt.invited.should.equal(event1.invited);
+
+						done();
+					});
 				});
 		});
 
@@ -908,7 +941,12 @@ describe('Express.js User Route Unit Tests:', function() {
 					should.not.exist(err);
 					res.status.should.equal(400);
 					res.body.message.should.equal("Required fields not specified.");
-					done();
+
+					Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+						newEvnt.invited.should.equal(event1.invited);
+
+						done();
+					});
 				});
 		});
 
@@ -920,7 +958,12 @@ describe('Express.js User Route Unit Tests:', function() {
 					should.not.exist(err);
 					res.status.should.equal(400);
 					res.body.message.should.equal("Required fields not specified.");
-					done();
+
+					Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+						newEvnt.invited.should.equal(event1.invited);
+
+						done();
+					});
 				});
 		});
 
@@ -932,7 +975,12 @@ describe('Express.js User Route Unit Tests:', function() {
 					should.not.exist(err);
 					res.status.should.equal(400);
 					res.body.message.should.equal("Required fields not specified.");
-					done();
+
+					Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+						newEvnt.invited.should.equal(event1.invited);
+
+						done();
+					});
 				});
 		});
 
@@ -944,7 +992,12 @@ describe('Express.js User Route Unit Tests:', function() {
 					should.not.exist(err);
 					res.status.should.equal(400);
 					res.body.message.should.equal("Required fields not specified.");
-					done();
+
+					Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+						newEvnt.invited.should.equal(event1.invited);
+
+						done();
+					});
 				});
 		});
 
@@ -956,7 +1009,12 @@ describe('Express.js User Route Unit Tests:', function() {
 					should.not.exist(err);
 					res.status.should.equal(400);
 					res.body.message.should.equal("Required fields not specified.");
-					done();
+
+					Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+						newEvnt.invited.should.equal(event1.invited);
+
+						done();
+					});
 				});
 		});
 	});
@@ -1005,7 +1063,7 @@ describe('Express.js User Route Unit Tests:', function() {
 
 
 	describe('Accepting an invitation', function() {
-		it('should allow an outside source to send data when the correct API key is sent and update the a user\'s account accordingly if they were already invited.', function(done) {
+		it('should allow an outside source to send data when the correct API key is sent and update the a user\'s account and the number of attendees for the event accordingly if they were already invited.', function(done) {
 			this.timeout(10000);
 			User.findOne({_id : user._id}, function(err, oldRectr) {
 				User.count({}, function(err, scount) {
@@ -1031,8 +1089,13 @@ describe('Express.js User Route Unit Tests:', function() {
 											}
 										}
 										i.should.not.equal(newUser5.status.length);
-										
-										done();
+
+										Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+											newEvnt.attending.should.equal(event1.attending + 1);
+											newEvnt.invited.should.equal(event1.invited - 1);
+
+											done();
+										});
 									});
 								});
 							});
@@ -1041,7 +1104,7 @@ describe('Express.js User Route Unit Tests:', function() {
 			});
 		});
 
-		it('should allow an outside source to send data when the correct API key is sent and update the a user\'s account accordingly if they have an account but were not invited to this event.', function(done) {
+		it('should allow an outside source to send data when the correct API key is sent and update the user\'s account and the number attending this event accordingly if they have an account but were not invited to this event.', function(done) {
 			this.timeout(10000);
 			User.findOne({_id : user._id}, function(err, oldRectr) {
 				User.count({}, function(err, scount) {
@@ -1067,8 +1130,13 @@ describe('Express.js User Route Unit Tests:', function() {
 											}
 										}
 										i.should.not.equal(newUser5.status.length);
-										
-										done();
+
+										Evnt.findOne({_id : event2._id}, function(err, newEvnt) {
+											newEvnt.attending.should.equal(event2.attending + 1);
+											newEvnt.invited.should.equal(event1.invited - 1);
+
+											done();
+										});
 									});
 								});
 							});
@@ -1077,7 +1145,7 @@ describe('Express.js User Route Unit Tests:', function() {
 			});
 		});
 
-		it('should allow an outside source to send data when the correct API key is sent and create a user\'s account correctly if they were not invited via the recruiter system.', function(done) {
+		it('should allow an outside source to send data when the correct API key is sent and create a user\'s account correctly and update the number attending if they were not invited via the recruiter system.', function(done) {
 			this.timeout(10000);
 			User.findOne({_id : user._id}, function(err, oldRectr) {
 				User.count({}, function(err, scount) {
@@ -1103,8 +1171,13 @@ describe('Express.js User Route Unit Tests:', function() {
 											}
 										}
 										i.should.not.equal(newUser.status.length);
-										
-										done();
+
+										Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+											newEvnt.attending.should.equal(event1.attending + 1);
+											newEvnt.invited.should.equal(event1.invited - 1);
+
+											done();
+										});
 									});
 								});
 							});
@@ -1124,7 +1197,13 @@ describe('Express.js User Route Unit Tests:', function() {
 							should.not.exist(err);
 							res.status.should.equal(400);
 							res.body.message.should.equal('All required fields not specified.');
-							done();
+
+							Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+								newEvnt.attending.should.equal(event1.attending);
+								newEvnt.invited.should.equal(event1.invited);
+
+								done();
+							});
 						});
 				});
 			});
@@ -1141,7 +1220,13 @@ describe('Express.js User Route Unit Tests:', function() {
 							should.not.exist(err);
 							res.status.should.equal(400);
 							res.body.message.should.equal('All required fields not specified.');
-							done();
+
+							Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+								newEvnt.attending.should.equal(event1.attending);
+								newEvnt.invited.should.equal(event1.invited);
+
+								done();
+							});
 						});
 				});
 			});
@@ -1158,7 +1243,13 @@ describe('Express.js User Route Unit Tests:', function() {
 							should.not.exist(err);
 							res.status.should.equal(400);
 							res.body.message.should.equal('All required fields not specified.');
-							done();
+
+							Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+								newEvnt.attending.should.equal(event1.attending);
+								newEvnt.invited.should.equal(event1.invited);
+
+								done();
+							});
 						});
 				});
 			});
@@ -1175,7 +1266,13 @@ describe('Express.js User Route Unit Tests:', function() {
 							should.not.exist(err);
 							res.status.should.equal(400);
 							res.body.message.should.equal('All required fields not specified.');
-							done();
+
+							Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+								newEvnt.attending.should.equal(event1.attending);
+								newEvnt.invited.should.equal(event1.invited);
+
+								done();
+							});
 						});
 				});
 			});
@@ -1192,7 +1289,13 @@ describe('Express.js User Route Unit Tests:', function() {
 							should.not.exist(err);
 							res.status.should.equal(400);
 							res.body.message.should.equal('All required fields not specified.');
-							done();
+
+							Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+								newEvnt.attending.should.equal(event1.attending);
+								newEvnt.invited.should.equal(event1.invited);
+
+								done();
+							});
 						});
 				});
 			});
@@ -1209,7 +1312,13 @@ describe('Express.js User Route Unit Tests:', function() {
 							should.not.exist(err);
 							res.status.should.equal(400);
 							res.body.message.should.equal('Event not found.');
-							done();
+
+							Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+								newEvnt.attending.should.equal(event1.attending);
+								newEvnt.invited.should.equal(event1.invited);
+
+								done();
+							});
 						});
 				});
 			});
@@ -1226,7 +1335,13 @@ describe('Express.js User Route Unit Tests:', function() {
 							should.not.exist(err);
 							res.status.should.equal(400);
 							res.body.message.should.equal('All required fields not specified.');
-							done();
+
+							Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+								newEvnt.attending.should.equal(event2.attending);
+								newEvnt.invited.should.equal(event2.invited);
+
+								done();
+							});
 						});
 				});
 			});
@@ -1243,7 +1358,13 @@ describe('Express.js User Route Unit Tests:', function() {
 							should.not.exist(err);
 							res.status.should.equal(400);
 							res.body.message.should.equal("You are not authorized to make this request.");
-							done();
+
+							Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+								newEvnt.attending.should.equal(event1.attending);
+								newEvnt.invited.should.equal(event1.invited);
+
+								done();
+							});
 						});
 				});
 			});
@@ -1260,7 +1381,13 @@ describe('Express.js User Route Unit Tests:', function() {
 							should.not.exist(err);
 							res.status.should.equal(400);
 							res.body.message.should.equal('Illegal value for field recruiter_email.');
-							done();
+
+							Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+								newEvnt.attending.should.equal(event2.attending);
+								newEvnt.invited.should.equal(event2.invited);
+
+								done();
+							});
 						});
 				});
 			});

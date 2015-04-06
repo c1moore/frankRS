@@ -40,7 +40,9 @@ describe('Event Model Unit Tests',function() {
 				end_date:  endDate,
 				location: 'UF',
 				schedule: 'www.google.com',
-				capacity: 50
+				capacity: 50,
+				attending: 5,
+				invited: 55
 			});
 
 			event1d = new Evnt({
@@ -49,7 +51,9 @@ describe('Event Model Unit Tests',function() {
 				end_date:  endDate,
 				location: 'UF',
 				schedule: 'www.google.com',
-				capacity: 50
+				capacity: 50,
+				attending: 5,
+				invited: 55
 			});
 
 			event2 = new Evnt({
@@ -58,7 +62,9 @@ describe('Event Model Unit Tests',function() {
 				end_date:  endDate,
 				location: 'UF',
 				schedule: 'www.google.com',
-				capacity: 50
+				capacity: 50,
+				attending: 10,
+				invited: 25
 			});
 			
 			done();
@@ -208,6 +214,24 @@ describe('Event Model Unit Tests',function() {
 		it('should be able to show an error when trying to save with an end date before the start date', function(done) {
 			event1.end_date=  new Date(startDate - 50000).getTime();
 			return event1.save(function(err) {
+				should.exist(err);
+				err.message.should.equal("Validation failed");
+				done();
+			});
+		});
+
+		it('should not be able to save an event with a negative number attending.', function(done) {
+			event1.attending = -1;
+			event1.save(function(err) {
+				should.exist(err);
+				err.message.should.equal("Validation failed");
+				done();
+			});
+		});
+
+		it('should not be able to save an event with a negative number invited.', function(done) {
+			event1.invited = -1;
+			event1.save(function(err) {
 				should.exist(err);
 				err.message.should.equal("Validation failed");
 				done();

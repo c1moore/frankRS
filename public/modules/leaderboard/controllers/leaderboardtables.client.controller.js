@@ -2,9 +2,10 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 	function($scope, Authentication, $http, ngTableParams, $filter, $resource, $location, eventSelector, $timeout) {
 
 		$scope.authentication = Authentication;
-		$scope.userScore = 0;
-		$scope.userInvites = 0;
-		$scope.userAttendees = 0;
+		$scope.userScore = 0;						//Recruiter's rank out of all the recruiters for this event.
+		$scope.userInvites = 0;						//Number of people this recruiter invited.
+		$scope.userAttendees = 0;					//Number of people attending that this recruiter invited.
+		$scope.maxStat = 0;							//Maximum of capacity, # attending, and #invited.
 
 		$scope.mainTableFilter = {displayName : ''};
 
@@ -35,9 +36,6 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		var mainApi = $resource('/leaderboard/maintable',{event_id: eventSelector.postEventId}, {'getTable':{method:'POST', isArray:true}});
 		var attendingApi = $resource('/leaderboard/attendees',{event_id: eventSelector.postEventId}, {'getTable':{method:'POST', isArray:true}});
 		var invitedApi = $resource('/leaderboard/invitees',{event_id: eventSelector.postEventId}, {'getTable':{method:'POST', isArray:true}});
-		// var attendingApi = $resource('/modules/leaderboard/tests/MOCK_ATTENDEE_DATA.json');
-		// var invitedApi = $resource('/modules/leaderboard/tests/MOCK_INVITEE_DATA.json');
-		// var testApi = $resource('/modules/leaderboard/tests/MOCK_DATA.json');
 
 		var getTables = function() {
 			$scope.mainTableParams = new ngTableParams({
@@ -129,23 +127,35 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 			});
 		};
 
+		/**
+		* Obtain the recruiter's stats: score, number attending, and number invited.
+		*/
 		$scope.smallRankHeader = false;
 		var getStats = function() {
 			$http.get('/leaderboard/recruiterinfo', {params : {event_id : eventSelector.postEventId}}).success(function(response) {
-				//$scope.userScore = response.place ? response.place : "N/A";
 				if(response.place) {
 					$scope.userScore = response.place;
 				} else {
 					$scope.userScore = "N/A";
 					$scope.smallRankHeader = true;
 				}
+
 				$scope.userInvites = response.invited;
 				$scope.userAttendees = response.attending;
+
+				http.get('/events/capacity', {params : {event_id : eventSelector.postEventId}}).success(function(response) {
+					
+				}).error(function(response, status) {
+
+				});
 			}).error(function(response, status) {
 
 			});
 		};
 
+		/**
+		* Return the success rate ratio (number attending) / (total number invited and attending).
+		*/
 		$scope.getRatio = function() {
 			if(($scope.userInvites + $scope.userAttendees) === 0) {
 				return 0;
@@ -154,6 +164,9 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 			}
 		};
 
+		/**
+		* Set or reset the tables.
+		*/
 		var tablesSet = false;		//Will be used to determine if the tables have already been set previously.  If they have, simply reload the tables when a change is made.  If not, set them.
 		$scope.$watch(
 			function() {

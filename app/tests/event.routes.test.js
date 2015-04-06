@@ -54,7 +54,9 @@ describe('Event Route Integration Tests:', function() {
  			end_date: endDate,
  			location: 'UF',
  			schedule: 'www.google.com',
-			capacity: 50
+			capacity: 50,
+			attending: 5,
+			invited: 55
  		});
 
  		event2 = new Evnt({
@@ -63,7 +65,9 @@ describe('Event Route Integration Tests:', function() {
  			end_date: endDate,
  			location: 'UF2',
  			schedule: 'www.google.com',
-			capacity: 50
+			capacity: 50,
+			attending: 5,
+			invited: 25
  		});
 
  		event1.save(function(err){
@@ -202,6 +206,30 @@ describe('Event Route Integration Tests:', function() {
  	it("should not be able to get the event capacity when not signed in", function(done) {
  		request('http://localhost:3001')
  			.get('/events/capacity')
+ 			.query({event_id: event1._id.toString()})
+ 			.expect(401)
+ 			.end(function(err, res) {
+ 				should.not.exist(err);
+ 				res.body.message.should.equal("User is not logged in.");
+ 				done();
+ 			});
+ 	});
+
+ 	it("should not be able to get the number of people attending the event when not signed in", function(done) {
+ 		request('http://localhost:3001')
+ 			.get('/events/attending')
+ 			.query({event_id: event1._id.toString()})
+ 			.expect(401)
+ 			.end(function(err, res) {
+ 				should.not.exist(err);
+ 				res.body.message.should.equal("User is not logged in.");
+ 				done();
+ 			});
+ 	});
+
+ 	it("should not be able to get the number of people invited to the event when not signed in", function(done) {
+ 		request('http://localhost:3001')
+ 			.get('/events/invited')
  			.query({event_id: event1._id.toString()})
  			.expect(401)
  			.end(function(err, res) {
@@ -374,6 +402,48 @@ describe('Event Route Integration Tests:', function() {
 						res.status.should.be.equal(200);
 						res.body.should.have.property('capacity');
 						res.body.capacity.should.equal(event1.capacity);
+		 				done();
+		 			});
+		 	});
+ 	});
+
+	it("should now be able to get the number of people attending the event when signed in", function(done) {
+ 		agent
+ 			.post('http://localhost:3001/auth/signin')
+ 			.send({email: user.email, password: 'password'})
+ 			.end(function (err, res) {
+ 				if(err)
+ 					return done(err);
+
+		 		agent //IMPORTANT: Agent does not support expect, use should
+		 			.get('http://localhost:3001/events/attending')
+		 			.query({event_id: event1._id.toString()})
+		 			.end(function(err,res) {
+		 				should.not.exist(err);
+						res.status.should.be.equal(200);
+						res.body.should.have.property('attending');
+						res.body.attending.should.equal(event1.attending);
+		 				done();
+		 			});
+		 	});
+ 	});
+
+	it("should now be able to get the number of people invited to the event when signed in", function(done) {
+ 		agent
+ 			.post('http://localhost:3001/auth/signin')
+ 			.send({email: user.email, password: 'password'})
+ 			.end(function (err, res) {
+ 				if(err)
+ 					return done(err);
+
+		 		agent //IMPORTANT: Agent does not support expect, use should
+		 			.get('http://localhost:3001/events/invited')
+		 			.query({event_id: event1._id.toString()})
+		 			.end(function(err,res) {
+		 				should.not.exist(err);
+						res.status.should.be.equal(200);
+						res.body.should.have.property('invited');
+						res.body.invited.should.equal(event1.invited);
 		 				done();
 		 			});
 		 	});
@@ -575,6 +645,48 @@ describe('Event Route Integration Tests:', function() {
 		 	});
  	});
 
+	it("should not be able to access the number attending the event if the user shouldn't know about that event", function(done) {
+ 		agent
+ 			.post('http://localhost:3001/auth/signin')
+ 			.send({email: user.email, password: 'password'})
+ 			.end(function (err, res) {
+ 				if(err)
+ 					return done(err);
+
+		 		agent //IMPORTANT: Agent does not support expect, use should
+		 			.get('http://localhost:3001/events/attending')
+					.query({event_id: event2._id.toString()})
+		 			.end(function(err,res) {
+		 				should.not.exist(err);
+						res.status.should.be.equal(401);
+						res.body.should.have.property('message');
+						res.body.message.should.equal("You do not have permission to request this ID");
+		 				done();
+		 			});
+		 	});
+ 	});
+
+	it("should not be able to access the number invited to the event if the user shouldn't know about that event", function(done) {
+ 		agent
+ 			.post('http://localhost:3001/auth/signin')
+ 			.send({email: user.email, password: 'password'})
+ 			.end(function (err, res) {
+ 				if(err)
+ 					return done(err);
+
+		 		agent //IMPORTANT: Agent does not support expect, use should
+		 			.get('http://localhost:3001/events/invited')
+					.query({event_id: event2._id.toString()})
+		 			.end(function(err,res) {
+		 				should.not.exist(err);
+						res.status.should.be.equal(401);
+						res.body.should.have.property('message');
+						res.body.message.should.equal("You do not have permission to request this ID");
+		 				done();
+		 			});
+		 	});
+ 	});
+
 	it("should be able to login as admin",function(done) {
 		agentAdmin
 			.post('http://localhost:3001/auth/signin')
@@ -761,7 +873,50 @@ describe('Event Route Integration Tests:', function() {
 		 	});
  	});
 
+	it("should be able to access the number attending for any event if admin", function(done) {
+ 		agentAdmin
+			.post('http://localhost:3001/auth/signin')
+			.send({email: userAdmin.email, password: 'password'})
+ 			.end(function (err, res) {
+ 				if(err)
+ 					return done(err);
+
+		 		agentAdmin //IMPORTANT: Agent does not support expect, use should
+		 			.get('http://localhost:3001/events/attending')
+					.query({event_id: event2._id.toString()})
+		 			.end(function(err,res) {
+		 				should.not.exist(err);
+						res.status.should.be.equal(200);
+						res.body.should.have.property('attending');
+						res.body.attending.should.equal(event2.attending);
+		 				done();
+		 			});
+		 	});
+ 	});
+
+	it("should be able to access the number invited to any event if admin", function(done) {
+ 		agentAdmin
+			.post('http://localhost:3001/auth/signin')
+			.send({email: userAdmin.email, password: 'password'})
+ 			.end(function (err, res) {
+ 				if(err)
+ 					return done(err);
+
+		 		agentAdmin //IMPORTANT: Agent does not support expect, use should
+		 			.get('http://localhost:3001/events/invited')
+					.query({event_id: event2._id.toString()})
+		 			.end(function(err,res) {
+		 				should.not.exist(err);
+						res.status.should.be.equal(200);
+						res.body.should.have.property('invited');
+						res.body.invited.should.equal(event2.invited);
+		 				done();
+		 			});
+		 	});
+ 	});
+
 	//Post tests
+	/* Note: At this time, there will be no methods provided to set the number attending/invited generally.  These numbers can only be modified through invitations/acceptances. */
 	
 	it("should be able to set the name if admin", function(done) {
 		agentAdmin

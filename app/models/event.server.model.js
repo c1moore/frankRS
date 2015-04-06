@@ -51,6 +51,18 @@ var EventSchema = new Schema({
 		min: 0,
 		required: true,
 		validate: [validateRequired, 'Capacity is required.']
+	},
+	attending: {
+		type: Number,
+		min: 0,
+		default: 0,
+		required: true
+	},
+	invited: {
+		type: Number,
+		min: 0,
+		default: 0,
+		required: true
 	}
 });
 

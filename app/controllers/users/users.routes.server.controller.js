@@ -566,8 +566,9 @@ exports.getEmail = function(req, res) {
 /*
 * This method sends an invitation to the invitee through the recruiter's email address.  If the invitee has not been invited before, the invitee is added to our database.  If the
 * invitee has been invited before, but is not attending, this invitee is simply added to the recruiter's inviteeList.  In either of these cases, the recruiter's rank may have changed
-* so their rank for this event must be updated.  However, if the user has been invited and is already attending the specified event, the invitee will be added to their almostList.
-* Since the almostList does not affect the recruiter's rank, their rank does not have to be updated.
+* so their rank for this event must be updated.  Furthermore, the number of people attending this event may need to be updated if the person has not yet been invited to this event.
+* However, if the user has been invited and is already attending the specified event, the invitee will be added to their almostList.  Since the almostList does not affect the
+* recruiter's rank, their rank does not have to be updated.
 *
 * TODO: A much more efficient method for updating this information, especially the recruiter's rank, should be researched and used when time permits.
 */
@@ -616,7 +617,7 @@ exports.sendInvitation = function(req, res) {
 								* This query will determine if the user is already in the database 
 								* (either from being invited to this event or another) or if the
 								* invitee should be added to the database.  The former case will
-								* return a result, while the latter will not return anything.
+								* return a result, while the latter will return nothing.
 								*/
 								User.findOne({'email' : req.body.email}, function(err, result) {
 									if(err) {
@@ -640,7 +641,13 @@ exports.sendInvitation = function(req, res) {
 										});
 
 										newUser.save(function(err, result2) {
-											callback(err, result2);
+											Event.findByIdAndUpdate(new mongoose.Types.ObjectId(req.body.event_id), {$inc : {invited : 1}}, function(err) {
+												if(err) {
+													callback(err, null);
+												} else {
+													callback(err, result2);
+												}
+											});
 										});
 									} else {
 										/**
@@ -649,17 +656,36 @@ exports.sendInvitation = function(req, res) {
 										* not already there, and send the User object to the
 										* next function to be added to the recruiter's inviteeList.
 										*/
+										var i;
+										for(i = 0; i < result.status.length; i++) {
+											if(result.status[i].event_id.toString() === req.body.event_id.toString())
+												break;
+										}
 
-										result.status.addToSet({'event_id' : new mongoose.Types.ObjectId(req.body.event_id), 'attending' : false, 'recruiter' : false});
-										result.save(function(err, updatedUser) {
-											callback(err, updatedUser);
-										});
+										if(i === result.status.length) {
+											//The invitee has not been invited to the event yet, increment the event invited count and add this event to the invitee status array.
+											var evnt_id = new mongoose.Types.ObjectId(req.body.event_id);
+
+											result.status.addToSet({'event_id' : evnt_id, 'attending' : false, 'recruiter' : false});
+											result.save(function(err, updatedUser) {
+												Event.findByIdAndUpdate(evnt_id, {$inc : {invited : 1}}, function(err) {
+													if(err) {
+														callback(err, null);
+													} else {
+														callback(err, updatedUser);
+													}
+												});
+											});
+										} else {
+											//The invitee has already been invited to this event.  Simply send result on to the next function.
+											callback(null, result);
+										}
 									}
 								});
 							},
 							function(invitee, callback) {
 								//Add the invitee to the recruiter's inviteeList.
-								recruiter.inviteeList.addToSet({'event_id' : req.body.event_id, 'user_id' : invitee._id});
+								recruiter.inviteeList.addToSet({'event_id' : new mongoose.Types.ObjectId(req.body.event_id), 'user_id' : invitee._id});
 								recruiter.save(function(err, result) {
 									if(err) {
 										callback(true, null);
@@ -802,6 +828,9 @@ exports.sendInvitation = function(req, res) {
 * login_enable to true and resetting their password from the random one created when they were first invited.  This
 * new password will then be sent to them in an email telling them of their account on this website.
 *
+* If the attendee is added to the db, we need to increment the number of people attending and decrement the total
+* number of people invited for this event (invitation count is only for those invited, but not attending).
+*
 * TODO: Change the API before production.
 */
 exports.acceptInvitation = function(req, res) {
@@ -940,7 +969,13 @@ exports.acceptInvitation = function(req, res) {
 											if(err) {
 												return res.status(400).send({message : err});
 											} else {
-												return res.status(200).send({message : "As expected, everything worked perfectly."});
+												Event.findByIdAndUpdate(evnt._id, {$inc : {attending : 1, invited : -1}}, function(err) {
+													if(err) {
+														return res.status(400).send({message : "Error updating attending and invited.", error : err});
+													} else {
+														return res.status(200).send({message : "As expected, everything worked perfectly."});
+													}
+												});
 											}
 										}
 									);
@@ -1044,7 +1079,14 @@ exports.acceptInvitation = function(req, res) {
 											if(err) {
 												return res.status(400).send({message : err});
 											} else {
-												return res.status(200).send({message : "As expected, everything worked perfectly."});
+												console.log("Getting here.");
+												Event.findByIdAndUpdate(evnt._id, {$inc : {attending : 1, invited : -1}}, function(err) {
+													if(err) {
+														return res.status(400).send({message : "Error updating attending and invited.", error : err});
+													} else {
+														return res.status(200).send({message : "As expected, everything worked perfectly."});
+													}
+												});
 											}
 										}
 									);
