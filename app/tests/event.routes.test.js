@@ -239,6 +239,18 @@ describe('Event Route Integration Tests:', function() {
  			});
  	});
 
+ 	it("should not be able to get the event stats when not signed in", function(done) {
+ 		request('http://localhost:3001')
+ 			.get('/events/stats')
+ 			.query({event_id: event1._id.toString()})
+ 			.expect(401)
+ 			.end(function(err, res) {
+ 				should.not.exist(err);
+ 				res.body.message.should.equal("User is not logged in.");
+ 				done();
+ 			});
+ 	});
+
 	it("should not be able to sign in without a password", function(done) {
  		agent
  			.post('http://localhost:3001/auth/signin')
@@ -442,6 +454,31 @@ describe('Event Route Integration Tests:', function() {
 		 			.end(function(err,res) {
 		 				should.not.exist(err);
 						res.status.should.be.equal(200);
+						res.body.should.have.property('invited');
+						res.body.invited.should.equal(event1.invited);
+		 				done();
+		 			});
+		 	});
+ 	});
+
+	it("should now be able to get the event stats when signed in", function(done) {
+ 		agent
+ 			.post('http://localhost:3001/auth/signin')
+ 			.send({email: user.email, password: 'password'})
+ 			.end(function (err, res) {
+ 				if(err)
+ 					return done(err);
+
+		 		agent //IMPORTANT: Agent does not support expect, use should
+		 			.get('http://localhost:3001/events/stats')
+		 			.query({event_id: event1._id.toString()})
+		 			.end(function(err,res) {
+		 				should.not.exist(err);
+						res.status.should.be.equal(200);
+						res.body.should.have.property('capacity');
+						res.body.capacity.should.equal(event1.capacity);
+						res.body.should.have.property('attending');
+						res.body.attending.should.equal(event1.attending);
 						res.body.should.have.property('invited');
 						res.body.invited.should.equal(event1.invited);
 		 				done();
@@ -687,6 +724,27 @@ describe('Event Route Integration Tests:', function() {
 		 	});
  	});
 
+	it("should not be able to access the event stats if the user shouldn't know about that event", function(done) {
+ 		agent
+ 			.post('http://localhost:3001/auth/signin')
+ 			.send({email: user.email, password: 'password'})
+ 			.end(function (err, res) {
+ 				if(err)
+ 					return done(err);
+
+		 		agent //IMPORTANT: Agent does not support expect, use should
+		 			.get('http://localhost:3001/events/stats')
+					.query({event_id: event2._id.toString()})
+		 			.end(function(err,res) {
+		 				should.not.exist(err);
+						res.status.should.be.equal(401);
+						res.body.should.have.property('message');
+						res.body.message.should.equal("You do not have permission to request this ID");
+		 				done();
+		 			});
+		 	});
+ 	});
+
 	it("should be able to login as admin",function(done) {
 		agentAdmin
 			.post('http://localhost:3001/auth/signin')
@@ -908,6 +966,31 @@ describe('Event Route Integration Tests:', function() {
 		 			.end(function(err,res) {
 		 				should.not.exist(err);
 						res.status.should.be.equal(200);
+						res.body.should.have.property('invited');
+						res.body.invited.should.equal(event2.invited);
+		 				done();
+		 			});
+		 	});
+ 	});
+
+	it("should be able to access the event stats if admin", function(done) {
+ 		agentAdmin
+			.post('http://localhost:3001/auth/signin')
+			.send({email: userAdmin.email, password: 'password'})
+ 			.end(function (err, res) {
+ 				if(err)
+ 					return done(err);
+
+		 		agentAdmin //IMPORTANT: Agent does not support expect, use should
+		 			.get('http://localhost:3001/events/stats')
+					.query({event_id: event2._id.toString()})
+		 			.end(function(err,res) {
+		 				should.not.exist(err);
+						res.status.should.be.equal(200);
+						res.body.should.have.property('capacity');
+						res.body.capacity.should.equal(event2.capacity);
+						res.body.should.have.property('attending');
+						res.body.attending.should.equal(event2.attending);
 						res.body.should.have.property('invited');
 						res.body.invited.should.equal(event2.invited);
 		 				done();
