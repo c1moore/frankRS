@@ -310,6 +310,34 @@ exports.getInvited = function(req, res) {
 	}
 };
 
+exports.getStats = function(req, res) {
+	try {
+		if(req.query.event_id == undefined) {
+			return res.status(400).send({message : 'Required field not specified.'});
+		}
+		if (!req.isAuthenticated()) { //Must be logged in
+			res.status(401).json({message: "User is not logged in."});
+			return;
+		//Must have permission to make requests on this ID
+		} else if (!canViewEvent(req.user,req.query.event_id,req.hasAuthorization)) {
+			res.status(401).json({message: "You do not have permission to request this ID"});
+			return;
+		}
+
+		var event_id = mongoose.Types.ObjectId(req.query.event_id);
+		var query = Event.findOne({_id: event_id});
+
+		query.exec(function(err,result) {
+			if (err) res.status(400).send(err);
+			else if (!result) res.status(400).json({message: "Event not found."});
+			else res.status(200).send({capacity : result.capacity, attending : result.attending, invited: result.invited});
+		});
+	} catch (err) {
+		console.log(err);
+		res.status(500);
+	}
+};
+
 //Setter routes
 
 exports.setStartDate = function(req, res) {

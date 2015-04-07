@@ -5,7 +5,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		$scope.userScore = 0;						//Recruiter's rank out of all the recruiters for this event.
 		$scope.userInvites = 0;						//Number of people this recruiter invited.
 		$scope.userAttendees = 0;					//Number of people attending that this recruiter invited.
-		$scope.maxStat = 0;							//Maximum of capacity, # attending, and #invited.
+		$scope.statsError = false;					//Error retreiving stats for this event?
 
 		$scope.mainTableFilter = {displayName : ''};
 
@@ -70,7 +70,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
 		            });
 	        	},
-	   			$scope: { $data: {}}
+	        	$scope: {$data: {}}
 			});
 
 			$scope.attendingTableParams = new ngTableParams({
@@ -96,7 +96,8 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		            	params.total(orderedData.length); //set total recalculation for paganation
 		            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
 		            });
-	        	}
+	        	},
+	        	$scope: {$data: {}}
 			});
 
 			$scope.invitedTableParams = new ngTableParams({
@@ -123,9 +124,16 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 		            	params.total(orderedData.length); //set total recalculation for paganation
 		            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
 		            });
-	        	}
+	        	},
+	        	$scope: {$data: {}}
 			});
 		};
+
+		if(!$scope.hasOwnProperty('params')) {
+			$scope.params = new ngTableParams();
+			$scope.params.isNullInstance = true;
+		}
+		$scope.params.settings().$scope = $scope;
 
 		/**
 		* Obtain the recruiter's stats: score, number attending, and number invited.
@@ -143,10 +151,24 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 				$scope.userInvites = response.invited;
 				$scope.userAttendees = response.attending;
 
-				http.get('/events/capacity', {params : {event_id : eventSelector.postEventId}}).success(function(response) {
-					
-				}).error(function(response, status) {
+				$http.get('/events/stats', {params : {event_id : eventSelector.postEventId}}).success(function(response) {
+					$scope.capacity = response.capacity;
+					$scope.attending = response.attending;
+					$scope.invited = response.invited;
 
+					if(($scope.invited + $scope.attending) < $scope.capacity && $scope.attending !== $scope.capacity) {
+						$scope.percentAttending = Math.round(($scope.attending / $scope.capacity) * 100);
+						$scope.percentInvited = Math.round(($scope.invited / $scope.capacity) * 100);
+						$scope.percentCapacity = 100 - ($scope.percentAttending + $scope.percentInvited);
+					} else if(($scope.invited >= $scope.capacity && $scope.attending !== $scope.capacity) || ($scope.attending < $scope.capacity && $scope.invited < $scope.capacity)) {
+						var total = $scope.attending + $scope.invited + $scope.capacity;
+
+						$scope.percentAttending = Math.round(($scope.attending / total) * 100);
+						$scope.percentInvited = Math.round(($scope.invited / total) * 100);
+						$scope.percentCapacity = 100 - ($scope.percentAttending + $scope.percentInvited);
+					}
+				}).error(function(response, status) {
+					$scope.statsError = true;
 				});
 			}).error(function(response, status) {
 
@@ -160,7 +182,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 			if(($scope.userInvites + $scope.userAttendees) === 0) {
 				return 0;
 			} else {
-				return $scope.userAttendees/($scope.userInvites + $scope.userAttendees);
+				return (($scope.userAttendees/($scope.userInvites + $scope.userAttendees)) * 100).toFixed(2);
 			}
 		};
 

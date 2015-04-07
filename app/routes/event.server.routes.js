@@ -27,4 +27,5 @@ module.exports = function(app) {
 	app.route('/events/capacity').post(james_event_routes.setCapacity);
 	app.route('/events/attending').get(james_event_routes.getAttending);
 	app.route('/events/invited').get(james_event_routes.getInvited);
+	app.route('/events/stats').get(james_event_routes.getStats);
 };
