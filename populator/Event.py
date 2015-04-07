@@ -21,6 +21,8 @@ class Event:
     self.start_date = randomTimeInMS()+round(time.time()*1000)
     self.end_date = randomTimeInMS(self.start_date)
     self.capacity = random.randint(0, 500)
+    self.attending = random.randint(0, self.capacity) #Might not be true to the actual number attending, but shouldn't cause problems
+    self.invited = random.randint(0, 750) #Might not be true to the actual number invited, but shouldn't cause problems
 
   def valid(self):
     return (hasattr(self,'name') and hasattr(self,'schedule') and hasattr(self,'location') and
