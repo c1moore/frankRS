@@ -3,26 +3,26 @@
 		<div class="col-md-4" ng-class="{'frank-main-view' : !selected.emails.length}">
 			<div class="well">
 				<form name="candidateForm" novalidate ng-submit="addCandidate(newCandidate)">
-					<div class="form-group row">
+					<div class="admin-form-group form-group row">
 						<label>Select Event:</label>
 						<div ng-dropdown-multiselect="" options="selectEvents" selected-model="newCandidateEvents" extra-settings="selectSettings" required></div>
 					</div>
-					<div class="form-group row">
+					<div class="admin-form-group form-group row">
 						<label>First Name:</label>
 						<input name="fName" class="form-control" type="text" ng-model="newCandidate.fName" required>
 						<p ng-show="candidateForm.fName.$invalid && !candidateForm.fName.$pristine" class="help-block">A first name is required.</p>
 					</div>
-					<div class="form-group row">
+					<div class="admin-form-group form-group row">
 						<label>Last Name:</label>
 						<input name="lName" class="form-control" type="text" ng-model="newCandidate.lName" required>
 						<p ng-show="candidateForm.lName.$invalid && !candidateForm.lName.$pristine" class="help-block">A last name is required.</p>
 					</div>
-					<div class="form-group row">
+					<div class="admin-form-group form-group row">
 						<label>Email Address:</label>
 						<input name="email" class="form-control" type="email" ng-model="newCandidate.email" required>
 						 <p ng-show="candidateForm.email.$invalid && !candidateForm.email.$pristine" class="help-block">Enter a valid email.</p>
 					</div>
-					<div class="form-group row">
+					<div class="admin-form-group form-group row">
 						<label>Notes (Optional):</label>
 						<textarea name="notes" class="form-control" type="text" ng-model="newCandidate.note"/>
 					</div>
@@ -32,34 +32,70 @@
 		</div>
 
 		<div class="col-md-8" ng-class="{'frank-main-view' : !selected.emails.length}">
-			<h2 ng-if="isEventSelected">Pending Applications for {{selectedEvent}}</h2>
-			<h2 ng-if="!isEventSelected" class="text-danger">Please select an event (in the top right-hand corner).</h2>
-			<table ng-table="tableParams" show-filter="true" class="table table-bordered">
-				<tr ng-repeat="candidate in $data">
-					<td data-title="'Send Message'" width="50">
-						<input type="checkbox" ng-click="setSelected(candidate._id, candidate.email)" ng-model="selectedCandidates" />
-					</td>
-					<td data-title="'Candidate'" sortable="'fName'" filter="{'fName':'text'}" width="200">
-						{{candidate.fName + ' ' + candidate.lName}}
-					</td>
-					<td data-title="'Email'">
-						{{candidate.email}}
-					</td>
-					<td data-title="'Status'" sortable="'status'" filter="{'status':'text'}" width="100">
-						{{candidate.events.status}}
-					</td>
-					<td data-title="'Notes'" sortable="'note'" filter="{'note':'text'}">
-						{{candidate.note}}
-					</td>
-					<td data-title="'Accept'" width="90" class="text-center">
-						<button ng-if="!candidate.events.accepted" class="btn btn-success" ng-click="acceptCandidate(candidate)">Accept</button>
-						<span ng-if="candidate.events.accepted" class="glyphicon glyphicon-ok"></span>
-					</td>
-					<td data-title="'Deny'" width="90">
-						<button class="btn btn-danger" ng-click="denyCandidate(candidate)">Deny</button>
-					</td>
-				</tr>
-			</table>
+			<div ng-if="!isEventSelected" class="alert alert-danger"><i class="fa fa-exclamation-triangle"></i>Please select an event in the top right-hand corner.</div>
+			<div ng-if="isEventSelected">
+				<h2 ng-if="isEventSelected">Applications for {{selectedEvent}}</h2>
+				<table ng-table="tableParams" show-filter="true" class="table table-bordered frank-table">
+					<tr ng-repeat="candidate in $data" ng-init="candidate.$edit = {name : false, email : false, status : false, notes : false}">
+						<td class="text-center" data-title="'Send Message'" width="5%">
+							<input type="checkbox" ng-click="setSelected(candidate._id, candidate.email)" ng-model="selectedCandidates" />
+						</td>
+						<td data-title="'Candidate'" sortable="'lName'" filter="{'lName':'text'}" width="20%">
+							<div ng-if="!candidate.user_id">
+								<span ng-if="!candidate.$edit.name" ng-click="candidate.$edit.name = true; $edit.row = $index;">{{candidate.lName + ', ' + candidate.fName}}</span>
+								<div ng-if="candidate.$edit.name">
+									<input type="text" class="form-control" ng-model="candidate.lName" ng-blur="$edit.lName = false" ng-focus="$edit.lName = true" autofocus required />, 
+									<br />
+									<input type="text" class="form-control" ng-model="candidate.fName" ng-blur="$edit.fName = false" ng-focus="$edit.fName = true" required />
+								</div>
+							</div>
+							<div ng-if="candidate.user_id">
+								{{candidate.lName + ', ' + candidate.fName}}
+							</div>
+						</td>
+						<td data-title="'Email'" sortable="'email'" filter="{'email' : 'text'}" width="20%">
+							<div ng-if="!candidate.user_id">
+								<span ng-if="!candidate.$edit.email" ng-click="candidate.$edit.email = true">{{candidate.email}}</span>
+								<div ng-if="candidate.$edit.email">
+									<input class="form-control" type="email" ng-model="candidate.email" ng-blur="candidate.$edit.email = false; updateCandidate($index, 'Email')" required autofocus />
+								</div>
+							</div>
+							<div ng-if="candidate.user_id">
+								{{candidate.email}}
+							</div>
+						</td>
+						<td data-title="'Status'" sortable="'status'" filter="{'status':'text'}" width="10%">
+							<span ng-if="!candidate.$edit.status" ng-click="candidate.$edit.status = true">{{candidate.events.status}}</span>
+							<div ng-if="candidate.$edit.status">
+								<div class="btn-group" dropdown>
+									<button type="button" class="btn" dropdown-toggle>{{candidate.events.status}}<i class="fa fa-caret-down"></i></button>
+									<ul class="dropdown-menu" role="menu">
+										<li ng-repeat="status in candidateStatuses" ng-click="candidate.events.status = candidateStatuses[$index]; candidate.$edit.status = false; updateCandidate($index, 'Status')"><a href="#">{{status}}</a></li>
+									</ul>
+								</div>
+							</div>
+						</td>
+						<td data-title="'Notes'" sortable="'note'" filter="{'note':'text'}" ng-click="candidate.$edit.note = true">
+							<span ng-if="!candidate.$edit.note" ng-click="candidate.$edit.note = true">{{candidate.note}}</span>
+							<div ng-if="candidate.$edit.note">
+								<textarea class="form-control" ng-model="candidate.note" ng-blur="candidate.$edit.note = false; updateCandidate(index, 'Note')" autofocus></textarea>
+							</div>
+						</td>
+						<td data-title="'Make a Recruiter'" width="10%" class="text-center">
+							<a href="#" class="text-success" ng-click="acceptCandidate(candidate)"><i class="fa fa-check"></i></a>
+							<span> / </span>
+							<a href="#" class="text-danger" ng-click="denyCandidate(candidate)"><i class="fa fa-times"></i></a>
+						</td>
+						<!-- <td data-title="'Accept'" width="90" class="text-center">
+							<button ng-if="!candidate.events.accepted" class="btn btn-success" ng-click="acceptCandidate(candidate)">Accept</button>
+							<span ng-if="candidate.events.accepted" class="glyphicon glyphicon-ok"></span>
+						</td>
+						<td data-title="'Deny'" width="90">
+							<button class="btn btn-danger" ng-click="denyCandidate(candidate)">Deny</button>
+						</td> -->
+					</tr>
+				</table>
+			</div>
 		</div>
 		<div class="col-md-12 frank-main-view" ng-show="selected.emails.length">
 			<form class="frank-admin-email-form" name="frankAdminEmail" ng-submit="sendMessages()">
