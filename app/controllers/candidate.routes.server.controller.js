@@ -283,6 +283,9 @@ exports.getCandidatesByEvent = function(req, res) {
  exports.setEmail = function(req,res){
  	if(!req.isAuthenticated())
  		return res.status(401).send({'message' : 'User is not logged in.'});
+ 	if(!req.body.candidate_id || !req.body.email) {
+ 		return res.status(401).send({message : "Required field not set."});
+ 	}
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id:candidate_id });
