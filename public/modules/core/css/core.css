@@ -111,3 +111,8 @@ li .disabled {
 #recruiter-request-button-title {
 	font-size: 17px;
 }
+
+.frank-table {
+	margin: auto;
+	background-color: white;
+}
