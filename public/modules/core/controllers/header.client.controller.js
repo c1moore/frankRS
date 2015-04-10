@@ -24,13 +24,13 @@ angular.module('core').controller('HeaderController', ['$scope', 'Authentication
 
 		$scope.hideLink = function(rolesNeeded) {
 			if (!$scope.authentication.user) {
-				return true
+				return true;
 			}
 			else if (($filter('roles')($scope.authentication.user.roles,rolesNeeded)).length === 0) {
-				return true
+				return true;
 			}
 			else {
-				return false
+				return false;
 			}
 		};
 	}
