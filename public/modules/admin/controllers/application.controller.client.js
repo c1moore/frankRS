@@ -21,7 +21,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 			$timeout(function() {
 				if(!$scope.$edit.lName && !$scope.$edit.fName && $scope.$edit.row >= 0) {
 					$scope.$data[$scope.$edit.row].$edit.name = false;
-					$scope.updateCandidate($scope.$edit.$row, 'name');
+					$scope.updateCandidate($scope.$data[$scope.$edit.row]._id, 'name');
 				}
 			}, 100);
 		});
@@ -29,7 +29,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 			$timeout(function() {
 				if(!$scope.$edit.lName && !$scope.$edit.fName && $scope.$edit.row >= 0) {
 					$scope.$data[$scope.$edit.row].$edit.name = false;
-					$scope.updateCandidate($scope.$edit.$row, 'name');
+					$scope.updateCandidate($scope.$data[$scope.$edit.row]._id, 'name');
 				}
 			}, 100);
 		});
@@ -231,43 +231,54 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 		$scope.$watch('$data', function() {
 			//Only mark as modified if there actually is data in the table.
 			if($scope.$data && $scope.$data.length > 0) {
-				console.log("Change");
 				rowUpdated = true;
 			}
 		});
 
-		$scope.updateCandidate = function(index, field) {
+		$scope.updateCandidate = function(id, field) {
 			if(rowUpdated) {
-				if(field === 'name') {
-					$http.post("/candidate/fName", {fName : $scope.$data[index].fName, candidate_id : $scope.$data[index]._id}).success(function() {
-						$scope.getCandidates();
-					}).error(function(res) {
-						$scope.getCandidates();
+				var index = -1;
+				for(var i = 0; i < $scope.$data.length; i++) {
+					if($scope.$data[i]._id === id)
+						index = i;
+				}
 
-						$window.alert("Error occurred while updating " + $scope.$data[index].fName + "'s entry.\n\n" + res);
-					});
+				if(index !== -1) {
+					if(field === 'name') {
+						$http.post("/candidate/setfName", {fName : $scope.$data[index].fName, candidate_id : $scope.$data[index]._id}).success(function() {
+							$scope.getCandidates();
+						}).error(function(res) {
+							$scope.getCandidates();
 
-					$http.post("/candidate/lName", {lName : $scope.$data[index].lName, candidate_id : $scope.$data[index]._id}).success(function() {
-						$scope.getCandidates();
-					}).error(function(res) {
-						$scope.getCandidates();
+							$window.alert("Error occurred while updating " + $scope.$data[index].fName + "'s entry.\n\n" + res);
+						});
 
-						$window.alert("Error occurred while updating " + $scope.$data[index].fName + "'s entry.\n\n" + res);
-					});
+						$http.post("/candidate/setlName", {lName : $scope.$data[index].lName, candidate_id : $scope.$data[index]._id}).success(function() {
+							$scope.getCandidates();
+						}).error(function(res) {
+							$scope.getCandidates();
+
+							$window.alert("Error occurred while updating " + $scope.$data[index].fName + "'s entry.\n\n" + res);
+						});
+					} else {
+						var address = "/candidate/set" + field;
+						var data = {};
+
+						data[field.toLowerCase()] = $scope.$data[index][field.toLowerCase()];
+						data.candidate_id = $scope.$data[index]._id;
+
+						$http.post(address, data).success(function() {
+							$scope.getCandidates();
+						}).error(function(res) {
+							$scope.getCandidates();
+
+							$window.alert("Error occurred while updating " + $scope.$data[index].fName + "'s entry.\n\n" + res);
+						});
+					}
 				} else {
-					var address = "/candidate/set" + field;
-					var data = {};
+					$scope.getCandidates();
 
-					data[field.toLowerCase()] = $scope.$data[index][field.toLowerCase()];
-					data.candidate_id = $scope.$data[index]._id;
-
-					$http.post(address, data).success(function() {
-						$scope.getCandidates();
-					}).error(function(res) {
-						$scope.getCandidates();
-
-						$window.alert("Error occurred while updating " + $scope.$data[index].fName + "'s entry.\n\n" + res);
-					});
+					$window.alert("Candidate could not be found.  Refresh the page and try again.");
 				}
 			}
 		};

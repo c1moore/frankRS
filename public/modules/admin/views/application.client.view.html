@@ -57,7 +57,7 @@
 							<div ng-if="!candidate.user_id">
 								<span ng-if="!candidate.$edit.email" ng-click="candidate.$edit.email = true">{{candidate.email}}</span>
 								<div ng-if="candidate.$edit.email">
-									<input class="form-control" type="email" ng-model="candidate.email" ng-blur="candidate.$edit.email = false; updateCandidate($index, 'Email')" required autofocus />
+									<input class="form-control" type="email" ng-model="candidate.email" ng-blur="candidate.$edit.email = false; updateCandidate(candidate._id, 'Email')" required autofocus />
 								</div>
 							</div>
 							<div ng-if="candidate.user_id">
@@ -70,7 +70,7 @@
 								<div class="btn-group" dropdown>
 									<button type="button" class="btn" dropdown-toggle>{{candidate.events.status}}<i class="fa fa-caret-down"></i></button>
 									<ul class="dropdown-menu" role="menu">
-										<li ng-repeat="status in candidateStatuses" ng-click="candidate.events.status = candidateStatuses[$index]; candidate.$edit.status = false; updateCandidate($index, 'Status')"><a href="#">{{status}}</a></li>
+										<li ng-repeat="status in candidateStatuses" ng-click="candidate.events.status = candidateStatuses[$index]; candidate.$edit.status = false; updateCandidate(candidate._id, 'Status')"><a href="#">{{status}}</a></li>
 									</ul>
 								</div>
 							</div>
@@ -78,7 +78,7 @@
 						<td data-title="'Notes'" sortable="'note'" filter="{'note':'text'}" ng-click="candidate.$edit.note = true">
 							<span ng-if="!candidate.$edit.note" ng-click="candidate.$edit.note = true">{{candidate.note}}</span>
 							<div ng-if="candidate.$edit.note">
-								<textarea class="form-control" ng-model="candidate.note" ng-blur="candidate.$edit.note = false; updateCandidate(index, 'Note')" autofocus></textarea>
+								<textarea class="form-control" ng-model="candidate.note" ng-blur="candidate.$edit.note = false; updateCandidate(candidate._id, 'Note')" autofocus></textarea>
 							</div>
 						</td>
 						<td data-title="'Make a Recruiter'" width="10%" class="text-center">
