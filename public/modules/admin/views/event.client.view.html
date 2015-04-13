@@ -3,11 +3,11 @@
       <div class="col-sm-4">
          <div class="well">
             <form name="eventForm" novalidate ng-submit="addEvent(newEvent)">
-               <div class="form-group row">
+               <div class="form-group admin-form-group row">
                   <label>Event Name:</label>
                   <input name="eventName" class="form-control" type="text" ng-model="newEvent.name" required>
                </div>
-               <div class="form-group row">
+               <div class="form-group admin-form-group row">
                   <label>Start Date (mm/dd/yy):</label>
                   <p class="input-group">
                     <input type="text" class="form-control" datepicker-popup="shortDate" ng-model="newEvent.start_date" is-open="openedS" min-date="dt" datepicker-options="dateOptions" ng-required="true" close-text="Close"/>
@@ -18,7 +18,7 @@
                   </span>
                </p>
             </div>
-            <div class="form-group row">
+            <div class="form-group admin-form-group row">
                <label>End Date (mm/dd/yy):</label>
                <p class="input-group">
                    <input type="text" class="form-control" datepicker-popup="shortDate" ng-model="newEvent.end_date" is-open="openedE" min-date="newEvent.start_date" datepicker-options="dateOptions" ng-required="true" close-text="Close" />
@@ -29,7 +29,11 @@
                    </span>
                </p>
             </div>
-              <div class="form-group row">
+            <div class="form-group admin-form-group row">
+              <label for="capacity">Capacity: </label>
+              <input type="number" name="capacity" id="capacity" class="form-control" ng-model="newEvent.capacity" min="1" required />
+            </div>
+              <div class="form-group admin-form-group row">
                   <label>Location:</label>
                   <input name="location" class="form-control" type="text" ng-model="newEvent.location" required>
               </div>
@@ -41,40 +45,46 @@
       <div class="col-sm-8 frank-main-view">
          <h2>Event List</h2>
          <form name="editForm" novalidate>
-            <table ng-table="tableParams" show-filter="true" class="table table-bordered">
+            <table ng-table="tableParams" show-filter="true" class="table table-bordered frank-table">
                 <tr ng-repeat="event in $data">
+                    <td>
+                      <a href='' class="text-danger" ng-click="deleteEvent(event)"><i class="fa fa-times"></i></a>
+                    </td>
                     <td data-title="'Name'" sortable="'name'" filter="{'name':'text'}">
-                        <span ng-if="!event.$edit">{{event.name}}</span>
-                        <div ng-if="event.$edit">
-                            <input class="form-control" type="text" ng-model="event.name" />
+                        <span ng-if="!event.$edit.name" ng-click="event.$edit.name = true">{{event.name}}</span>
+                        <div ng-if="event.$edit.name">
+                            <input class="form-control" type="text" ng-model="event.name" ng-blur="event.$edit.name = false; updateEvent(event)" required autofocus />
                         </div>
                     </td>
-                    <td data-title="'Start Date'">
-                        <span ng-if="!event.$edit">{{event.start_date | date:'shortDate'}}</span>
-                        <div ng-if="event.$edit">
-                              <input class="form-control" type="date" max="event.end_date" ng-model="event.start_date" required/>
+                    <td data-title="'Start Date'" sortable="'start_date'">
+                        <span ng-if="!event.$edit.start_date" ng-click="event.$edit.start_date = true">{{event.start_date | date:'shortDate'}}</span>
+                        <div ng-if="event.$edit.start_date">
+                              <input class="form-control" type="date" max="event.end_date" ng-model="event.start_date" ng-blur="event.$edit.start_date = false; updateEvent(event)" required autofocus />
                         </div>
                     </td>
-                    <td data-title="'End Date'">
-                     <span ng-if="!event.$edit">{{event.end_date | date:'shortDate'}}</span>
-                        <div ng-if="event.$edit">
-                           <input class="form-control" type="date" min="event.start_date" ng-model="event.end_date" required/>
-                        </div>
+                    <td data-title="'End Date'" sortable="'end_date'">
+                      <span ng-if="!event.$edit.end_date" ng-click="event.$edit.end_date = true">{{event.end_date | date:'shortDate'}}</span>
+                      <div ng-if="event.$edit.end_date">
+                        <input class="form-control" type="date" min="event.start_date" ng-model="event.end_date" ng-blur="event.$edit.start_date = false; updateEvent(event)" required autofocus />
+                      </div>
                     </td>
                     <td data-title="'Location'" sortable="'location'" filter="{'location':'text'}">
-                        <span ng-if="!event.$edit">{{event.location}}</span>
-                        <div ng-if="event.$edit">
-                            <input class="form-control" type="text" ng-model="event.location" />
+                        <span ng-if="!event.$edit.location" ng-click="event.$edit.location = true">{{event.location}}</span>
+                        <div ng-if="event.$edit.location">
+                            <input class="form-control" type="text" ng-model="event.location" ng-blur="event.$edit.location = false; updateEvent(event)" required autofocus />
                         </div>
                     </td>
-                    <td data-title="'Remove'">
-                        <input type="button" value="Remove" class="btn btn-default btn-xs" ng-click="deleteEvent(event)" />
+                    <td data-title="'Capacity'" sortable="'capacity'">
+                      <span ng-if="!event.$edit.capacity" ng-click="event.$edit.capacity = true">{{event.capacity}}</span>
+                      <div ng-if="event.$edit.capacity">
+                        <input class="form-control" type="number" ng-model="event.capacity" ng-blur="event.$edit.capacity = false; updateEvent(event)" required autofocus />
+                      </div>
                     </td>
-                    <td data-title="'Actions'" width="100">
+                    <!-- <td data-title="'Actions'" width="100">
                         <a ng-if="!event.$edit" href="" class="btn btn-default btn-xs" ng-click="event.$edit = true">Edit</a>
                         <a ng-if="event.$edit" href="" class="btn btn-primary btn-xs" ng-click="event.$edit = false; updateEvent(event)">Save</a>
                         <a ng-if="event.$edit" href="" class="btn btn-primary btn-xs" ng-click="event.$edit = false">Cancel</a>
-                    </td>
+                    </td> -->
                 </tr>
             </table>
          </form>

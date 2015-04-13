@@ -73,10 +73,8 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 			event.start_date = new Date(event.start_date).getTime();
         	event.end_date = new Date(event.end_date).getTime();
 			$http.post('/events/setEventObj',{event_id : event._id, event:event}).success(function() {
-				console.log("Event Updated");
 				getEvents();
 			}).error(function(error) {
-				console.log(error);
 				getEvents();
 			});
 		};
