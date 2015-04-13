@@ -1,0 +1,12 @@
+<section class="admin-attendees">
+	<div class="row" ng-controller="adminAttendeesController">
+		<div class="cold-md-12 frank-main-view">
+			<div ng-if="!isEventSelected" class="alert alert-danger">
+				<i class="fa fa-exlamation-triangle"></i>Please select an event in the top right-hand corner.
+			</div>
+			<div ng-if="isEventSelected">
+				<h2>{{selectedEvent}} Attendees</h2>
+			</div>
+		</div>
+	</div>
+</section>
