@@ -28,6 +28,7 @@ app.route('/candidate/setStatus').post(dan_candidate_routes.setEventStatus);
 app.route('/candidate/addEvent').post(dan_candidate_routes.addEvent);
 app.route('/candidate/setAccepted').post(dan_candidate_routes.setEventAccepted);
 app.route('/candidate/setNote').post(dan_candidate_routes.setNote);
+app.route('/candidate/update').post(dan_candidate_routes.updateCandidate);
 
 app.route('/candidate/setCandidate').post(dan_candidate_routes.setCandidate);
 app.route('/candidate/deleteCandidate').post(dan_candidate_routes.deleteCandidate);

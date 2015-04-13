@@ -806,6 +806,99 @@ describe('Candidate Route Integration Tests:', function() {
 						});
 					});
 			});
+
+			it("admin should be able to update a candidate with a candidate object.", function(done) {
+				candidate1.fName = "Calvin";
+				candidate1.lName = "Moore";
+				candidate1.email = "test@ufl.edu";
+				candidate1.note = "This is a test with good grammar.";
+
+				userAgent
+					.post("http://localhost:3001/candidate/update")
+					.send({candidate_id : candidate1._id, candidate : candidate1.toObject()})
+					.end(function(err, res) {
+						if(err)
+							return done(err);
+
+						res.status.should.equal(200);
+
+						Candidate.findOne({_id : candidate1._id}, function(err, res) {
+							if(err)
+								return done(err);
+
+							res.fName.should.equal(candidate1.fName);
+							res.lName.should.equal(candidate1.lName);
+							res.email.should.equal(candidate1.email);
+							res.note.should.equal(candidate1.note);
+							res.user_id.toString().should.equal(candidate1.user_id.toString());
+
+							done();
+						});
+					});
+			});
+
+			it("admin should not be able to update a candidate with a candidate object with an invalid field.", function(done) {
+				var temp = candidate1.toObject();
+				candidate1.fName = "Calvin";
+				candidate1.lName = "Moore";
+				candidate1.email = "test@ufl.edu";
+				candidate1.note = "This is a test with good grammar.";
+				candidate1.events = [{status : true}];
+
+				userAgent
+					.post("http://localhost:3001/candidate/update")
+					.send({candidate_id : candidate1._id, candidate : candidate1.toObject()})
+					.end(function(err, res) {
+						if(err)
+							return done(err);
+
+						res.status.should.equal(400);
+
+						Candidate.findOne({_id : candidate1._id}, function(err, res) {
+							if(err)
+								return done(err);
+
+							res.fName.should.equal(temp.fName);
+							res.lName.should.equal(temp.lName);
+							res.email.should.equal(temp.email);
+							res.note.should.equal(temp.note);
+							res.user_id.toString().should.equal(temp.user_id.toString());
+
+							done();
+						});
+					});
+			});
+
+			it("admin should not be able to update a candidate with a candidate object with an invalid field.", function(done) {
+				var temp = candidate1.toObject();
+				candidate1.fName = "";
+				candidate1.lName = "Moore";
+				candidate1.email = ".edu";
+				candidate1.note = "This is a test with good grammar.";
+
+				userAgent
+					.post("http://localhost:3001/candidate/update")
+					.send({candidate_id : candidate1._id, candidate : candidate1.toObject()})
+					.end(function(err, res) {
+						if(err)
+							return done(err);
+
+						res.status.should.equal(400);
+
+						Candidate.findOne({_id : candidate1._id}, function(err, res) {
+							if(err)
+								return done(err);
+
+							res.fName.should.equal(temp.fName);
+							res.lName.should.equal(temp.lName);
+							res.email.should.equal(temp.email);
+							res.note.should.equal(temp.note);
+							res.user_id.toString().should.equal(temp.user_id.toString());
+
+							done();
+						});
+					});
+			});
 		});
 	});
 
@@ -1137,6 +1230,38 @@ describe('Candidate Route Integration Tests:', function() {
 					});
 			});
 		});
+
+		it("attendee should NOT be able to update a candidate with a candidate object.", function(done) {
+			var tempCandidate = candidate1.toObject();
+			candidate1.fName = "Calvin";
+			candidate1.lName = "Moore";
+			candidate1.email = "test@ufl.edu";
+			candidate1.note = "This is a test with good grammar.";
+
+			attendeeAgent2
+				.post("http://localhost:3001/candidate/update")
+				.send({candidate_id : candidate1._id, candidate : candidate1.toObject()})
+				.end(function(err, res) {
+					if(err)
+						return done(err);
+
+					res.status.should.equal(401);
+					res.body.message.should.equal("User does not have permission.");
+
+					Candidate.findOne({_id : candidate1._id}, function(err, res) {
+						if(err)
+							return done(err);
+
+						res.fName.should.equal(tempCandidate.fName);
+						res.lName.should.equal(tempCandidate.lName);
+						res.email.should.equal(tempCandidate.email);
+						res.note.should.equal(tempCandidate.note);
+						res.user_id.toString().should.equal(tempCandidate.user_id.toString());
+
+						done();
+					});
+				});
+		});
 	});
 
 	describe('Recruiter route tests:', function() {
@@ -1363,6 +1488,38 @@ describe('Candidate Route Integration Tests:', function() {
 						should.not.exist(err);
 
 						res.note.should.equal(candidate1.note);
+
+						done();
+					});
+				});
+		});
+
+		it("recruiter should NOT be able to update a candidate with a candidate object.", function(done) {
+			var tempCandidate = candidate1.toObject();
+			candidate1.fName = "Calvin";
+			candidate1.lName = "Moore";
+			candidate1.email = "test@ufl.edu";
+			candidate1.note = "This is a test with good grammar.";
+
+			recruiterAgent
+				.post("http://localhost:3001/candidate/update")
+				.send({candidate_id : candidate1._id, candidate : candidate1.toObject()})
+				.end(function(err, res) {
+					if(err)
+						return done(err);
+
+					res.status.should.equal(401);
+					res.body.message.should.equal("User does not have permission.");
+
+					Candidate.findOne({_id : candidate1._id}, function(err, res) {
+						if(err)
+							return done(err);
+
+						res.fName.should.equal(tempCandidate.fName);
+						res.lName.should.equal(tempCandidate.lName);
+						res.email.should.equal(tempCandidate.email);
+						res.note.should.equal(tempCandidate.note);
+						res.user_id.toString().should.equal(tempCandidate.user_id.toString());
 
 						done();
 					});
@@ -1614,6 +1771,38 @@ describe('Candidate Route Integration Tests:', function() {
 						should.not.exist(err);
 
 						res.note.should.equal(candidate1.note);
+
+						done();
+					});
+				});
+		});
+
+		it("guest should NOT be able to update a candidate with a candidate object.", function(done) {
+			var tempCandidate = candidate1.toObject();
+			candidate1.fName = "Calvin";
+			candidate1.lName = "Moore";
+			candidate1.email = "test@ufl.edu";
+			candidate1.note = "This is a test with good grammar.";
+
+			tempAgent
+				.post("http://localhost:3001/candidate/update")
+				.send({candidate_id : candidate1._id, candidate : candidate1.toObject()})
+				.end(function(err, res) {
+					if(err)
+						return done(err);
+
+					res.status.should.equal(401);
+					res.body.message.should.equal("User is not logged in.");
+
+					Candidate.findOne({_id : candidate1._id}, function(err, res) {
+						if(err)
+							return done(err);
+
+						res.fName.should.equal(tempCandidate.fName);
+						res.lName.should.equal(tempCandidate.lName);
+						res.email.should.equal(tempCandidate.email);
+						res.note.should.equal(tempCandidate.note);
+						res.user_id.toString().should.equal(tempCandidate.user_id.toString());
 
 						done();
 					});

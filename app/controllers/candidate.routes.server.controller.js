@@ -703,6 +703,57 @@ exports.setNote = function(req,res){
 };
 
 /**
+* This function takes a Candidate object and updates the record as determined by the _id field.  If one or more fields of the object do not exist, but are
+* defined in the database record, these fields will remain unchanged.  user_id will not be updated even if specified.
+*
+* @param candidate - a Candiate object with the _id field defined and all fields that should be updated specified.
+* @return candidate
+*/
+exports.updateCandidate = function(req, res) {
+	if(!req.isAuthenticated()) {
+		return res.status(401).send({message : "User is not logged in."});
+	} else if(!req.hasAuthorization(req.user, ["admin"])) {
+		return res.status(401).send({message : "User does not have permission."});
+	}
+
+	if(req.body.candidate == undefined || req.body.candidate._id == undefined) {
+		return res.status(400).send({message : "A required field is not specified."});
+	}
+
+	var candidate = req.body.candidate;
+	var c_id = new mongoose.Types.ObjectId(req.body.candidate._id);
+	Candidate.findOne({_id : c_id}, function(err, old_cand) {
+		if(err)
+			return res.status(400).send(err);
+		if(!old_cand)
+			return res.status(400).send({message : "Candidate not found."});
+
+		if(candidate.fName) {
+			old_cand.fName = candidate.fName;
+		}
+		if(candidate.lName) {
+			old_cand.lName = candidate.lName;
+		}
+		if(candidate.email) {
+			old_cand.email = candidate.email;
+		}
+		if(candidate.events) {
+			old_cand.events = candidate.events;
+		}
+		if(candidate.note) {
+			old_cand.note = candidate.note;
+		}
+
+		old_cand.save(function(err, new_cand) {
+			if(err)
+				return res.status(400).send(err);
+
+			return res.status(200).send(new_cand);
+		});
+	});
+};
+
+/**
 * This function will either create a new candidate object if there is not currently one in the db for them or add a new event to the candidates events array.
 * This function should only be used when a user is signing up to be a candidate or when an admin is creating a new candidate.  This method does check to see
 * if the candidate already exists if an admin creates a new candidate; however, setEvent() should be used instead of this method.
