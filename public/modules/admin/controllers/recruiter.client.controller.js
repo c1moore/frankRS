@@ -68,20 +68,24 @@ angular.module('admin').controller('recruitersController', ['$scope', 'ngTablePa
 		});
 
 		//Remove user's role as a recruiter for this specific event.
-		var removeRecruiter = function() {
-			$http.post().success(function(res) {
-				$scope.getRecruiters();
+		var removeRecruiter = function(rid, rname) {
+			console.log("removing");
+			$http.post("/remove/Recruiter", {user_id : rid, event_id : eventSelector.postEventId}).success(function(res) {
+				getRecruiters();
 			}).error(function(res, status) {
-				$scope.getRecruiters();
+				$window.alert("There was an error removing " + rname + "'s recruiter role.\n\n" + res.message);
+
+				getRecruiters();
 			});
 		};
 
 		//Delete the recruiter's account.
-		var deleteRecruiter = function() {
-			$http.post().success(function(res) {
-				$scope.getRecruiters();
+		var deleteRecruiter = function(rid, rname) {
+			$http.post("/remove", {user_id : rid}).success(function(res) {
+				getRecruiters();
 			}).error(function(res, status) {
-				$scope.getRecruiters();
+				$window.alert("There was an error deleting " + rname + "'s account.\n\n" + res.message);
+				getRecruiters();
 			});
 		};
 
@@ -122,6 +126,7 @@ angular.module('admin').controller('recruitersController', ['$scope', 'ngTablePa
 			});
 
 			modalInstance.result.then(function(result) {
+				result = parseInt(result);
 				//Make sure a proper flag was returned
 				switch(result) {
 					case flags[0]:
@@ -129,11 +134,11 @@ angular.module('admin').controller('recruitersController', ['$scope', 'ngTablePa
 						break;
 					case flags[1]:
 						//Remove users recruiter role for this event
-						removeRecruiter();
+						removeRecruiter(recruiter._id, recruiter.fName);
 						break;
 					case flags[2]:
 						//Remove this user from the system
-						deleteRecruiter();
+						deleteRecruiter(recruiter._id, recruiter.fName);
 						break;
 				}
 			});
