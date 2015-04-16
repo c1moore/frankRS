@@ -1811,6 +1811,8 @@ describe('Candidate Route Integration Tests:', function() {
 	});
 
 	afterEach(function(done) {
+		userAgent = agent.agent(), attendeeAgent2 = agent.agent(), attendeeAgent = agent.agent(), tempAgent = agent.agent(), recruiterAgent = agent.agent();
+		
 		Candidate.remove(function(err) {
 			if(err)
 				return done(err);

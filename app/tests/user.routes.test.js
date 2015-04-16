@@ -1554,7 +1554,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 	});
 
-	describe("Admin routes", function() {
+	describe("Admin routes:", function() {
 		it("should return all recruiters for a specific event when the user is an admin.", function(done) {
 			var tempAdmin = agent.agent();
 			tempAdmin
@@ -1705,7 +1705,7 @@ describe('Express.js User Route Unit Tests:', function() {
 						}
 
 						res.status.should.equal(401);
-						res.message.should.equal("User does not have permission.");
+						res.body.message.should.equal("User does not have permission.");
 
 						User.count({}, function(err, fcount) {
 							if(err) {
@@ -1742,7 +1742,7 @@ describe('Express.js User Route Unit Tests:', function() {
 						}
 
 						res.status.should.equal(401);
-						res.body.message.should.equal("User does not have permission");
+						res.body.message.should.equal("User does not have permission.");
 
 						User.count({}, function(err, fcount) {
 							if(err) {
@@ -2021,13 +2021,13 @@ describe('Express.js User Route Unit Tests:', function() {
 
 							res.status.should.equal(200);
 
-							User.findOne({_id : user._id}, function(err, recruiter) {
+							User.findOne({_id : user3._id}, function(err, recruiter) {
 								if(err) {
 									return done(err);
 								}
 
 								should.exist(recruiter);		//A result should have been found.
-								recruiter.roles[0].should.equal(user.roles[0]);
+								recruiter.roles[0].should.equal(user3.roles[0]);
 
 								for(var i = 0; i < recruiter.status.length; i++) {
 									if(recruiter.status[i].event_id.toString() === event1._id.toString()) {
@@ -2052,7 +2052,7 @@ describe('Express.js User Route Unit Tests:', function() {
 						return done(err);
 					}
 
-					res.status.should.equal(400);
+					res.status.should.equal(401);
 					res.body.message.should.equal("User does not have permission.");
 
 					User.findOne({_id : user._id}, function(err, recruiter) {
@@ -2083,7 +2083,7 @@ describe('Express.js User Route Unit Tests:', function() {
 						return done(err);
 					}
 
-					res.status.should.equal(400);
+					res.status.should.equal(401);
 					res.body.message.should.equal("User does not have permission.");
 
 					User.findOne({_id : user._id}, function(err, recruiter) {
@@ -2115,8 +2115,8 @@ describe('Express.js User Route Unit Tests:', function() {
 						return done(err);
 					}
 
-					res.status.should.equal(400);
-					res.body.message.should.equal("User does not have permission.");
+					res.status.should.equal(401);
+					res.body.message.should.equal("User is not logged in.");
 
 					User.findOne({_id : user._id}, function(err, recruiter) {
 						if(err) {
@@ -2159,7 +2159,7 @@ describe('Express.js User Route Unit Tests:', function() {
 							}
 
 							res.status.should.equal(400);
-							res.body.message.should.equal("Required field not specified.");
+							res.body.message.should.equal("Required fields not specified.");
 
 							User.findOne({_id : user._id}, function(err, recruiter) {
 								if(err) {
@@ -2183,6 +2183,8 @@ describe('Express.js User Route Unit Tests:', function() {
 	});
 
 	afterEach(function(done) {
+		useragent = agent.agent(), useragent2 = agent.agent();
+
 		User.remove(function(err) {
 			if(err)
 				return done(err);

@@ -116,7 +116,23 @@ var updateRanks = function(event_id) {
 * @param user_id `_id` for the user that should be removed
 */
 exports.deleteUser = function(req, res) {
-	return res.status(200).send({});
+	if(!req.isAuthenticated()) {
+		return res.status(401).send({message : "User is not logged in."});
+	}
+	if(!req.hasAuthorization(req.user, ["admin"])) {
+		return res.status(401).send({message : "User does not have permission."});
+	}
+	if(!req.body.user_id) {
+		return res.status(400).send({message : "Required fields not specified."});
+	}
+
+	User.remove({_id : new mongoose.Types.ObjectId(req.body.user_id)}, function(err) {
+		if(err) {
+			return res.status(400).send(err);
+		}
+
+		return res.status(200).send();
+	});
 };
 
 /**
@@ -131,7 +147,89 @@ exports.deleteUser = function(req, res) {
 * @param event_id `_id` of the event the user's recruiter status should be removed
 */
 exports.removeRecruiterRole = function(req, res) {
-	return res.status(200).send({});
+	if(!req.isAuthenticated()) {
+		return res.status(401).send({message : "User is not logged in."});
+	}
+	if(!req.hasAuthorization(req.user, ["admin"])) {
+		return res.status(401).send({message : "User does not have permission."});
+	}
+	if(!req.body.user_id || !req.body.event_id) {
+		return res.status(400).send({message : "Required fields not specified."});
+	}
+
+	User.findOne({_id : new mongoose.Types.ObjectId(req.body.user_id)}, function(err, recruiter) {
+		if(err) {
+			return res.status(400).send(err);
+		}
+		if(!recruiter) {
+			return res.status(400).send({message : "Recruiter not found."});
+		}
+		var t;
+		for(t = 0; t < recruiter.roles.length; t++) {
+			if(recruiter.roles[t] === "recruiter") {
+				break;
+			}
+		}
+		if(t === recruiter.roles.length) {
+			return res.status(200).send();
+		}
+
+		//Take care of the case that only 1 event is in this user's status array.
+		if(recruiter.status.length === 1) {
+			if(recruiter.status[0].event_id.toString() === req.body.event_id.toString() && recruiter.status[0].recruiter) {
+				//Delete the user.
+				recruiter.remove(function(err) {
+					if(err) {
+						return res.status(400).send(err);
+					}
+
+					return res.status(200).send();
+				});
+			} else {
+				//This user is not a recruiter for this event.
+				return res.status(200).send();
+			}
+		} else {
+			var i = 0;
+			for(; i < recruiter.status.length; i++) {
+				if(recruiter.status[i].event_id.toString() === req.body.event_id.toString() && recruiter.status[i].recruiter) {
+					if(recruiter.status[i].attending) {
+						recruiter.status[i].recruiter = false;
+					} else {
+						recruiter.status.pull({event_id : new mongoose.Types.ObjectId(req.body.event_id)});
+					}
+
+					var j;
+					for(j = 0; j < recruiter.status.length; j++) {
+						if(recruiter.status[j].recruiter) {
+							break;
+						}
+					}
+
+					if(j === recruiter.status.length) {
+						//This user is no longer a recruiter, strip their permissions.
+						recruiter.roles.pull("recruiter");
+						recruiter.roles.addToSet("attendee");
+					}
+
+					recruiter.save(function(err, result) {
+						if(err) {
+							return res.status(400).send(err);
+						}
+
+						return res.status(200).send();
+					});
+
+					break;
+				}
+			}
+
+			if(i === recruiter.status.length) {
+				//This user is not a recruiter for this event, just return 200.
+				return res.status(200).send();
+			}
+		}
+	});
 };
 
 /*

@@ -39,20 +39,24 @@ var ranksEqual = function(arr1, arr2) {
 describe('User Model Unit Tests:', function() {
 
 	before(function(done) {
-		var millisInMonth = new Date(1970, 0, 31, 11, 59, 59).getTime();			//Number of milliseconds in a typical month.
-		var startDate = new Date(Date.now() + millisInMonth).getTime();				//Start date for 1 month from now.
-		var endDate = new Date(Date.now() + millisInMonth + 86400000).getTime();	//Event lasts 1 day.
+		User.remove(function() {
+			Evnt.remove(function() {
+				var millisInMonth = new Date(1970, 0, 31, 11, 59, 59).getTime();			//Number of milliseconds in a typical month.
+				var startDate = new Date(Date.now() + millisInMonth).getTime();				//Start date for 1 month from now.
+				var endDate = new Date(Date.now() + millisInMonth + 86400000).getTime();	//Event lasts 1 day.
 
-		event = new Evnt({
-			name:  'UserTestEvent',
-			start_date: startDate,
-			end_date:  endDate,
-			location: 'UF',
-			schedule: 'www.google.com',
-			capacity: 50
+				event = new Evnt({
+					name:  'UserTestEvent',
+					start_date: startDate,
+					end_date:  endDate,
+					location: 'UF',
+					schedule: 'www.google.com',
+					capacity: 50
+				});
+
+				event.save(done);
+			});
 		});
-
-		event.save(done);
 	});
 
 	describe('Method', function() {
@@ -398,21 +402,16 @@ describe('User Model Unit Tests:', function() {
 		});
 
 		afterEach(function(done) {
-			user.remove(function(err) {
+			User.remove(function(err) {
 				if(err)
 					return done(err);
 
-				user2.remove(function(err) {
-					if(err)
-						return done(err);
-
-					done();
-				});
+				done();
 			});
 		});
 	});
 
 	after(function(done) {
-		event.remove(done);
+		Evnt.remove(done);
 	});
 });
