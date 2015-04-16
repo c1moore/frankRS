@@ -58,6 +58,9 @@ module.exports = function(app) {
 	app.route('/auth/github').get(passport.authenticate('github'));
 	app.route('/auth/github/callback').get(users.oauthCallback('github'));
 
+	//Setting admin routes
+	app.route('/event/recruiters').get(users.getRecruiters);
+
 	//Returning Leaderboard data
 	app.route('/leaderboard/maintable').post(users.getLeaderboard);
 	app.route('/leaderboard/recruiterinfo').get(users.getRecruiterInfo);

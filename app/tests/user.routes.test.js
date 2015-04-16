@@ -1653,6 +1653,89 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 	});
 
+	it("should return all recruiters for a specific event when the user is an admin.", function(done) {
+		var tempAdmin = agent.agent();
+		tempAdmin
+			.post('http://localhost:3001/auth/signin')
+			.send({email : user5.email, password : 'password'})
+			.end(function(err, res) {
+				if(err) {
+					return done(err);
+				}
+
+				res.status.should.equal(200);
+				tempAdmin.saveCookies(res);
+
+				tempAdmin
+					.get('http://localhost:3001/event/recruiters')
+					.query({event_id : event1._id.toString()})
+					.end(function(err, res) {
+						if(err) {
+							return done(err);
+						}
+
+						res.status.should.equal(200);
+						res.body.length.should.equal(3);
+
+						var rcts = res.body;
+						for(var i = 0; i < rcts.length; i++) {
+							if(rcts[i]._id.toString() !== user2._id.toString() && rcts[i]._id.toString() !== user4._id.toString() && rcts[i]._id.toString() !== user._id.toString()) {
+								return done(new Error("Returned users that are not recruiters:\n" + rcts[i].toString()));
+							}
+						}
+
+						done();
+					});
+			});
+	});
+
+	it("should not return all recruiters for a specific event when the user is a recruiter.", function(done) {
+		useragent
+			.get('http://localhost:3001/event/recruiters')
+			.send({event_id : event1._id})
+			.end(function(err, res) {
+				if(err) {
+					return done(err);
+				}
+
+				res.status.should.equal(401);
+				res.body.message.should.equal("User does not have permission.");
+				done();
+			});
+	});
+
+	it("should not return all recruiters for a specific event when the user is an attendee.", function(done) {
+		useragent2
+			.get('http://localhost:3001/event/recruiters')
+			.send({event_id : event1._id})
+			.end(function(err, res) {
+				if(err) {
+					return done(err);
+				}
+
+				res.status.should.equal(401);
+				res.body.message.should.equal("User does not have permission.");
+				done();
+			});
+	});
+
+	it("should not return all recruiters for a specific event when the user is not logged in.", function(done) {
+		var tempAgent = agent.agent();
+		
+		tempAgent
+			.get('http://localhost:3001/event/recruiters')
+			.send({event_id : event1._id})
+			.end(function(err, res) {
+				if(err) {
+					return done(err);
+				}
+
+				res.status.should.equal(401);
+				res.body.message.should.equal("User is not logged in.");
+				done();
+			});
+	});
+
 	afterEach(function(done) {
 		User.remove(function(err) {
 			if(err)

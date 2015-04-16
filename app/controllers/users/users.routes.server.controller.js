@@ -563,6 +563,39 @@ exports.getEmail = function(req, res) {
 	}
 };
 
+/**
+* This method will return all recruiters for the specified event.
+*
+* @param event_id - The _id field for the event for which recruiters should be returned.
+*/
+exports.getRecruiters = function(req, res) {
+	if(!req.isAuthenticated()) {
+		return res.status(401).send({message : "User is not logged in."});
+	}
+
+	if(!req.hasAuthorization(req.user, ['admin'])) {
+		return res.status(401).send({message : "User does not have permission."});
+	}
+
+	if(!req.query.event_id) {
+		return res.status(400).send({message : "Required fields not specified."});
+	}
+
+	User.aggregate([
+		{$match : {'status.event_id' : new mongoose.Types.ObjectId(req.query.event_id), 'status.recruiter' : true}}
+	], function(err, result) {
+		if(err) {
+			return res.status(400).send(err);
+		}
+
+		if(!result) {
+			return res.status(400).send({message : "No recruiters found for this event."});
+		}
+
+		return res.status(200).send(result);
+	});
+};
+
 /*
 * This method sends an invitation to the invitee through the recruiter's email address.  If the invitee has not been invited before, the invitee is added to our database.  If the
 * invitee has been invited before, but is not attending, this invitee is simply added to the recruiter's inviteeList.  In either of these cases, the recruiter's rank may have changed
