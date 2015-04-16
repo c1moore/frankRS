@@ -20,6 +20,10 @@ module.exports = function(app) {
 	app.route('/users/auth').post(users.hasAuthorization);
 	app.route('/users/events').get(users.getUserEvents);
 
+	// Setting up user removal routes
+	app.route('/remove').post(users.deleteUser);
+	app.route('/remove/Recruiter').post(users.removeRecruiterRole);
+
 	// Setting up the users password api
 	app.route('/users/password').post(users.changePassword);
 	app.route('/auth/forgot').post(users.forgot);

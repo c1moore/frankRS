@@ -1019,49 +1019,6 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 	});
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	describe('Accepting an invitation', function() {
 		it('should allow an outside source to send data when the correct API key is sent and update the a user\'s account and the number of attendees for the event accordingly if they were already invited.', function(done) {
 			this.timeout(10000);
@@ -1549,62 +1506,6 @@ describe('Express.js User Route Unit Tests:', function() {
 		});*/
 	});
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	describe('Obtain specific user information:', function() {
 		it('should return the user displayname, which should be in the format "Last, First"', function(done) {
 			useragent
@@ -1653,87 +1554,632 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 	});
 
-	it("should return all recruiters for a specific event when the user is an admin.", function(done) {
-		var tempAdmin = agent.agent();
-		tempAdmin
-			.post('http://localhost:3001/auth/signin')
-			.send({email : user5.email, password : 'password'})
-			.end(function(err, res) {
+	describe("Admin routes", function() {
+		it("should return all recruiters for a specific event when the user is an admin.", function(done) {
+			var tempAdmin = agent.agent();
+			tempAdmin
+				.post('http://localhost:3001/auth/signin')
+				.send({email : user5.email, password : 'password'})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(200);
+					tempAdmin.saveCookies(res);
+
+					tempAdmin
+						.get('http://localhost:3001/event/recruiters')
+						.query({event_id : event1._id.toString()})
+						.end(function(err, res) {
+							if(err) {
+								return done(err);
+							}
+
+							res.status.should.equal(200);
+							res.body.length.should.equal(3);
+
+							var rcts = res.body;
+							for(var i = 0; i < rcts.length; i++) {
+								if(rcts[i]._id.toString() !== user2._id.toString() && rcts[i]._id.toString() !== user4._id.toString() && rcts[i]._id.toString() !== user._id.toString()) {
+									return done(new Error("Returned users that are not recruiters:\n" + rcts[i].toString()));
+								}
+							}
+
+							done();
+						});
+				});
+		});
+
+		it("should not return all recruiters for a specific event when the user is a recruiter.", function(done) {
+			useragent
+				.get('http://localhost:3001/event/recruiters')
+				.send({event_id : event1._id})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(401);
+					res.body.message.should.equal("User does not have permission.");
+					done();
+				});
+		});
+
+		it("should not return all recruiters for a specific event when the user is an attendee.", function(done) {
+			useragent2
+				.get('http://localhost:3001/event/recruiters')
+				.send({event_id : event1._id})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(401);
+					res.body.message.should.equal("User does not have permission.");
+					done();
+				});
+		});
+
+		it("should not return all recruiters for a specific event when the user is not logged in.", function(done) {
+			var tempAgent = agent.agent();
+			
+			tempAgent
+				.get('http://localhost:3001/event/recruiters')
+				.send({event_id : event1._id})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(401);
+					res.body.message.should.equal("User is not logged in.");
+					done();
+				});
+		});
+
+		it("should delete a user account from the system when the user has admin permissions.", function(done) {
+			var tempAdmin = agent.agent();
+			tempAdmin
+				.post('http://localhost:3001/auth/signin')
+				.send({email : user5.email, password : 'password'})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(200);
+					tempAdmin.saveCookies(res);
+
+					User.count({}, function(err, scount) {
+						if(err) {
+							return done(err);
+						}
+
+						tempAdmin
+							.post("http://localhost:3001/remove")
+							.send({user_id : user._id})
+							.end(function(err, res) {
+								if(err) {
+									return done(err);
+								}
+
+								res.status.should.equal(200);
+
+								User.count({}, function(err, fcount) {
+									if(err) {
+										return done(err);
+									}
+
+									fcount.should.equal(scount - 1);
+
+									User.find({_id : user._id}, function(err, result) {
+										if(err) {
+											return done(err);
+										}
+
+										if(result.length) {
+											return done(new Error("Correct user not removed."));
+										}
+
+										done();
+									});
+								});
+							});
+					});
+				});
+		});
+
+		it("should not delete a user account from the system when the user is a recruiter and does not own the account.", function(done) {
+			User.count({}, function(err, scount) {
 				if(err) {
 					return done(err);
 				}
 
-				res.status.should.equal(200);
-				tempAdmin.saveCookies(res);
-
-				tempAdmin
-					.get('http://localhost:3001/event/recruiters')
-					.query({event_id : event1._id.toString()})
+				useragent
+					.post("http://localhost:3001/remove")
+					.send({user_id : user4._id})
 					.end(function(err, res) {
 						if(err) {
 							return done(err);
 						}
 
-						res.status.should.equal(200);
-						res.body.length.should.equal(3);
+						res.status.should.equal(401);
+						res.message.should.equal("User does not have permission.");
 
-						var rcts = res.body;
-						for(var i = 0; i < rcts.length; i++) {
-							if(rcts[i]._id.toString() !== user2._id.toString() && rcts[i]._id.toString() !== user4._id.toString() && rcts[i]._id.toString() !== user._id.toString()) {
-								return done(new Error("Returned users that are not recruiters:\n" + rcts[i].toString()));
+						User.count({}, function(err, fcount) {
+							if(err) {
+								return done(err);
+							}
+
+							fcount.should.equal(scount);
+
+							User.find({_id : user4._id}, function(err, result) {
+								if(err) {
+									return done(err);
+								}
+
+								should.exist(result);
+								done();
+							});
+						});
+					});
+			});
+		});
+
+		it("should not delete a user account from the system when the user is an attendee and does not own the account.", function(done) {
+			User.count({}, function(err, scount) {
+				if(err) {
+					return done(err);
+				}
+
+				useragent2
+					.post("http://localhost:3001/remove")
+					.send({user_id : user4._id})
+					.end(function(err, res) {
+						if(err) {
+							return done(err);
+						}
+
+						res.status.should.equal(401);
+						res.body.message.should.equal("User does not have permission");
+
+						User.count({}, function(err, fcount) {
+							if(err) {
+								return done(err);
+							}
+
+							fcount.should.equal(scount);
+
+							User.find({_id : user4._id}, function(err, result) {
+								if(err) {
+									return done(err);
+								}
+
+								should.exist(result);
+								done();
+							});
+						});
+					});
+			});
+		});
+
+		it("should not delete a user account from the system when the user is not logged in.", function(done) {
+			var tempUser = agent.agent();
+
+			User.count({}, function(err, scount) {
+				if(err) {
+					return done(err);
+				}
+
+				tempUser
+					.post("http://localhost:3001/remove")
+					.send({user_id : user4._id})
+					.end(function(err, res) {
+						if(err) {
+							return done(err);
+						}
+
+						res.status.should.equal(401);
+						res.body.message.should.equal("User is not logged in.");
+
+						User.count({}, function(err, fcount) {
+							if(err) {
+								return done(err);
+							}
+
+							fcount.should.equal(scount);
+
+							User.find({_id : user4._id}, function(err, result) {
+								if(err) {
+									return done(err);
+								}
+
+								should.exist(result);
+								done();
+							});
+						});
+					});
+			});
+		});
+
+		it("should not delete a user account when the user_id is not specified.", function(done) {
+			var tempAdmin = agent.agent();
+			tempAdmin
+				.post('http://localhost:3001/auth/signin')
+				.send({email : user5.email, password : 'password'})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(200);
+					tempAdmin.saveCookies(res);
+
+					User.count({}, function(err, scount) {
+						if(err) {
+							return done(err);
+						}
+
+						tempAdmin
+							.post("http://localhost:3001/remove")
+							.end(function(err, res) {
+								if(err) {
+									return done(err);
+								}
+
+								res.status.should.equal(400);
+								res.body.message.should.equal("Required fields not specified.");
+
+								User.count({}, function(err, fcount) {
+									if(err) {
+										return done(err);
+									}
+
+									fcount.should.equal(scount);
+
+									User.find({_id : user._id}, function(err, result) {
+										if(err) {
+											return done(err);
+										}
+
+										if(!result.length) {
+											return done(new Error("Correct user not removed."));
+										}
+
+										done();
+									});
+								});
+							});
+					});
+				});
+		});
+
+		it("should remove a recruiter's current roles/status for a specific event when they are not attending the event and the requester is an admin.", function(done) {
+			var tempAdmin = agent.agent();
+			tempAdmin
+				.post('http://localhost:3001/auth/signin')
+				.send({email : user5.email, password : 'password'})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(200);
+					tempAdmin.saveCookies(res);
+
+					tempAdmin
+						.post("http://localhost:3001/remove/Recruiter")
+						.send({user_id : user._id, event_id : event2._id})
+						.end(function(err, res) {
+							if(err) {
+								return done(err);
+							}
+
+							res.status.should.equal(200);
+
+							User.findOne({_id : user._id}, function(err, recruiter) {
+								if(err) {
+									return done(err);
+								}
+
+								should.exist(recruiter);		//A result should have been found.
+								recruiter.roles[0].should.equal(user.roles[0]);
+
+								for(var i = 0; i < recruiter.status.length; i++) {
+									if(recruiter.status[i].event_id.toString() === event2._id.toString()) {
+										return done(new Error("Recruiter role not removed for proper event."));
+									}
+								}
+
+								done();
+							});
+						});
+				});
+		});
+
+		it("should change a recruiter's current role for an event to attendee when they are attending the event and the requester is an admin.", function(done) {
+			var tempAdmin = agent.agent();
+			tempAdmin
+				.post('http://localhost:3001/auth/signin')
+				.send({email : user5.email, password : 'password'})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(200);
+					tempAdmin.saveCookies(res);
+
+					tempAdmin
+						.post("http://localhost:3001/remove/Recruiter")
+						.send({user_id : user._id, event_id : event1._id})
+						.end(function(err, res) {
+							if(err) {
+								return done(err);
+							}
+
+							res.status.should.equal(200);
+
+							User.findOne({_id : user._id}, function(err, recruiter) {
+								if(err) {
+									return done(err);
+								}
+
+								should.exist(recruiter);		//A result should have been found.
+								recruiter.roles[0].should.equal(user.roles[0]);
+
+								var i;
+								for(i = 0; i < recruiter.status.length; i++) {
+									if(recruiter.status[i].event_id.toString() === event1._id.toString() && recruiter.status[i].recruiter) {
+										return done(new Error("Recruiter role not removed for event."));
+									}
+									if(recruiter.status[i].event_id.toString() === event1._id.toString()) {
+										break;
+									}
+								}
+
+								if(i === recruiter.status.length) {
+									return done(new Error("Event was deleted from recruiter's status."));
+								}
+
+								done();
+							});
+						});
+				});
+		});
+
+		it("should delete a recruiter's account if they are not attending any events or recruiting for any events and the requester is an admin.", function(done) {
+			var tempAdmin = agent.agent();
+			tempAdmin
+				.post('http://localhost:3001/auth/signin')
+				.send({email : user5.email, password : 'password'})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(200);
+					tempAdmin.saveCookies(res);
+
+					var tempUser = new User({
+						fName: 			"Temp",
+						lName: 			"User",
+						displayName: 	"User, Temp",
+						email: 			"temp_user_cen3031.0.boom0625@pamgourmet.com",
+						roles: 			["recruiter"],
+						status: 		[{event_id : event1._id, attending: false, recruiter : true}],
+						password: 		"password",
+						login_enabled: 	true
+					});
+
+					tempUser.save(function(err, ruser) {
+						tempAdmin
+							.post("http://localhost:3001/remove/Recruiter")
+							.send({user_id : tempUser._id, event_id : event1._id})
+							.end(function(err, res) {
+								if(err) {
+									return done(err);
+								}
+
+								res.status.should.equal(200);
+
+								User.findOne({_id : tempUser._id}, function(err, recruiter) {
+									if(err) {
+										return done(err);
+									}
+
+									should.not.exist(recruiter);		//A result should have been found.
+
+									done();
+								});
+							});
+					});
+				});
+		});
+
+		it("should do nothing when the user is not a recruiter.", function(done) {
+			var tempAdmin = agent.agent();
+			tempAdmin
+				.post('http://localhost:3001/auth/signin')
+				.send({email : user5.email, password : 'password'})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(200);
+					tempAdmin.saveCookies(res);
+
+					tempAdmin
+						.post("http://localhost:3001/remove/Recruiter")
+						.send({user_id : user3._id, event_id : event1._id})
+						.end(function(err, res) {
+							if(err) {
+								return done(err);
+							}
+
+							res.status.should.equal(200);
+
+							User.findOne({_id : user._id}, function(err, recruiter) {
+								if(err) {
+									return done(err);
+								}
+
+								should.exist(recruiter);		//A result should have been found.
+								recruiter.roles[0].should.equal(user.roles[0]);
+
+								for(var i = 0; i < recruiter.status.length; i++) {
+									if(recruiter.status[i].event_id.toString() === event1._id.toString()) {
+										if(recruiter.status[i].attending || recruiter.status[i].recruiter) {
+											return done(new Error("Nonrecruiter's status was updated."));
+										}
+									}
+								}
+
+								done();
+							});
+						});
+				});
+		});
+
+		it("should not change a recruiter's role when the requester is a recruiter.", function(done) {
+			useragent
+				.post("http://localhost:3001/remove/Recruiter")
+				.send({user_id : user._id, event_id : event2._id})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(400);
+					res.body.message.should.equal("User does not have permission.");
+
+					User.findOne({_id : user._id}, function(err, recruiter) {
+						if(err) {
+							return done(err);
+						}
+
+						should.exist(recruiter);		//A result should have been found.
+						recruiter.roles[0].should.equal(user.roles[0]);
+
+						for(var i = 0; i < recruiter.status.length; i++) {
+							if(recruiter.status[i].event_id.toString() === event2._id.toString() && !recruiter.status[i].recruiter) {
+								return done(new Error("Recruiter role removed."));
 							}
 						}
 
 						done();
 					});
-			});
-	});
+				});
+		});
 
-	it("should not return all recruiters for a specific event when the user is a recruiter.", function(done) {
-		useragent
-			.get('http://localhost:3001/event/recruiters')
-			.send({event_id : event1._id})
-			.end(function(err, res) {
-				if(err) {
-					return done(err);
-				}
+		it("should not change a recruiter's role when the requester is an attendee.", function(done) {
+			useragent2
+				.post("http://localhost:3001/remove/Recruiter")
+				.send({user_id : user._id, event_id : event2._id})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
 
-				res.status.should.equal(401);
-				res.body.message.should.equal("User does not have permission.");
-				done();
-			});
-	});
+					res.status.should.equal(400);
+					res.body.message.should.equal("User does not have permission.");
 
-	it("should not return all recruiters for a specific event when the user is an attendee.", function(done) {
-		useragent2
-			.get('http://localhost:3001/event/recruiters')
-			.send({event_id : event1._id})
-			.end(function(err, res) {
-				if(err) {
-					return done(err);
-				}
+					User.findOne({_id : user._id}, function(err, recruiter) {
+						if(err) {
+							return done(err);
+						}
 
-				res.status.should.equal(401);
-				res.body.message.should.equal("User does not have permission.");
-				done();
-			});
-	});
+						should.exist(recruiter);		//A result should have been found.
+						recruiter.roles[0].should.equal(user.roles[0]);
 
-	it("should not return all recruiters for a specific event when the user is not logged in.", function(done) {
-		var tempAgent = agent.agent();
-		
-		tempAgent
-			.get('http://localhost:3001/event/recruiters')
-			.send({event_id : event1._id})
-			.end(function(err, res) {
-				if(err) {
-					return done(err);
-				}
+						for(var i = 0; i < recruiter.status.length; i++) {
+							if(recruiter.status[i].event_id.toString() === event2._id.toString() && !recruiter.status[i].recruiter) {
+								return done(new Error("Recruiter role removed."));
+							}
+						}
 
-				res.status.should.equal(401);
-				res.body.message.should.equal("User is not logged in.");
-				done();
-			});
+						done();
+					});
+				});
+		});
+
+		it("should not change a recruiter's role when the requester is not logged in.", function(done) {
+			var tempagent = agent.agent();
+			tempagent
+				.post("http://localhost:3001/remove/Recruiter")
+				.send({user_id : user._id, event_id : event2._id})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(400);
+					res.body.message.should.equal("User does not have permission.");
+
+					User.findOne({_id : user._id}, function(err, recruiter) {
+						if(err) {
+							return done(err);
+						}
+
+						should.exist(recruiter);		//A result should have been found.
+						recruiter.roles[0].should.equal(user.roles[0]);
+
+						for(var i = 0; i < recruiter.status.length; i++) {
+							if(recruiter.status[i].event_id.toString() === event2._id.toString() && !recruiter.status[i].recruiter) {
+								return done(new Error("Recruiter role removed."));
+							}
+						}
+
+						done();
+					});
+				});
+		});
+
+		it("should not change a recruiter's role when the user_id is not specified.", function(done) {
+			var tempAdmin = agent.agent();
+			tempAdmin
+				.post('http://localhost:3001/auth/signin')
+				.send({email : user5.email, password : 'password'})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(200);
+					tempAdmin.saveCookies(res);
+
+					tempAdmin
+						.post("http://localhost:3001/remove/Recruiter")
+						.send({event_id : event2._id})
+						.end(function(err, res) {
+							if(err) {
+								return done(err);
+							}
+
+							res.status.should.equal(400);
+							res.body.message.should.equal("Required field not specified.");
+
+							User.findOne({_id : user._id}, function(err, recruiter) {
+								if(err) {
+									return done(err);
+								}
+
+								should.exist(recruiter);		//A result should have been found.
+								recruiter.roles[0].should.equal(user.roles[0]);
+
+								for(var i = 0; i < recruiter.status.length; i++) {
+									if(recruiter.status[i].event_id.toString() === event2._id.toString() && !recruiter.status[i].recruiter) {
+										return done(new Error("Recruiter role removed for event."));
+									}
+								}
+
+								done();
+							});
+						});
+				});
+		});
 	});
 
 	afterEach(function(done) {

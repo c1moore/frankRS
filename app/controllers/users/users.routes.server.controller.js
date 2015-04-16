@@ -110,6 +110,30 @@ var updateRanks = function(event_id) {
 };
 
 
+/**
+* Remove a user from the database completely without remorse.
+*
+* @param user_id `_id` for the user that should be removed
+*/
+exports.deleteUser = function(req, res) {
+	return res.status(200).send({});
+};
+
+/**
+* Remove a user's recruiter permissions for a specified event.  If the specified event is the
+* only event with which the user is affiliated, the following actions will be take:
+* 		- If the user is attending the event, the user's role will be changed to attendee
+* 		- If the user is not attending the event, the user's account will be deleted
+* If the user is not a recruiter (for the specified event), status 200 will be returned
+* without modifying the user's account.
+*
+* @param user_id `_id` for the recruiter that should have their account updated
+* @param event_id `_id` of the event the user's recruiter status should be removed
+*/
+exports.removeRecruiterRole = function(req, res) {
+	return res.status(200).send({});
+};
+
 /*
 * Return the user's displayname (Last, First).
 */
