@@ -1,7 +1,29 @@
 <section class="admin-recruiters">
 	<div class="row" ng-controller="recruitersController">
 		<div class="cold-md-12 frank-main-view">
-			<h2>Current Recruiters</h2>
+			<div ng-if="!isEventSelected" class="alert alert-danger">
+				<i class="fa fa-exclamation-triangle"></i>Please select an event in the top right-hand corner.
+			</div>
+			<div ng-if="isEventSelected">
+				<h2 class="text-center">Current Recruiters</h2>
+				<table ng-table="recruiterTableParams" show-filter="true" class="table table-bordered frank-table">
+					<tr ng-repeat="recruiter in $data">
+						<td class="text-center" data-title="''" width="5%">
+							<a href class="text-danger" ng-click="removeRecruiter(recruiter)"><i class="fa fa-times"></i></a>
+						</td>
+						<td data-title="'Recruiter'" sortable="'displayName'" filter="{'displayName' : 'text'}" width="20%">
+							{{recruiter.displayName}}
+						</td>
+						<td data-title="'Email'" sortable="'email'" filter="{'email' : 'text'}" width="20%">
+							{{recruiter.email}}
+						</td>
+						<td data-title="'Rank'" sortable="'rank'" filter="{'rank' : 'text'}" width="10%">
+							<span ng-if="recruiter.rank !== 0">{{recruiter.rank}}</span>
+							<span ng-if="recruiter.rank === 0">N/A</span>
+						</td>
+					</tr>
+				</table>
+			</div>
 		</div>
 	</div>
 </section>

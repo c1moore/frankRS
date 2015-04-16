@@ -1,0 +1,19 @@
+<div class="modal-header">
+	<h3 class="modal-title"><i class="fa fa-exclamation-triangle warning-text"></i> How should I proceed?</h3>
+</div>
+<div class="modal-body">
+	<div>
+		You have decided to remove {{recruiter.fName}} {{recruiter.lName}} from the elite ranks of the recruiters.
+		<br />
+		What action should be taken?
+		<br />
+		<div class="form-group" style="padding: 10px 20px; padding-bottom: 0; margin-bottom: 0;">
+			<label for="role"><input type="radio" value="flags[1]" ng-model="selection" name="action" id="role" /> Remove user's recruiter role for this event</label>
+			<label for="user"><input type="radio" value="flags[2]" ng-model="selection" name="action" id="user" /> Remove user completely from the system</label>
+		</div>
+	</div>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-warning" ng-click="done(cancel)">Cancel</button>
+	<button class="btn btn-danger" ng-click="done()" ng-disabled="!selection">Remove</button>
+</div>
