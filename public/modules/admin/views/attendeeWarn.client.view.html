@@ -1,0 +1,12 @@
+<div class="modal-header">
+	<h3 class="modal-title"><i class="fa fa-exclamation-triangle warning-text"></i> Warning</h3>
+</div>
+<div class="modal-body">
+	<div>
+		You are about to delete {{attendee.fName}}'s account completely for all events.  Are you sure you want to proceed?
+	</div>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-warning" ng-click="done(0)">Cancel</button>
+	<button class="btn btn-danger" ng-click="done(1)">Remove</button>
+</div>

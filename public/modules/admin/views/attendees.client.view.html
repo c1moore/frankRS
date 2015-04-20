@@ -1,11 +1,31 @@
 <section class="admin-attendees">
 	<div class="row" ng-controller="adminAttendeesController">
-		<div class="cold-md-12 frank-main-view">
+		<div class="col-md-12 frank-main-view">
 			<div ng-if="!isEventSelected" class="alert alert-danger">
 				<i class="fa fa-exlamation-triangle"></i>Please select an event in the top right-hand corner.
 			</div>
 			<div ng-if="isEventSelected">
-				<h2>{{selectedEvent}} Attendees</h2>
+				<h2 class="text-center">{{selectedEvent}} Attendees</h2>
+				<table ng-table="attendeeTableParams" show-filter="true" class="table table-bordered frank-table">
+					<tr ng-repeat="attendee in $data">
+						<td class="text-center" data-title="''" width="5%">
+							<a href class="text-danger" ng-click="removeAttendee(attendee)"><i class="fa fa-times"></i></a>
+						</td>
+						<td data-title="'Attendee'" sortable="'displayName'" filter="{'displayName' : 'text'}" width="30%">
+							{{attendee.displayName}}
+						</td>
+						<td data-title="'Email'" sortable="'email'" filter="{'email' : 'text'}" width="30%">
+							{{attendee.email}}
+						</td>
+						<td data-title="'Organization'" sortable="'organization'" filter="{'organization' : 'text'}" width="30%">
+							{{attendee.organization}}
+						</td>
+						<td data-title="'Attending?'" sortable="'attending'" width="5%">
+							<span ng-if="attendee.attending">Yes</span>
+							<span ng-if="!attendee.attending">No</span>
+						</td>
+					</tr>
+				</table>
 			</div>
 		</div>
 	</div>
