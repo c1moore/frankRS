@@ -686,6 +686,43 @@ exports.getEmail = function(req, res) {
 };
 
 /**
+* This method will return all users for the specified event that have access to the recruiter
+* system (i.e. login_enabled is set to true).
+*
+* @param event_id - The _id field for the event for which users should be returned.
+*/
+exports.getUsers = function(req, res) {
+	if(!req.isAuthenticated()) {
+		return res.status(401).send({message : "User is not logged in."});
+	}
+
+	if(!req.hasAuthorization(req.user, ["admin"])) {
+		return res.status(401).send({message : "User does not have permission."});
+	}
+
+	if(!req.body.event_id) {
+		return res.status(400).send({message : "Required fields not specified."});
+	}
+
+	User.aggregate([
+		{$match : {'status.event_id' : new mongoose.Types.ObjectId(req.body.event_id), 'login_enabled' : true}},
+		{$unwind : "$status"},
+		{$match : {'status.event_id' : new mongoose.Types.ObjectId(req.body.event_id)}},
+		{$project : {fName : 1, lName : 1, displayName : 1, email : 1, organization : 1, attending : "$status.attending"}}
+	], function(err, result) {
+		if(err) {
+			return res.status(400).send(err);
+		}
+
+		if(!result) {
+			return res.status(400).send({message : "No users found for this event."});
+		}
+
+		return res.status(200).send(result);
+	});
+};
+
+/**
 * This method will return all recruiters for the specified event.
 *
 * @param event_id - The _id field for the event for which recruiters should be returned.

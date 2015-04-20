@@ -64,6 +64,7 @@ module.exports = function(app) {
 
 	//Setting admin routes
 	app.route('/event/recruiters').get(users.getRecruiters);
+	app.route('/event/users').post(users.getUsers);
 
 	//Returning Leaderboard data
 	app.route('/leaderboard/maintable').post(users.getLeaderboard);
