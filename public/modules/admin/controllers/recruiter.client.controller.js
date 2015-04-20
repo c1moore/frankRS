@@ -32,7 +32,7 @@ angular.module('admin').controller('recruitersController', ['$scope', 'ngTablePa
 						}
 					}
 
-					if(j = res[i].rank.length) {
+					if(j === res[i].rank.length) {
 						res[i].rank = "0";
 					}
 				}
