@@ -68,11 +68,13 @@ var validateRole = function(property) {
 
 /*
 * This schema is used for attendeeList, inviteeList, and almostList.  All three of these lists require a user and event ID, which will be used to
-* determined who the recruiter invited to the specified event and whether they are attending or not.
+* determined who the recruiter invited to the specified event and whether they are attending or not.  Furthermore, the read field will keep track
+* of whether the invitee has read the invitation the recruiter has sent.
 */
 var ListSchema = new Schema({
-	user_id: {type: mongoose.Schema.Types.ObjectId, ref:'User'},
-	event_id: {type: mongoose.Schema.Types.ObjectId, ref:'Event'}
+	user_id: 	{type: mongoose.Schema.Types.ObjectId, ref:'User'},
+	event_id: 	{type: mongoose.Schema.Types.ObjectId, ref:'Event'},
+	read: 		{type: Boolean, default: false}
 }, {_id:false});
 
 //mongoose.model('List', ListSchema);
