@@ -252,8 +252,8 @@ describe('Event Model Unit Tests',function() {
 							return done(err);
 
 						done();
-					})
-				})
+					});
+				});
 			});
 		});
 	});

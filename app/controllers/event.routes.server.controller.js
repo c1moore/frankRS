@@ -8,17 +8,26 @@ var errorHandler = require('./errors'),
 	mongoose = require('mongoose'),
 	User = mongoose.model('User'),
 	Event = mongoose.model('Event'),
-	Candidate = mongoose.model('Candidate');
+	Candidate = mongoose.model('Candidate'),
+	Comment = mongoose.model('Comment');
 
 var canViewEvent = function(user,event_id,hasAuthorization) {
 	try {
+		if (hasAuthorization(user,['admin'])) {
+			return true;
+		}
+
 		var statusArray = user.status;
 		for (var i = 0; i<statusArray.length;i++) {
 			if(statusArray[i].event_id.toString()==event_id.toString()) {
-				return true;
+				if(statusArray[i].active) {
+					return true;
+				} else {
+					return false;
+				}
 			}
 		}
-		if (hasAuthorization(user,['admin'])) return true;
+
 		return false;
 	} catch (err) {
 		console.log(err);
@@ -33,23 +42,35 @@ exports.getMyEvents = function(req, res) {
 			res.status(401).json({message: "User is not logged in."});
 			return;
 		}
+
 		var id = req.user._id;
 		var query = User.findOne({_id: id});
-		var user;
+
 		//Retrieve user events on behalf of the authenticated user
 		query.exec(function(err,result) {
-			user = result;
-			if (err) {res.status(400).send(err);return;}
-			else if (!user) {res.status(400).json({message: "No user found!"});return;}
+			if (err) {
+				res.status(400).send(err);
+				return;
+			} else if (!result) {
+				res.status(400).json({message: "No user found!"});
+				return;
+			}
+
 			var myEvents = [];
-			var statusArray = user.status;
-			for (var i = 0; i<statusArray.length;i++)
-				myEvents.push(statusArray[i].event_id);
+			var statusArray = result.status;
+			for(var i = 0; i < statusArray.length; i++) {
+				if(statusArray[i].active) {
+					myEvents.push(statusArray[i].event_id);
+				} else if(req.hasAuthorization(req.user, ["admin"])) {
+					//Admins have access to all events
+					myEvents.push(status[i].event_id);
+				}
+			}
 			res.status(200).json({events: myEvents});
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 
@@ -71,7 +92,7 @@ exports.getAllEvents = function(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 
@@ -97,7 +118,7 @@ exports.getStartDate = function(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 
@@ -122,7 +143,7 @@ exports.getEndDate = function(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 
@@ -147,7 +168,7 @@ exports.getLocation = function(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 
@@ -172,7 +193,7 @@ exports.getEventObj = function(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 
@@ -197,7 +218,7 @@ exports.getSchedule = function(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 
@@ -222,7 +243,7 @@ exports.getName = function(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 
@@ -250,7 +271,7 @@ exports.getCapacity = function(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 
@@ -278,7 +299,7 @@ exports.getAttending = function(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 
@@ -306,7 +327,7 @@ exports.getInvited = function(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 
@@ -334,7 +355,7 @@ exports.getStats = function(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 
@@ -372,7 +393,7 @@ exports.setStartDate = function(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 
@@ -408,7 +429,7 @@ exports.setEndDate = function(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 
@@ -444,7 +465,7 @@ exports.setLocation = function(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 
@@ -499,7 +520,7 @@ exports.setEventObj = function(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 
@@ -535,7 +556,7 @@ exports.setSchedule = function(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 
@@ -570,7 +591,7 @@ exports.setName = function(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 
@@ -610,7 +631,48 @@ exports.setCapacity = function(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
+	}
+};
+
+/**
+* Makes an event inactive and revokes all recruiter permissions for the event.  If there are
+* users attending only this event, their login_enabled field will be set to false.
+*
+* @param event_id _id of event which should be made inactive
+*/
+exports.makeInactive = function(req, res) {
+	try {
+		if(!req.isAuthenticated()) {
+			return res.status(401).send({message : "User is not logged in."});
+		}
+		if(!req.hasAuthorization(req.user, ["admin"])) {
+			return res.status(401).send({message : "User does not have permission."});
+		}
+		if(!req.body.event_id) {
+			return res.status(400).send({message : "Required fields not specified."});
+		}
+
+		var eid = new mongoose.Types.ObjectId(req.body.event_id);
+		Event.findOneAndUpdate({_id : eid}, {active : false}, function(err, event) {
+			if(err) {
+				return res.status(400).send(err);
+			}
+			if(!event) {
+				return res.status(400).send({message : "Event not found."});
+			}
+
+			User.update({"status.event_id" : eid}, {$set : {"status.$.active" : false}}, {multi : true}, function(err, mres) {
+				if(err) {
+					return res.status(400).send(err);
+				}
+
+				return res.status(200).send();
+			});
+		});
+	} catch(err) {
+		console.log(err);
+		res.status(500).send();
 	}
 };
 
@@ -626,19 +688,45 @@ exports.delete = function(req, res) {
 		}
 		var event_id = mongoose.Types.ObjectId(req.body.event_id);
 		var query = Event.findOne({_id: event_id});
-		var theResult;
 		query.exec(function(err,result) {
-			theResult = result;
-			if (err) res.status(400).send(err);
-			else if (!theResult) res.status(400).json({message: "Event not found."});
-			else {
-				result.remove();
-				res.status(200).send();
+			if (err) {
+				res.status(400).send(err);
+			} else if (!result) {
+				res.status(400).json({message: "Event not found."});
+			} else {
+				result.remove(function(err) {
+					User.update({'status.event_id' : event_id}, {$pull : {status : {event_id : event_id}}}, {multi : true}, function(err) {
+						if(err) {
+							return res.status(400).send(err);
+						}
+
+						//If the user can no longer access any events, set login_enabled to false.S
+						User.update({"status.0" : {$exists : false}}, {$set : {login_enabled : false}}, {multi : true}, function(err) {
+							if(err) {
+								return res.status(400).send(err);
+							}
+
+							Candidate.update({events : event_id}, {$pull : {events : event_id}}, {multi : true}, function(err) {
+								if(err) {
+									return res.status(400).send(err);
+								}
+
+								Comment.remove({event_id : event_id}, function(err) {
+									if(err) {
+										return res.status(400).send(err);
+									}
+
+									return res.status(200).send();
+								});
+							});
+						});
+					});
+				});
 			}
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 
@@ -670,7 +758,7 @@ exports.create = function(req, res) {
 		});
 	} catch (err) {
 		console.log(err);
-		res.status(500);
+		res.status(500).send();
 	}
 };
 

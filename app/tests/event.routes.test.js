@@ -1744,24 +1744,155 @@ describe('Event Route Integration Tests:', function() {
  				if(err)
  					return done(err);
 
-		 		agentAdmin
-					.post('http://localhost:3001/events/delete')
+ 				var tempUser = new User({
+		 			fName: 'Full',
+		 			lName: 'Name',
+		 			roles: ['admin', 'recruiter'],
+		 			displayName: 'Full Name',
+		 			email: 'temp@test.com',
+		 			password: 'password',
+		 			status: [{event_id: event1._id, attending:false, recruiter:false}, {event_id : event2._id, attending : true, recruiter : true}],
+		 			salt: 'abc123',
+		 			rank: [],
+		 			provider: 'local',
+		 			login_enabled: true
+ 				});
+
+ 				tempUser.save(function(err) {
+ 					if(err) {
+ 						return done(err);
+ 					}
+
+			 		agentAdmin
+						.post('http://localhost:3001/events/delete')
+						.send({event_id: event1._id.toString()})
+						.end(function(err,res) {
+							should.not.exist(err);
+							res.status.should.be.equal(200);
+
+							agentAdmin
+								.get('http://localhost:3001/events/getName')
+								.query({event_id: event1._id.toString()})
+								.end(function(err,res) {
+									should.not.exist(err);
+									
+									res.status.should.equal(400);
+									res.body.message.should.equal("No name!");
+
+									User.find({}, function(err, users) {
+										if(err) {
+											return done(err);
+										}
+
+										users.length.should.equal(3);
+
+										var canLogin = 0;
+										for(var i = 0; i < users.length; i++) {
+											if(!users[i].status || !users[i].status.length) {
+												users[i].login_enabled.should.be.false;
+											} else {
+												users[i].login_enabled.should.be.true;
+												(++canLogin).should.equal(1);
+											}
+										}
+
+										canLogin.should.equal(1);
+
+										done();
+									});
+								});
+						});
+ 				});
+			});
+	});
+
+	it("should not be able to inactivate an event as a normal user", function(done) {
+		agent
+ 			.post('http://localhost:3001/auth/signin')
+ 			.send({email: user.email, password: 'password'})
+ 			.end(function (err, res) {
+ 				if(err)
+ 					return done(err);
+
+		 		agent
+					.post('http://localhost:3001/events/inactivate')
 					.send({event_id: event1._id.toString()})
 					.end(function(err,res) {
 						should.not.exist(err);
-						res.status.should.be.equal(200);
+						res.status.should.be.equal(401);
+						res.body.message.should.equal("User does not have permission.");
 
-						agentAdmin
-							.get('http://localhost:3001/events/getName')
-							.query({event_id: event1._id.toString()})
-							.end(function(err,res) {
-								should.not.exist(err);
-								res.status.should.equal(400);
-								res.body.message.should.equal("No name!");
-								done();
-							});
+						Evnt.findOne({_id : event1._id}, function(err, event) {
+							if(err) {
+								return done(err);
+							}
+
+							event.active.should.be.true;
+
+							done();
+						});
 					});
 			});
+	});
+
+	it("should be able to make an event inactive as an admin", function(done) {
+		agentAdmin
+			.post('http://localhost:3001/auth/signin')
+			.send({email: userAdmin.email, password: 'password'})
+ 			.end(function (err, res) {
+ 				if(err)
+ 					return done(err);
+
+ 				var tempUser = new User({
+		 			fName: 'Full',
+		 			lName: 'Name',
+		 			roles: ['admin', 'recruiter'],
+		 			displayName: 'Full Name',
+		 			email: 'temp@test.com',
+		 			password: 'password',
+		 			status: [{event_id: event1._id, attending:false, recruiter:false}, {event_id : event2._id, attending : true, recruiter : true}],
+		 			salt: 'abc123',
+		 			rank: [],
+		 			provider: 'local',
+		 			login_enabled: true
+ 				});
+
+ 				tempUser.save(function(err) {
+ 					if(err) {
+ 						return done(err);
+ 					}
+
+			 		agentAdmin
+						.post('http://localhost:3001/events/inactivate')
+						.send({event_id : event1._id})
+						.end(function(err, res) {
+							if(err) {
+								return done(err);
+							}
+
+							res.status.should.equal(200);
+
+							Evnt.findOne({_id : event1._id}, function(err, event) {
+								event.active.should.be.false;
+
+								User.find({"status.event_id" : event1._id}, function(err, users) {
+									users.length.should.equal(3);
+
+									for(var i = 0; i < users.length; i++) {
+										for(var j = 0; j < users[i].status.length; j++) {
+											if(users[i].status[j].event_id.toString() === event1._id.toString()) {
+												users[i].status[j].active.should.be.false;
+												break;
+											}
+										}
+									}
+
+									done();
+								});
+							});
+						});
+ 				});
+ 			});
 	});
 
 	it("should be able to create an event using the event creation route as admin",function(done) {

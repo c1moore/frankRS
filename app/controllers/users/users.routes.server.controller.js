@@ -9,18 +9,19 @@ var errorHandler = require('../errors'),
 	nodemailer = require('nodemailer'),
 	User = mongoose.model('User'),
 	Event = mongoose.model('Event'),
+	Candidate = mongoose.model('Candidate'),
+	Comment = mongoose.model('Comment'),
 	config = require('../../../config/config'),
 	crypto = require('crypto'),
 	async = require('async'),
 	path = require('path');
 
-/*
+/**
 * Helper function to search through one of the lists (invitee, attendee, almost) and return only those users who are attending the
 * specified event.
 *
 * ONLY WORKS IF event_id HAS NOT BEEN POPULATED.
 */
-
 var searchByEvent = function(eventID, arr) {
 	var temp = [], j=0;
 	for(var i=0; i<arr.length; i++) {
@@ -33,7 +34,7 @@ var searchByEvent = function(eventID, arr) {
 	return temp;
 };
 
-/*
+/**
 * Create a temporary password.  This password will not be seen by the invitee, but is just a placeholder for the required password field.
 */
 var tempPass = function() {
@@ -75,7 +76,7 @@ var newAttendeePass = function(credentialsArr) {
 	return password.join('');
 };
 
-/*
+/**
 * Update the rank of all recruiters for the specified event.
 */
 var updateRanks = function(event_id) {
@@ -111,7 +112,8 @@ var updateRanks = function(event_id) {
 
 
 /**
-* Remove a user from the database completely without remorse.
+* Remove a user from the database completely without remorse and wipe out any proof of their
+* existence.
 *
 * @param user_id `_id` for the user that should be removed
 */
@@ -126,12 +128,167 @@ exports.deleteUser = function(req, res) {
 		return res.status(400).send({message : "Required fields not specified."});
 	}
 
-	User.remove({_id : new mongoose.Types.ObjectId(req.body.user_id)}, function(err) {
+	var uid = new mongoose.Types.ObjectId(req.body.user_id);
+	User.remove({_id : uid}, function(err) {
 		if(err) {
 			return res.status(400).send(err);
 		}
 
-		return res.status(200).send();
+		Candidate.remove({user_id : uid}, function(err) {
+			if(err) {
+				return res.status(400).send(err);
+			}
+
+			Comment.remove({user_id : uid}, function(err) {
+				if(err) {
+					return res.status(400).send(err);
+				}
+
+				return res.status(200).send();
+			});
+		});
+	});
+};
+
+/**
+* Revoke a user's permissions for an event completely.  If each user had a separate account
+* for each event, this would be equivalent to setting the login_enabled field for that
+* event to false.
+*
+* @param user_id _id field of the user from which permissions should be revoked
+* @param event_id _id field of the event from which to revoke permissions for the user
+*/
+exports.removePermissions = function(req, res) {
+	if(!req.isAuthenticated()) {
+		return res.status(401).send({message : "User is not logged in."});
+	}
+	if(!req.hasAuthorization(req.user, ["admin"])) {
+		return res.status(401).send({message : "User does not have permission."});
+	}
+	if(!req.body.user_id || !req.body.event_id) {
+		return res.status(400).send({message : "Required fields not specified."});
+	}
+
+	var uid = new mongoose.Types.ObjectId(req.body.user_id);
+	User.findOne({_id : uid}, function(err, user) {
+		if(err) {
+			return res.status(400).send(err);
+		}
+		if(!user) {
+			return res.status(400).send({message : "User not found."});
+		}
+
+		var i;
+		var recruiter = false;
+		var active = false;
+		var updated = false;
+		for(i = 0; i < user.status.length; i++) {
+			if(user.status[i].event_id.toString() === req.body.event_id.toString()) {
+				user.status[i].active = false;
+				user.status[i].recruiter = false;
+
+				updated = true;
+
+				if(recruiter && active) {
+					//Do not break prematurely.
+					break;
+				}
+			} else {
+				//Keep track of whether the user is a recruiter for another event.
+				if(user.status[i].recruiter) {
+					recruiter = true;
+				}
+
+				//Keep track of whether the user can access another event.
+				if(user.status[i].active) {
+					active = true;
+				}
+
+				if(recruiter && active && updated) {
+					//Do not break prematurely.
+					break;
+				}
+			}
+		}
+
+		//If the event was found, we need to save the updated user.
+		if(i <= user.status.length) {
+			//If the user is no longer a recruiter, take that role away.
+			if(_.intersection(user.roles, ["recruiter"]) && !recruiter) {
+				for(var j = 0; j < user.roles.length; j++) {
+					if(user.roles[j] === "recruiter") {
+						user.roles.splice(j, 1);
+					}
+				}
+			}
+
+			//If the user cannot access any events, don't let them login anymore.
+			if(!active) {
+				user.login_enabled = false;
+			}
+
+			user.save(function(err) {
+				if(err) {
+					return res.status(400).send(err);
+				}
+
+				return res.status(200).send();
+			});
+		} else {
+			return res.status(400).send({message : "User not associated with this event."});
+		}
+	});
+};
+
+/**
+* Revoke a user's permissions for all events and set login_enabled to false for the user.
+*
+* @param user_id _id field of the user from which permissions should be revoked
+* @param event_id _id field of the event from which to revoke permissions for the user
+*/
+exports.removeAllPermissions = function(req, res) {
+	if(!req.isAuthenticated()) {
+		return res.status(401).send({message : "User is not logged in."});
+	}
+	if(!req.hasAuthorization(req.user, ["admin"])) {
+		return res.status(401).send({message : "User does not have permission."});
+	}
+	if(!req.body.user_id || !req.body.event_id) {
+		return res.status(400).send({message : "Required fields not specified."});
+	}
+
+	var uid = new mongoose.Types.ObjectId(req.body.user_id);
+	User.findOne({_id : uid}, function(err, user) {
+		if(err) {
+			return res.status(400).send(err);
+		}
+		if(!user) {
+			return res.status(400).send({message : "User not found."});
+		}
+
+		for(i = 0; i < user.status.length; i++) {
+			user.status[i].active = false;
+			user.status[i].recruiter = false;
+		}
+
+		//If the user was a recruiter, take that role away.
+		if(req.hasAuthorization(req.user, ["recruiter"])) {
+			for(var j = 0; j < user.roles.length; j++) {
+				if(user.roles[j] === "recruiter") {
+					user.roles = user.roles.splice(j, 1);
+				}
+			}
+		}
+
+		user.login_enabled = false;
+
+		user.save(function(err) {
+			if(err) {
+				return res.status(400).send(err);
+			}
+
+			return res.status(200).send();
+		});
 	});
 };
 
@@ -232,7 +389,7 @@ exports.removeRecruiterRole = function(req, res) {
 	});
 };
 
-/*
+/**
 * Return the user's displayname (Last, First).
 */
 exports.getDisplayName = function(req, res) {
@@ -253,7 +410,7 @@ exports.getDisplayName = function(req, res) {
 	}
 };
 
-/*
+/**
 * Get the data that will be displayed for in the leaderboard.  This data includes all of the recruiter names, their rank,
 * and the inviteeList and attendeeList, properly populated with the displayName of each user in one of these lists.
 */
@@ -303,7 +460,7 @@ exports.getLeaderboard = function(req, res) {
 	}
 };
 
-/*
+/**
 * Get a list of events for which this user is a recruiter.  The method first queries the database for the currently logged in recruiter,
 * then, if found, goes through the array of all events with which this recruiter is associated and returns only those events for which the
 * user is a recruiter.
@@ -324,7 +481,7 @@ exports.getRecruiterEvents = function(req, res) {
 			} else {
 				var events = [], j=0;
 				for(var i=0; i<result.status.length; i++) {
-					if(result.status[i].recruiter) {
+					if(result.status[i].recruiter && result.status[i].active) {
 						events[j] = result.status[i];
 						j++;
 					}
@@ -358,18 +515,36 @@ exports.getUserEvents = function(req, res) {
 				}
 			});
 		} else {
-			var id = req.user._id;
-			var query = User.findOne({'_id' : id});
-			query.select('status');
-			query.populate('status.event_id');
-			query.exec(function(err, result) {
+			var id = new mongoose.Types.ObjectId(req.user._id);
+
+			User.aggregate([
+				{$match : {_id : id}},
+				{$project : {_id : 0, status : 1}},
+				{$unwind : "$status"},
+				{$match : {"status.active" : true}}
+			], function(err, results) {
 				if(err) {
-					return res.status(400).send({message : err});
-				} else if(!result) {
-					return res.status(400).json({message : 'User not found or is not associated with any events!'});
-				} else {
-					return res.status(200).send(result);
+					return res.status(400).send(err);
 				}
+				if(!results || !results.length) {
+					return res.status(400).send({message : 'User not found or is not associated with any events!'});
+				}
+				User.populate(results, {
+					path : "status.event_id",
+					model : "Event",
+				}, function(err, populatedResults) {
+					if(err) {
+						return res.status(400).send(err);
+					}
+
+					//Transform the results in a form previously expected by the frontend (i.e. an object with a status field that is an array of event objects).
+					var rval = {status : []};
+					for(var i = 0; i < populatedResults.length; i++) {
+						rval.status.push(populatedResults[i].status);
+					}
+
+					return res.status(200).send(rval);
+				});
 			});
 		}
 	} else {
@@ -787,6 +962,27 @@ exports.sendInvitation = function(req, res) {
 			} else if(!recruiter) {
 				return res.status(400).send({'message' : 'Recruiter not found.'});
 			} else {
+				/**
+				* First, determine if the user is in fact a recruiter for this event and that the
+				* user has access to this event (i.e. active in the status array is not false).
+				*/
+				var tempi = 0;
+				for(; tempi < recruiter.status.length; tempi++) {
+					if(recruiter.status[tempi].event_id.toString() === req.body.event_id.toString()) {
+						if(!recruiter.status[tempi].recruiter || !recruiter.status[tempi].active) {
+							//This user should not be recruiting for this event.
+							return res.status(401).send({message : 'User does not have permission to send invitations for this event.'});
+						}
+
+						break;
+					}
+				}
+
+				if(tempi === recruiter.status.length) {
+					//This user is not even associated with this event.
+					return res.status(401).send({message : 'User does not have permission to send invitations for this event.'});
+				}
+
 				/**
 				* We need to determine if the user is already attending the event.  If not,
 				* we need to either add them to the database or update their status array
@@ -1271,7 +1467,6 @@ exports.acceptInvitation = function(req, res) {
 											if(err) {
 												return res.status(400).send({message : err});
 											} else {
-												console.log("Getting here.");
 												Event.findByIdAndUpdate(evnt._id, {$inc : {attending : 1, invited : -1}}, function(err) {
 													if(err) {
 														return res.status(400).send({message : "Error updating attending and invited.", error : err});

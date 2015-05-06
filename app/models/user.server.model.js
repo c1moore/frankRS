@@ -89,7 +89,8 @@ var ListSchema = new Schema({
 var StatusSchema = new Schema({
 	event_id: {type: mongoose.Schema.Types.ObjectId, ref:'Event'},
 	attending: {type: Boolean},
-	recruiter: {type:Boolean}
+	recruiter: {type: Boolean},
+	active: {type: Boolean, default: true, required: true}
 }, {_id:false, validate : [validateOptional, 'All fields of status required.']});
 
 /*

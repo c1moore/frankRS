@@ -28,4 +28,5 @@ module.exports = function(app) {
 	app.route('/events/attending').get(james_event_routes.getAttending);
 	app.route('/events/invited').get(james_event_routes.getInvited);
 	app.route('/events/stats').get(james_event_routes.getStats);
+	app.route('/events/inactivate').post(james_event_routes.makeInactive);
 };

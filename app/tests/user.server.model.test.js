@@ -236,7 +236,10 @@ describe('User Model Unit Tests:', function() {
 
 				var query = User.findOne({'login_enabled':user.login_enabled});
 				query.exec(function(err,result) {
-					return done(err);
+					if(err) {
+						return done(err);
+					}
+					
 					(result.login_enabled===undefined).should.be.false;
 					(result.login_enabled).should.be.equal(user.login_enabled);
 					done();

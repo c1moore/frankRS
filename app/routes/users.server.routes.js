@@ -23,6 +23,7 @@ module.exports = function(app) {
 	// Setting up user removal routes
 	app.route('/remove').post(users.deleteUser);
 	app.route('/remove/Recruiter').post(users.removeRecruiterRole);
+	app.route('/user/inactivate').post(users.removePermissions);
 
 	// Setting up the users password api
 	app.route('/users/password').post(users.changePassword);

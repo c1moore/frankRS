@@ -901,6 +901,278 @@ describe('Express.js User Route Unit Tests:', function() {
 				});
 		});
 
+		it("should allow an admin to make an account inactive for a particular event", function(done) {
+			var tempAdmin = agent.agent();
+			tempAdmin
+				.post('http://localhost:3001/auth/signin')
+				.send({email : user5.email, password : 'password'})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(200);
+					tempAdmin.saveCookies(res);
+
+					tempAdmin
+						.post('http://localhost:3001/user/inactivate')
+						.send({user_id : user._id, event_id : event1._id})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(200);
+
+							User.findOne({_id : user._id}, function(err, ruser) {
+								should.not.exist(err);
+								should.exist(ruser);
+
+								for(var i = 0; i < ruser.status.length; i++) {
+									if(ruser.status[i].event_id.toString() === event1._id.toString()) {
+										if(ruser.status[i].active) {
+											return done(new Error("Event not made inactive."));
+										}
+
+										if(!ruser.login_enabled) {
+											return done(new Error("User login_enabled set to false incorrectly."));
+										}
+
+										break;
+									}
+								}
+
+								done();
+							});
+						});
+				});
+		});
+
+		it("should not return events that are inactive for the user when requesting user events", function(done) {
+			var tempAdmin = agent.agent();
+			tempAdmin
+				.post('http://localhost:3001/auth/signin')
+				.send({email : user5.email, password : 'password'})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(200);
+					tempAdmin.saveCookies(res);
+
+					tempAdmin
+						.post('http://localhost:3001/user/inactivate')
+						.send({user_id : user._id, event_id : event1._id})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(200);
+
+							User.findOne({_id : user._id}, function(err, ruser) {
+								should.not.exist(err);
+								should.exist(ruser);
+
+								for(var i = 0; i < ruser.status.length; i++) {
+									if(ruser.status[i].event_id.toString() === event1._id.toString()) {
+										if(ruser.status[i].active) {
+											return done(new Error("Event not made inactive."));
+										}
+
+										if(!ruser.login_enabled) {
+											return done(new Error("User login_enabled set to false incorrectly."));
+										}
+
+										break;
+									}
+								}
+
+								useragent
+									.get('http://localhost:3001/users/events')
+									.end(function(err, res) {
+										should.not.exist(err);
+										res.status.should.equal(200);
+
+										res.body.status.length.should.equal(user.status.length - 1);
+
+										for(var i = 0; i < res.body.status.length; i++) {
+											if(res.body.status[i].event_id === event1._id.toString()) {
+												return done(new Error("Inactive event returned."));
+												break;
+											}
+										}
+
+										done();
+									});
+							});
+						});
+				});
+		});
+
+		it("should revoke a recruiter's role for the specified event when setting the event as inactive for the user", function(done) {
+			var tempAdmin = agent.agent();
+			tempAdmin
+				.post('http://localhost:3001/auth/signin')
+				.send({email : user5.email, password : 'password'})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(200);
+					tempAdmin.saveCookies(res);
+
+					tempAdmin
+						.post('http://localhost:3001/user/inactivate')
+						.send({user_id : user._id, event_id : event1._id})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(200);
+
+							User.findOne({_id : user._id}, function(err, ruser) {
+								should.not.exist(err);
+								should.exist(ruser);
+
+								for(var i = 0; i < ruser.status.length; i++) {
+									if(ruser.status[i].event_id.toString() === event1._id.toString()) {
+										if(ruser.status[i].active) {
+											return done(new Error("Event not made inactive."));
+										}
+
+										if(ruser.status[i].recruiter) {
+											return done(new Error("Recruiter permissions not revoked."));
+										}
+
+										break;
+									}
+								}
+
+								if(!ruser.login_enabled) {
+									return done(new Error("User login_enabled set to false incorrectly."));
+								}
+
+								done();
+							});
+						});
+				});
+		});
+
+		it("should revoke a recruiter's role completely when the making an event inactive for the recruiter and the user is no longer recruiting for any events", function(done) {
+			var tempAdmin = agent.agent();
+			tempAdmin
+				.post('http://localhost:3001/auth/signin')
+				.send({email : user5.email, password : 'password'})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(200);
+					tempAdmin.saveCookies(res);
+
+					tempAdmin
+						.post('http://localhost:3001/user/inactivate')
+						.send({user_id : user4._id, event_id : event1._id})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(200);
+
+							User.findOne({_id : user4._id}, function(err, ruser) {
+								should.not.exist(err);
+								should.exist(ruser);
+
+								for(var i = 0; i < ruser.status.length; i++) {
+									if(ruser.status[i].event_id.toString() === event1._id.toString()) {
+										if(ruser.status[i].active) {
+											return done(new Error("Event not made inactive."));
+										}
+
+										break;
+									}
+								}
+
+								console.log(ruser.roles);
+
+								if(_.intersection(["recruiter"], ruser.roles).length) {
+									return done(new Error("Recruiter permissions not revoked."));
+								}
+
+								if(ruser.login_enabled) {
+									return done(new Error("User login_enabled not set to false as expected."));
+								}
+
+								done();
+							});
+						});
+				});
+		});
+
+		it("should not allow a recruiter to make an event inactive for another user", function(done) {
+			useragent
+				.post('http://localhost:3001/user/inactivate')
+				.send({user_id : user4._id, event_id : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal("User does not have permission.");
+
+					User.findOne({_id : user4._id}, function(err, ruser) {
+						should.not.exist(err);
+
+						for(var i = 0; i < ruser.status.length; i++) {
+							if(ruser.status[i].event_id.toString() === event1._id.toString() && !ruser.status[i].active) {
+								return done(new Error("User account made inactive."));
+							}
+						}
+
+						done();
+					});
+				});
+		});
+
+		it("should not allow an attendee to make an event inactive for another user", function(done) {
+			useragent2
+				.post('http://localhost:3001/user/inactivate')
+				.send({user_id : user4._id, event_id : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal("User does not have permission.");
+
+					User.findOne({_id : user4._id}, function(err, ruser) {
+						should.not.exist(err);
+
+						for(var i = 0; i < ruser.status.length; i++) {
+							if(ruser.status[i].event_id.toString() === event1._id.toString() && !ruser.status[i].active) {
+								return done(new Error("User account made inactive."));
+							}
+						}
+
+						done();
+					});
+				});
+		});
+
+		it("should not allow a user that is not logged in to make an event inactive for another user", function(done) {
+			var tempAgent = agent.agent();
+			tempAgent
+				.post('http://localhost:3001/user/inactivate')
+				.send({user_id : user4._id, event_id : event1._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal("User is not logged in.");
+
+					User.findOne({_id : user4._id}, function(err, ruser) {
+						should.not.exist(err);
+
+						for(var i = 0; i < ruser.status.length; i++) {
+							if(ruser.status[i].event_id.toString() === event1._id.toString() && !ruser.status[i].active) {
+								return done(new Error("User account made inactive."));
+							}
+						}
+
+						done();
+					});
+				});
+		});
+
 		it('should allow an admin to obtain all users for a particular event.', function(done) {
 			var tempAdmin = agent.agent();
 			tempAdmin
@@ -1608,6 +1880,117 @@ describe('Express.js User Route Unit Tests:', function() {
 						});
 					});
 			});
+		});
+
+		it('should not send an invitation if the user is a recruiter, but not a recruiter for this event.', function(done) {
+			useragent
+				.post('http://localhost:3001/invitation/send')
+				.send({lName : 'Moore', fName : 'Calvin', email : 'donotsend_cen3031.0.boom0625@spamgourmet.com', event_id : event4._id, event_name : event4.name})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal("User does not have permission to send invitations for this event.");
+
+					User.findOne({email : 'donotsend_cen3031.0.boom0625@spamgourmet.com'}, function(err, ruser) {
+						should.not.exist(err);
+						should.not.exist(ruser);
+
+						Evnt.findOne({_id : event4._id}, function(err, revent) {
+							should.not.exist(err);
+							revent.invited.should.equal(event4.invited);
+
+							done();
+						});
+					});
+				});
+		});
+
+		it('should not send an invitation for an event that has been made inactive for this event even if the user is still a recruiter.', function(done) {
+			var tempAdmin = agent.agent();
+			tempAdmin
+				.post('http://localhost:3001/auth/signin')
+				.send({email : user5.email, password : 'password'})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(200);
+					tempAdmin.saveCookies(res);
+
+					tempAdmin
+						.post('http://localhost:3001/user/inactivate')
+						.send({user_id : user._id, event_id : event1._id})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(200);
+							
+							useragent
+								.post('http://localhost:3001/invitation/send')
+								.send({lName : 'Moore', fName : 'Calvin', email : 'donotsend_cen3031.0.boom0625@spamgourmet.com', event_id : event4._id, event_name : event4.name})
+								.end(function(err, res) {
+									should.not.exist(err);
+									res.status.should.equal(401);
+									res.body.message.should.equal("User does not have permission to send invitations for this event.");
+
+									User.findOne({email : 'donotsend_cen3031.0.boom0625@spamgourmet.com'}, function(err, ruser) {
+										should.not.exist(err);
+										should.not.exist(ruser);
+
+										Evnt.findOne({_id : event4._id}, function(err, revent) {
+											should.not.exist(err);
+											revent.invited.should.equal(event4.invited);
+
+											done();
+										});
+									});
+								});
+						});
+				});
+		});
+
+		it('should not send an invitation for an event that has been made inactive even if the user is a recruiter.', function(done) {
+			var tempAdmin = agent.agent();
+			tempAdmin
+				.post('http://localhost:3001/auth/signin')
+				.send({email : user5.email, password : 'password'})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(200);
+					tempAdmin.saveCookies(res);
+
+					tempAdmin
+						.post('http://localhost:3001/events/inactivate')
+						.send({event_id : event1._id})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(200);
+							
+							useragent
+								.post('http://localhost:3001/invitation/send')
+								.send({lName : 'Moore', fName : 'Calvin', email : 'donotsend_cen3031.0.boom0625@spamgourmet.com', event_id : event4._id, event_name : event4.name})
+								.end(function(err, res) {
+									should.not.exist(err);
+									res.status.should.equal(401);
+									res.body.message.should.equal("User does not have permission to send invitations for this event.");
+
+									User.findOne({email : 'donotsend_cen3031.0.boom0625@spamgourmet.com'}, function(err, ruser) {
+										should.not.exist(err);
+										should.not.exist(ruser);
+
+										Evnt.findOne({_id : event4._id}, function(err, revent) {
+											should.not.exist(err);
+											revent.invited.should.equal(event4.invited);
+
+											done();
+										});
+									});
+								});
+						});
+				});
 		});
 
 		it('should not send an invitation when the user does not have the proper permissions.', function(done) {

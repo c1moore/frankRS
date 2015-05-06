@@ -63,6 +63,11 @@ var EventSchema = new Schema({
 		min: 0,
 		default: 0,
 		required: true
+	},
+	active: {
+		type: Boolean,
+		default: true,
+		required: true
 	}
 });
 
