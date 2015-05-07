@@ -214,7 +214,7 @@ exports.removePermissions = function(req, res) {
 		//If the event was found, we need to save the updated user.
 		if(i <= user.status.length) {
 			//If the user is no longer a recruiter, take that role away.
-			if(_.intersection(user.roles, ["recruiter"]) && !recruiter) {
+			if(_.intersection(user.roles, ["recruiter"]).length && !recruiter) {
 				for(var j = 0; j < user.roles.length; j++) {
 					if(user.roles[j] === "recruiter") {
 						user.roles.splice(j, 1);
@@ -253,7 +253,7 @@ exports.removeAllPermissions = function(req, res) {
 	if(!req.hasAuthorization(req.user, ["admin"])) {
 		return res.status(401).send({message : "User does not have permission."});
 	}
-	if(!req.body.user_id || !req.body.event_id) {
+	if(!req.body.user_id) {
 		return res.status(400).send({message : "Required fields not specified."});
 	}
 
@@ -266,18 +266,22 @@ exports.removeAllPermissions = function(req, res) {
 			return res.status(400).send({message : "User not found."});
 		}
 
-		for(i = 0; i < user.status.length; i++) {
+		for(var i = 0; i < user.status.length; i++) {
 			user.status[i].active = false;
 			user.status[i].recruiter = false;
 		}
 
 		//If the user was a recruiter, take that role away.
-		if(req.hasAuthorization(req.user, ["recruiter"])) {
+		if(_.intersection(user.roles, ["recruiter"]).length) {
 			for(var j = 0; j < user.roles.length; j++) {
 				if(user.roles[j] === "recruiter") {
-					user.roles = user.roles.splice(j, 1);
+					user.roles.splice(j, 1);
 				}
 			}
+		}
+
+		if(!user.roles.length) {
+			user.roles = ["attendee"];
 		}
 
 		user.login_enabled = false;
@@ -861,8 +865,7 @@ exports.getEmail = function(req, res) {
 };
 
 /**
-* This method will return all users for the specified event that have access to the recruiter
-* system (i.e. login_enabled is set to true).
+* This method will return all users for the specified event.
 *
 * @param event_id - The _id field for the event for which users should be returned.
 */
@@ -883,7 +886,7 @@ exports.getUsers = function(req, res) {
 		{$match : {'status.event_id' : new mongoose.Types.ObjectId(req.body.event_id), 'login_enabled' : true}},
 		{$unwind : "$status"},
 		{$match : {'status.event_id' : new mongoose.Types.ObjectId(req.body.event_id)}},
-		{$project : {fName : 1, lName : 1, displayName : 1, email : 1, organization : 1, attending : "$status.attending"}}
+		{$project : {fName : 1, lName : 1, displayName : 1, email : 1, organization : 1, attending : "$status.attending", active : "$status.active"}}
 	], function(err, result) {
 		if(err) {
 			return res.status(400).send(err);
@@ -1390,6 +1393,16 @@ exports.acceptInvitation = function(req, res) {
 								attendee.status.addToSet({event_id : evnt._id, attending : true, recruiter : false});
 							}
 
+							//If login_enabled is false, reset password and set login_enabled to true.
+							var pass, new_accnt = false;
+							if(!attendee.login_enabled) {
+								pass = newAttendeePass([req.body.invitee_fName, req.body.invitee_lName, req.body.invitee_email, req.body.organization]);
+								new_accnt = true;
+
+								attendee.login_enabled = true;
+								attendee.password = pass;
+							}
+
 							attendee.save(function(err) {
 								if(err) {
 									return res.status(400).send({message : err});
@@ -1413,20 +1426,38 @@ exports.acceptInvitation = function(req, res) {
 									async.parallel([
 										//Send message to attendee.
 										function(callback) {
-											res.render('templates/invitation-accepted-user-email', {
-												name: req.body.invitee_fName,
-												event: req.body.event_name,
-												address : 'http://frank.jou.ufl.edu/recruiters'
-											}, function(err, emailHTML) {
-												attendeeMailOptions.html = emailHTML;
-												smtpTransport.sendMail(attendeeMailOptions, function(err, info) {
-													if(err) {
-														callback(err, false);
-													} else {
-														callback(false, info.response);
-													}
+											if(!new_accnt) {
+												res.render('templates/invitation-accepted-user-email', {
+													name: req.body.invitee_fName,
+													event: req.body.event_name,
+													address : 'http://frank.jou.ufl.edu/recruiters'
+												}, function(err, emailHTML) {
+													attendeeMailOptions.html = emailHTML;
+													smtpTransport.sendMail(attendeeMailOptions, function(err, info) {
+														if(err) {
+															callback(err, false);
+														} else {
+															callback(false, info.response);
+														}
+													});
 												});
-											});
+											} else {
+												res.render('templates/invitation-accepted-attendee-email', {
+													name: req.body.invitee_fName,
+													event: req.body.event_name,
+													password : pass,
+													address : 'http://frank.jou.ufl.edu/recruiters'
+												}, function(err, emailHTML) {
+													attendeeMailOptions.html = emailHTML;
+													smtpTransport.sendMail(attendeeMailOptions, function(err, info) {
+														if(err) {
+															callback(err, false);
+														} else {
+															callback(false, info.response);
+														}
+													});
+												});
+											}
 										},
 										//Get recruiter information and send notification.
 										function(callback) {

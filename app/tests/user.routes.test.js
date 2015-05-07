@@ -1173,7 +1173,7 @@ describe('Express.js User Route Unit Tests:', function() {
 				});
 		});
 
-		it('should allow an admin to obtain all users for a particular event.', function(done) {
+		it('should remove the user\'s recruiter status and make all events inactive.', function(done) {
 			var tempAdmin = agent.agent();
 			tempAdmin
 				.post('http://localhost:3001/auth/signin')
@@ -1187,24 +1187,171 @@ describe('Express.js User Route Unit Tests:', function() {
 					tempAdmin.saveCookies(res);
 
 					tempAdmin
-						.post("http://localhost:3001/event/users")
-						.send({event_id : event1._id})
+						.post('http://localhost:3001/user/inactivate/all')
+						.send({user_id : user._id})
 						.end(function(err, res) {
-							if(err) {
-								return done(err);
-							}
-
+							should.not.exist(err);
+							console.log(res.body);
 							res.status.should.equal(200);
-							res.body.length.should.equal(5);
 
-							for(var i=0; i < res.body.length; i++) {
-								if(res.body[i]._id.toString() !== user._id.toString() && res.body[i]._id.toString() !== user2._id.toString() && res.body[i]._id.toString() !== user3._id.toString() && res.body[i]._id.toString() !== user4._id.toString() && res.body[i]._id.toString() !== user5._id.toString()) {
-									return done(new Error("Correct users not returned."));
+							User.findOne({_id : user._id}, function(err, ruser) {
+								should.not.exist(err);
+								should.exist(ruser);
+
+								for(var i = 0; i < ruser.status.length; i++) {
+									if(ruser.status[i].active || ruser.status[i].recruiter) {
+										return done(new Error("Not all events inactivated or recruiter status not revoked. \n\nactive: " + ruser.status[i].active + "\nrecruiter: " + ruser.status[i].recruiter));
+									}
 								}
+
+								console.log(ruser.roles);
+								if(_.intersection(['recruiter'], ruser.roles).length) {
+									return done(new Error("User recruiter role not removed."));
+								}
+
+								if(ruser.login_enabled) {
+									return done(new Error("User can still log in."));
+								}
+
+								done();
+							});
+						});
+				});
+		});
+
+		it('should not allow a recruiter to make a user\'s account inactive.', function(done) {
+			useragent
+				.post('http://localhost:3001/user/inactivate/all')
+				.send({user_id : user2._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal("User does not have permission.");
+
+					User.findOne({_id : user2._id}, function(err, user) {
+						for(var i = 0; i < user.status.length; i++) {
+							if(!user.status[i].active) {
+								return done(new Error("Event made inactive by recruiter."));
 							}
+						}
+
+						done();
+					});
+				});
+		});
+
+		it('should not allow an attendee to make a user\'s account inactive.', function(done) {
+			useragent2
+				.post('http://localhost:3001/user/inactivate/all')
+				.send({user_id : user2._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal("User does not have permission.");
+
+					User.findOne({_id : user2._id}, function(err, user) {
+						for(var i = 0; i < user.status.length; i++) {
+							if(!user.status[i].active) {
+								return done(new Error("Event made inactive by recruiter."));
+							}
+						}
+
+						done();
+					});
+				});
+		});
+
+		it('should not allow a user that is not logged in to make a user\'s account inactive', function(done) {
+			var tempAgent = agent.agent();
+			tempAgent
+				.post('http://localhost:3001/user/inactivate/all')
+				.send({user_id : user2._id})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
+					res.body.message.should.equal("User is not logged in.");
+
+					User.findOne({_id : user2._id}, function(err, user) {
+						for(var i = 0; i < user.status.length; i++) {
+							if(!user.status[i].active) {
+								return done(new Error("Event made inactive by recruiter."));
+							}
+						}
+
+						done();
+					});
+				});
+		});
+
+		it('should return a proper error when user_id is not specified.', function(done) {
+			var tempAdmin = agent.agent();
+			tempAdmin
+				.post('http://localhost:3001/auth/signin')
+				.send({email : user5.email, password : 'password'})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(200);
+					tempAdmin.saveCookies(res);
+
+					tempAdmin
+						.post('http://localhost:3001/user/inactivate/all')
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(400);
+							res.body.message.should.equal("Required fields not specified.");
 
 							done();
 						});
+				});
+		});
+
+		it('should allow an admin to obtain all users for a particular event.', function(done) {
+			var tempAdmin = agent.agent();
+			tempAdmin
+				.post('http://localhost:3001/auth/signin')
+				.send({email : user5.email, password : 'password'})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(200);
+					tempAdmin.saveCookies(res);
+
+					//Set active to false in user's status array for this event to confirm all users are returned.
+					for(var i = 0; i < user.status.length; i++) {
+						if(user.status[i].event_id.toString() === event1._id.toString()) {
+							user.status[i].active = false;
+							break;
+						}
+					}
+
+					user.save(function(err) {
+						should.not.exist(err);
+
+						tempAdmin
+							.post("http://localhost:3001/event/users")
+							.send({event_id : event1._id})
+							.end(function(err, res) {
+								if(err) {
+									return done(err);
+								}
+
+								res.status.should.equal(200);
+								res.body.length.should.equal(5);
+
+								for(var i=0; i < res.body.length; i++) {
+									if(res.body[i]._id.toString() !== user._id.toString() && res.body[i]._id.toString() !== user2._id.toString() && res.body[i]._id.toString() !== user3._id.toString() && res.body[i]._id.toString() !== user4._id.toString() && res.body[i]._id.toString() !== user5._id.toString()) {
+										return done(new Error("Correct users not returned."));
+									}
+								}
+
+								done();
+							});
+					});
 				});
 		});
 
