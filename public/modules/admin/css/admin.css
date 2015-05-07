@@ -43,6 +43,11 @@
 	border-radius: 5px;
 	background-color: white;
 }
+
+.inactive-attendee {
+	color: gray;
+}
+
 .tab-content {
 	margin-top: 5px;
 }

@@ -61,6 +61,26 @@ angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTab
 			});
 		};
 
+		//Remove attendee's permissions for selected event.
+		var removeEventPermissions = function(aid, aname) {
+			$http.post('/user/inactivate', {user_id : aid, event_id : eventSelector.postEventId}).success(function(res) {
+				getAttendees();
+			}).error(function(res, status) {
+				$window.alert("There was an error removing permissions for " + aname + ".\n\n" + res.message);
+				getAttendees();
+			});
+		};
+
+		//Remove attendee's permissions for selected event.
+		var removeAllPermissions = function(aid, aname) {
+			$http.post('/user/inactivate/all', {user_id : aid}).success(function(res) {
+				getAttendees();
+			}).error(function(res, status) {
+				$window.alert("There was an error removing permissions for " + aname + ".\n\n" + res.message);
+				getAttendees();
+			});
+		};
+
 		/**
 		* To be called when the user wants to remove an attendee.  When called, the user is
 		* prompted on whether the action should be completed.  If the user decides to
@@ -68,13 +88,27 @@ angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTab
 		*
 		* @param attendee - Attendee object to delete
 		*/
-		$scope.removeAttendee = function(attendee) {
+		$scope.removeAttendee = function(attendee) {/**
+			* Flags to represent what action should be taken.  The flags have the
+			* following meanings:
+			* 		0 - Take no action (cancel)
+			* 		1 - Remove the user's permissions for only the selected event
+			* 		2 - Remove the user's permissions for all events
+			*
+			* These flags are always assumed to stay in this order (i.e. cancel is first,
+			* remove role is second, and remove user is last).
+			*/
+			var actionFlags = [0, 1, 2];
+
 			var modalInstance = $modal.open({
 				templateUrl: 	"modules/admin/views/attendeeWarn.client.view.html",
 				controller: 	"attendeeActionModalCtrl",
 				backdrop: 		true,
 				backdropClass: 	"admin-backdrop",
 				resolve: 		{
+					flags: function() {
+						return actionFlags;
+					},
 					attendee: function() {
 						return attendee;
 					}
@@ -83,27 +117,44 @@ angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTab
 
 			modalInstance.result.then(function(result) {
 				result = parseInt(result);
-				//Should return either 0 (do not delete) or 1 (delete).
-				if(result) {
-					deleteAttendee(attendee._id, attendee.fName);
+				
+				//Do the action specified by the returned flag.
+				switch(result) {
+					case flags[0]:
+						//Do nothing
+						break;
+					case flags[1]:
+						//Remove user's permissions for this event.
+						removeEventPermissions(attendee._id, attendee.fName);
+						break;
+					case flags[2]:
+						//Remove user's permissions for all events.
+						removeAllPermissions(attendee._id, attendee.fName);
+						break;
 				}
 			});
 		};
 	}
 ]);
 
-angular.module("admin").controller("attendeeActionModalCtrl", ["$scope", "$modalInstance", "attendee",
-	function($scope, $modalInstance, attendee) {
+angular.module("admin").controller("attendeeActionModalCtrl", ["$scope", "$modalInstance", "attendee", "flags", "eventSelector",
+	function($scope, $modalInstance, attendee, flags, eventSelector) {
 		$scope.attendee = attendee;
+		$scope.event = eventSelector.selectedEvent;
+		$scope.flags = flags;
+		$scope.selection = flags[0];
 
 		/**
 		* Action to call whenever the modal is exited using any button.  If the user
-		* accepts, 1 is returned; otherwise, 0 is returned.
+		* accepts, whatever action they chose is returned as specified by the flags;
+		* otherwise, 0 for cancel is returned.
 		*
 		* @param action - 1 if the user accepts or 0 if the user changed their mind
 		*/
 		$scope.done = function(action) {
-			$modalInstance.close(action);
+			var flag = action ? $scope.flags[0] : $scope.selection;
+
+			$modalInstance.close(flag);
 		};
 	}
 ]);

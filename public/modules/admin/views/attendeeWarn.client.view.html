@@ -3,7 +3,13 @@
 </div>
 <div class="modal-body">
 	<div>
-		You are about to delete {{attendee.fName}}'s account completely for all events.  Are you sure you want to proceed?
+		<p>You have chose to remove {{attendee.fName}}'s permissions for {{event}}.</p>
+		<p>Would you like to remove their permissions for all events?</p>
+		<br />
+		<div class="form-group" style="padding: 10px 20px; padding-bottom: 0; margin-bottom: 0;">
+			<label for="current"><input type="radio" value="{{flags[1]}}" ng-model="selection" name="action" id="current" checked /> Remove {{attendee.fName}}'s permissions for only this event.</label>
+			<label for="all"><input type="radio" value="{{flags[2]}}" ng-model="selection" name="action" id="all" /> Remove {{attendee.fName}}'s permissions for all events (they will no longer be able to long in).</label>
+		</div>
 	</div>
 </div>
 <div class="modal-footer">

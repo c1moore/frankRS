@@ -7,9 +7,12 @@
 			<div ng-if="isEventSelected">
 				<h2 class="text-center">{{selectedEvent}} Attendees</h2>
 				<table ng-table="attendeeTableParams" show-filter="true" class="table table-bordered frank-table">
-					<tr ng-repeat="attendee in $data">
-						<td class="text-center" data-title="''" width="5%">
-							<a href class="text-danger" ng-click="removeAttendee(attendee)"><i class="fa fa-times"></i></a>
+					<tr ng-repeat="attendee in $data" ng-class="{'inactive-attendee' : !attendee.active}">
+						<td class="text-center" data-title="''" width="5%" ng-if="attendee.active">
+							<a href class="text-danger" ng-click="removeAttendee(attendee)"><i class="fa fa-ban"></i></a>
+						</td>
+						<td class="text-center" data-title="''" width="5%" ng-if="!attendee.active">
+							<a href class="text-danger" ng-click="removeAttendee(attendee)"><i class="fa fa-trash-o"></i></a>
 						</td>
 						<td data-title="'Attendee'" sortable="'displayName'" filter="{'displayName' : 'text'}" width="30%">
 							{{attendee.displayName}}
