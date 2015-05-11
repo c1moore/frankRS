@@ -82,13 +82,41 @@ angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTab
 		};
 
 		/**
+		* To be called when the user wants to completely delete an attendee.  The user will be
+		* prompted to confirm this action should be completed.
+		*
+		* @param attendee - Attendee object to delete
+		*/
+		$scope.deleteAttendee = function(attendee) {
+			var modalInstance = $modal.open({
+				templateUrl: 	"modules/admin/views/attendee-warn-delete.client.view.html",
+				controller: 	"attendeeDeleteModalCtrl",
+				backdrop: 		true,
+				backdropClass: 	"admin-backdrop",
+				resolve: 		{
+					attendee: 	function() {
+						return attendee;
+					}
+				}
+			});
+
+			modalInstance.result.then(function(result) {
+				if(result) {
+					deleteAttendee(attendee._id, attendee.fName + ' ' + attendee.lName);
+				}
+			});
+		};
+
+
+		/**
 		* To be called when the user wants to remove an attendee.  When called, the user is
 		* prompted on whether the action should be completed.  If the user decides to
 		* continue, removeAttendee will be called.
 		*
 		* @param attendee - Attendee object to delete
 		*/
-		$scope.removeAttendee = function(attendee) {/**
+		$scope.removeAttendee = function(attendee) {
+			/**
 			* Flags to represent what action should be taken.  The flags have the
 			* following meanings:
 			* 		0 - Take no action (cancel)
@@ -101,7 +129,7 @@ angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTab
 			var actionFlags = [0, 1, 2];
 
 			var modalInstance = $modal.open({
-				templateUrl: 	"modules/admin/views/attendeeWarn.client.view.html",
+				templateUrl: 	"modules/admin/views/attendee-warn-inactive.client.view.html",
 				controller: 	"attendeeActionModalCtrl",
 				backdrop: 		true,
 				backdropClass: 	"admin-backdrop",
@@ -116,7 +144,7 @@ angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTab
 			});
 
 			modalInstance.result.then(function(result) {
-				result = parseInt(result);
+				result = parseInt(result, 10);
 				
 				//Do the action specified by the returned flag.
 				switch(result) {
@@ -156,5 +184,20 @@ angular.module("admin").controller("attendeeActionModalCtrl", ["$scope", "$modal
 
 			$modalInstance.close(flag);
 		};
+	}
+]);
+
+angular.module("admin").controller("attendeeDeleteModalCtrl", ["$scope", "$modalInstance", "attendee",
+	function($scope, $modalInstance, attendee) {
+		$scope.attendee = attendee;
+
+		$scope.done = function(action) {
+			action = parseInt(action, 10);
+			if(action) {
+				$modalInstance.close(true);
+			} else {
+				$modalInstance.close(false);
+			}
+		}
 	}
 ]);

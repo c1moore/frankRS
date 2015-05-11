@@ -12,7 +12,7 @@
 							<a href class="text-danger" ng-click="removeAttendee(attendee)"><i class="fa fa-ban"></i></a>
 						</td>
 						<td class="text-center" data-title="''" width="5%" ng-if="!attendee.active">
-							<a href class="text-danger" ng-click="removeAttendee(attendee)"><i class="fa fa-trash-o"></i></a>
+							<a href class="text-danger" ng-click="deleteAttendee(attendee)"><i class="fa fa-trash-o"></i></a>
 						</td>
 						<td data-title="'Attendee'" sortable="'displayName'" filter="{'displayName' : 'text'}" width="30%">
 							{{attendee.displayName}}
@@ -21,7 +21,8 @@
 							{{attendee.email}}
 						</td>
 						<td data-title="'Organization'" sortable="'organization'" filter="{'organization' : 'text'}" width="30%">
-							{{attendee.organization}}
+							<span ng-if="attendee.organization">{{attendee.organization}}</span>
+							<span ng-if="!attendee.organization">N/A</span>
 						</td>
 						<td data-title="'Attending?'" sortable="'attending'" width="5%">
 							<span ng-if="attendee.attending">Yes</span>
