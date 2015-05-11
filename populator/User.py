@@ -78,7 +78,12 @@ class User:
 
   def decide(self,eventID,attending,recruiting,recruiter=None):
     eventID = ensureID(eventID)
-    statdict = {'event_id':eventID,'attending':attending,'recruiter':recruiting}
+    active = randint(1, 10)
+    if active<=7:
+      active = True
+    else:
+      active = False
+    statdict = {'event_id':eventID,'attending':attending,'recruiter':recruiting,'active':active}
     for sd in self.status:
       if sd['event_id']==eventID:
         return None #I have already decided
