@@ -50,7 +50,7 @@ angular.module('admin').controller('recruitersController', ['$scope', 'ngTablePa
 		//Setup ng-table
 		$scope.recruiterTableParams = new ngTableParams({
 			page: 	1,
-			count: 	5,
+			count: 	10,
 			filter: {
 				displayName: 	''
 			},

@@ -34,7 +34,7 @@ angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTab
 		//Setup ng-table
 		$scope.attendeeTableParams = new ngTableParams({
 			page: 	1,
-			count: 	5,
+			count: 	10,
 			filter: {
 				displayName: 	''
 			},

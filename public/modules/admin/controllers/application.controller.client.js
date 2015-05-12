@@ -132,7 +132,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 
 		$scope.tableParams = new ngTableParams({
 			page: 1,
-			count: 5,
+			count: 10,
 			filter: {
 				fName:''
 			},
