@@ -1,18 +1,14 @@
-angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams', '$http', '$timeout', '$filter',
-	function($scope, ngTableParams, $http, $timeout, $filter) {
+angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams', '$http', '$timeout', '$filter', '$modal', '$window',
+	function($scope, ngTableParams, $http, $timeout, $filter, $modal, $window) {
 		$scope.events = [];
-
-		$scope.test = function(event) {
-			console.log(event);
-		}
 
 		//converts to date object so the date forms can be validated
 		var toDate = function(element) {
 			if (element.start_date && element.end_date) {
 				element.start_date = new Date(element.start_date);
 				element.end_date = new Date(element.end_date);
-			};
-		}
+			}
+		};
 
 		var getEvents = function() {
 			$http.get('/events/enumerateAll').success(function(data) {
@@ -20,12 +16,12 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 				data.forEach(toDate);
 				$scope.events = data;
 			});
-		}
+		};
 		getEvents();
 
 	  	$scope.tableParams = new ngTableParams({
         	page: 1,
-			count: 5,
+			count: 10,
 			filter: {
 			        name:''
 			  },
@@ -61,13 +57,6 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
         	$scope.newEvent = null;
         	$scope.eventForm.$setPristine(true);
   		};
-
-		$scope.deleteEvent = function(event) {
-			$http.post('/events/delete',{event_id:event._id}).success(function() {
-				console.log('Event Deleted');
-				getEvents()
-			});
-		};
 
 		$scope.updateEvent = function(event) {
 			event.start_date = new Date(event.start_date).getTime();
@@ -106,7 +95,93 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 			formatYear: 'yy',
 			startingDay: 1
 		};
+
+		var deleteEvent = function(event) {
+			$http.post('/events/delete',{event_id:event._id}).success(function() {
+				getEvents();
+			}).error(function(res, status) {
+				$window.alert("An error occurred while deleting " + event.name +".\n\nError: " + res.message);
+				getEvents();
+			});
+		};
+
+		$scope.deleteEvent = function(event) {
+			var modalInstance = $modal.open({
+				templateUrl: 	"modules/admin/views/event-warn-delete.client.view.html",
+				controller: 	"eventDeleteModalCtrl",
+				backdrop: 		true,
+				backdropClass: 	"admin-backdrop",
+				resolve: 		{
+					event: 	function() {
+						return event;
+					}
+				}
+			});
+
+			modalInstance.result.then(function(result) {
+				if(result) {
+					deleteEvent(event);
+				}
+			});
+		};
+
+		var inactivateEvent = function(eid, ename) {
+			$http.post('events/inactivate', {event_id : eid}).success(function() {
+				getEvents();
+			}).error(function(res, status) {
+				$window.alert("An error occurred while disabling " + ename + ".\n\nError: " + res.message);
+				getEvents();
+			});
+		};
+
+		$scope.inactivateEvent = function(event) {
+			var modalInstance = $modal.open({
+				templateUrl: 	"modules/admin/views/event-warn-inactivate.client.view.html",
+				controller: 	"eventInactivateModalCtrl",
+				backdrop: 		true,
+				backdropClass: 	"admin-backdrop",
+				resolve: 		{
+					event: 	function() {
+						return event;
+					}
+				}
+			});
+
+			modalInstance.result.then(function(result) {
+				if(result) {
+					inactivateEvent(event._id, event.name);
+				}
+			});
+		};
 	}
 ]);
 
+angular.module("admin").controller("eventDeleteModalCtrl", ["$scope", "$modalInstance", "event",
+	function($scope, $modalInstance, event) {
+		$scope.event = event;
 
+		$scope.done = function(action) {
+			action = parseInt(action, 10);
+			if(action) {
+				$modalInstance.close(true);
+			} else {
+				$modalInstance.close(false);
+			}
+		}
+	}
+]);
+
+angular.module("admin").controller("eventInactivateModalCtrl", ["$scope", "$modalInstance", "event",
+	function($scope, $modalInstance, event) {
+		$scope.event = event;
+
+		$scope.done = function(action) {
+			action = parseInt(action, 10);
+			if(action) {
+				$modalInstance.close(true);
+			} else {
+				$modalInstance.close(false);
+			}
+		}
+	}
+]);

@@ -46,9 +46,10 @@
          <h2>Event List</h2>
          <form name="editForm" novalidate>
             <table ng-table="tableParams" show-filter="true" class="table table-bordered frank-table">
-                <tr ng-repeat="event in $data">
+                <tr ng-repeat="event in $data" ng-class="{'inactive-record' : !event.active}">
                     <td>
-                      <a href='' class="text-danger" ng-click="deleteEvent(event)"><i class="fa fa-times"></i></a>
+                      <a href='' class="text-danger" ng-click="inactivateEvent(event)" ng-if="event.active"><i class="fa fa-ban"></i></a>
+                      <a href='' class="text-danger" ng-click="deleteEvent(event)" ng-if="!event.active"><i class="fa fa-trash-o"></i></a>
                     </td>
                     <td data-title="'Name'" sortable="'name'" filter="{'name':'text'}">
                         <span ng-if="!event.$edit.name" ng-click="event.$edit.name = true">{{event.name}}</span>
