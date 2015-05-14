@@ -19,8 +19,6 @@ var attendee1, attendee2u, attendee3e,
 	user,  user2,
 	event1, event2;
 
-console.log("Test");
-
 /**
  * Unit tests
  */

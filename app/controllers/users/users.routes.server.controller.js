@@ -428,8 +428,6 @@ exports.getLeaderboard = function(req, res) {
 	} else if(req.hasAuthorization(req.user, ["recruiter", "admin"])) {
 		var query = User.find({'roles' : 'recruiter', 'status.event_id' : req.body.event_id, 'status.recruiter' : true});
 		query.select('displayName rank inviteeList attendeeList');
-		query.populate('inviteeList.user_id', 'displayName email');
-		query.populate('attendeeList.user_id', 'displayName email');
 		query.exec(function(err, result) {
 			if(err) {
 				res.status(400).send(err);
@@ -544,7 +542,10 @@ exports.getUserEvents = function(req, res) {
 					//Transform the results in a form previously expected by the frontend (i.e. an object with a status field that is an array of event objects).
 					var rval = {status : []};
 					for(var i = 0; i < populatedResults.length; i++) {
-						rval.status.push(populatedResults[i].status);
+						//Only add those events that still exist.
+						if(populatedResults[i].status.event_id) {
+							rval.status.push(populatedResults[i].status);
+						}
 					}
 
 					return res.status(200).send(rval);
@@ -582,7 +583,7 @@ exports.getRecruiterAttendees = function(req, res) {
 			} else {
 				var attendeeList = [], j=0;
 				for(var i=0; i<result.attendeeList.length; i++) {
-					if(result.attendeeList[i].event_id.toString() === req.body.event_id.toString()) {
+					if(result.attendeeList[i].event_id.toString() === req.body.event_id.toString() && result.attendeeList[i].user_id) {
 						attendeeList[j] =result.attendeeList[i];
 						j++;
 					}
@@ -618,7 +619,7 @@ exports.getRecruiterInvitees = function(req, res) {
 			} else {
 				var inviteeList = [], j=0;
 				for(var i=0; i<result.inviteeList.length; i++) {
-					if(result.inviteeList[i].event_id.toString() === req.body.event_id.toString()) {
+					if(result.inviteeList[i].event_id.toString() === req.body.event_id.toString() && result.inviteeList[i].user_id) {
 						inviteeList[j] =result.inviteeList[i];
 						j++;
 					}
@@ -654,7 +655,7 @@ exports.getRecruiterAlmosts = function(req, res) {
 			} else {
 				var almostList = [], j=0;
 				for(var i=0; i<result.almostList.length; i++) {
-					if(result.almostList[i].event_id.toString() === req.body.event_id.toString()) {
+					if(result.almostList[i].event_id.toString() === req.body.event_id.toString() && result.almostList[i].user_id) {
 						almostList[j] =result.almostList[i];
 						j++;
 					}
@@ -680,7 +681,7 @@ exports.getAttendees = function(req, res) {
 	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
 		User.aggregate([
 			{$match : {roles : 'recruiter', "status.event_id" : new mongoose.Types.ObjectId(req.body.event_id), "status.recruiter" : true}},
-			{$project : {recruiterName : "$displayName", attendeeList : 1, _id : -1}},
+			{$project : {recruiterName : "$displayName", attendeeList : 1, _id : 0}},
 			{$unwind : "$attendeeList"},
 			{$match : {"attendeeList.event_id" : new mongoose.Types.ObjectId(req.body.event_id)}}
 		], function(err, results) {
@@ -693,14 +694,21 @@ exports.getAttendees = function(req, res) {
 					results, {
 						path : "attendeeList.user_id",
 						model : 'User',
-						select : 'displayName -_id'
+						select : 'displayName organization -_id'
 					}, function(err, pResults) {
 						if(err) {
 							res.status(400).send({message : err});
 						} else {
 							for(var i=0; i<pResults.length; i++) {
-								pResults[i].attendeeName = pResults[i].attendeeList.user_id.displayName;
-								delete pResults[i].attendeeList;
+								//If this user was deleted, just delete the record.
+								if(pResults[i].attendeeList.user_id) {
+									pResults[i].attendeeName = pResults[i].attendeeList.user_id.displayName;
+									pResults[i].organization = pResults[i].attendeeList.user_id.organization;
+
+									delete pResults[i].attendeeList;
+								} else {
+									pResults.splice(i--, 1);
+								}
 							}
 
 							res.status(200).send(pResults);	
@@ -746,8 +754,14 @@ exports.getInvitees = function(req, res) {
 							res.status(400).send({message : err});
 						} else {
 							for(var i=0; i<pResults.length; i++) {
-								pResults[i].inviteeName = pResults[i].inviteeList.user_id.displayName;
-								delete pResults[i].inviteeList;
+								//If the user was deleted, delete the array entry.
+								if(pResults[i].inviteeList.user_id) {
+									pResults[i].inviteeName = pResults[i].inviteeList.user_id.displayName;
+								
+									delete pResults[i].inviteeList;
+								} else {
+									pResults.splice(i--, 1);
+								}
 							}
 
 							res.status(200).send(pResults);	
