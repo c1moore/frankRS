@@ -56,6 +56,7 @@ li .disabled {
 .jumbotron {
 	padding:20px;
 	bottom-margin:20px;
+	background-color: #E8E9EB;
 }
 .musicdiv{
 	position: fixed;

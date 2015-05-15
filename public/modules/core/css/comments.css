@@ -199,3 +199,11 @@ i.fa.fa-remove.text-danger:hover {
 	margin: 5px;
 	border-color: rgba(51, 50, 50, .75);
 }
+
+@media (max-width: 991px) {
+	.frank-recruiter-comment-board {
+		margin: 25px;
+		width: 95%;
+		position: absolute;
+	}
+}
