@@ -4,113 +4,34 @@
 			<div class="rank-container" ng-class="{'frank-rank-smaller' : smallRankHeader}"><h1>{{userScore}}</h1></div>
 		</div>
 		<div class="col-md-8">
-			<h1 id="stats">Your Stats</h1>
+			<h1 class="stat-heading">Your Stats</h1>
 			<div class="well">
 				<p>Number Invited: {{userInvites}}</p>
 				<p>Number Attending: {{userAttendees}}</p>
 				<p>Success Rate: {{getRatio()}}%</p>
 			</div>
 		</div>
-		<div class="col-md-12" style="margin-top: 150px;">
-			<div ng-if="!statsError">
-				<progress ng-if="(((attending + invited) < capacity) && attending != capacity) || (attending < capacity && invited < capacity && attending <= invited)">
-					<!-- Attending progress bar -->
-					<bar class="progress-bar progress-bar-warning" value="percentAttending">
-						<span ng-if="percentAttending > 5">{{attending}}</span>
-					</bar>
-					<!-- Invited progress bar -->
-					<bar class="progress-bar progress-bar-success" value="percentInvited">
-						<span ng-if="percentInvited > 5">{{invited}}</span>
-					</bar>
-					<!-- Capacity progress bar -->
-					<bar class="progress-bar" value="percentCapacity">
-						<span ng-if="percentCapacity > 5">{{capacity}}</span>
-					</bar>
-				</progress>
-				<progress ng-if="(attending < capacity && invited < capacity  && invited < attending)">
-					<!-- Attending progress bar -->
-					<bar class="progress-bar progress-bar-success" value="percentInvited">
-						<span ng-if="percentInvited > 5">{{invited}}</span>
-					</bar>
-					<!-- Invited progress bar -->
-					<bar class="progress-bar progress-bar-warning" value="percentAttending">
-						<span ng-if="percentAttending > 5">{{attending}}</span>
-					</bar>
-					<!-- Capacity progress bar -->
-					<bar class="progress-bar" value="percentCapacity">
-						<span ng-if="percentCapacity > 5">{{capacity}}</span>
-					</bar>
-				</progress>
-				<progress ng-if="(attending == capacity)">
-					<!-- Only one progress bar is needed to show full capacity -->
-					<bar class="progress-bar progress-bar-warning" value="100">
-						<span ng-if="percentCapacity > 5">{{capacity}}</span>
-					</bar>
-				</progress>
-				<progress ng-if="invited >= capacity">
-					<!-- Attending progress bar -->
-					<bar class="progress-bar progress-bar-warning" value="percentAttending">
-						<span ng-if="percentAttending > 5">{{attending}}</span>
-					</bar>
-					<!-- Capacity progress bar -->
-					<bar class="progress-bar" value="percentCapacity">
-						<span ng-if="percentCapacity > 5">{{capacity}}</span>
-					</bar>
-					<!-- Invited progress bar -->
-					<bar class="progress-bar progress-bar-success" value="percentInvited">
-						<span ng-if="percentInvited > 5">{{invited}}</span>
-					</bar>
-				</progress>
-				<div class="progress-keys" ng-if="attending <= invited">
-					<div class="progress-key">
-						<div class="progress-color-key progress-bar progress-bar-warning">
-						</div>
-						<div class="progress-key-value">
-							Attending = {{attending}}
-						</div>
+		<!-- <div class="col-md-3">
+		</div> -->
+		<div class="col-md-12 overall-stats">
+			<h1 class="stat-heading">Overall Stats</h1>
+			<div class="well">
+				<div ng-if="!statsError">
+					<div class="stat">
+						<div class="stat-title">Invited: </div>
+						<i class="fa fa-child" ng-repeat="i in getArr(percentInvited) track by $index"></i>
+						<div class="stat-num">{{invited}}</div>
 					</div>
-					<div class="progress-key">
-						<div class="progress-color-key progress-bar progress-bar-success">
-						</div>
-						<div class="progress-key-value">
-							Invited = {{invited}}
-						</div>
+					<div class="stat">
+						<div class="stat-title">Attending: </div>
+						<i class="fa fa-child" ng-repeat="i in getArr(percentAttending) track by $index"></i>
+						<div class="stat-num">{{attending}}</div>
 					</div>
-					<div class="progress-key">
-						<div class="progress-color-key progress-bar">
-						</div>
-						<div class="progress-key-value">
-							Capacity = {{capacity}}
-						</div>
+					<div class="stat">
+						<div class="stat-title">Capacity: </div>
+						<i class="fa fa-child" ng-repeat="i in getArr(percentCapacity) track by $index"></i>
+						<div class="stat-num">{{capacity}}</div>
 					</div>
-				</div>
-				<div class="progress-keys" ng-if="attending > invited">
-					<div class="progress-key">
-						<div class="progress-color-key progress-bar progress-bar-success">
-						</div>
-						<div class="progress-key-value">
-							Invited = {{invited}}
-						</div>
-					</div>
-					<div class="progress-key">
-						<div class="progress-color-key progress-bar progress-bar-warning">
-						</div>
-						<div class="progress-key-value">
-							Attending = {{attending}}
-						</div>
-					</div>
-					<div class="progress-key">
-						<div class="progress-color-key progress-bar">
-						</div>
-						<div class="progress-key-value">
-							Capacity = {{capacity}}
-						</div>
-					</div>
-				</div>
-			</div>
-			<div ng-if="statsError">
-				<div class="progress-err-message alert alert-danger">
-					<i class="fa fa-exclamation-triangle"></i>There was a problem retrieving the event stats.  Try refreshing the page.
 				</div>
 			</div>
 		</div>

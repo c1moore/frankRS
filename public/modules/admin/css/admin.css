@@ -2,6 +2,9 @@
 	padding-left:10px;
 	padding-right:10px;
 }
+.admin-application .col-md-4 .well {
+	margin-top: 25px;
+}
 .admin-backdrop {
 	background-color: rgba(100, 100, 100, .75);
 }
@@ -67,4 +70,7 @@
 	border-style: ridge;
 	min-width: 45vw;
 	min-height: 150px;
+}
+.tab-pane .well {
+	margin-top: 25px;
 }

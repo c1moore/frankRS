@@ -3,6 +3,10 @@
 angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication', '$location', 'eventSelector', '$http', '$window', '$modal', 'cacheService', 'previewService', 'usSpinnerService',
 	function($scope, Authentication, $location, eventSelector, $http, $window, $modal, cacheService, previewService, usSpinnerService) {
 		$scope.authentication = Authentication;
+		$scope.sidebarActiveColor = '#333232';
+		$scope.sidebarInactiveColor = '#6c6969';
+		$scope.sidebarColor = $scope.sidebarInactiveColor;
+		$scope.sidebarOpen = false;
 
 		/*
 		* If the user is not logged in, they should be redirected to the sigin page.  If the

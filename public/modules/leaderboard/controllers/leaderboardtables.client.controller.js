@@ -33,6 +33,11 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 			return Math.floor(value);
 		};
 
+		/* Create an array of specified length.  Used to create an array ngRepeat can iterate over when creating infographics on attendance. */
+		$scope.getArr = function(length) {
+			return new Array(length);
+		};
+
 		var mainApi = $resource('/leaderboard/maintable',{event_id: eventSelector.postEventId}, {'getTable':{method:'POST', isArray:true}});
 		var attendingApi = $resource('/leaderboard/attendees',{event_id: eventSelector.postEventId}, {'getTable':{method:'POST', isArray:true}});
 		var invitedApi = $resource('/leaderboard/invitees',{event_id: eventSelector.postEventId}, {'getTable':{method:'POST', isArray:true}});
@@ -156,17 +161,10 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 					$scope.attending = response.attending;
 					$scope.invited = response.invited;
 
-					if(($scope.invited + $scope.attending) < $scope.capacity && $scope.attending !== $scope.capacity) {
-						$scope.percentAttending = Math.round(($scope.attending / $scope.capacity) * 100);
-						$scope.percentInvited = Math.round(($scope.invited / $scope.capacity) * 100);
-						$scope.percentCapacity = 100 - ($scope.percentAttending + $scope.percentInvited);
-					} else if(($scope.invited >= $scope.capacity && $scope.attending !== $scope.capacity) || ($scope.attending < $scope.capacity && $scope.invited < $scope.capacity)) {
-						var total = $scope.attending + $scope.invited + $scope.capacity;
-
-						$scope.percentAttending = Math.round(($scope.attending / total) * 100);
-						$scope.percentInvited = Math.round(($scope.invited / total) * 100);
-						$scope.percentCapacity = 100 - ($scope.percentAttending + $scope.percentInvited);
-					}
+					//Find ratio of above stats to the capacity for the event.  Convert to percent and divide by 2 (make the number easier to display on the screen).
+					$scope.percentInvited = Math.round(($scope.invited / $scope.capacity) * 50);
+					$scope.percentAttending = Math.round(($scope.attending / $scope.capacity) * 50);
+					$scope.percentCapacity = 50;
 				}).error(function(response, status) {
 					$scope.statsError = true;
 				});

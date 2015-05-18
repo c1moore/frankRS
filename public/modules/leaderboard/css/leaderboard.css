@@ -77,6 +77,10 @@ th.header {
 	width:80px;
 }
 
+.overall-stats {
+	margin-top: 50px;
+}
+
 .progress-bar {
 	.background-image: none;
 	.background-color: #c54e92;
@@ -138,6 +142,42 @@ th.header {
 	font-size: 110px !important;
 }
 
-#stats {
+.stat-heading {
 	font-size:3em;
+}
+
+.stat {
+	margin-top: 5px;
+}
+
+.stat-title {
+	display: inline-block;
+	width: 100px;
+	font-weight: 700px;
+}
+
+.stat .fa.fa-child {
+	margin-right: -1px;
+}
+
+.stat-num {
+	display: inline-block;
+	margin-left: 15px;
+}
+
+@media (max-width: 991px) {
+	div.leaderboard-container.frank-main-view {
+		margin-bottom: 0px !important;
+	}
+
+	.score-section .col-md-4 {
+		max-width: 200px;
+		display: inline-block;
+		margin-right: 25px;
+	}
+
+	.score-section .col-md-8 {
+		width: 66.66666666%;
+		display: inline-block;
+	}
 }

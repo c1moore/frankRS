@@ -14,9 +14,17 @@
 			<strong>To: </strong>
 			<br />
 			<div id="to_fields">
-				<input type="text" class="to_field invitation_fName" ng-model="invite.fName" placeholder="Frank" required />
-				<input type="text" class="to_field" ng-model="invite.lName" placeholder="Karel" required />
-				<input type="email" class="to_field" id="invitee_email" ng-model="invite.email" placeholder="frankis@wesome.edu" required />
+				<label for="invitation_fName">First Name: 
+					<input type="text" id="invitation_fName" class="to_field invitation_fName" ng-model="invite.fName" placeholder="Frank" required />
+				</label>
+				<br />
+				<label for="invitation_lName">Last Name: 
+					<input type="text" id="invitation_lName" class="to_field" ng-model="invite.lName" placeholder="Karel" required />
+				</label>
+				<br />
+				<label for="invitee_email">Email: 
+					<input type="email" class="to_field" id="invitee_email" ng-model="invite.email" placeholder="frankis@wesome.edu" required />
+				</label>
 			</div>
 		</div>
 		<div id="message">
@@ -30,8 +38,11 @@
 			<span us-spinner="{lines:13, length:5, width:2, radius:7}" spinner-key="spinner-1" ng-show="sending"></span>
 		</div>
 	</form>
-	<div class="frank-invites-sidebar">
-		<accordion close-others="true">
+	<div class="frank-invites-sidebar" ng-class="{'frank-invites-sidebar-closed' : !sidebarOpen}">
+		<div class="sidebar-display" ng-style="{'background-color' : sidebarColor}" ng-mouseenter="sidebarColor = sidebarActiveColor" ng-mouseleave="sidebarColor = sidebarInactiveColor" ng-click="sidebarOpen = !sidebarOpen">
+			<i class='fa' ng-class="{'fa-chevron-left' : !sidebarOpen, 'fa-chevron-right' : sidebarOpen}"></i>
+		</div>
+		<accordion close-others="false" ng-class="{'accordion-hidden' : !sidebarOpen}">
 			<accordion-group is-open="firstSelected" style="margin-top: 183px;">
 				<accordion-heading>
 					Awesome People Attending <i class="pull-right fa" ng-class="{'fa-chevron-right' : !firstSelected, 'fa-chevron-down' : firstSelected}"></i>

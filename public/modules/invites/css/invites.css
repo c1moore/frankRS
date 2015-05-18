@@ -77,23 +77,33 @@
   margin-right:50%;
   z-index:100;
   border-radius:10px;
-color:black;
+  color:black;
+}
+.sidebar-display {
+  display: none;
+}
+.sidebar-display i.fa {
+  top: 50vh;
+  right: -13px;
+  position: relative;
+  color: white;
+  font-size: 20px;
 }
 .to_field {
-  border: none;
-  border-right: 1px solid rgb(169, 169, 169);
-  border-top: 1px solid rgb(169, 169, 169);
-  border-bottom: 1px solid rgb(169, 169, 169);
+  border: 1px solid rgb(169, 169, 169);
+  border-radius: 5px;
   height: 28px;
-  background: transparent;
-  width: 12vw;
-  margin-left: -4px;
+  width: 80%;
   padding-left: 4px;
+  margin-bottom: 7px;
+}
+
+#to_fields label {
+  padding-left: 25px;
+  display: initial;
 }
 
 .to_field.ng-pristine.ng-valid {
-  border-top: none;
-  border-bottom: none;
 }
 
 /* when hiding the thing */
@@ -301,7 +311,7 @@ animation:0.5s flipInX ease;
   margin-top: 10px;
 }
 #invitee_email {
-  width: 19vw;
+  margin-left: 33px;
 }
 /*#to {
   border:1px solid black;
@@ -313,12 +323,7 @@ animation:0.5s flipInX ease;
   border-radius:10px;
 }*/
 #to_fields {
-  display: inline-block;
-  border: 1px solid rgb(169, 169, 169);
   width: 45vw;
-  height: 30px;
-  background-color: white;
-  border-radius: 5px;
 }
 #header {
   text-align:center;
@@ -404,4 +409,59 @@ body {
 /*Overwritten jQuery-UI*/
 .ui-draggable-handle {
   cursor: pointer;
+}
+
+@media (max-width: 876px) {
+  #invitee_email {
+    margin-left: 0px;
+    display: block;
+  }
+}
+
+@media (max-width: 935px) {
+  .accordion-hidden {
+    display: none;
+  }
+
+  .frank-invites-sidebar {
+    display: inline-flex;
+    width: 370px;
+    z-index: 0;
+  }
+
+  .frank-invites-sidebar-closed {
+    width: 40px;
+  }
+
+  .jumbotron {
+    position: relative;
+    z-index: 5;
+  }
+
+  .panel-group {
+    width: 325px;
+  }
+
+  .sidebar-display {
+    display: inline-block;
+    height: 100vh;
+    width: 40px;
+    background: 6C6969;
+  }
+
+  #invite {
+    width: 90vw;
+  }
+
+  #p_message {
+    width: 75vw;
+  }
+
+  #recruiter_email {
+    width: 75vw;
+  }
+
+  #to_fields {
+    width: 75vw;
+  }
 }
