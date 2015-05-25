@@ -37,8 +37,8 @@ angular.module('memoboard').controller('memoboardCtrl', ['$scope', 'Authenticati
 				}).error(function(response, status) {
 					if(status === 401) {
 						$location.path('/');
-					} else {
-						$window.alert(response.message);
+					} else if(response.message !== "No comments found!") {
+						$window.alert("There was an error retreiving comments.  Please try again later.");
 					}
 				});
 			}

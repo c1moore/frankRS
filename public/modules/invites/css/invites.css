@@ -67,6 +67,9 @@
   margin-left: 6vw;
   display: inline-table;
 }
+.ng-pristine.ng-invalid-required {
+  box-shadow: none;
+}
 .preview {
   background:purple;
   height:50%;

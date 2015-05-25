@@ -204,6 +204,12 @@ i.fa.fa-remove.text-danger:hover {
 	.frank-recruiter-comment-board {
 		margin: 25px;
 		width: 95%;
-		position: absolute;
+		float: none;
+	}
+}
+
+@media (max-width: 991px) {
+	.frank-comments-board {
+		width: 100%;
 	}
 }
