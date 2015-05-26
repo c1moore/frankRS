@@ -184,11 +184,12 @@ def main():
       rec_user = random.choice(attendees)
       while rec_user is recruiter:
         rec_user = random.choice(attendees)
-      if recruiter.invite(rec_user,rec_event_id):
-        invitations.append((rec_user,rec_event_id,recruiter))
+      read = random.choice([True,False])
+      if recruiter.invite(rec_user,rec_event_id,read):
+        invitations.append((rec_user,rec_event_id,recruiter,read))
   #Users, accept invitations
-  for invitee,event,recruiter in invitations:
-    invitee.decide(event,random.random()<p,'recruiter' in invitee.roles,recruiter)
+  for invitee,event,recruiter,read in invitations:
+    invitee.decide(event,random.random()<p,'recruiter' in invitee.roles,read,recruiter)
   #Attach ranks
   eventBins = [[]]
   eventOrder = []

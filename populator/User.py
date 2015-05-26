@@ -76,9 +76,9 @@ class User:
     self.login_enabled = True
     self.templates = makeTemplates(0,5)
 
-  def decide(self,eventID,attending,recruiting,recruiter=None):
+  def decide(self,eventID,attending,recruiting,read,recruiter=None):
     eventID = ensureID(eventID)
-    active = randint(1, 10)
+    active = random.randint(1, 10)
     if active<=7:
       active = True
     else:
@@ -90,7 +90,7 @@ class User:
     self.status.append(statdict)
     self.save()
     if attending and recruiter:
-      attendeedict = {'user_id':self._id,'event_id':eventID}
+      attendeedict = {'user_id':self._id,'event_id':eventID, 'read':read}
       recruiter.attendeeList.append(attendeedict)
       recruiter.inviteeList.remove(attendeedict)
       recruiter.save()
@@ -107,11 +107,11 @@ class User:
       attendee.save()
       return attendee
 
-  def invite(self,userID,eventID):
+  def invite(self,userID,eventID,read):
     userID = ensureID(userID)
     eventID = ensureID(eventID)
     assert 'recruiter' in self.roles, 'Not a recruiter'
-    inviteedict = {'user_id':userID,'event_id':eventID}
+    inviteedict = {'user_id':userID,'event_id':eventID, 'read':read}
     if inviteedict in self.inviteeList:
       return False
     self.inviteeList.append(inviteedict)
