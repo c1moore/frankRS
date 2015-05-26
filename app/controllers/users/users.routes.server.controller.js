@@ -533,7 +533,7 @@ exports.getUserEvents = function(req, res) {
 				}
 				User.populate(results, {
 					path : "status.event_id",
-					model : "Event",
+					model : "Event"
 				}, function(err, populatedResults) {
 					if(err) {
 						return res.status(400).send(err);
@@ -560,9 +560,6 @@ exports.getUserEvents = function(req, res) {
 /*
 * Get the list of attendees for the event specified and the recruiter that is currently logged in.
 */
-/*This method will need to be modified so it will return only the attendees for the specified event.  This should be simple,
-simply replace the the definition of query with the following line:
-	var query = User.findOne({'_id' : id, 'attendeeList.event_id' : req.});*/
 exports.getRecruiterAttendees = function(req, res) {
 	if(req.body.event_id == undefined) {
 		res.status(400).send({'message' : 'Event not specified.'});
@@ -571,26 +568,61 @@ exports.getRecruiterAttendees = function(req, res) {
 	if(!req.isAuthenticated()) {
 		res.status(401).send({'message' : 'User is not logged in.'});
 	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
-		var id = req.user._id;
-		var query = User.findOne({'_id' : id});
-		query.select('attendeeList');
-		query.populate('attendeeList.user_id', 'displayName email');
-		query.exec(function(err, result) {
+		var uid = new mongoose.Types.ObjectId(req.user._id);
+		var eid = new mongoose.Types.ObjectId(req.body.event_id);
+
+		User.aggregate([
+			{$match : {_id : uid}},
+			{$project : {_id : 0, attendeeList : 1}},
+			{$unwind : "$attendeeList"},
+			{$match : {"attendeeList.event_id" : eid}}
+		], function(err, attendees) {
 			if(err) {
 				res.status(400).send(err);
-			} else if(!result || !result.attendeeList.length) {
+			} else if(!attendees || !attendees.length) {
 				res.status(400).json({'message' : 'User not found or nobody the user invited has signed up to attend yet.'});
 			} else {
-				var attendeeList = [], j=0;
-				for(var i=0; i<result.attendeeList.length; i++) {
-					if(result.attendeeList[i].event_id.toString() === req.body.event_id.toString() && result.attendeeList[i].user_id) {
-						attendeeList[j] =result.attendeeList[i];
-						j++;
+				User.populate(attendees, {
+					path : "attendeeList.user_id",
+					model : "User",
+					select : "-_id displayName email"
+				}, function(err, populatedAttendees) {
+					if(err) {
+						res.status(400).send(err);
 					}
-				}
-				res.status(200).send(attendeeList);
+
+					var attendeeList = [];
+					for(var i = 0; i < populatedAttendees.length; i++) {
+						populatedAttendees[i].attendeeList.user_id = populatedAttendees[i].attendeeList.user_id.toObject();
+						populatedAttendees[i].attendeeList.user_id.read = populatedAttendees[i].attendeeList.read;
+						attendeeList.push(populatedAttendees[i].attendeeList.user_id);
+					}
+
+					res.status(200).send(attendeeList);
+				});
 			}
 		});
+
+		// var query = User.findOne({'_id' : id});
+		// query.select('attendeeList');
+		// query.populate('attendeeList.user_id', 'displayName email');
+		// query.exec(function(err, result) {
+		// 	if(err) {
+		// 		res.status(400).send(err);
+		// 	} else if(!result || !result.attendeeList.length) {
+		// 		res.status(400).json({'message' : 'User not found or nobody the user invited has signed up to attend yet.'});
+		// 	} else {
+		// 		var attendeeList = [], j=0;
+		// 		result = result.toObject();
+		// 		for(var i=0; i<result.attendeeList.length; i++) {
+		// 			if(result.attendeeList[i].event_id.toString() === req.body.event_id.toString() && result.attendeeList[i].user_id) {
+		// 				attendeeList[j] =result.attendeeList[i];
+		// 				j++;
+		// 			}
+		// 		}
+		// 		res.status(200).send(attendeeList);
+		// 	}
+		// });
 	} else {
 		res.status(401).send({'message' : 'User does not have permission.'});
 	}
@@ -607,26 +639,60 @@ exports.getRecruiterInvitees = function(req, res) {
 	if(!req.isAuthenticated()) {
 		res.status(401).send({'message' : 'User is not logged in.'});
 	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
-		var id = req.user._id;
-		var query = User.findOne({'_id' : id});
-		query.select('inviteeList');
-		query.populate('inviteeList.user_id', 'displayName email');
-		query.exec(function(err, result) {
+		var uid = new mongoose.Types.ObjectId(req.user._id);
+		var eid = new mongoose.Types.ObjectId(req.body.event_id);
+
+		User.aggregate([
+			{$match : {_id : uid}},
+			{$project : {_id : 0, inviteeList : 1}},
+			{$unwind : "$inviteeList"},
+			{$match : {"inviteeList.event_id" : eid}}
+		], function(err, invitees) {
 			if(err) {
 				res.status(400).send(err);
-			} else if(!result || !result.inviteeList.length) {
-				res.status(400).json({'message' : 'User not found or the user has not invited anybody yet.'});
+			} else if(!invitees || !invitees.length) {
+				res.status(400).json({'message' : 'User not found or nobody the user invited has signed up to attend yet.'});
 			} else {
-				var inviteeList = [], j=0;
-				for(var i=0; i<result.inviteeList.length; i++) {
-					if(result.inviteeList[i].event_id.toString() === req.body.event_id.toString() && result.inviteeList[i].user_id) {
-						inviteeList[j] =result.inviteeList[i];
-						j++;
+				User.populate(invitees, {
+					path : "inviteeList.user_id",
+					model : "User",
+					select : "-_id displayName email"
+				}, function(err, populatedInvitees) {
+					if(err) {
+						res.status(400).send(err);
 					}
-				}
-				res.status(200).send(inviteeList);
+
+					var inviteeList = [];
+					for(var i = 0; i < populatedInvitees.length; i++) {
+						populatedInvitees[i].inviteeList.user_id = populatedInvitees[i].inviteeList.user_id.toObject();
+						populatedInvitees[i].inviteeList.user_id.read = populatedInvitees[i].inviteeList.read;
+						inviteeList.push(populatedInvitees[i].inviteeList.user_id);
+					}
+
+					res.status(200).send(inviteeList);
+				});
 			}
 		});
+
+		// var query = User.findOne({'_id' : id});
+		// query.select('inviteeList');
+		// query.populate('inviteeList.user_id', 'displayName email');
+		// query.exec(function(err, result) {
+		// 	if(err) {
+		// 		res.status(400).send(err);
+		// 	} else if(!result || !result.inviteeList.length) {
+		// 		res.status(400).json({'message' : 'User not found or the user has not invited anybody yet.'});
+		// 	} else {
+		// 		var inviteeList = [], j=0;
+		// 		for(var i=0; i<result.inviteeList.length; i++) {
+		// 			if(result.inviteeList[i].event_id.toString() === req.body.event_id.toString() && result.inviteeList[i].user_id) {
+		// 				inviteeList[j] =result.inviteeList[i];
+		// 				j++;
+		// 			}
+		// 		}
+		// 		res.status(200).send(inviteeList);
+		// 	}
+		// });
 	} else {
 		res.status(401).send({'message' : 'User does not have permission.'});
 	}
@@ -643,26 +709,61 @@ exports.getRecruiterAlmosts = function(req, res) {
 	if(!req.isAuthenticated()) {
 		res.status(401).send({'message' : 'User is not logged in.'});
 	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
-		var id = req.user._id;
-		var query = User.findOne({'_id' : id});
-		query.select('almostList');
-		query.populate('almostList.user_id', 'displayName email');
-		query.exec(function(err, result) {
+		var uid = new mongoose.Types.ObjectId(req.user._id);
+		var eid = new mongoose.Types.ObjectId(req.body.event_id);
+
+		User.aggregate([
+			{$match : {_id : uid}},
+			{$project : {_id : 0, almostList : 1}},
+			{$unwind : "$almostList"},
+			{$match : {"almostList.event_id" : eid}}
+		], function(err, almosts) {
 			if(err) {
 				res.status(400).send(err);
-			} else if(!result || !result.almostList.length) {
-				res.status(400).json({'message' : 'User not found or the user has not invited anybody yet.'});
+			} else if(!almosts || !almosts.length) {
+				res.status(400).json({'message' : 'User not found or nobody the user invited has signed up to attend yet.'});
 			} else {
-				var almostList = [], j=0;
-				for(var i=0; i<result.almostList.length; i++) {
-					if(result.almostList[i].event_id.toString() === req.body.event_id.toString() && result.almostList[i].user_id) {
-						almostList[j] =result.almostList[i];
-						j++;
+				User.populate(almosts, {
+					path : "almostList.user_id",
+					model : "User",
+					select : "-_id displayName email"
+				}, function(err, populatedAlmosts) {
+					if(err) {
+						res.status(400).send(err);
 					}
-				}
-				res.status(200).send(almostList);
+
+					var almostList = [];
+					for(var i = 0; i < populatedAlmosts.length; i++) {
+						populatedAlmosts[i].almostList.user_id = populatedAlmosts[i].almostList.user_id.toObject();
+						populatedAlmosts[i].almostList.user_id.read = populatedAlmosts[i].almostList.read;
+						almostList.push(populatedAlmosts[i].almostList.user_id);
+					}
+
+					res.status(200).send(almostList);
+				});
 			}
 		});
+
+		// var id = req.user._id;
+		// var query = User.findOne({'_id' : id});
+		// query.select('almostList');
+		// query.populate('almostList.user_id', 'displayName email');
+		// query.exec(function(err, result) {
+		// 	if(err) {
+		// 		res.status(400).send(err);
+		// 	} else if(!result || !result.almostList.length) {
+		// 		res.status(400).json({'message' : 'User not found or the user has not invited anybody yet.'});
+		// 	} else {
+		// 		var almostList = [], j=0;
+		// 		for(var i=0; i<result.almostList.length; i++) {
+		// 			if(result.almostList[i].event_id.toString() === req.body.event_id.toString() && result.almostList[i].user_id) {
+		// 				almostList[j] =result.almostList[i];
+		// 				j++;
+		// 			}
+		// 		}
+		// 		res.status(200).send(almostList);
+		// 	}
+		// });
 	} else {
 		res.status(401).send({'message' : 'User does not have permission.'});
 	}

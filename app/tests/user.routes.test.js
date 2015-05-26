@@ -1599,7 +1599,9 @@ describe('Express.js User Route Unit Tests:', function() {
 					res.status.should.equal(200);
 					res.body.length.should.equal(2);
 					for(var i=0; i<res.body.length; i++) {
-						res.body[i].event_id.toString().should.equal(event1._id.toString());
+						if(res.body[i].email !== user2.email && res.body[i].email !== user4.email) {
+							done(new Error("Proper attendees not returned."));
+						}
 					}
 					done();
 				});
@@ -1651,7 +1653,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					should.not.exist(err);
 					res.status.should.equal(200);
 					res.body.length.should.equal(1);
-					res.body[0].event_id.toString().should.equal(event1._id.toString());
+					res.body[0].email.should.equal(user3.email);
 					done();
 				});
 		});
@@ -1703,7 +1705,9 @@ describe('Express.js User Route Unit Tests:', function() {
 					res.status.should.equal(200);
 					res.body.length.should.equal(2);
 					for(var i=0; i<res.body.length; i++) {
-						res.body[i].event_id.toString().should.equal(event2._id.toString());
+						if(res.body[i].email !== user4.email && res.body[i].email !== user2.email) {
+							done(new Error("Proper attendees not returned."));
+						}
 					}
 					done();
 				});
