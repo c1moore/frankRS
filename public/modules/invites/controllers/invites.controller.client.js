@@ -3,6 +3,8 @@
 angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication', '$location', 'eventSelector', '$http', '$window', '$modal', 'cacheService', 'previewService', 'usSpinnerService',
 	function($scope, Authentication, $location, eventSelector, $http, $window, $modal, cacheService, previewService, usSpinnerService) {
 		$scope.authentication = Authentication;
+
+		//Defaults for when the screen is too small to display the sidebar.
 		$scope.sidebarActiveColor = '#333232';
 		$scope.sidebarInactiveColor = '#6c6969';
 		$scope.sidebarColor = $scope.sidebarInactiveColor;
@@ -60,9 +62,14 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 			},
 			function() {
 				if(eventSelector.postEventId) {
-					angular.element("#invitation-submit-button").removeClass("disabled");
-					angular.element("#invitation-preview-button").removeClass("disabled");
+					if(eventSelector.recruiterEvent) {
+						angular.element("#invitation-submit-button").removeClass("disabled");
+						angular.element("#invitation-preview-button").removeClass("disabled");
+					}
+
 					$scope.invite.event_name = eventSelector.selectedEvent;
+					$scope.invite.event_id = eventSelector.postEventId;
+
 					getPreview();
 				}
 			}
@@ -83,6 +90,7 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 			$scope.sending = true;
 			usSpinnerService.spin('spinner-1');
 			angular.element("#invitation-submit-button").addClass("disabled");
+
 			$http.post('/invitation/send', $scope.invite).success(function(response) {
 				$window.alert(response.message);
 
@@ -109,9 +117,8 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 		};
 
 	/*
-	* Sidebar controllers
+	* Logic for sidebars
 	*/
-
 	$scope.firstSelected = true;
 	$scope.secondSelected = false;
 	$scope.thirdSelected = false;
@@ -128,83 +135,55 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 				if(response.length) {
 					$scope.attendees.error = '';
 				} else {
-					$scope.attendees.error = "Looks like nobody you invited has accepted your request.  Keep trying, eventually you'll find the right people.";
+					$scope.attendees.error = "What?  How could this be?  Nobody has accepted one of your invitations yet!?!";
 				}
 
 			}).error(function(response, status) {
 				$scope.attendees.list = [];
 				//Since the http interceptor handles 401 cases, simply display a message despite the error code.
-				if(status === 400) {
-					$scope.attendees.error = "Looks like nobody you invited has accepted your request.  Keep trying, eventually you'll find the right people.";
+				if(status === 400 && response.message === "User not found or nobody the user invited has signed up to attend yet.") {
+					$scope.attendees.error = "What?  How could this be?  Nobody has accepted one of your invitations yet!?!";
 				} else {
 					$scope.attendees.error = response.message;		//If the interceptor has not redirected the user, this message may contain helpful information.
 				}
-
-				// if(status === 401) {
-				// 	if(response.message === "User is not logged in.") {
-				// 		$location.path('/signin');
-				// 	} else {
-				// 		$location.path('/');
-				// 	}
-				// } else if(status === 400) {
-				// 	$scope.attendees.error = "Looks like nobody you invited has accepted your request.  Keep trying, eventually you'll find the right people.";
-				// }
 			});
 			
 			$http.post('/recruiter/invitees', request).success(function(response) {
 				$scope.invitees.list = response;
 				
-				if(response.length)
+				if(response.length) {
 					$scope.invitees.error = '';
-				else
+				} else {
 					$scope.invitees.error = "How will anybody have be able to enjoy " + eventSelector.selectedEvent + " without wonderful people like you inviting them?  You should invite more people.";
+				}
 			
 			}).error(function(response, status) {
 				$scope.invitees.list = [];
 				
-				if(status === 400) {
+				if(status === 400 && response.message === "User not found or nobody the user invited has signed up to attend yet.") {
 					$scope.invitees.error = "How will anybody have be able to enjoy " + eventSelector.selectedEvent + " without wonderful people like you inviting them?  You should invite more people.";
 				} else {
 					$scope.attendees.error = response.message;
 				}
-
-				// if(status === 401) {
-				// 	if(response.message === "User is not logged in.") {
-				// 		$location.path('/signin');
-				// 	} else {
-				// 		$location.path('/');
-				// 	}
-				// } else if(status === 400) {
-				// 	$scope.invitees.error = "How will anybody have be able to enjoy " + eventSelector.selectedEvent + " without wonderful people like you inviting them?  You should invite more people.";
-				// }
 			});
 
 			$http.post('/recruiter/almosts', request).success(function(response) {
 				$scope.almosts.list = response;
 
-				if(response.length)
+				if(response.length) {
 					$scope.almosts.error = '';
-				else
+				} else {
 					$scope.almosts.error = "Nobody has chosen somebody else's invitation over your invitation.  Looks like somebody is popular.";
+				}
 
 			}).error(function(response, status) {
 				$scope.almosts.list = [];
 				
-				if(status === 400) {
-					$scope.invitees.error = "Nobody has chosen somebody else's invitation over your invitation.  Looks like somebody is popular.";
+				if(status === 400 && response.message === "User not found or nobody the user invited has signed up to attend yet.") {
+					$scope.almosts.error = "Nobody has chosen somebody else's invitation over your invitation.  Looks like somebody is popular.";
 				} else {
-					$scope.attendees.error = response.message;
+					$scope.almosts.error = response.message;
 				}
-
-				// if(status === 401) {
-				// 	if(response.message === "User is not logged in.") {
-				// 		$location.path('/signin');
-				// 	} else {
-				// 		$location.path('/');
-				// 	}
-				// } else if(status === 400) {
-				// 	$scope.almosts.error = "Nobody has chosen somebody else's invitation over your invitation.  Looks like somebody is popular.";
-				// }
 			});
 		} else {
 			$scope.attendees.error = "You have not selected an event.  You can do so in the top right-hand corner.";
@@ -218,7 +197,6 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 	/*
 	* Logic for preview.
 	*/
-
 	var previewOptions = {};
 
 

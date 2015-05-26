@@ -18,6 +18,9 @@
   height: 250px;
   overflow: auto;
 }
+.frank-invite-sb-read {
+  color: rgb(247, 181, 24);
+}
 .frank-invites-sidebar{
   position: fixed;
   height: 100vh;
@@ -50,8 +53,11 @@
   width: 100%;
 }
 .frank-invite-table-container {
-  height: 100px;
+  max-height: 45vh;
   overflow: auto;
+}
+.frank-invite-table-container thead {
+  background-color: #E8E9EB;
 }
 .invitation-button {
   height: 45px;
@@ -87,7 +93,7 @@
 }
 .sidebar-display i.fa {
   top: 50vh;
-  right: -13px;
+  right: -7px;
   position: relative;
   color: white;
   font-size: 20px;
@@ -315,6 +321,7 @@ animation:0.5s flipInX ease;
 }
 #invitee_email {
   margin-left: 33px;
+  display: inline-block;
 }
 /*#to {
   border:1px solid black;
@@ -433,7 +440,7 @@ body {
   }
 
   .frank-invites-sidebar-closed {
-    width: 40px;
+    width: 25px;
   }
 
   .jumbotron {
@@ -442,14 +449,14 @@ body {
   }
 
   .panel-group {
-    width: 325px;
+    width: 345px;
   }
 
   .sidebar-display {
     display: inline-block;
     height: 100vh;
-    width: 40px;
-    background: 6C6969;
+    width: 25px;
+    background: #6C6969;
   }
 
   #invite {
@@ -466,5 +473,12 @@ body {
 
   #to_fields {
     width: 75vw;
+  }
+}
+
+@media (max-width: 1154px) and (min-width: 935px) {
+  #invitee_email {
+    display: block;
+    margin-left: 0;
   }
 }

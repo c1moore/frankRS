@@ -206,9 +206,7 @@ i.fa.fa-remove.text-danger:hover {
 		width: 95%;
 		float: none;
 	}
-}
 
-@media (max-width: 991px) {
 	.frank-comments-board {
 		width: 100%;
 	}

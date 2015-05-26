@@ -58,12 +58,12 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr class="animate-repeat"  ng-repeat="attendee in (results = (attendees.list | filter:q))">
+							<tr class="animate-repeat"  ng-repeat="attendee in (results = (attendees.list | filter:q))" ng-class="{'frank-invite-sb-read' : attendee.read}">
 								<td>
-							 		{{attendee.user_id.displayName}}
+							 		{{attendee.displayName}}
 							 	</td>
 							 	<td>
-							 		{{attendee.user_id.email}}
+							 		{{attendee.email}}
 							 	</td>
 							</tr>
 							<tr class="animate-repeat" ng-if="results.length == 0">
@@ -97,12 +97,12 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr class="animate-repeat"  ng-repeat="invitee in (results = (invitees.list | filter:q))">
+							<tr class="animate-repeat"  ng-repeat="invitee in (results = (invitees.list | filter:q))" ng-class="{'frank-invite-sb-read' : invitee.read}">
 								<td>
-							 		{{invitee.user_id.displayName}}
+							 		{{invitee.displayName}}
 							 	</td>
 							 	<td>
-							 		{{invitee.user_id.email}}
+							 		{{invitee.email}}
 							 	</td>
 							</tr>
 							<tr class="animate-repeat" ng-if="results.length == 0">
@@ -136,12 +136,12 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr class="animate-repeat"  ng-repeat="almost in (results = (almosts.list | filter:q))">
+							<tr class="animate-repeat"  ng-repeat="almost in (results = (almosts.list | filter:q))" ng-class="{'frank-invite-sb-read' : almost.read}">
 								<td>
-							 		{{almost.user_id.displayName}}
+							 		{{almost.displayName}}
 							 	</td>
 							 	<td>
-							 		{{almost.user_id.email}}
+							 		{{almost.email}}
 							 	</td>
 							</tr>
 							<tr class="animate-repeat" ng-if="results.length == 0">
@@ -161,77 +161,7 @@
 				</div>
 			</accordion-group>
 		</accordion>
-	</div>
-	<!-- <div id="accepted" class="frank-invite-sidebar">
-		<div class="frank-invite-sidebar-title">
-			<b>Awesome People Attending</b>
-		</div>
-		<input type="search" class="frank-invite-sidebar-search" ng-model="q" placeholder="Search..." />
-		<hr class="frank-invite-hr" />
-		<div class="frank-invite-table-container">
-			<table class="animate-container">
-				<thead>
-					<tr>
-						<th>Name</th>
-						<th>Email</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr class="animate-repeat"  ng-repeat="friend in (results = (friends | filter:q))">
-						<td>
-					 		{{friend.name}}
-					 	</td>
-					 	<td>
-					 		{{friend.email}}
-					 	</td>
-					</tr>
-					<tr class="animate-repeat" ng-if="results.length == 0">
-						<td>
-							<strong>No results found...</strong>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-		<div class="frank-invite-sidebar-total" id="accepted-total">
-			<hr class="frank-invite-hr"/>
-			<b>Total: {{friends.length}}</b>
+		<div class="sb-key">
 		</div>
 	</div>
-	<div id="invites" class="frank-invite-sidebar">
-		<div class="frank-invite-sidebar-title">
-			<b>People You Invited</b>
-		</div>
-		<input type="search" class="frank-invite-sidebar-search" ng-model="q" placeholder="Search..." />
-		<hr class="frank-invite-hr"/>
-		<div class="frank-invite-table-container">
-			<table class="animate-container">
-				<thead>
-					<tr>
-						<th>Name</th>
-						<th>Email</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr class="animate-repeat"  ng-repeat="invite in (results = (invites | filter:q))">
-						<td>
-					 		{{invite.name}}
-					 	</td>
-					 	<td>
-					 		{{invite.email}}
-					 	</td>
-					</tr>
-					<tr class="animate-repeat" ng-if="results.length == 0">
-						<td>
-							<strong>No results found...</strong>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-		<div class="frank-invite-sidebar-total" id="invited-total">
-			<hr class="frank-invite-hr"/>
-			<b>Total: {{invites.length}}</b>
-		</div>
-	</div> -->
 </section>
