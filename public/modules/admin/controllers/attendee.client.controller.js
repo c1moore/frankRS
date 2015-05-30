@@ -148,14 +148,14 @@ angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTab
 				
 				//Do the action specified by the returned flag.
 				switch(result) {
-					case flags[0]:
+					case actionFlags[0]:
 						//Do nothing
 						break;
-					case flags[1]:
+					case actionFlags[1]:
 						//Remove user's permissions for this event.
 						removeEventPermissions(attendee._id, attendee.fName);
 						break;
-					case flags[2]:
+					case actionFlags[2]:
 						//Remove user's permissions for all events.
 						removeAllPermissions(attendee._id, attendee.fName);
 						break;
@@ -180,7 +180,8 @@ angular.module("admin").controller("attendeeActionModalCtrl", ["$scope", "$modal
 		* @param action - 1 if the user accepts or 0 if the user changed their mind
 		*/
 		$scope.done = function(action) {
-			var flag = action ? $scope.flags[0] : $scope.selection;
+			action = parseInt(action, 10);
+			var flag = action ? $scope.selection : $scope.flags[0];
 
 			$modalInstance.close(flag);
 		};
