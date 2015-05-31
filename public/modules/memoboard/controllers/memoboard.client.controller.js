@@ -35,10 +35,11 @@ angular.module('memoboard').controller('memoboardCtrl', ['$scope', 'Authenticati
 				$http.post('/comments/getSocialCommentsForEvent', {event_id : eventSelector.postEventId}).success(function(response) {
 					$scope.comments = response;
 				}).error(function(response, status) {
-					if(status === 401) {
-						$location.path('/');
-					} else if(response.message !== "No comments found!") {
-						$window.alert("There was an error retreiving comments.  Please try again later.");
+					if(response.message !== "No comments found!") {
+						//Fail silently since the interceptor should handle any important cases and notices can be annoying.  Attempt again in 5 seconds.
+						$timeout(function() {
+							getEvents();
+						}, 5000);
 					}
 				});
 			}

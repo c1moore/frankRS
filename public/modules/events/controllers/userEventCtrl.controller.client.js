@@ -1,3 +1,5 @@
+'use strict';
+
 angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams', '$http', 'eventSelector', '$filter', 'dialogs', 'Authentication', '$timeout', '$window',
 	function($scope, ngTableParams, $http, eventSelector, $filter, dialogs, Authentication, $timeout, $window) {
 		$scope.user = Authentication;
@@ -23,7 +25,10 @@ angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams',
 					$scope.events[i].end_date = $filter('date')($scope.events[i].end_date, "EEE, MMM d, yyyy");
 				}
 			}).error(function(error) {
-				console.log(error);
+				//Fail silently, since the interceptor should handle any important cases and notices can be annoying.  Attempt again in 5 seconds.
+				$timeout(function() {
+					getEvents();
+				}, 5000);
 			});
 		};
 		getEvents();
@@ -40,12 +45,8 @@ angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams',
 			  }
 			}, {
 			getData: function($defer, params) {
-		        var filteredData = params.filter() ?
-		              $filter('filter')($scope.events, params.filter()) :
-		              $scope.events;
-		        var orderedData = params.sorting() ? 
-		              $filter('orderBy')(filteredData, params.orderBy()) : 
-		              $scope.events;
+		        var filteredData = params.filter() ? $filter('filter')($scope.events, params.filter()) : $scope.events;
+		        var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : $scope.events;
 
 		        if(orderedData) {
 		        	params.total(orderedData.length);
@@ -69,11 +70,10 @@ angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams',
 				$http.post("candidate/setCandidate", {event_id:event._id}).success(function() {
 					getEvents();
 				}).error(function(error) {
-					console.log(error);
 					$window.alert("There was an error submitting your request.  Please try again later.");
-				})
-			})
-		}
+				});
+			});
+		};
 
 		/**
 		* Adopted from post made on stackoverflow.com by disfated.  Original post here:

@@ -1,3 +1,5 @@
+'use strict';
+
 (function() {
 	describe('Roles Filter Test', function() {
 		// Load the main application module
@@ -9,7 +11,7 @@
 			{roles:['admin','atendee']}
 		];
 
-		var testArrayData = ['recruiter','admin']
+		var testArrayData = ['recruiter','admin'];
 
 		it('should return remove third testData', 
 			inject(function($filter) {

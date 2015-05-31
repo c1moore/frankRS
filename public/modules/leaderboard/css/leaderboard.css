@@ -14,6 +14,7 @@ a:hover {
 .frank-event-select {
 	background-image: -webkit-linear-gradient(top, #f0ad4e 0%, #ec971f 100%);
 	background-image: -o-linear-gradient(top, #f0ad4e 0%, #ec971f 100%);
+	background-image: -moz-linear-gradient(top, #f0ad4e 0%, #ec971f 100%);
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#f0ad4e), to(#ec971f));
 	background-image: linear-gradient(to bottom, #f0ad4e 0%, #ec971f 100%);
 	background-repeat: repeat-x;
@@ -40,6 +41,7 @@ a:hover {
 }
 
 .ng-table th.sortable.sort-desc, .ng-table th.sortable.sort-asc {
+	background-color: rgb(25, 25, 25);
 	background-color: rgba(25, 25, 25, .70);
 }
 
@@ -65,12 +67,8 @@ th.header {
 	margin-top:2px;
 }
 
-.attendingBar{
-	.background:#c54e92;
-}
-
-.invitedBar {
-
+.attendingBar {
+	background-color: #c54e92;
 }
 
 .rankCol {
@@ -82,8 +80,8 @@ th.header {
 }
 
 .progress-bar {
-	.background-image: none;
-	.background-color: #c54e92;
+	background-image: none;
+	background-color: #c54e92;
 }
 
 .progress-keys {
@@ -106,11 +104,11 @@ th.header {
 
 .ranktitle {
 	font-size:2em;
-	margin-bottom:0px;
+	margin-bottom:0;
 }
 
 .eventSelector {
-	padding-top:0px;
+	padding-top:0;
 }
 
 .score-section  {
@@ -118,7 +116,7 @@ th.header {
 }
 
 .score-section h1 {
-	margin:0px;
+	margin:0;
 }
 
 .rank-container {
@@ -130,7 +128,7 @@ th.header {
 }
 
 .rank-container h1 {
-	margin:0px;
+	margin:0;
 	font-size:150px;
 	text-align:center;
 	line-height:200px;

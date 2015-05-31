@@ -31,7 +31,7 @@ exports.getCandidates = function(req, res) {
 			}
 		});
 	}
-}
+};
 
 exports.getCandidatesByEvent = function(req, res) {
 	if(!req.isAuthenticated()) {
@@ -55,7 +55,7 @@ exports.getCandidatesByEvent = function(req, res) {
 			}
 		});
 	}
-}
+};
 
  exports.getfName = function(req, res) {
  	var user = req.user;
@@ -633,11 +633,11 @@ exports.setEventAccepted = function(req,res){
 									
 									result.save(function(err){
 										if (err) {
-											return res.status(400).send({message : err})
+											return res.status(400).send({message : err});
 										} else {
 											newUser.save(function(err){
 												if (err) {
-													return res.status(400).send({message : err})
+													return res.status(400).send({message : err});
 												} else {
 													return res.status(200).send({message : "New recruiter added and notification sent!"});
 												}
@@ -813,9 +813,9 @@ exports.setCandidate = function(req,res){
 					if(err) {
 						return res.status(400).send({message : err});
 					} else {
-						return res.status(200).send({message : req.body.fName + ' ' + req.body.lName + ' now has the honor of being a candidate for us.'})
+						return res.status(200).send({message : req.body.fName + ' ' + req.body.lName + ' now has the honor of being a candidate for us.'});
 					}
-				})
+				});
 			}
 		});
 	} else {
@@ -858,9 +858,9 @@ exports.setCandidate = function(req,res){
 		 			} else {
 		 				return res.status(200).send({message : 'Congrats! You are now in the running to be a recruiter for {{eventSelector.selectedEvent}}.'});
 		 			}
-		 		})
+		 		});
 		 	}
-	 	})
+	 	});
  	}
 };
 

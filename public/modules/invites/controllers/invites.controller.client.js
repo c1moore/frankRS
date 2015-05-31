@@ -92,8 +92,6 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 			angular.element("#invitation-submit-button").addClass("disabled");
 
 			$http.post('/invitation/send', $scope.invite).success(function(response) {
-				$window.alert(response.message);
-
 				//Set all form fields to blank so the user can send another invitation.
 				$scope.invite.fName = "";
 				$scope.invite.lName = "";
@@ -107,7 +105,7 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 				usSpinnerService.stop('spinner-1');
 				$scope.sending = false;
 			}).error(function(response) {
-				$window.alert(response.message);
+				$window.alert("There was an error sending this message.\n\nError: " + response.message);
 
 				angular.element("#invitation-submit-button").removeClass("disabled");
 				

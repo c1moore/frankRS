@@ -1,3 +1,5 @@
+'use strict';
+
 angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Authentication', '$http', 'ngTableParams', '$filter', '$resource', '$location', 'eventSelector', '$timeout',
 	function($scope, Authentication, $http, ngTableParams, $filter, $resource, $location, eventSelector, $timeout) {
 
@@ -53,16 +55,12 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 	        	sorting: {
 	        		place:'asc'		// set the initial sorting to be place asc
 	        	}
-	    		}, {
+	    	}, {
 	        	total: 0, // length of data
 	        	getData: function($defer, params) {
 	        		mainApi.getTable({event_id:eventSelector.postEventId}, function(data) {
-		            	var filteredData = params.filter() ?
-		            		$filter('filter')(data, params.filter()) :
-		            		data;
-		            	var orderedData = params.sorting() ? 
-		            		$filter('orderBy')(filteredData, params.orderBy()) : 
-		            		data;
+		            	var filteredData = params.filter() ? $filter('filter')(data, params.filter()) : data;
+		            	var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : data;
 		           
 		           		//get the max invited and attending
 		            	var maxInvitedFilter = $filter('orderBy')(data,'invited', 'reverse');
@@ -87,16 +85,12 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 	        	sorting: {
 	        		attendeeName:'asc'		// set the initial sorting to be displayName asc
 	        	}
-	    		}, {
+	    	}, {
 	        	total: 0, // length of data
 	        	getData: function($defer, params) {
 	            	attendingApi.getTable({event_id:eventSelector.postEventId}, function(data){
-		            	var filteredData = params.filter() ?
-		            		$filter('filter')(data, params.filter()) :
-		            		data;
-		            	var orderedData = params.sorting() ? 
-		            		$filter('orderBy')(filteredData, params.orderBy()) : 
-		            		data;
+		            	var filteredData = params.filter() ? $filter('filter')(data, params.filter()) : data;
+		            	var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : data;
 
 		            	params.total(orderedData.length); //set total recalculation for paganation
 		            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
@@ -114,16 +108,12 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 	        	sorting: {
 	        		inviteeName:'asc'		// set the initial sorting to be displayName asc
 	        	}
-	    		}, {
+	    	}, {
 	        	total: 0, // length of data
 	        	getData: function($defer, params) {
 	            	invitedApi.getTable(params.url,{event_id: eventSelector.postEventId}, function(data){
-		            	var filteredData = params.filter() ?
-		            		$filter('filter')(data, params.filter()) :
-		            		data;
-		            	var orderedData = params.sorting() ? 
-		            		$filter('orderBy')(filteredData, params.orderBy()) : 
-		            		data;
+		            	var filteredData = params.filter() ? $filter('filter')(data, params.filter()) : data;
+		            	var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : data;
 
 
 		            	params.total(orderedData.length); //set total recalculation for paganation
@@ -169,7 +159,10 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 					$scope.statsError = true;
 				});
 			}).error(function(response, status) {
-
+				//Fail silently since the interceptor should handle any important cases and notices can be annoying.  Attempt again in 5 seconds.
+				$timeout(function() {
+					getStats();
+				}, 5000);
 			});
 		};
 

@@ -1,3 +1,5 @@
+'use strict';
+
 angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams', '$http', 'eventSelector', '$filter', '$window', '$location', 'usSpinnerService', '$timeout',
 	function($scope, ngTableParams, $http, eventSelector, $filter, $window, $location, usSpinnerService, $timeout) {
 		$scope.newCandidateEvents = [];
@@ -52,8 +54,11 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 		};
 
 		//updated the selected event from the event selector service
-		$scope.$watch( function() {return eventSelector.selectedEvent},
-		  function(selectedEvent) {
+		$scope.$watch(
+			function() {
+				return eventSelector.selectedEvent;
+			},
+			function(selectedEvent) {
 				$scope.isEventSelected = eventSelector.postEventId ? true : false;
 
 				if($scope.isEventSelected) {
@@ -78,7 +83,10 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 
 				rowUpdated = false;
 			}).error(function(error) {
-				console.log(error)
+				//Fail silently, since the interceptor should handle any important cases and notices can be annoying.  Attempt again in 5 seconds.
+				$timeout(function() {
+					$scope.getCandidates();
+				}, 5000);
 			});
 		};
 
@@ -90,36 +98,44 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 				}
 
 				$http.post('/candidate/setCandidate',newCandidate).success(function() {
-					console.log("Candidate created");
-					//refresh table view
+					//Refresh table view
 					$scope.getCandidates();
-				}).error(function(error) {
-					console.log(error);
+
+					//Reset the form
+					$scope.candidateForm.$setPristine(true);
+					$scope.newCandidate = {};
+					$scope.newCanidateEvents = [];
+				}).error(function(res) {
+					//Warn the user.
+					$window.alert("Oops, something bad happened.  We couldn't save the new candidate.  Please make sure all fields are correct and try again.\n\nError: " + res.message);
 				});
 			}
-			$scope.candidateForm.$setPristine(true);
-			$scope.newCandidate = {};
-			$scope.newCanidateEvents = [];
 		};
 
 		$scope.acceptCandidate = function(candidate) {
 			var postObject = {candidate_id:candidate._id, event_id:eventSelector.postEventId, accepted:true};
 			$http.post('/candidate/setAccepted',postObject).success(function() {
-				console.log("Candidate Accepted");
 				//refresh table view
 				$scope.getCandidates();
-			}).error(function(error) {
-				console.log(error);
+			}).error(function(res) {
+				//Warn the user.
+				$window.alert("Candidate not updated.  Please try again.\n\n" + res.message);
+				
+				//Refresh table view
+				$scope.getCandidates();
 			});
 		};
 
 		$scope.denyCandidate = function(candidate) {
-			$http.post('/candidate/deleteCandidate/event',{candidate_id:candidate._id, event_id:eventSelector.postEventId}).success(function(){
-				console.log("Candidate Deleted");
+			$http.post('/candidate/deleteCandidate/event',{candidate_id:candidate._id, event_id:eventSelector.postEventId}).success(function() {
 				//refresh table view
 				$scope.getCandidates();
-			}).error(function(error) {
-				console.log(error);
+			}).error(function(res) {
+				//Warn the user.
+				$window.alert("Candidate not updated.  Please try again.\n\nError: " + res.message);
+				
+				//Refresh table view
+				$scope.getCandidates();
 			});
 		};
 
@@ -131,25 +147,26 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 		});
 
 		$scope.tableParams = new ngTableParams({
-			page: 1,
-			count: 10,
-			filter: {
-				fName:''
-			},
-			sorting: {
-				fName:'asc'
+				page: 1,
+				count: 10,
+				filter: {
+					fName:''
+				},
+				sorting: {
+					fName:'asc'
+				}
+			}, {
+				getData: function($defer, params) {
+					var filteredData = params.filter() ? $filter('filter')($scope.candidates, params.filter()) : $scope.candidates;
+					var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : $scope.candidates;
+			
+					params.total(orderedData.length);
+			
+					$scope.$data = orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count());
+					$defer.resolve($scope.$data);
+				}
 			}
-		}, {
-			getData: function($defer, params) {
-				var filteredData = params.filter() ? $filter('filter')($scope.candidates, params.filter()) : $scope.candidates;
-				var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : $scope.candidates;
-		
-				params.total(orderedData.length);
-		
-				$scope.$data = orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count());
-				$defer.resolve($scope.$data);
-			}
-		});
+		);
 
 		/**
 		* This is the logic for sending an email to a candidate.  Instead of having one array with
@@ -211,16 +228,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 					usSpinnerService.stop('spinner-2');
 					$scope.sending = false;
 				}).error(function(response, status) {
-					console.log(response.message);
-					if(status === 401) {
-						if(response.message === "User is not logged in.") {
-							$location.path('/signin');
-						} else {
-							$location.path('/');
-						}
-					} else if(status === 400) {
-						$window.alert("There was an error sending the message.  Please try again later.");
-					}
+					$window.alert("There was an error sending the message.  Please try again later.\n\nError: " + response);
 						
 					usSpinnerService.stop('spinner-2');
 					$scope.sending = false;
@@ -250,7 +258,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 						}).error(function(res) {
 							$scope.getCandidates();
 
-							$window.alert("Error occurred while updating " + $scope.$data[index].fName + "'s entry.\n\n" + res);
+							$window.alert("Error occurred while updating " + $scope.$data[index].fName + "'s name.\n\nError: " + res);
 						});
 
 						$http.post("/candidate/setlName", {lName : $scope.$data[index].lName, candidate_id : $scope.$data[index]._id}).success(function() {
@@ -258,7 +266,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 						}).error(function(res) {
 							$scope.getCandidates();
 
-							$window.alert("Error occurred while updating " + $scope.$data[index].fName + "'s entry.\n\n" + res);
+							$window.alert("Error occurred while updating " + $scope.$data[index].fName + "'s name.\n\nError: " + res);
 						});
 					} else {
 						var address = "/candidate/set" + field;
@@ -272,7 +280,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 						}).error(function(res) {
 							$scope.getCandidates();
 
-							$window.alert("Error occurred while updating " + $scope.$data[index].fName + "'s entry.\n\n" + res);
+							$window.alert("Error occurred while updating " + $scope.$data[index].fName + "'s record.\n\nError: " + res);
 						});
 					}
 				} else {
@@ -282,42 +290,5 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 				}
 			}
 		};
-
-		/**
-		var updatedCandidates = [];
-		var dataUpdated = false;
-		var rowUpdated = false;
-		$scope.$watch('$data', function() {
-			//Only mark as modified if there actually is data in the table.
-			if($scope.$data.length > 0) {
-				console.log("Change");
-				dataUpdated = true;
-				rowUpdated = true;
-			}
-		});
-
-		/**
-		* Mark a row as modified so we know it needs to be written back to
-		* the database on the next save.  This method should only be called
-		* on an onBlur event so dataUpdated has a chance to update.
-		
-		$scope.setModified = function(index) {
-			if(rowUpdated) {
-				$scope.updatedCandidates.push(index);
-				rowUpdated = false;
-			}
-		};
-
-		//Save any changes to candidates every 2 seconds.
-		$timeout(function() {
-			if(dataUpdated) {
-
-			}
-		}, 2000);
-
-		//Save any changes to candidates before the user leaves the page.
-		$scope.$on('$locationChangeStart', function(event, next, current) {
-			alert("Page is changing!!!!!");
-		});*/
 	}
 ]);

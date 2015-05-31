@@ -87,6 +87,7 @@ li .disabled {
 }
 .sidebar-hidden-text {
 	writing-mode:tb-rl;
+	transform: rotate(90deg);
 	-webkit-transform:rotate(90deg);
 	-moz-transform:rotate(90deg);
 	-o-transform: rotate(90deg);
@@ -100,15 +101,7 @@ li .disabled {
 	top: 56px;
 	right: -28px;
 }
-#frank-buttons-containter {
-	/*height: 55vh;
-	width: 650px;
-	margin: 0 30px;
-	overflow: auto;
-	position: static;
-	float: left;
-	margin-left: 20vw;*/
-}
+
 #recruiter-request-button-title {
 	font-size: 17px;
 }

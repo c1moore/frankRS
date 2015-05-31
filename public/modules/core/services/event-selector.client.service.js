@@ -9,9 +9,9 @@
 * the user selected before refreshing the page so this event can automatically be restored.  We are using
 * cacheService to deal with saving these values to the localStorage.
 */
-angular.module('core').service('eventSelector', ['$rootScope', '$http', '$location', 'cacheService', 'Authentication', '$window',
+angular.module('core').service('eventSelector', ['$rootScope', '$http', '$location', 'cacheService', 'Authentication', '$window', '$timeout',
 
-	function($rootScope, $http, $location, cacheService, Authentication, $window) {
+	function($rootScope, $http, $location, cacheService, Authentication, $window, $timeout) {
 		var thisService = this;
 		var cache = cacheService;
 
@@ -27,13 +27,13 @@ angular.module('core').service('eventSelector', ['$rootScope', '$http', '$locati
 		var keys = [];
 		var put = function(key, value) {
 			cache.setData(key,value);
-		}
+		};
 
 		this.hideEventSelector = function() {
 			var path = $location.path();
 
 			return (path === '/signin' || path === '/settings/profile' || path === '/settings/password');
-		}
+		};
 
 		thisService.eventSelect = function() {
 			/**
@@ -50,29 +50,36 @@ angular.module('core').service('eventSelector', ['$rootScope', '$http', '$locati
 							return true;
 					}
 					return false;
-				}
+				};
 
 				
 				/*This request the available events from the db. If there already is a cache of the selected event,
 				this event is used as the currently selected event. If there is not a cache of events, it will use
 				the first available event in the events array from the db as the selected event. */
-				$http.get('/users/events').success(function(data) {
-					thisService.events = data;
+				var getEvents = function() {
+					$http.get('/users/events').success(function(data) {
+						thisService.events = data;
 
-					var cachedEvent = cache.getData('selectedEvent'), cachedId = cache.getData('eventId');
+						var cachedEvent = cache.getData('selectedEvent'), cachedId = cache.getData('eventId');
 
-					if(cachedEvent && cachedId && thisService.events.length && checkEvent(cachedId)) {
-						thisService.selectedEvent = cache.getData('selectedEvent');
-						thisService.postEventId = cache.getData('eventId');
-					}
-					else {
-						thisService.selectedEvent = thisService.events[0].name;
-						thisService.postEventId = thisService.events[0]._id;
-					}
-				}).error(function(error, status) {
-					thisService.selectedEvent = "Error";
-					console.log(error);
-				});
+						if(cachedEvent && cachedId && thisService.events.length && checkEvent(cachedId)) {
+							thisService.selectedEvent = cache.getData('selectedEvent');
+							thisService.postEventId = cache.getData('eventId');
+						}
+						else {
+							thisService.selectedEvent = thisService.events[0].name;
+							thisService.postEventId = thisService.events[0]._id;
+						}
+					}).error(function(error, status) {
+						thisService.selectedEvent = "Error";
+
+						//Attempt again in 5 seconds.
+						$timeout(function() {
+							getEvents();
+						}, 5000);
+					});
+				};
+				getEvents();
 
 				thisService.changeEvent = function(event) {
 					thisService.selectedEvent = event.name;
@@ -87,7 +94,8 @@ angular.module('core').service('eventSelector', ['$rootScope', '$http', '$locati
 				*/
 				thisService.showDivider = function() {
 					return false;
-				}
+				};
+
 				thisService.toggleDisabledEvents = function() {};
 			} else {
 				var checkEvent = function(needle) {
@@ -95,32 +103,39 @@ angular.module('core').service('eventSelector', ['$rootScope', '$http', '$locati
 						if (thisService.events[i].event_id._id === needle) return true;
 					}
 					return false;
-				}
+				};
 
-				$http.get('/users/events').success(function(data) {
-					thisService.events = data.status;
-					for(var i=0; i<thisService.events.length; i++) {
-						if(thisService.events[i].recruiter)
-							thisService.numRecruiting++;
-					}
+				var getEvents = function() {
+					$http.get('/users/events').success(function(data) {
+						thisService.events = data.status;
+						for(var i=0; i<thisService.events.length; i++) {
+							if(thisService.events[i].recruiter)
+								thisService.numRecruiting++;
+						}
 
-					var cachedEvent = cache.getData('selectedEvent'), cachedId = cache.getData('eventId');
+						var cachedEvent = cache.getData('selectedEvent'), cachedId = cache.getData('eventId');
 
-					if(cachedEvent && cachedId && thisService.events.length && checkEvent(cachedId)) {
-						thisService.selectedEvent = cache.getData('selectedEvent');
-						thisService.postEventId = cache.getData('eventId');
-						thisService.recruiterEvent = cache.getData('recruiterEvent');
-					} else {
-						thisService.selectedEvent = thisService.events[0].name;
-						thisService.postEventId = thisService.events[0]._id;
-					}
-				}).error(function(error, status) {
-					if(status === 401) {
-						thisService.selectedEvent = "Error";
-						thisService.disabled = !thisService.disabled;
-					}
-					console.log(error);
-				});
+						if(cachedEvent && cachedId && thisService.events.length && checkEvent(cachedId)) {
+							thisService.selectedEvent = cache.getData('selectedEvent');
+							thisService.postEventId = cache.getData('eventId');
+							thisService.recruiterEvent = cache.getData('recruiterEvent');
+						} else {
+							thisService.selectedEvent = thisService.events[0].name;
+							thisService.postEventId = thisService.events[0]._id;
+						}
+					}).error(function(error, status) {
+						if(status === 400) {
+							thisService.selectedEvent = "Error";
+							thisService.disabled = !thisService.disabled;
+						}
+
+						//Attempt again in 5 seconds.
+						$timeout(function() {
+							getEvents();
+						}, 5000);
+					});
+				};
+				getEvents();
 
 				thisService.changeEvent = function(event) {
 					thisService.selectedEvent = event.event_id.name;

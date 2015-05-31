@@ -8,7 +8,7 @@ angular.module("core").filter("roles", function(){
 				if (array[x] === needle) return true;
 			}
 			return false;
-		}
+		};
 
 		//filters out data for arrays of objects
 		var objectContaining = function(element) {
@@ -21,11 +21,11 @@ angular.module("core").filter("roles", function(){
 		//filters out data for arrays of strings
 		var arrayContaining = function(element) {
 			return contains(rolesNeeded,element);
-		}
+		};
 
 		//handles the case when data or rolesNeeded don't exist 
 		if (data === null || rolesNeeded === null) {
-			return []
+			return [];
 		}
 		//check if arrays are the same
 		else if (angular.equals(data,rolesNeeded)) {

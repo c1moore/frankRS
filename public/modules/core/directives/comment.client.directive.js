@@ -56,7 +56,6 @@ angular.module('core').directive('commentHeader', ['$http', '$window',
 						$scope.commentsArr.splice($scope.arrIndex, 1);
 					}).error(function(response, status) {
 						$window.alert("There was an error deleting this comment.  Please try again.");
-						console.log(response.message);
 					});
 				};
 			}
@@ -185,7 +184,6 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout', 'even
 						var now = Date.now();
 						for(var i=0; i<$scope.uploader.flowInstance.files.length; i++) {
 							$scope.uploader.flowInstance.files[i].name = Authentication.user._id + eventSelector.selectedEvent + now + i + "." + $scope.uploader.flowInstance.files[i].getExtension();
-							console.log($scope.uploader.flowInstance.files[i].name);
 						}
 						$scope.uploader.flowInstance.opts.query = {event_id : eventSelector.postEventId};
 						$scope.uploader.flowInstance.opts.testChunks = false;
@@ -224,7 +222,7 @@ angular.module('core').directive('commentEditor', ['$compile', '$timeout', 'even
 										}
 									}
 								}).error(function(response, status) {
-									$window.alert(status + " " + response.message);
+									$window.alert("This is embarrassing!  We couldn't post your comment.  Please try again.");
 								});
 							}
 						};

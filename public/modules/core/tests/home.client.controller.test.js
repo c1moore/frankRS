@@ -53,6 +53,6 @@
 		it('should return a width of 50', function() {
 			scope.authentication.user.roles = ['recruiter'];
 			expect(scope.data.buttons.length).toEqual(5);
-		})
+		});
 	});
 })();

@@ -1,3 +1,5 @@
+'use strict';
+
 angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams', '$http', '$timeout', '$filter', '$modal', '$window',
 	function($scope, ngTableParams, $http, $timeout, $filter, $modal, $window) {
 		$scope.events = [];
@@ -30,13 +32,11 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 			  }
 			}, {
 			getData: function($defer, params) {
-		        var filteredData = params.filter() ?
-		              $filter('filter')($scope.events, params.filter()) :
-		              $scope.events;
-		        var orderedData = params.sorting() ? 
-		              $filter('orderBy')(filteredData, params.orderBy()) : 
-		              $scope.events;
+		        var filteredData = params.filter() ? $filter('filter')($scope.events, params.filter()) : $scope.events;
+		        var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : $scope.events;
+		        
 		        params.total(orderedData.length);
+
 				$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
 			}
         });
@@ -48,22 +48,26 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
         $scope.addEvent = function (newEvent) {
         	newEvent.start_date = new Date(newEvent.start_date).getTime();
         	newEvent.end_date = new Date(newEvent.end_date).getTime();
+        	
         	$http.post('/events/create',newEvent).success(function() {
-        		console.log('Event created');
         		getEvents();
-        	}).error(function(error) {
-        		console.log(error);
+
+	        	$scope.newEvent = null;
+	        	$scope.eventForm.$setPristine(true);
+        	}).error(function(response) {
+        		$window.alert("There was an error adding " + newEvent.name + ".  Please make sure all information is correct and try again.\n\nError: " + response.message);
         	});
-        	$scope.newEvent = null;
-        	$scope.eventForm.$setPristine(true);
   		};
 
 		$scope.updateEvent = function(event) {
 			event.start_date = new Date(event.start_date).getTime();
         	event.end_date = new Date(event.end_date).getTime();
+
 			$http.post('/events/setEventObj',{event_id : event._id, event:event}).success(function() {
 				getEvents();
-			}).error(function(error) {
+			}).error(function(response) {
+        		$window.alert("There was an error updating " + event.name + ".  Please make sure all information is correct and try again.\n\nError: " + response.message);
+
 				getEvents();
 			});
 		};
@@ -72,24 +76,24 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
   		//the following code sets up the date selectors in the event form 
   		$scope.today = function() {
 			$scope.dt = new Date();
-		}
+		};
 		$scope.today();
 
 		$scope.clear = function() {
 			$scope.dt = null;
-		}
+		};
 
 		$scope.openS = function($event) {
 			$event.preventDefault();
 			$event.stopPropagation();
 			$scope.openedS = true;
-		}
+		};
 
 		$scope.openE = function($event) {
 			$event.preventDefault();
 			$event.stopPropagation();
 			$scope.openedE = true;
-		}
+		};
 
 		$scope.dateOptions = {
 			formatYear: 'yy',
@@ -101,6 +105,7 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 				getEvents();
 			}).error(function(res, status) {
 				$window.alert("An error occurred while deleting " + event.name +".\n\nError: " + res.message);
+
 				getEvents();
 			});
 		};
@@ -130,6 +135,7 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 				getEvents();
 			}).error(function(res, status) {
 				$window.alert("An error occurred while disabling " + ename + ".\n\nError: " + res.message);
+				
 				getEvents();
 			});
 		};
@@ -167,7 +173,7 @@ angular.module("admin").controller("eventDeleteModalCtrl", ["$scope", "$modalIns
 			} else {
 				$modalInstance.close(false);
 			}
-		}
+		};
 	}
 ]);
 
@@ -182,6 +188,6 @@ angular.module("admin").controller("eventInactivateModalCtrl", ["$scope", "$moda
 			} else {
 				$modalInstance.close(false);
 			}
-		}
+		};
 	}
 ]);

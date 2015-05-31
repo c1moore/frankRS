@@ -24,6 +24,6 @@ angular.module('admin').directive('multiselect',
 					return def.promise;
 				};
 			}
-		}
+		};
 	}
 );

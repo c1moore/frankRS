@@ -30,16 +30,13 @@ angular.module('leaderboard').controller('commentsCtrl', ['$scope', 'Authenticat
 				$http.post('/comments/getRecruiterCommentsForEvent', {event_id : eventSelector.postEventId}).success(function(response) {
 					$scope.comments = response;
 				}).error(function(response, status) {
-					if(status === 401) {
-						if(response.message === "User is not logged in.") {
-							$location.path('/signin');
-						} else if(response.message === "User does not have permission."){
-							$location.path('/');
-						} else {
-							console.log(response.message);
-						}
-					} else if(status === 400) {
+					if(status === 400 && "No comments found!") {
 						$scope.commentErr = "Error retrieving comments.  Try refreshing the page.";
+
+						//Fail silently, since the interceptor should handle any important cases and notices can be annoying.  Attempt again in 5 seconds.
+						$timeout(function() {
+							$scope.getComments();
+						}, 5000);
 					}
 				});
 			}
@@ -54,7 +51,5 @@ angular.module('leaderboard').controller('commentsCtrl', ['$scope', 'Authenticat
 
 		//Update comments every 1 minute.
 		$interval($scope.getComments(), 60000);
-
-		
 	}
 ]);

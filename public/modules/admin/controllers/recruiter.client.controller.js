@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('admin').controller('recruitersController', ['$scope', 'ngTableParams', '$http', '$filter', 'eventSelector', '$modal',
-	function($scope, ngTableParams, $http, $filter, eventSelector, $modal) {
+angular.module('admin').controller('recruitersController', ['$scope', 'ngTableParams', '$http', '$filter', 'eventSelector', '$modal', '$window', '$timeout',
+	function($scope, ngTableParams, $http, $filter, eventSelector, $modal, $window, $timeout) {
 		$scope.recruiters = [];			//Array of recruiters (user objects).
 		$scope.isEventSelected = eventSelector.postEventId ? true : false;		//Is an event selected?
 		$scope.tabErr = false;			//Was there an error obtaining recruiters from backend?
@@ -41,8 +41,13 @@ angular.module('admin').controller('recruitersController', ['$scope', 'ngTablePa
 
 				$scope.recruiterTableParams.reload();
 			}).error(function(res, status) {
-				if(status === 400) {
+				if(status === 400 && res.message === "No recruiters found for this event.") {
 					$scope.tabErr = res.message;
+				} else {
+					//Fail silently, since the interceptor should handle any important cases and notices can be annoying.  Attempt again in 5 seconds.
+					$timeout(function() {
+						$scope.getCandidates();
+					}, 5000);
 				}
 			});
 		};
@@ -69,7 +74,6 @@ angular.module('admin').controller('recruitersController', ['$scope', 'ngTablePa
 
 		//Remove user's role as a recruiter for this specific event.
 		var removeRecruiter = function(rid, rname) {
-			console.log("removing");
 			$http.post("/remove/Recruiter", {user_id : rid, event_id : eventSelector.postEventId}).success(function(res) {
 				getRecruiters();
 			}).error(function(res, status) {
@@ -84,7 +88,8 @@ angular.module('admin').controller('recruitersController', ['$scope', 'ngTablePa
 			$http.post("/remove", {user_id : rid}).success(function(res) {
 				getRecruiters();
 			}).error(function(res, status) {
-				$window.alert("There was an error deleting " + rname + "'s account.\n\n" + res.message);
+				$window.alert("There was an error deleting " + rname + "'s account.\n\nError: " + res.message);
+
 				getRecruiters();
 			});
 		};

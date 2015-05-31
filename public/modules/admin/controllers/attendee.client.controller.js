@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTableParams', '$http', '$filter', 'eventSelector', '$modal',
-	function($scope, ngTableParams, $http, $filter, eventSelector, $modal) {
+angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTableParams', '$http', '$filter', 'eventSelector', '$modal', '$window', '$timeout',
+	function($scope, ngTableParams, $http, $filter, eventSelector, $modal, $window, $timeout) {
 		$scope.attendees = [];			//Array of attendees (user objects).
 		$scope.isEventSelected = eventSelector.postEventId ? true : false;		//Is an event selected?
 		$scope.tabErr = false;			//Was there an error obtaining attendees from backend?
@@ -25,8 +25,13 @@ angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTab
 
 				$scope.attendeeTableParams.reload();
 			}).error(function(res, status) {
-				if(status === 400) {
+				if(status === 400 && res.message === "No users found for this event.") {
 					$scope.tabErr = res.message;
+				} else {
+					//Fail silently, since the interceptor should handle any important cases and notices can be annoying.  Attempt again in 5 seconds.
+					$timeout(function() {
+						$scope.getCandidates();
+					}, 5000);
 				}
 			});
 		};
@@ -56,7 +61,7 @@ angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTab
 			$http.post("/remove", {user_id : aid}).success(function(res) {
 				getAttendees();
 			}).error(function(res, status) {
-				$window.alert("There was an error deleting " + aname + "'s account.\n\n" + res.message);
+				$window.alert("There was an error deleting " + aname + "'s account.\n\nError: " + res.message);
 				getAttendees();
 			});
 		};
@@ -66,7 +71,7 @@ angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTab
 			$http.post('/user/inactivate', {user_id : aid, event_id : eventSelector.postEventId}).success(function(res) {
 				getAttendees();
 			}).error(function(res, status) {
-				$window.alert("There was an error removing permissions for " + aname + ".\n\n" + res.message);
+				$window.alert("There was an error removing permissions for " + aname + ".\n\nError: " + res.message);
 				getAttendees();
 			});
 		};
@@ -76,7 +81,7 @@ angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTab
 			$http.post('/user/inactivate/all', {user_id : aid}).success(function(res) {
 				getAttendees();
 			}).error(function(res, status) {
-				$window.alert("There was an error removing permissions for " + aname + ".\n\n" + res.message);
+				$window.alert("There was an error removing permissions for " + aname + ".\n\nError: " + res.message);
 				getAttendees();
 			});
 		};
@@ -199,6 +204,6 @@ angular.module("admin").controller("attendeeDeleteModalCtrl", ["$scope", "$modal
 			} else {
 				$modalInstance.close(false);
 			}
-		}
+		};
 	}
 ]);

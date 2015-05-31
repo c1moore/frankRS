@@ -74,6 +74,7 @@ i.fa.fa-remove.text-danger:hover {
 	border: 1px solid #333232;
 	border-radius: 3px;
 	padding: 1px;
+	color: rgb(0, 0, 0);
 	color: rgba(0, 0, 0, .5);
 }
 .frank-comment-editor-container {
@@ -197,6 +198,7 @@ i.fa.fa-remove.text-danger:hover {
 
 #frank-comment-editorDivider {
 	margin: 5px;
+	border-color: rgba(51, 50, 50);
 	border-color: rgba(51, 50, 50, .75);
 }
 

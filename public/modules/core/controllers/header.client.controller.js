@@ -10,7 +10,7 @@ angular.module('core').controller('HeaderController', ['$scope', 'Authentication
 		$scope.eventsRoles = ['attendee','recruiter'];
 		$scope.adminRoles = ['admin'];
 		$scope.isCollapsed = false;
-		$scope.menu = Menus.getMenu('topbar')
+		$scope.menu = Menus.getMenu('topbar');
 		$scope.eventSelector = eventSelector;
 
 		$scope.toggleCollapsibleMenu = function() {
