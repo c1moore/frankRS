@@ -4,6 +4,9 @@ angular.module('users').controller('SettingsController', ['$scope', '$http', '$l
 	function($scope, $http, $location, Users, Authentication) {
 		$scope.user = Authentication.user;
 
+		//Keep track of if this is the user's first time using the system.
+		$scope.newUser = !$scope.user.updated || $scope.user.updated === $scope.user.created;
+
 		// If user is not signed in then redirect back home
 		if (!$scope.user) $location.path('/');
 
@@ -67,6 +70,11 @@ angular.module('users').controller('SettingsController', ['$scope', '$http', '$l
 				// If successful show success message and clear form
 				$scope.success = true;
 				$scope.passwordDetails = null;
+
+				//Send user to the settings page if they are accessing the system for the first time
+				if($scope.newUser) {
+					$location.path('/settings/profile');
+				}
 			}).error(function(response) {
 				$scope.error = response.message;
 			});

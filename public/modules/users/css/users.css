@@ -48,6 +48,11 @@ form.signin.form-horizontal {
 	min-width: 195px;
 }
 
+.new-user-warning {
+	width: 80%;
+	margin: auto;
+}
+
 .signin .multiSelectButton {
 	text-align: left !important;
 }

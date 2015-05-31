@@ -28,7 +28,11 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$http
 				eventSelector.eventSelect();
 
 				// And redirect to the index page
-				$location.path('/');
+				if(!response.updated || response.updated === response.created) {
+					$location.path('/settings/password');
+				} else {
+					$location.path('/');
+				}
 			}).error(function(response) {
 				$scope.error = response.message;
 			});
