@@ -26,10 +26,17 @@ form.signin.form-horizontal {
 }
 
 .frank-form-group-1 {
-	width: 15vw;
 	padding: 0;
 	margin-left: 15px !important;
 	margin-right: 0px !important;
+}
+
+.frank-form-group-1 .form-control {
+	margin-left: 15px;
+}
+
+.frank-form-group-1 .multiSelectButton {
+	margin-left: 15px;
 }
 
 .frank-signin-container {
