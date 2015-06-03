@@ -1,3 +1,9 @@
+.btn-left {
+	left: 0;
+	position: absolute;
+	margin-left: 15px;
+}
+
 .frank-recruiter-signup-modal .modal-header{
 	border-top-left-radius: 4px;
 	border-top-right-radius: 4px;
@@ -5,4 +11,8 @@
 .frank-recruiter-signup-modal .modal-content{
 	width: 530px;
 	margin: auto;
+}
+
+.tabs-hidden .nav-tabs {
+	display: none;
 }

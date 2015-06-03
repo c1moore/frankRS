@@ -1,0 +1,42 @@
+<div class="modal-header">
+	<h3 class="modal-title"><i class="fa fa-info-circle"></i> Recruiter Exam</h3>
+</div>
+<div class="modal-body tabs-hidden">
+	<tabset>
+		<tab active="tabs[0]">
+			<div>
+				<p>Are you absolutely sure you want to go through the rigorous tests we put forth to become a recruiter for {{event.name}}? <br /><br />(You obviously have the right stuff if you have access to this page.)</p>
+			</div>
+		</tab>
+		<tab active="tabs[1]">
+			<div>
+				<p>Great!  We would like to get to know you a little better first.  Please answer the next few questions (this should only take a few minutes).</p>
+				<p>Why do you want to be a recruiter for {{event.name}}?  Why do you think you will make a good recruiter?</p>
+				<form>
+					<textarea class="form-control" ng-model="answers.reason"></textarea>
+				</form>
+			</div>
+		</tab>
+		<tab active="tabs[2]">
+			<div>
+				<p>In which sector are most of your connections (e.g.: law, education, etc.)?</p>
+				<form>
+					<textarea class="form-control" ng-model="answers.connection"></textarea>
+				</form>
+			</div>
+		</tab>
+		<tab active="tabs[3]">
+			<div us-spinner="spinnerOpts" spinner-key="candidate-form-spinner-1" ng-show="sending" style="height: 80px;"></div>
+			<div ng-show="!sending">
+				Congratulations!  Your responses have been recorded and we are now looking into your application.  We should be in contact with you shortly if you are amongst the chosen few.
+			</div>
+		</tab>
+	</tabset>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-warning btn-left" ng-click="done(0)" ng-if="!tabs[3]">Cancel</button>
+	<button class="btn btn-danger" ng-click="previous()" ng-if="tabs[1] || tabs[2]">Previous</button>
+	<button class="btn btn-danger" ng-click="next()" ng-if="!tabs[3] && !tabs[2]" ng-disabled="tabs[1] && !answers.reason">Next</button>
+	<button class="btn btn-danger" ng-click="send();" ng-if="tabs[2]" ng-disabled="!answers.connection || !answers.reason">Submit</button>
+	<button class="btn btn-danger" ng-click="done(1)" ng-if="tabs[3]">Done</button>
+</div>
