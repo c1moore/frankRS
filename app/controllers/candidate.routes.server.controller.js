@@ -758,13 +758,33 @@ exports.updateCandidate = function(req, res) {
 * This function should only be used when a user is signing up to be a candidate or when an admin is creating a new candidate.  This method does check to see
 * if the candidate already exists if an admin creates a new candidate; however, setEvent() should be used instead of this method.
 *
-* @param events - An array of event_ids, which will be added to the candidate's events array.
+* IMPORTANT: If a candidate is sending a note, it should have the following format:
+* 		PLEASE DO NOT DELETE OR EDIT THIS SECTION:
+* 		**********
+*		***Field1:
+*		Field1 data...
+*		***Field2:
+*		Field2 data...
+*		***************
+* The first line contains the message "PLEASE DO NOT DELETE OR EDIT THIS SECTION:".  The second line contains ten (10) astericks.  The last line contains
+* fifteen (15) astericks.  Any information the user is sending should go between the two lines of astericks.  This information must begin with three (3)
+* astericks followed by a field name.  Any information related to this field should go on the next line.  Fields are identified by the three astericks
+* before the field name, so any legal characters can follow.  If this format is followed, the note field will be discarded.
+*
+* ***When a user sends a note, it will overwrite any notes that are stored that were previously sent from the user.***
+*
+* If a user is requesting to become a recruiter, the following paramers should be sent
+*
+* @param event_id - Event the user is requesting to for which to user wants to become a recruiter
+* @param note - (optional) Any notes that should be included
 * 
-* If an admin is adding the candidate, the following parameters should also be sent.
+* If an admin is adding the candidate, the following parameters should be sent.
 *
 * @param fName - Candidate's first name
 * @param lName - Candidate's last name
 * @param email - Candidate's email address
+* @param events - An array of event_ids, which will be added to the candidate's events array.
+* @param note - (optional) Any notes that should be included
 */
 exports.setCandidate = function(req,res){
 	if(!req.isAuthenticated()) {
@@ -809,6 +829,10 @@ exports.setCandidate = function(req,res){
 					candidate.events.addToSet({event_id : new mongoose.Types.ObjectId(req.body.events[i]), accepted : false, status : 'volunteer'});
 				}
 
+				if(req.body.note) {
+					candidate.note = req.body.note + "\n\n" + candidate.note;
+				}
+
 				candidate.save(function(err) {
 					if(err) {
 						return res.status(400).send({message : err});
@@ -824,21 +848,51 @@ exports.setCandidate = function(req,res){
 		* them.  Since attendees/recruiters can only make requests to be a candidate for themselves, we can use the req.user object for all the information.
 		*/
 
+		var firstline = /^PLEASE DO NOT DELETE OR EDIT THIS SECTION:/;		//Length including \n: 43
+		var dbFirstline = /PLEASE DO NOT DELETE OR EDIT THIS SECTION:/;		//This line may not always be first in docs stored in the db.  Should only be used when checking docs from the db.
+		var firstlineLength = 43;
+		var startRegex = /\*\*\*\*\*\*\*\*\*\*/;							//Length including \n: 11
+		var startLength = 11;
+		var endRegex = /\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*$/;					//Length including \n: 16
+		var dbEndRegex = /\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*/;					//This line may not always be first in docs stored in the db.  Should only be used when checking docs from the db.
+		var endLength = 16;
+		var fieldRegex = /\*\*\*.*:\n/;
+		var userSection = /PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n*\*\*\*\*\*\*\*\*\*\*\n*(?:.*\n)*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*/;
+
 		if(!req.body.event_id) {
 			return res.status(400).send({message : "All required fields not specified."});
 		}
 
-		Candidate.findOne({email : req.user.email}, function(err, candidate) {
+		Candidate.findOne({user_id : req.user._id}, function(err, candidate) {
 			if(err) {
 				return res.status(400).send({message : err});
 			} else if(!candidate) {
 				//The user was not previously a candidate, create a new candidate object for them for this event.
+
+				/**
+				* Check the note field.  If it is present, make sure it has the proper format.  Otherwise discard it.
+				*/
+				if(req.body.note) {
+					if(req.body.note.search(firstline) === -1) {
+						req.body.note = "";
+					} else {
+						if(req.body.note.search(startRegex) !== firstlineLength) {
+							req.body.note = "";
+						} else {
+							if(!(req.body.note.search(endRegex) > (firstlineLength + startLength))) {
+								req.body.note = "";
+							}
+						}
+					}
+				}
+
 		 		var	newCandidate = new Candidate({
 		 			fName: req.user.fName,
 		 			lName: req.user.lName,
 		 			email: req.user.email,
 		 			user_id : new mongoose.Types.ObjectId(req.user._id),
-		 			events : [{event_id : new mongoose.Types.ObjectId(req.body.event_id), accepted : false, status : 'volunteer'}]
+		 			events : [{event_id : new mongoose.Types.ObjectId(req.body.event_id), accepted : false, status : 'volunteer'}],
+		 			note : req.body.note
 		 		});
 
 		 		newCandidate.save(function(err){
@@ -851,6 +905,27 @@ exports.setCandidate = function(req,res){
 		 	} else {
 		 		//The user was already a candidate, add this event to their list.
 		 		candidate.events.addToSet({event_id : new mongoose.Types.ObjectId(req.body.event_id), accepted : false, status : 'volunteer'});
+
+				/**
+				* Check the note field.  If it is present, make sure it has the proper format.  Otherwise discard it.
+				*/
+				if(req.body.note) {
+					if(req.body.note.search(firstline) === -1) {
+						req.body.note = "";
+					} else {
+						if(req.body.note.search(startRegex) !== firstlineLength) {
+							req.body.note = "";
+						} else {
+							if(!(req.body.note.search(endRegex) > (firstlineLength + startLength))) {
+								req.body.note = "";
+							}
+						}
+					}
+				}
+
+		 		if(req.body.note) {
+		 			candidate.note = req.body.note + "\n\n" + candidate.note.replace(userSection, '');
+		 		}
 
 		 		candidate.save(function(err) {
 		 			if(err) {
@@ -987,6 +1062,33 @@ exports.sendCandidateEmail = function(req, res) {
 							return res.status(200).send({message : "Email(s) sent!"});
 						}
 					});
+				}
+			});
+		}
+	} catch(err) {
+		console.log(err);
+		return res.status(500).send();
+	}
+};
+
+/**
+* Return the candidate object stored in the db for a user IFF the current candidate is the same user requesting
+* the data.  The user_id field of the candidate and the _id field from the request is used to search for the
+* candidate.  Of course, this requires a user to be logged in.
+*/
+exports.userCandidate = function(req, res) {
+	try {
+		if(!req.isAuthenticated()) {
+			return res.status(401).send({message : "User is not logged in."});
+		} else {
+			var user_id = new mongoose.Types.ObjectId(req.user._id);
+			Candidate.findOne({user_id : user_id}, function(err, candidate) {
+				if(err) {
+					return res.status(400).send(err);
+				} else if(!candidate) {
+					return res.status(204).send({message : "User not found."});
+				} else {
+					return res.status(200).send(candidate);
 				}
 			});
 		}

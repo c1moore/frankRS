@@ -276,6 +276,17 @@ describe('Candidate Route Integration Tests:', function() {
 		});
 	});
 
+	it("should return a user candidate for the currently logged in user.", function(done) {
+		attendeeAgent
+			.post('http://localhost:3001/candidate/me')
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(200);
+				res.body.user_id.toString().should.equal(attendee2._id.toString());		//attendeeAgent does not reference attendee, but rather attendee2.
+				done();
+			});
+	});
+
 	describe('Admin route tests:', function() {
 		describe('Obtain candidate information:', function() {
 			it("should return all of the candidates in the db.", function(done) {

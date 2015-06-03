@@ -19,6 +19,7 @@ app.route('/candidate/getEvents').post(dan_candidate_routes.getEvents);
 //app.route('/candidate/getAccept_Key').post(dan_candidate_routes.getAccept_Key);
 app.route('/candidate/getNote').post(dan_candidate_routes.getNote);
 app.route('/candidate/getUser_id').post(dan_candidate_routes.getUser_id);
+app.route('/candidate/me').post(dan_candidate_routes.userCandidate);
 
 
 app.route('/candidate/setfName').post(dan_candidate_routes.setfName);
