@@ -75,13 +75,13 @@
 								</div>
 							</div>
 						</td>
-						<td data-title="'Notes'" sortable="'note'" filter="{'note':'text'}" ng-click="candidate.$edit.note = true">
-							<span ng-if="!candidate.$edit.note" ng-click="candidate.$edit.note = true">{{candidate.note}}</span>
+						<td data-title="'Notes'" sortable="'note'" filter="{'note':'text'}" ng-click="candidate.$edit.note = true" width="40%">
+							<div ng-if="!candidate.$edit.note" ng-click="candidate.$edit.note = true" class="admin-note"><pre>{{candidate.note}}</pre></div>
 							<div ng-if="candidate.$edit.note">
 								<textarea class="form-control" ng-model="candidate.note" ng-blur="candidate.$edit.note = false; updateCandidate(candidate._id, 'Note')" autofocus></textarea>
 							</div>
 						</td>
-						<td data-title="'Make a Recruiter'" width="10%" class="text-center">
+						<td data-title="'Accept'" width="5%" class="text-center">
 							<a href="#" class="text-success" ng-click="acceptCandidate(candidate)"><i class="fa fa-check"></i></a>
 							<span> / </span>
 							<a href="#" class="text-danger" ng-click="denyCandidate(candidate)"><i class="fa fa-times"></i></a>

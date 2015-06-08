@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams', '$http', 'eventSelector', '$filter', '$window', '$location', 'usSpinnerService', '$timeout',
-	function($scope, ngTableParams, $http, eventSelector, $filter, $window, $location, usSpinnerService, $timeout) {
+angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams', '$http', 'eventSelector', '$filter', '$window', '$location', 'usSpinnerService', '$timeout', '$sce',
+	function($scope, ngTableParams, $http, eventSelector, $filter, $window, $location, usSpinnerService, $timeout, $sce) {
 		$scope.newCandidateEvents = [];
 		$scope.candidates = [];
 		$scope.selectEvents = [];
@@ -148,7 +148,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 
 		$scope.tableParams = new ngTableParams({
 				page: 1,
-				count: 10,
+				count: 5,
 				filter: {
 					fName:''
 				},

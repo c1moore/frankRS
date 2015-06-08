@@ -18,6 +18,13 @@
 	margin-left: 0px !important;
 	margin-right: 0px !important;
 }
+.admin-note {
+	max-height: 100px;
+	min-height: 40px;
+	overflow:auto;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
 .frank-admin-email-form {
 	width: 60vw;
 	background-color: white;
@@ -45,6 +52,27 @@
 	padding: 4px;
 	border-radius: 5px;
 	background-color: white;
+}
+
+.frank-table .admin-note pre {
+	background-color: white;
+	border: none;
+	white-space: pre-wrap;       /* css-3 */
+	white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+	white-space: -pre-wrap;      /* Opera 4-6 */
+	white-space: -o-pre-wrap;    /* Opera 7 */
+	word-wrap: break-word;       /* Internet Explorer 5.5+ */
+	word-break: break-word;
+}
+
+.frank-table td div {
+	white-space: pre-wrap;
+	white-space: -moz-pre-wrap;
+	white-space: -pre-wrap;
+	white-space: -o-pre-wrap;
+	word-wrap: break-word;
+	word-break: break-word;
+	display: flex;
 }
 
 .inactive-record {
