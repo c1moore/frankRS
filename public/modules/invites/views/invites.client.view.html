@@ -53,12 +53,17 @@
 					<table class="animate-container" ng-if="attendees.list.length">
 						<thead>
 							<tr>
+								<th></th>
 								<th>Name</th>
 								<th>Email</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr class="animate-repeat"  ng-repeat="attendee in (results = (attendees.list | filter:q))" ng-class="{'frank-invite-sb-read' : attendee.read}">
+								<td>
+									<i class="octicon octicon-mail" ng-if="attendee.read"></i>
+									<i class="octicon octicon-mail-read" ng-if="!attendee.read"></i>
+								</td>
 								<td>
 							 		{{attendee.displayName}}
 							 	</td>
