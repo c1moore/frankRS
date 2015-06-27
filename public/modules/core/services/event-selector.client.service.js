@@ -32,7 +32,7 @@ angular.module('core').service('eventSelector', ['$rootScope', '$http', '$locati
 		this.hideEventSelector = function() {
 			var path = $location.path();
 
-			return (path === '/signin' || path === '/settings/profile' || path === '/settings/password');
+			return (path === '/signin' || path === '/settings/profile' || path === '/settings/password' || !Authentication.user);
 		};
 
 		thisService.eventSelect = function() {
