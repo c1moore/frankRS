@@ -10,8 +10,8 @@
 		</tab>
 		<tab active="tabs[1]">
 			<div>
-				<p>Great!  We would like to get to know you a little better first.  Please answer the next few questions (this should only take a few minutes).</p>
-				<p>Why do you want to be a recruiter for {{event.name}}?  Why do you think you will make a good recruiter?</p>
+				<p>Great!  But we need to get to know you a little better first so we have a few questions for you (this should only take a few minutes).</p>
+				<p>Why do you want to be a recruiter for {{event.name}}?</p>
 				<form>
 					<textarea class="form-control" ng-model="answers.reason"></textarea>
 				</form>
@@ -19,13 +19,21 @@
 		</tab>
 		<tab active="tabs[2]">
 			<div>
-				<p>In which sector are most of your connections (e.g.: law, education, etc.)?</p>
+				<p>What would make you a great recruiter?</p>
+				<form>
+					<textarea class="form-control" ng-model="answers.skills"></textarea>
+				</form>
+			</div>
+		</tab>
+		<tab active="tabs[3]">
+			<div>
+				<p>What connections do you think you could bring to frank (e.g.: Public Interest Law, University Staff, Entertainment, Corporate, Scientific, etc.)?</p>
 				<form>
 					<textarea class="form-control" ng-model="answers.connection"></textarea>
 				</form>
 			</div>
 		</tab>
-		<tab active="tabs[3]">
+		<tab active="tabs[4]">
 			<div us-spinner="spinnerOpts" spinner-key="candidate-form-spinner-1" ng-show="sending" style="height: 80px;"></div>
 			<div ng-show="!sending">
 				Congratulations!  Your responses have been recorded and we are now looking into your application.  We should be in contact with you shortly if you are amongst the chosen few.
@@ -34,9 +42,9 @@
 	</tabset>
 </div>
 <div class="modal-footer">
-	<button class="btn btn-warning btn-left" ng-click="done(0)" ng-if="!tabs[3]">Cancel</button>
-	<button class="btn btn-danger" ng-click="previous()" ng-if="tabs[1] || tabs[2]">Previous</button>
-	<button class="btn btn-danger" ng-click="next()" ng-if="!tabs[3] && !tabs[2]" ng-disabled="tabs[1] && !answers.reason">Next</button>
-	<button class="btn btn-danger" ng-click="send();" ng-if="tabs[2]" ng-disabled="!answers.connection || !answers.reason">Submit</button>
-	<button class="btn btn-danger" ng-click="done(1)" ng-if="tabs[3]">Done</button>
+	<button class="btn btn-warning btn-left" ng-click="done(0)" ng-if="!tabs[4]">Cancel</button>
+	<button class="btn btn-danger" ng-click="previous()" ng-if="tabs[1] || tabs[2] || tabs[3]">Previous</button>
+	<button class="btn btn-danger" ng-click="next()" ng-if="!tabs[4] && !tabs[3]" ng-disabled="(tabs[1] && !answers.reason) || (tabs[2] && !answers.skills)">Next</button>
+	<button class="btn btn-danger" ng-click="send();" ng-if="tabs[3]" ng-disabled="!answers.connection || !answers.reason || !answers.skills">Submit</button>
+	<button class="btn btn-danger" ng-click="done(1)" ng-if="tabs[4]">Done</button>
 </div>

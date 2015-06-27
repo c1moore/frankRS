@@ -128,6 +128,7 @@ angular.module("events").controller("FormModalCtrl", ["$scope", "$modalInstance"
 					var endRegex = /\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*/;
 					var reasonRegex = /\*\*\*Reason:/;
 					var connRegex = /\*\*\*Connections:/;
+					var skillsRegex = /\*\*\*Recruiter Skills:/;
 
 					if(candidate.note.search(startRegex) !== -1) {
 						var rindex = candidate.note.search(reasonRegex);
@@ -142,9 +143,16 @@ angular.module("events").controller("FormModalCtrl", ["$scope", "$modalInstance"
 							cindex += 16;		//Go to the start of the connection answer.
 						}
 
-						var cend = candidate.note.search(endRegex);
+						var sindex = candidate.note.search(skillsRegex);
+						var cend;
+						if(sindex !== -1) {
+							cend = sindex - 2;
+							sindex += 21;
+						}
 
-						if(rindex !== -1 && cindex > rindex && cend > cindex) {
+						var send = candidate.note.search(endRegex);
+
+						if(rindex !== -1 && cindex > rindex && send > sindex && sindex > cindex) {
 							$scope.answers.reason = candidate.note.substring(rindex, rend);
 							$scope.answers.connection = candidate.note.substring(cindex, cend);
 						}
@@ -171,6 +179,7 @@ angular.module("events").controller("FormModalCtrl", ["$scope", "$modalInstance"
 		$scope.tabs[1] = false;
 		$scope.tabs[2] = false;
 		$scope.tabs[3] = false;
+		$scope.tabs[4] = false;
 		$scope.selected = 0;
 
 		$scope.next = function() {
