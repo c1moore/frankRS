@@ -79,11 +79,6 @@ th.header {
 	margin-top: 50px;
 }
 
-.progress-bar {
-	background-image: none;
-	background-color: #c54e92;
-}
-
 .progress-keys {
 	display: table;
 	margin: auto;
