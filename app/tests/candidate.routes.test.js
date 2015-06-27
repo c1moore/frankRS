@@ -1819,6 +1819,61 @@ describe('Candidate Route Integration Tests:', function() {
 					});
 				});
 		});
+
+		it('should allow guests to become candidates.', function(done) {
+			tempAgent
+				.post("http://localhost:3001/candidate/new/no_user")
+				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************"})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+				});
+		});
+
+		it('should reject guests that do not have a required field.', function(done) {
+			tempAgent
+				.post("http://localhost:3001/candidate/new/no_user")
+				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************"})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+				});
+		});
+
+		it('should reject guests without a valid g-recaptcha-response field.', function(done) {
+			tempAgent
+				.post("http://localhost:3001/candidate/new/no_user")
+				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************"})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+				});
+		});
+
+		it('should reject guests that do not have the proper format for a note.', function(done) {
+			tempAgent
+				.post("http://localhost:3001/candidate/new/no_user")
+				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************"})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+				});
+		});
+
+		it('should fail when the g-recaptcha-response field is invalid.', function(done) {
+			tempAgent
+				.post("http://localhost:3001/candidate/new/no_user")
+				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************"})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+				});
+		});
 	});
 
 	afterEach(function(done) {

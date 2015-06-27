@@ -12,8 +12,63 @@
  Candidate = mongoose.model('Candidate'),
  nodemailer = require("nodemailer"),
  smtpPool = require('nodemailer-smtp-pool'),
- config = require('../../config/config');
+ config = require('../../config/config'),
+ http = require('http'),
+ querystring = require('querystring');
 
+/**
+* When a candidate without admin permissions submits a note, it must contain the following format:
+*
+* 			PLEASE DO NOT DELETE OR EDIT THIS SECTION:
+* 			**********
+*			***Field1:
+*			Field1 data...
+*			***Field2:
+*			Field2 data...
+*			***************
+*
+* This function determines whether if the string it is passed follows the above format.  If it does not
+* follow this format, an empty string is returned.  If the string does follow this format and replace
+* is not specified, the string is returned.  If replace is specified and true, original will be searched
+* using regexes 
+*/
+var checkUserNote = function(note, replace, original) {
+	if(!replace || typeof replace !== 'boolean') {
+		replace = false;
+	}
+
+	if(!original || typeof original !== 'string') {
+		replace = false;
+		original = "";
+	}
+
+	var firstline = /^PLEASE DO NOT DELETE OR EDIT THIS SECTION:/;		//Length including \n: 43
+	var dbFirstline = /PLEASE DO NOT DELETE OR EDIT THIS SECTION:/;		//This line may not always be first in docs stored in the db.  Should only be used when checking docs from the db.
+	var firstlineLength = 43;
+	var startRegex = /\*\*\*\*\*\*\*\*\*\*/;							//Length including \n: 11
+	var startLength = 11;
+	var endRegex = /\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*$/;					//Length including \n: 16
+	var dbEndRegex = /\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*/;					//This line may not always be first in docs stored in the db.  Should only be used when checking docs from the db.
+	var endLength = 16;
+	var fieldRegex = /\*\*\*.*:\n/;
+	var userSection = /PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n*\*\*\*\*\*\*\*\*\*\*\n*(?:.*\n)*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*/;
+
+	if(note) {
+		if(note.search(firstline) === -1) {
+			return "";
+		} else if(note.search(startRegex) !== firstlineLength) {
+			return "";
+		} else if(!(note.search(endRegex) > (firstlineLength + startLength))) {
+			return "";
+		}
+
+		if(replace) {
+			return note + "\n\n" + original.replace(userSection, '');
+		}
+	}
+
+	return note;
+};
 
 exports.getCandidates = function(req, res) {
 	if(!req.isAuthenticated()) {
@@ -848,17 +903,6 @@ exports.setCandidate = function(req,res){
 		* them.  Since attendees/recruiters can only make requests to be a candidate for themselves, we can use the req.user object for all the information.
 		*/
 
-		var firstline = /^PLEASE DO NOT DELETE OR EDIT THIS SECTION:/;		//Length including \n: 43
-		var dbFirstline = /PLEASE DO NOT DELETE OR EDIT THIS SECTION:/;		//This line may not always be first in docs stored in the db.  Should only be used when checking docs from the db.
-		var firstlineLength = 43;
-		var startRegex = /\*\*\*\*\*\*\*\*\*\*/;							//Length including \n: 11
-		var startLength = 11;
-		var endRegex = /\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*$/;					//Length including \n: 16
-		var dbEndRegex = /\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*/;					//This line may not always be first in docs stored in the db.  Should only be used when checking docs from the db.
-		var endLength = 16;
-		var fieldRegex = /\*\*\*.*:\n/;
-		var userSection = /PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n*\*\*\*\*\*\*\*\*\*\*\n*(?:.*\n)*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*/;
-
 		if(!req.body.event_id) {
 			return res.status(400).send({message : "All required fields not specified."});
 		}
@@ -872,19 +916,7 @@ exports.setCandidate = function(req,res){
 				/**
 				* Check the note field.  If it is present, make sure it has the proper format.  Otherwise discard it.
 				*/
-				if(req.body.note) {
-					if(req.body.note.search(firstline) === -1) {
-						req.body.note = "";
-					} else {
-						if(req.body.note.search(startRegex) !== firstlineLength) {
-							req.body.note = "";
-						} else {
-							if(!(req.body.note.search(endRegex) > (firstlineLength + startLength))) {
-								req.body.note = "";
-							}
-						}
-					}
-				}
+				req.body.note = checkUserNote(req.body.note, false);
 
 		 		var	newCandidate = new Candidate({
 		 			fName: req.user.fName,
@@ -909,23 +941,7 @@ exports.setCandidate = function(req,res){
 				/**
 				* Check the note field.  If it is present, make sure it has the proper format.  Otherwise discard it.
 				*/
-				if(req.body.note) {
-					if(req.body.note.search(firstline) === -1) {
-						req.body.note = "";
-					} else {
-						if(req.body.note.search(startRegex) !== firstlineLength) {
-							req.body.note = "";
-						} else {
-							if(!(req.body.note.search(endRegex) > (firstlineLength + startLength))) {
-								req.body.note = "";
-							}
-						}
-					}
-				}
-
-		 		if(req.body.note) {
-		 			candidate.note = req.body.note + "\n\n" + candidate.note.replace(userSection, '');
-		 		}
+				candidate.note = checkUserNote(req.body.note, true, candidate.note);
 
 		 		candidate.save(function(err) {
 		 			if(err) {
@@ -937,6 +953,68 @@ exports.setCandidate = function(req,res){
 		 	}
 	 	});
  	}
+};
+
+/**
+* Creates a new candidate that is not tied to an existing user account and is not created by an admin.
+*
+* @param fName - Candidate's first name
+* @param lName - Candidate's last name
+* @param email - Candidate's email address
+* @param organization - The organization for which the candidate works
+* @param note - Any notes submitted by the candidate.  This field MUST have the specified format for all
+* 		candidate submitted notes specified above.
+* @param g-recaptcha-response - reCAPTCHA response
+*/
+exports.createNonuserCandidate = function(req, res) {
+	if(req.body.fName == "" || req.body.fName == undefined || req.body.lName == "" || req.body.lname == undefined || req.body.email == "" || req.body.email == undefined || req.body.note == "" || req.body.note == undefined || req.body['g-recaptcha-response'] == "" || req.body['g-recaptcha-response'] == undefined) {
+		return res.status(400).send({message : "A required field is not specified."});
+	}
+
+	var post_data = querystring.stringify({
+		secret: 	'Replace with real secret',
+		response: 	req.body['g-recaptcha-response'],
+		remoteip: 	req.headers['x-forwarded-for']
+	});
+
+	var post_options = {
+		hostname: 	'www.google.com',
+		path: 		'/recaptcha/api/siteverify',
+		method: 	'POST'
+	};
+
+	var out_req = http.request(options, function(out_res) {
+		if(out_res.success) {
+			if(req.body.note || checkUserNote(req.body.note) === "") {
+				return res.status(400).send({message : "Note does not have proper format or not sent."});
+			}
+
+			var candidate = new Candidate({
+				fName: 			req.body.fName,
+				lName: 			req.body.lName,
+				email: 			req.body.email,
+				organization: 	req.body.organization,
+				note: 			req.body.note
+			});
+
+			candidate.save(function(err) {
+				if(err) {
+					return res.status(400).send({message : err});
+				} else {
+					return res.status(200).send("Form submitted.");
+				}
+			});
+		} else {
+			return res.status(400).send({message : false, 'g-errors' : out_res['error-codes']});
+		}
+	});
+
+	req.on('error', function(err) {
+		res.status(400).send({message : err});
+	});
+
+	req.write(post_data);
+	req.end();
 };
 
 exports.deleteCandidate = function(req,res){
