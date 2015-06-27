@@ -79,6 +79,11 @@
 	color: gray;
 }
 
+.invite-candidate {
+	float: right;
+	margin-right: 15px;
+}
+
 .tab-content {
 	margin-top: 5px;
 }

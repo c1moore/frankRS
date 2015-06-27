@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams', '$http', 'eventSelector', '$filter', '$window', '$location', 'usSpinnerService', '$timeout', '$sce',
-	function($scope, ngTableParams, $http, eventSelector, $filter, $window, $location, usSpinnerService, $timeout, $sce) {
+angular.module('admin').controller('applicationController', ['$scope', 'ngTableParams', '$http', 'eventSelector', '$filter', '$window', '$location', 'usSpinnerService', '$timeout', '$sce', '$modal',
+	function($scope, ngTableParams, $http, eventSelector, $filter, $window, $location, usSpinnerService, $timeout, $sce, $modal) {
 		$scope.newCandidateEvents = [];
 		$scope.candidates = [];
 		$scope.selectEvents = [];
@@ -289,6 +289,38 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 					$window.alert("Candidate could not be found.  Refresh the page and try again.");
 				}
 			}
+		};
+
+		$scope.inviteRecruiter = function(event) {
+			var modalInstance = $modal.open({
+				templateUrl: 	"modules/admin/views/inviteRecruiter",
+				controller: 	"RecruiterInvitationCtrl",
+				backdrop: 		"static",
+				keyboard: 		false
+			});
+		};
+	}
+]);
+
+angular.module("admin").controller("RecruiterInvitationCtrl", ["$scope", "$modalInstance", "$http", "eventSelector",
+	function($scope, $modalInstance, $http, eventSelector) {
+		$scope.event = {name : eventSelector.selectedEvent, id : eventSelector.postEventId};
+		$scope.recruiter = {};
+
+		var link = "http://www.frank2016.net/#!/recruiter/form";
+		var linkHtml = "<a href='" + $scope.link + "'>" + $scope.link + "</a>";
+		var linkRegex = /#link#/;
+
+		$scope.sendInvite = function() {
+			$scope.recruiter.message.replace(/&/g, "&amp;").replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+			
+			if($scope.recruiter.message.search(linkRegex) === -1) {
+				$scope.recruiter.message += "\n\nYou can sign up at " + linkHtml;
+			} else {
+				$scope.recruiter.message.replace(linkRegex, linkHtml)
+			}
+
+			$scope.recruiter.message.replace(/\n/g, "<br />");
 		};
 	}
 ]);

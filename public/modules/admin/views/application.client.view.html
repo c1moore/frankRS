@@ -1,5 +1,6 @@
 <section class="admin-application">
-	<div class="row" ng-controller="applicationController">    
+	<div class="row" ng-controller="applicationController">
+		<button class="btn btn-primary invite-candidate" ng-show="isEventSelected">Invite Candidate</button>
 		<div class="col-md-4" ng-class="{'frank-main-view' : !selected.emails.length}">
 			<div class="well">
 				<form name="candidateForm" novalidate ng-submit="addCandidate(newCandidate)">
