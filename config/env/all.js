@@ -18,7 +18,8 @@ module.exports = {
 				'public/lib/ng-table/ng-table.css',
 				'public/lib/font-awesome/css/font-awesome.min.css',
 				'public/lib/angular-multi-select/angular-multi-select.css',
-				'public/lib/angular-dialog-service/dist/dialogs.min.css'
+				'public/lib/angular-dialog-service/dist/dialogs.min.css',
+				'public/lib/octicons/octicons/octicons.css'
 			],
 			js: [
 				'public/lib/jquery/dist/jquery.min.js',
@@ -31,6 +32,7 @@ module.exports = {
 				'public/lib/angular-ui-router/release/angular-ui-router.js',
 				'public/lib/angular-ui-utils/ui-utils.js',
 				'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
+				'public/lib/angular-recaptcha/release/angular-recaptcha.min.js',
 				'public/lib/ng-table/ng-table.js',
 				'public/lib/lodash/dist/lodash.js',
 				'public/lib/jquery-ui/jquery-ui.min.js',
