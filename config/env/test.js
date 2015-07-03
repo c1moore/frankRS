@@ -32,17 +32,17 @@ module.exports = {
 		callbackURL: 'http://localhost:3000/auth/github/callback'
 	},
 	mailer: {
-		//from: process.env.MAILER_FROM || 'MAILER_FROM',
-		from: "1development.testing@gmail.com",
+		from: process.env.MAILER_FROM || 'MAILER_FROM',
 		options: {
-			//service: process.env.MAILER_SERVICE_PROVIDER || 'MAILER_SERVICE_PROVIDER',
-			service: "gmail",
+			service: process.env.MAILER_SERVICE_PROVIDER || 'MAILER_SERVICE_PROVIDER',
 			auth: {
-				//user: process.env.MAILER_EMAIL_ID || 'MAILER_EMAIL_ID',
-				user: "1development.testing@gmail.com",
-				//pass: process.env.MAILER_PASSWORD || 'MAILER_PASSWORD'
-				pass: "#1password"
+				user: process.env.MAILER_EMAIL_ID || 'MAILER_EMAIL_ID',
+				pass: process.env.MAILER_PASSWORD || 'MAILER_PASSWORD'
 			}
 		}
+	},
+	recaptcha: {
+		public_key: process.env.G_RECAPTCHA_PUBLIC_KEY || 'G_RECAPTCHA_PUBLIC_KEY',
+		private_key: process.env.G_RECAPTCHA_PRIVATE_KEY || 'G_RECAPTCHA_PRIVATE_KEY'
 	}
 };
