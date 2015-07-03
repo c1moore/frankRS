@@ -302,10 +302,10 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 	}
 ]);
 
-angular.module("admin").controller("RecruiterInvitationCtrl", ["$scope", "$modalInstance", "$http", "eventSelector", "$location",
-	function($scope, $modalInstance, $http, eventSelector, $location) {
+angular.module("admin").controller("RecruiterInvitationCtrl", ["$scope", "$modalInstance", "$http", "eventSelector", "$location", "usSpinnerService",
+	function($scope, $modalInstance, $http, eventSelector, $location, usSpinnerService) {
 		$scope.event = {name : eventSelector.selectedEvent, id : eventSelector.postEventId};
-		$scope.invite = {subject : ""};
+		$scope.invite = {subject : "We Want You to Be Our Next Great Recruiter"};
 
 		$scope.editorMode = true;
 		$scope.sending = false;
@@ -314,7 +314,7 @@ angular.module("admin").controller("RecruiterInvitationCtrl", ["$scope", "$modal
 
 		var link = "http://" + $location.host() + "/#!/recruiter/form";
 		var linkHtml = "<a href='" + link + "'>" + link + "</a>";
-		var linkRegex = /#link#/;
+		var linkRegex = /#link#/g;
 
 		$scope.spinnerOpts = {
 			lines: 		11,
@@ -340,19 +340,22 @@ angular.module("admin").controller("RecruiterInvitationCtrl", ["$scope", "$modal
 			if($scope.invite.message.search(linkRegex) === -1) {
 				$scope.invite.message += "\n\nYou can sign up at " + linkHtml;
 			} else {
-				$scope.invite.message.replace(linkRegex, linkHtml)
+				$scope.invite.message = $scope.invite.message.replace(linkRegex, linkHtml);
 			}
 
 			//Replace all newline characters with <br />.
-			$scope.invite.message.replace(/\n/g, "<br />");
+			$scope.invite.message = $scope.invite.message.replace(/\n/g, "<br />");
+			console.log($scope.invite.message);
 
 			$http.post("/candidate/send", $scope.invite).success(function() {
 				$scope.sending = false;
 				$scope.sentMode = true;
 				usSpinnerService.stop('admin-new-recruiter-spinner-1');
 			}).error(function(res, status) {
+				$scope.sending = false;
 				$scope.error = res.message + "  Error: " + res.error;
 				$scope.editorMode = true;
+				usSpinnerService.stop("admin-new-recruiter-spinner-1");
 			});
 		};
 
