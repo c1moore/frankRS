@@ -3,14 +3,22 @@
 </div>
 <div class="modal-body">
 	<div ng-show="editorMode">
-		<form ng-submit="sendInvite">
+		<form ng-submit="sendInvite" name="newCandidateEmailForm">
 			<div class="form-group">
-				<label for="email">Email: <input type="email" ng-model="invite.email" name="email" id="email" required/></label>
+				<label for="email">To:<br />
+					<div class="note text-muted form-help">
+						<span>To send this message to more than one person, use commas (',') to separate the email addresses.</span>
+					</div>
+					<input type="text" ng-model="invite.emails" name="email" id="email" class="frank-admin-email-to" style="width: 100%; min-width: 100%" required/>
+				</label>
 			</div>
 			<div class="form-group">
-				<label for="message">Message: </label>
-				<div class="note text-muted"><span>To add a link to the recruiter form, type <code>#link#</code>.  If this is not included, the following will be added automatically to the end of your message: <code>You can sign up at #link#</code></span></div>
-				<textarea ng-model="invite.message"></textarea>
+				<label for="message">Message:<br />
+					<div class="note text-muted form-help" style="font-size: 12px; padding: 7px;">
+						<span>To add a link to the recruiter form, type <code>#link#</code>.  If this is not included, the following will be added automatically to the end of your message: <code>You can sign up at #link#</code></span>
+					</div>
+					<textarea ng-model="invite.message" class="frank-admin-email-message" style="width: 100%; min-width: 100%"></textarea>
+				</label>
 			</div>
 		</form>
 		<div class="alert alert-danger" ng-show="error">
@@ -26,6 +34,6 @@
 </div>
 <div class="modal-footer">
 	<button class="btn btn-warning pull-left" ng-click="done()" ng-show="!sentMode">Cancel</button>
-	<button class="btn btn-success" ng-click="sendInvite()" ng-show="editorMode">Send</button>
+	<button class="btn btn-success" ng-click="sendInvite()" ng-show="editorMode" ng-disabled="newCandidateEmailForm.$invalid">Send</button>
 	<button class="btn btn-success" ng-click="done()" ng-show="sentMode">Done</button>
 </div>

@@ -42,6 +42,12 @@
 	margin-left: 5px;
 	margin-bottom: 2px;
 }
+.frank-admin-email-message {
+	border-radius: 5px;
+	border-style: ridge;
+	min-width: 45vw;
+	min-height: 150px;
+}
 .frank-admin-email-to {
 	display: inline-block;
 	border: 1px solid rgb(169, 169, 169);
@@ -97,12 +103,6 @@
 	min-height: 30px;
 	border-radius: 5px;
 	border-style: ridge;
-}
-#frank-admin-email-message {
-	border-radius: 5px;
-	border-style: ridge;
-	min-width: 45vw;
-	min-height: 150px;
 }
 .tab-pane .well {
 	margin-top: 25px;

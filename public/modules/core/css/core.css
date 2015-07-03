@@ -27,6 +27,10 @@ li .disabled {
 .frank-main-view {
 	margin-bottom: 85px !important;
 }
+.form-help {
+	font-size: 12px;
+	padding: 7px;
+}
 .glyphicon.glyphicon-chevron-left {
 	top: -35px;
 	right: 5px;
