@@ -293,7 +293,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 
 		$scope.inviteRecruiter = function(event) {
 			var modalInstance = $modal.open({
-				templateUrl: 	"modules/admin/views/inviteRecruiter",
+				templateUrl: 	"modules/admin/views/inviteRecruiter.client.view.html",
 				controller: 	"RecruiterInvitationCtrl",
 				backdrop: 		"static",
 				keyboard: 		false
@@ -302,25 +302,62 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 	}
 ]);
 
-angular.module("admin").controller("RecruiterInvitationCtrl", ["$scope", "$modalInstance", "$http", "eventSelector",
-	function($scope, $modalInstance, $http, eventSelector) {
+angular.module("admin").controller("RecruiterInvitationCtrl", ["$scope", "$modalInstance", "$http", "eventSelector", "$location",
+	function($scope, $modalInstance, $http, eventSelector, $location) {
 		$scope.event = {name : eventSelector.selectedEvent, id : eventSelector.postEventId};
-		$scope.recruiter = {};
+		$scope.invite = {subject : ""};
 
-		var link = "http://www.frank2016.net/#!/recruiter/form";
-		var linkHtml = "<a href='" + $scope.link + "'>" + $scope.link + "</a>";
+		$scope.editorMode = true;
+		$scope.sending = false;
+		$scope.sentMode = false;
+		$scope.error = false;
+
+		var link = "http://" + $location.host() + "/#!/recruiter/form";
+		var linkHtml = "<a href='" + link + "'>" + link + "</a>";
 		var linkRegex = /#link#/;
 
+		$scope.spinnerOpts = {
+			lines: 		11,
+			length: 	12,
+			width: 		5,
+			radius: 	14,
+			corners: 	.5,
+			opacity: 	.05,
+			shadow: 	true,
+			color: 		['#73c92d', '#f7b518', '#C54E90']
+		};
+
 		$scope.sendInvite = function() {
-			$scope.recruiter.message.replace(/&/g, "&amp;").replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+			usSpinnerService.spin('admin-new-recruiter-spinner-1');
+			$scope.editorMode = $scope.sentMode = false;
+			$scope.sending = true;
+			$scope.error = false;
+
+			//Replace HTML unsafe characters with their proper HTML safe equivalents.
+			$scope.invite.message = _.escape($scope.invite.message);
 			
-			if($scope.recruiter.message.search(linkRegex) === -1) {
-				$scope.recruiter.message += "\n\nYou can sign up at " + linkHtml;
+			//Either add the link to the end of the email or replace the reserved word with the link.
+			if($scope.invite.message.search(linkRegex) === -1) {
+				$scope.invite.message += "\n\nYou can sign up at " + linkHtml;
 			} else {
-				$scope.recruiter.message.replace(linkRegex, linkHtml)
+				$scope.invite.message.replace(linkRegex, linkHtml)
 			}
 
-			$scope.recruiter.message.replace(/\n/g, "<br />");
+			//Replace all newline characters with <br />.
+			$scope.invite.message.replace(/\n/g, "<br />");
+
+			$http.post("/candidate/send", $scope.invite).success(function() {
+				$scope.sending = false;
+				$scope.sentMode = true;
+				usSpinnerService.stop('admin-new-recruiter-spinner-1');
+			}).error(function(res, status) {
+				$scope.error = res.message + "  Error: " + res.error;
+				$scope.editorMode = true;
+			});
+		};
+
+		$scope.done = function() {
+			$modalInstance.close();
 		};
 	}
 ]);

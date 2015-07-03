@@ -1094,7 +1094,6 @@ exports.deleteCandidateByEvent = function(req, res) {
 * @param subject - the subject of the email
 * @param message - the message of the email
 */
-
 exports.sendCandidateEmail = function(req, res) {
 	try {
 		if(!req.isAuthenticated()) {
@@ -1140,6 +1139,49 @@ exports.sendCandidateEmail = function(req, res) {
 							return res.status(200).send({message : "Email(s) sent!"});
 						}
 					});
+				}
+			});
+		}
+	} catch(err) {
+		console.log(err);
+		return res.status(500).send();
+	}
+};
+
+/**
+* This function sends an email that the admin creates to a single receiver.  The receiver does not have
+* to have an account nor does the system check if the receiver is in the system.
+*
+* @param email - email address to send email
+* @param subject - the subject of the email
+* @param message - the message of the email
+*/
+exports.sendNewCandidateEmail = function(req, res) {
+	try {
+		if(!req.isAuthenticated()) {
+			return res.status(401).send({message : "User is not logged in."});
+		} else if(!req.hasAuthorization(req.user, ["admin"])) {
+			return res.status(401).send({message : "User does not have permission."});
+		} else if(!req.body.email) {
+			return res.status(400).send({message : "Required field not specified."});
+		} else if(!req.body.message) {
+			return res.status(400).send({message : "Required field not specified."});
+		} else if(!req.body.subject) {
+			return res.status(400).send({message : "Required field not specified."})
+		} else {
+			var smtpTransport = nodemailer.createTransport(config.mailer.options);
+			smtpTransport.sendMail({
+				to : req.body.email,
+				from : "frank@jou.ufl.edu",
+				sender : "frank@jou.ufl.edu",
+				replyTo : "frank@jou.ufl.edu",
+				subject : req.body.subject,
+				html : req.body.message
+			}, function(err) {
+				if(err) {
+					return res.status(400).send({message : "Message was not sent.", error : err});
+				} else {
+					return res.status(200).send({message : "Email sent!"});
 				}
 			});
 		}
