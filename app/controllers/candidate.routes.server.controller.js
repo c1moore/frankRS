@@ -967,12 +967,12 @@ exports.setCandidate = function(req,res){
 * @param g-recaptcha-response - reCAPTCHA response
 */
 exports.createNonuserCandidate = function(req, res) {
-	if(req.body.fName == "" || req.body.fName == undefined || req.body.lName == "" || req.body.lname == undefined || req.body.email == "" || req.body.email == undefined || req.body.note == "" || req.body.note == undefined || req.body['g-recaptcha-response'] == "" || req.body['g-recaptcha-response'] == undefined) {
+	if(req.body.fName == "" || req.body.fName == undefined || req.body.lName == "" || req.body.lName == undefined || req.body.email == "" || req.body.email == undefined || req.body.note == "" || req.body.note == undefined || req.body['g-recaptcha-response'] == "" || req.body['g-recaptcha-response'] == undefined) {
 		return res.status(400).send({message : "A required field is not specified."});
 	}
 
 	var post_data = querystring.stringify({
-		secret: 	'Replace with real secret',
+		secret: 	config.recaptcha.private_key,
 		response: 	req.body['g-recaptcha-response'],
 		remoteip: 	req.headers['x-forwarded-for']
 	});
@@ -983,9 +983,10 @@ exports.createNonuserCandidate = function(req, res) {
 		method: 	'POST'
 	};
 
-	var out_req = http.request(options, function(out_res) {
-		if(out_res.success) {
-			if(req.body.note || checkUserNote(req.body.note) === "") {
+	var out_req = http.request(post_options, function(out_res) {
+		//Only add candidate if the request was successful or if the private key is Google's fake private key.
+		if(out_res.success || config.recaptcha.private_key === "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe") {
+			if(!req.body.note || checkUserNote(req.body.note) === "") {
 				return res.status(400).send({message : "Note does not have proper format or not sent."});
 			}
 
@@ -1001,7 +1002,7 @@ exports.createNonuserCandidate = function(req, res) {
 				if(err) {
 					return res.status(400).send({message : err});
 				} else {
-					return res.status(200).send("Form submitted.");
+					return res.status(200).send({message : "Form submitted."});
 				}
 			});
 		} else {
@@ -1009,12 +1010,12 @@ exports.createNonuserCandidate = function(req, res) {
 		}
 	});
 
-	req.on('error', function(err) {
+	out_req.on('error', function(err) {
 		res.status(400).send({message : err});
 	});
 
-	req.write(post_data);
-	req.end();
+	out_req.write(post_data);
+	out_req.end();
 };
 
 exports.deleteCandidate = function(req,res){
@@ -1150,9 +1151,10 @@ exports.sendCandidateEmail = function(req, res) {
 
 /**
 * This function sends an email that the admin creates to a single receiver.  The receiver does not have
-* to have an account nor does the system check if the receiver is in the system.
+* to have an account nor does the system check if the receiver is in the system.  Since a large number
+* email addresses could be specified, the emails will be pooled.
 *
-* @param email - email address to send email
+* @param emails - an array of email addresses to send email
 * @param subject - the subject of the email
 * @param message - the message of the email
 */
@@ -1162,16 +1164,16 @@ exports.sendNewCandidateEmail = function(req, res) {
 			return res.status(401).send({message : "User is not logged in."});
 		} else if(!req.hasAuthorization(req.user, ["admin"])) {
 			return res.status(401).send({message : "User does not have permission."});
-		} else if(!req.body.email) {
+		} else if(!req.body.emails) {
 			return res.status(400).send({message : "Required field not specified."});
 		} else if(!req.body.message) {
 			return res.status(400).send({message : "Required field not specified."});
 		} else if(!req.body.subject) {
 			return res.status(400).send({message : "Required field not specified."})
 		} else {
-			var smtpTransport = nodemailer.createTransport(config.mailer.options);
+			var smtpTransport = nodemailer.createTransport(smtpPool(config.mailer.options));
 			smtpTransport.sendMail({
-				to : req.body.email,
+				to : req.body.emails,
 				from : "frank@jou.ufl.edu",
 				sender : "frank@jou.ufl.edu",
 				replyTo : "frank@jou.ufl.edu",
@@ -1181,7 +1183,7 @@ exports.sendNewCandidateEmail = function(req, res) {
 				if(err) {
 					return res.status(400).send({message : "Message was not sent.", error : err});
 				} else {
-					return res.status(200).send({message : "Email sent!"});
+					return res.status(200).send({message : "Email(s) sent!"});
 				}
 			});
 		}
