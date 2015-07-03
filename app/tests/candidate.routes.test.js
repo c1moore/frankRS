@@ -440,6 +440,67 @@ describe('Candidate Route Integration Tests:', function() {
 						done();
 					});
 			});
+
+			it("admin should be able to send an email to multiple people.", function(done) {
+				userAgent
+					.post('http://localhost:3001/candidate/send')
+					.send({emails : ["anyString_cen3031.0.boom0625@spamgourmet.com", "test_cen3031.0.boom0625@spamgourmet.com", "cowsandbeans_cen3031.0.boom0625@spamgourmet.com"], subject : "Selling Cows for Beans", message : "Did you know that selling a cow for magic beans is typically a bad idea?"})
+					.end(function(err,res) {
+						if (err) throw err;
+						
+						res.status.should.equal(200);
+						res.body.should.have.property('message');
+						res.body.message.should.be.equal("Email(s) sent!");
+						
+						done();
+					});
+			});
+
+			it("admin should not be able to send an email when the subject is not specified.", function(done) {
+				userAgent
+					.post('http://localhost:3001/candidate/send')
+					.send({emails : ["anyString_cen3031.0.boom0625@spamgourmet.com", "test_cen3031.0.boom0625@spamgourmet.com", "cowsandbeans_cen3031.0.boom0625@spamgourmet.com"], message : "Did you know that selling a cow for magic beans is typically a bad idea?"})
+					.end(function(err,res) {
+						if (err) throw err;
+						
+						res.status.should.equal(400);
+						res.body.should.have.property('message');
+						res.body.message.should.be.equal("Required field not specified.");
+						
+						done();
+					});
+			});
+
+			it("admin should not be able to send an email when receivers are not specified.", function(done) {
+				userAgent
+					.post('http://localhost:3001/candidate/send')
+					.send({subject : "Selling Cows for Beans", message : "Did you know that selling a cow for magic beans is typically a bad idea?"})
+					.end(function(err,res) {
+						if (err) throw err;
+						
+						res.status.should.equal(400);
+						res.body.should.have.property('message');
+						res.body.message.should.be.equal("Required field not specified.");
+						
+						done();
+					});
+			});
+
+			it("admin should not be able to send an email when the message is not specified.", function(done) {
+				this.timeout(10000);
+				userAgent
+					.post('http://localhost:3001/candidate/send')
+					.send({emails : ["anyString_cen3031.0.boom0625@spamgourmet.com", "test_cen3031.0.boom0625@spamgourmet.com", "cowsandbeans_cen3031.0.boom0625@spamgourmet.com"], subject : "Selling Cows for Beans"})
+					.end(function(err,res) {
+						if (err) throw err;
+						
+						res.status.should.equal(400);
+						res.body.should.have.property('message');
+						res.body.message.should.be.equal("Required field not specified.");
+						
+						done();
+					});
+			});
 		});
 
 		describe("Set candidate information: ", function() {
@@ -1273,6 +1334,21 @@ describe('Candidate Route Integration Tests:', function() {
 					});
 				});
 		});
+
+		it("should not allow attendees to send an email.", function(done) {
+				attendeeAgent2
+					.post('http://localhost:3001/candidate/send')
+					.send({emails : ["anyString_cen3031.0.boom0625@spamgourmet.com", "test_cen3031.0.boom0625@spamgourmet.com", "cowsandbeans_cen3031.0.boom0625@spamgourmet.com"], subject : "Selling Cows for Beans", message : "Did you know that selling a cow for magic beans is typically a bad idea?"})
+					.end(function(err,res) {
+						if (err) throw err;
+						
+						res.status.should.equal(401);
+						res.body.should.have.property('message');
+						res.body.message.should.be.equal("User does not have permission.");
+						
+						done();
+					});
+		});
 	});
 
 	describe('Recruiter route tests:', function() {
@@ -1535,6 +1611,21 @@ describe('Candidate Route Integration Tests:', function() {
 						done();
 					});
 				});
+		});
+
+		it("should not allow recruiters to send an email.", function(done) {
+				attendeeAgent2
+					.post('http://localhost:3001/candidate/send')
+					.send({emails : ["anyString_cen3031.0.boom0625@spamgourmet.com", "test_cen3031.0.boom0625@spamgourmet.com", "cowsandbeans_cen3031.0.boom0625@spamgourmet.com"], subject : "Selling Cows for Beans", message : "Did you know that selling a cow for magic beans is typically a bad idea?"})
+					.end(function(err,res) {
+						if (err) throw err;
+						
+						res.status.should.equal(401);
+						res.body.should.have.property('message');
+						res.body.message.should.be.equal("User does not have permission.");
+						
+						done();
+					});
 		});
 	});
 
@@ -1823,56 +1914,192 @@ describe('Candidate Route Integration Tests:', function() {
 		it('should allow guests to become candidates.', function(done) {
 			tempAgent
 				.post("http://localhost:3001/candidate/new/no_user")
-				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************"})
+				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************", 'g-recaptcha-response' : "testrun"})
 				.end(function(err, res) {
 					if(err) {
 						return done(err);
 					}
+
+					res.status.should.equal(200);
+					res.body.message.should.equal("Form submitted.");
+
+					Candidate.findOne({email : "nicetry@noemail.com"}, function(err, newCandidate) {
+						if(err) {
+							return done(err);
+						}
+
+						if(!newCandidate) {
+							return done(new error("Candidate was not actually created."));
+						}
+
+						newCandidate.fName.should.equal("Calvin");
+						newCandidate.lName.should.equal("Moore");
+						newCandidate.note.search(/PLEASE DO NOT DELETE OR EDIT THIS SECTION:/).should.be.greaterThan(-1);
+						done();
+					});
 				});
 		});
 
-		it('should reject guests that do not have a required field.', function(done) {
+		it('should reject guests that do not specify the fName field.', function(done) {
 			tempAgent
 				.post("http://localhost:3001/candidate/new/no_user")
-				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************"})
+				.send({lName : "Moore", email : 'nicetry@noemail.com', note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************", 'g-recaptcha-response' : "testrun"})
 				.end(function(err, res) {
 					if(err) {
 						return done(err);
 					}
+
+					res.status.should.equal(400);
+					res.body.message.should.equal("A required field is not specified.");
+
+					Candidate.findOne({email : "nicetry@noemail.com"}, function(err, newCandidate) {
+						if(err) {
+							return done(err);
+						}
+
+						if(newCandidate) {
+							return done(new error("Candidate was created while missing a field."));
+						}
+
+						done();
+					});
+				});
+		});
+
+		it('should reject guests that do not specify the lName field.', function(done) {
+			tempAgent
+				.post("http://localhost:3001/candidate/new/no_user")
+				.send({fName : "Moore", email : 'nicetry@noemail.com', note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************", 'g-recaptcha-response' : "testrun"})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(400);
+					res.body.message.should.equal("A required field is not specified.");
+
+					Candidate.findOne({email : "nicetry@noemail.com"}, function(err, newCandidate) {
+						if(err) {
+							return done(err);
+						}
+
+						if(newCandidate) {
+							return done(new error("Candidate was created while missing a field."));
+						}
+
+						done();
+					});
+				});
+		});
+
+		it('should reject guests that do not specify the note field.', function(done) {
+			tempAgent
+				.post("http://localhost:3001/candidate/new/no_user")
+				.send({fName : "Calvin", lName : "Moore", email : 'nicetry@noemail.com', 'g-recaptcha-response' : "testrun"})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(400);
+					res.body.message.should.equal("A required field is not specified.");
+
+					Candidate.findOne({email : "nicetry@noemail.com"}, function(err, newCandidate) {
+						if(err) {
+							return done(err);
+						}
+
+						if(newCandidate) {
+							return done(new error("Candidate was created while missing a field."));
+						}
+
+						done();
+					});
+				});
+		});
+
+		it('should reject guests that do not specify the email field.', function(done) {
+			tempAgent
+				.post("http://localhost:3001/candidate/new/no_user")
+				.send({fName : "Calvin", lName : "Moore", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************", 'g-recaptcha-response' : "testrun"})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(400);
+					res.body.message.should.equal("A required field is not specified.");
+
+					done();
 				});
 		});
 
 		it('should reject guests without a valid g-recaptcha-response field.', function(done) {
 			tempAgent
 				.post("http://localhost:3001/candidate/new/no_user")
-				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************"})
+				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************", 'g-recaptcha-response' : ""})
 				.end(function(err, res) {
 					if(err) {
 						return done(err);
 					}
+
+					res.status.should.equal(400);
+					res.body.message.should.equal("A required field is not specified.");
+
+					Candidate.findOne({email : "nicetry@noemail.com"}, function(err, newCandidate) {
+						if(err) {
+							return done(err);
+						}
+
+						if(newCandidate) {
+							return done(new error("Candidate was created while missing a field."));
+						}
+
+						done();
+					});
 				});
 		});
 
 		it('should reject guests that do not have the proper format for a note.', function(done) {
+			this.timeout(10000);
 			tempAgent
 				.post("http://localhost:3001/candidate/new/no_user")
-				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************"})
+				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n*******\n***Field:\nData\n***************", 'g-recaptcha-response' : "testrun"})
 				.end(function(err, res) {
 					if(err) {
 						return done(err);
 					}
+
+					res.status.should.equal(400);
+					res.body.message.should.equal("Note does not have proper format or not sent.");
+
+					Candidate.findOne({email : "nicetry@noemail.com"}, function(err, newCandidate) {
+						if(err) {
+							return done(err);
+						}
+
+						if(newCandidate) {
+							return done(new error("Candidate was created while missing a field."));
+						}
+
+						done();
+					});
 				});
 		});
 
-		it('should fail when the g-recaptcha-response field is invalid.', function(done) {
-			tempAgent
-				.post("http://localhost:3001/candidate/new/no_user")
-				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************"})
-				.end(function(err, res) {
-					if(err) {
-						return done(err);
-					}
-				});
+		it("should not allow guests to send an email.", function(done) {
+				tempAgent
+					.post('http://localhost:3001/candidate/send')
+					.send({emails : ["anyString_cen3031.0.boom0625@spamgourmet.com", "test_cen3031.0.boom0625@spamgourmet.com", "cowsandbeans_cen3031.0.boom0625@spamgourmet.com"], subject : "Selling Cows for Beans", message : "Did you know that selling a cow for magic beans is typically a bad idea?"})
+					.end(function(err,res) {
+						if (err) throw err;
+						
+						res.status.should.equal(401);
+						res.body.should.have.property('message');
+						res.body.message.should.be.equal("User is not logged in.");
+						
+						done();
+					});
 		});
 	});
 
