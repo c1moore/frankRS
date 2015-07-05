@@ -27,6 +27,16 @@ li .disabled {
 .frank-main-view {
 	margin-bottom: 85px !important;
 }
+.frank-form-element {
+	display: inline-block;
+	border: 1px solid rgb(169, 169, 169);
+	width: 100%;
+	min-height: 30px;
+	vertical-align: middle;
+	padding: 4px;
+	border-radius: 5px;
+	/*background-color: white;*/
+}
 .form-help {
 	font-size: 12px;
 	padding: 7px;
