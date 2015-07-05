@@ -1,172 +1,180 @@
 'use strict';
 
-angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTableParams', '$http', '$filter', 'eventSelector', '$modal', '$window', '$timeout',
-	function($scope, ngTableParams, $http, $filter, eventSelector, $modal, $window, $timeout) {
-		$scope.attendees = [];			//Array of attendees (user objects).
-		$scope.isEventSelected = eventSelector.postEventId ? true : false;		//Is an event selected?
-		$scope.tabErr = false;			//Was there an error obtaining attendees from backend?
-
-		//When a new event is selected, update isEventSelected and attendees.
-		$scope.$watch(function() {
-			return eventSelector.postEventId;
-		}, function() {
-			$scope.isEventSelected = eventSelector.postEventId ? true : false;
-
-			if($scope.isEventSelected) {
-				getAttendees();
+angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTableParams', '$http', '$filter', 'eventSelector', '$modal', '$window', '$timeout', 'Authentication', '$location',
+	function($scope, ngTableParams, $http, $filter, eventSelector, $modal, $window, $timeout, Authentication, $location) {
+		if(!Authentication.user || _.intersection(Authentication.user.roles, ['admin']).length === 0) {
+			if(!Authentication.user) {
+				$location.path('/signin');
+			} else {
+				$location.path('/');
 			}
-		});
+		} else {
+			$scope.attendees = [];			//Array of attendees (user objects).
+			$scope.isEventSelected = eventSelector.postEventId ? true : false;		//Is an event selected?
+			$scope.tabErr = false;			//Was there an error obtaining attendees from backend?
 
-		//Obtain all users for this event from the backend.
-		var getAttendees = function() {
-			$scope.tabErr = false;
-			$http.post('/event/users', {event_id : eventSelector.postEventId}).success(function(res) {
-				$scope.attendees = res;
+			//When a new event is selected, update isEventSelected and attendees.
+			$scope.$watch(function() {
+				return eventSelector.postEventId;
+			}, function() {
+				$scope.isEventSelected = eventSelector.postEventId ? true : false;
 
-				$scope.attendeeTableParams.reload();
-			}).error(function(res, status) {
-				if(status === 400 && res.message === "No users found for this event.") {
-					$scope.tabErr = res.message;
-				} else {
-					//Fail silently, since the interceptor should handle any important cases and notices can be annoying.  Attempt again in 5 seconds.
-					$timeout(function() {
-						$scope.getCandidates();
-					}, 5000);
+				if($scope.isEventSelected) {
+					getAttendees();
 				}
 			});
-		};
 
-		//Setup ng-table
-		$scope.attendeeTableParams = new ngTableParams({
-			page: 	1,
-			count: 	10,
-			filter: {
-				displayName: 	''
-			},
-			sorting: {
-				displayName: 	'asc'
-			}
-		}, {
-			getData: function($defer, params) {
-				var filteredData = params.filter() ? $filter('filter')($scope.attendees, params.filter()) : $scope.attendees;
-				var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : $scope.attendees;
+			//Obtain all users for this event from the backend.
+			var getAttendees = function() {
+				$scope.tabErr = false;
+				$http.post('/event/users', {event_id : eventSelector.postEventId}).success(function(res) {
+					$scope.attendees = res;
 
-				params.total(orderedData.length);
-				$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
-			}
-		});
-
-		//Delete the attendee's account.
-		var deleteAttendee = function(aid, aname) {
-			$http.post("/remove", {user_id : aid}).success(function(res) {
-				getAttendees();
-			}).error(function(res, status) {
-				$window.alert("There was an error deleting " + aname + "'s account.\n\nError: " + res.message);
-				getAttendees();
-			});
-		};
-
-		//Remove attendee's permissions for selected event.
-		var removeEventPermissions = function(aid, aname) {
-			$http.post('/user/inactivate', {user_id : aid, event_id : eventSelector.postEventId}).success(function(res) {
-				getAttendees();
-			}).error(function(res, status) {
-				$window.alert("There was an error removing permissions for " + aname + ".\n\nError: " + res.message);
-				getAttendees();
-			});
-		};
-
-		//Remove attendee's permissions for selected event.
-		var removeAllPermissions = function(aid, aname) {
-			$http.post('/user/inactivate/all', {user_id : aid}).success(function(res) {
-				getAttendees();
-			}).error(function(res, status) {
-				$window.alert("There was an error removing permissions for " + aname + ".\n\nError: " + res.message);
-				getAttendees();
-			});
-		};
-
-		/**
-		* To be called when the user wants to completely delete an attendee.  The user will be
-		* prompted to confirm this action should be completed.
-		*
-		* @param attendee - Attendee object to delete
-		*/
-		$scope.deleteAttendee = function(attendee) {
-			var modalInstance = $modal.open({
-				templateUrl: 	"modules/admin/views/attendee-warn-delete.client.view.html",
-				controller: 	"attendeeDeleteModalCtrl",
-				backdrop: 		true,
-				backdropClass: 	"admin-backdrop",
-				resolve: 		{
-					attendee: 	function() {
-						return attendee;
+					$scope.attendeeTableParams.reload();
+				}).error(function(res, status) {
+					if(status === 400 && res.message === "No users found for this event.") {
+						$scope.tabErr = res.message;
+					} else {
+						//Fail silently, since the interceptor should handle any important cases and notices can be annoying.  Attempt again in 5 seconds.
+						$timeout(function() {
+							$scope.getCandidates();
+						}, 5000);
 					}
+				});
+			};
+
+			//Setup ng-table
+			$scope.attendeeTableParams = new ngTableParams({
+				page: 	1,
+				count: 	10,
+				filter: {
+					displayName: 	''
+				},
+				sorting: {
+					displayName: 	'asc'
+				}
+			}, {
+				getData: function($defer, params) {
+					var filteredData = params.filter() ? $filter('filter')($scope.attendees, params.filter()) : $scope.attendees;
+					var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : $scope.attendees;
+
+					params.total(orderedData.length);
+					$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
 				}
 			});
 
-			modalInstance.result.then(function(result) {
-				if(result) {
-					deleteAttendee(attendee._id, attendee.fName + ' ' + attendee.lName);
-				}
-			});
-		};
+			//Delete the attendee's account.
+			var deleteAttendee = function(aid, aname) {
+				$http.post("/remove", {user_id : aid}).success(function(res) {
+					getAttendees();
+				}).error(function(res, status) {
+					$window.alert("There was an error deleting " + aname + "'s account.\n\nError: " + res.message);
+					getAttendees();
+				});
+			};
 
+			//Remove attendee's permissions for selected event.
+			var removeEventPermissions = function(aid, aname) {
+				$http.post('/user/inactivate', {user_id : aid, event_id : eventSelector.postEventId}).success(function(res) {
+					getAttendees();
+				}).error(function(res, status) {
+					$window.alert("There was an error removing permissions for " + aname + ".\n\nError: " + res.message);
+					getAttendees();
+				});
+			};
 
-		/**
-		* To be called when the user wants to remove an attendee.  When called, the user is
-		* prompted on whether the action should be completed.  If the user decides to
-		* continue, removeAttendee will be called.
-		*
-		* @param attendee - Attendee object to delete
-		*/
-		$scope.removeAttendee = function(attendee) {
+			//Remove attendee's permissions for selected event.
+			var removeAllPermissions = function(aid, aname) {
+				$http.post('/user/inactivate/all', {user_id : aid}).success(function(res) {
+					getAttendees();
+				}).error(function(res, status) {
+					$window.alert("There was an error removing permissions for " + aname + ".\n\nError: " + res.message);
+					getAttendees();
+				});
+			};
+
 			/**
-			* Flags to represent what action should be taken.  The flags have the
-			* following meanings:
-			* 		0 - Take no action (cancel)
-			* 		1 - Remove the user's permissions for only the selected event
-			* 		2 - Remove the user's permissions for all events
+			* To be called when the user wants to completely delete an attendee.  The user will be
+			* prompted to confirm this action should be completed.
 			*
-			* These flags are always assumed to stay in this order (i.e. cancel is first,
-			* remove role is second, and remove user is last).
+			* @param attendee - Attendee object to delete
 			*/
-			var actionFlags = [0, 1, 2];
-
-			var modalInstance = $modal.open({
-				templateUrl: 	"modules/admin/views/attendee-warn-inactive.client.view.html",
-				controller: 	"attendeeActionModalCtrl",
-				backdrop: 		true,
-				backdropClass: 	"admin-backdrop",
-				resolve: 		{
-					flags: function() {
-						return actionFlags;
-					},
-					attendee: function() {
-						return attendee;
+			$scope.deleteAttendee = function(attendee) {
+				var modalInstance = $modal.open({
+					templateUrl: 	"modules/admin/views/attendee-warn-delete.client.view.html",
+					controller: 	"attendeeDeleteModalCtrl",
+					backdrop: 		true,
+					backdropClass: 	"admin-backdrop",
+					resolve: 		{
+						attendee: 	function() {
+							return attendee;
+						}
 					}
-				}
-			});
+				});
 
-			modalInstance.result.then(function(result) {
-				result = parseInt(result, 10);
-				
-				//Do the action specified by the returned flag.
-				switch(result) {
-					case actionFlags[0]:
-						//Do nothing
-						break;
-					case actionFlags[1]:
-						//Remove user's permissions for this event.
-						removeEventPermissions(attendee._id, attendee.fName);
-						break;
-					case actionFlags[2]:
-						//Remove user's permissions for all events.
-						removeAllPermissions(attendee._id, attendee.fName);
-						break;
-				}
-			});
-		};
+				modalInstance.result.then(function(result) {
+					if(result) {
+						deleteAttendee(attendee._id, attendee.fName + ' ' + attendee.lName);
+					}
+				});
+			};
+
+
+			/**
+			* To be called when the user wants to remove an attendee.  When called, the user is
+			* prompted on whether the action should be completed.  If the user decides to
+			* continue, removeAttendee will be called.
+			*
+			* @param attendee - Attendee object to delete
+			*/
+			$scope.removeAttendee = function(attendee) {
+				/**
+				* Flags to represent what action should be taken.  The flags have the
+				* following meanings:
+				* 		0 - Take no action (cancel)
+				* 		1 - Remove the user's permissions for only the selected event
+				* 		2 - Remove the user's permissions for all events
+				*
+				* These flags are always assumed to stay in this order (i.e. cancel is first,
+				* remove role is second, and remove user is last).
+				*/
+				var actionFlags = [0, 1, 2];
+
+				var modalInstance = $modal.open({
+					templateUrl: 	"modules/admin/views/attendee-warn-inactive.client.view.html",
+					controller: 	"attendeeActionModalCtrl",
+					backdrop: 		true,
+					backdropClass: 	"admin-backdrop",
+					resolve: 		{
+						flags: function() {
+							return actionFlags;
+						},
+						attendee: function() {
+							return attendee;
+						}
+					}
+				});
+
+				modalInstance.result.then(function(result) {
+					result = parseInt(result, 10);
+					
+					//Do the action specified by the returned flag.
+					switch(result) {
+						case actionFlags[0]:
+							//Do nothing
+							break;
+						case actionFlags[1]:
+							//Remove user's permissions for this event.
+							removeEventPermissions(attendee._id, attendee.fName);
+							break;
+						case actionFlags[2]:
+							//Remove user's permissions for all events.
+							removeAllPermissions(attendee._id, attendee.fName);
+							break;
+					}
+				});
+			};
+		}
 	}
 ]);
 
