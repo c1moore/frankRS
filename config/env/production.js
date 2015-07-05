@@ -61,5 +61,8 @@ module.exports = {
 	recaptcha: {
 		public_key: process.env.G_RECAPTCHA_PUBLIC_KEY || 'G_RECAPTCHA_PUBLIC_KEY',
 		private_key: process.env.G_RECAPTCHA_PRIVATE_KEY || 'G_RECAPTCHA_PRIVATE_KEY'
+	},
+	programmer: {
+		email: process.env.PROGRAMMER_EMAIL || 'PROGRAMMER_EMAIL'
 	}
 };
