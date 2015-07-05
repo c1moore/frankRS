@@ -61,8 +61,8 @@
 						<tbody>
 							<tr class="animate-repeat"  ng-repeat="attendee in (results = (attendees.list | filter:q))" ng-class="{'frank-invite-sb-read' : attendee.read}">
 								<td>
-									<i class="octicon octicon-mail" ng-if="attendee.read"></i>
-									<i class="octicon octicon-mail-read" ng-if="!attendee.read"></i>
+									<i class="octicon octicon-mail" ng-if="attendee.read" tooltip="This attendee has NOT read your invitation." tooltip-placement="left" tooltip-class="frank-tooltip"></i>
+									<i class="octicon octicon-mail-read" ng-if="!attendee.read" tooltip="This attendee has read your invitation." tooltip-placement="left" tooltip-class="frank-tooltip"></i>
 								</td>
 								<td>
 							 		{{attendee.displayName}}
@@ -97,12 +97,17 @@
 					<table class="animate-container" ng-if="invitees.list.length">
 						<thead>
 							<tr>
+								<th></th>
 								<th>Name</th>
 								<th>Email</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr class="animate-repeat"  ng-repeat="invitee in (results = (invitees.list | filter:q))" ng-class="{'frank-invite-sb-read' : invitee.read}">
+								<td>
+									<i class="octicon octicon-mail" ng-if="attendee.read" tooltip="This invitee has NOT read your invitation.  Maybe you should reinvite them..." tooltip-placement="left" tooltip-class="frank-tooltip"></i>
+									<i class="octicon octicon-mail-read" ng-if="!attendee.read" tooltip="This attendee has read your invitation.  They may need a little nudge." tooltip-placement="left" tooltip-class="frank-tooltip"></i>
+								</td>
 								<td>
 							 		{{invitee.displayName}}
 							 	</td>
@@ -136,12 +141,17 @@
 					<table class="animate-container" ng-if="almosts.list.length">
 						<thead>
 							<tr>
+								<th></th>
 								<th>Name</th>
 								<th>Email</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr class="animate-repeat"  ng-repeat="almost in (results = (almosts.list | filter:q))" ng-class="{'frank-invite-sb-read' : almost.read}">
+								<td>
+									<i class="octicon octicon-mail" ng-if="attendee.read" tooltip="This attendee has NOT read your invitation.  Maybe that's why they didn't accept your invitation." tooltip-placement="left" tooltip-class="frank-tooltip"></i>
+									<i class="octicon octicon-mail-read" ng-if="!attendee.read" tooltip="This attendee has read your invitation.  It's too bad they did not accept your invitation." tooltip-placement="left" tooltip-class="frank-tooltip"></i>
+								</td>
 								<td>
 							 		{{almost.displayName}}
 							 	</td>
