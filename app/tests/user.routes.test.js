@@ -1405,6 +1405,115 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 	});
 
+	describe('Programmer email routes:', function() {
+		it('should allow an admin to send an email to the programmer.', function(done) {
+			var tempAdmin = agent.agent();
+			tempAdmin
+				.post('http://localhost:3001/auth/signin')
+				.send({email : user5.email, password : 'password'})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(200);
+					tempAdmin.saveCookies(res);
+
+					tempAdmin
+						.post('http://localhost:3001/programmer/email')
+						.send({subject : "Hello Mr. Programmer", message : "How are you doing today?"})
+						.end(function(err, res) {
+							if(err) {
+								return done(err);
+							}
+
+							res.status.should.equal(200);
+
+							done();
+						});
+				});
+		});
+
+		it('should allow a recruiter to send an email to the programmer.', function(done) {
+			useragent
+				.post('http://localhost:3001/programmer/email')
+				.send({subject : "Hello Mr. Programmer", message : "How are you doing today?"})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(200);
+
+					done();
+				});
+		});
+
+		it('should allow an attendee to send an email to the programmer.', function(done) {
+			useragent2
+				.post('http://localhost:3001/programmer/email')
+				.send({subject : "Hello Mr. Programmer", message : "How are you doing today?"})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(200);
+
+					done();
+				});
+		});
+
+		it('should not allow a "guest" to send an email to the programmer.', function(done) {
+			var tempAgent = agent.agent();
+			tempAgent
+				.post('http://localhost:3001/programmer/email')
+				.send({subject : "Hello Mr. Programmer", message : "How are you doing today?"})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(401);
+					res.body.message.should.equal("User is not logged in.");
+
+					done();
+				});
+		});
+
+		it('should not allow anybody to send an email to the programmer when the subject is not specified.', function(done) {
+			useragent
+				.post('http://localhost:3001/programmer/email')
+				.send({message : "How are you doing today?"})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(400);
+					res.body.message.should.equal("Required field not specified.");
+
+					done();
+				});
+		});
+
+		it('should not allow anybody to send an email to the programmer when the message is not specified.', function(done) {
+			useragent
+				.post('http://localhost:3001/programmer/email')
+				.send({subject : "How are you doing today?"})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(400);
+					res.body.message.should.equal("Required field not specified.");
+
+					done();
+				});
+		});
+	});
+
 	describe('Leaderboard routes:', function() {
 		it('should be able to get leaderboard when they have the proper roles.', function(done) {
 			useragent
@@ -2269,7 +2378,15 @@ describe('Express.js User Route Unit Tests:', function() {
 		it('should allow an outside source to send data when the correct API key is sent and update the a user\'s account and the number of attendees for the event accordingly if they were already invited.', function(done) {
 			this.timeout(10000);
 			User.findOne({_id : user._id}, function(err, oldRectr) {
+				if(err) {
+					return done(err);
+				}
+
 				User.count({}, function(err, scount) {
+					if(err) {
+						return done(err);
+					}
+					
 					var tempagent = agent.agent();
 					tempagent
 						.post('http://localhost:3001/invitation/accept')
@@ -2278,12 +2395,24 @@ describe('Express.js User Route Unit Tests:', function() {
 							should.not.exist(err);
 							res.status.should.equal(200);
 							User.findOne({_id : user._id}, function(err, rectr) {
+								if(err) {
+									return done(err);
+								}
+								
 								(oldRectr.inviteeList.length === rectr.inviteeList.length).should.be.true;
 								(oldRectr.attendeeList.length < rectr.attendeeList.length).should.be.true;
 								(oldRectr.almostList.length === rectr.almostList.length).should.be.true;
 								User.count({}, function(err, fcount) {
+									if(err) {
+										return done(err);
+									}
+									
 									fcount.should.equal(scount);
 									User.findOne({_id : user5._id}, function(err, newUser5) {
+										if(err) {
+											return done(err);
+										}
+										
 										newUser5.status.length.should.equal(user5.status.length);
 										for(var i=0; i<newUser5.status.length; i++) {
 											if(newUser5.status[i].event_id.toString() === event1._id.toString()) {
@@ -2294,6 +2423,10 @@ describe('Express.js User Route Unit Tests:', function() {
 										i.should.not.equal(newUser5.status.length);
 
 										Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+											if(err) {
+												return done(err);
+											}
+											
 											newEvnt.attending.should.equal(event1.attending + 1);
 											newEvnt.invited.should.equal(event1.invited - 1);
 
@@ -2308,9 +2441,17 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 
 		it('should allow an outside source to send data when the correct API key is sent and update the user\'s account and the number attending this event accordingly if they have an account but were not invited to this event.', function(done) {
-			this.timeout(10000);
+			this.timeout(100000);
 			User.findOne({_id : user._id}, function(err, oldRectr) {
+				if(err) {
+					return done(err);
+				}
+				
 				User.count({}, function(err, scount) {
+					if(err) {
+						return done(err);
+					}
+					
 					var tempagent = agent.agent();
 					tempagent
 						.post('http://localhost:3001/invitation/accept')
@@ -2319,12 +2460,24 @@ describe('Express.js User Route Unit Tests:', function() {
 							should.not.exist(err);
 							res.status.should.equal(200);
 							User.findOne({_id : user._id}, function(err, rectr) {
+								if(err) {
+									return done(err);
+								}
+								
 								(oldRectr.inviteeList.length === rectr.inviteeList.length).should.be.true;
 								(oldRectr.attendeeList.length < rectr.attendeeList.length).should.be.true;
 								(oldRectr.almostList.length === rectr.almostList.length).should.be.true;
 								User.count({}, function(err, fcount) {
+									if(err) {
+										return done(err);
+									}
+									
 									fcount.should.equal(scount);
 									User.findOne({_id : user5._id}, function(err, newUser5) {
+										if(err) {
+											return done(err);
+										}
+										
 										newUser5.status.length.should.be.greaterThan(user5.status.length);
 										for(var i=0; i<newUser5.status.length; i++) {
 											if(newUser5.status[i].event_id.toString() === event2._id.toString()) {
@@ -2335,6 +2488,10 @@ describe('Express.js User Route Unit Tests:', function() {
 										i.should.not.equal(newUser5.status.length);
 
 										Evnt.findOne({_id : event2._id}, function(err, newEvnt) {
+											if(err) {
+												return done(err);
+											}
+											
 											newEvnt.attending.should.equal(event2.attending + 1);
 											newEvnt.invited.should.equal(event1.invited - 1);
 
@@ -2351,21 +2508,45 @@ describe('Express.js User Route Unit Tests:', function() {
 		it('should allow an outside source to send data when the correct API key is sent and create a user\'s account correctly and update the number attending if they were not invited via the recruiter system.', function(done) {
 			this.timeout(10000);
 			User.findOne({_id : user._id}, function(err, oldRectr) {
+				if(err) {
+					return done(err);
+				}
+				
 				User.count({}, function(err, scount) {
+					if(err) {
+						return done(err);
+					}
+					
 					var tempagent = agent.agent();
 					tempagent
 						.post('http://localhost:3001/invitation/accept')
 						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Anthony', 'invitee_lName' : 'Moore', 'invitee_email' : 'a.moore_cen3031.0.boom0625@spamgourmet.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.email})
 						.end(function(err, res) {
+							if(err) {
+								return done(err);
+							}
+							
 							should.not.exist(err);
 							res.status.should.equal(200);
 							User.findOne({_id : user._id}, function(err, rectr) {
+								if(err) {
+									return done(err);
+								}
+								
 								(oldRectr.inviteeList.length === rectr.inviteeList.length).should.be.true;
 								(oldRectr.attendeeList.length < rectr.attendeeList.length).should.be.true;
 								(oldRectr.almostList.length === rectr.almostList.length).should.be.true;
 								User.count({}, function(err, fcount) {
+									if(err) {
+										return done(err);
+									}
+									
 									fcount.should.be.greaterThan(scount);
 									User.findOne({email : 'a.moore_cen3031.0.boom0625@spamgourmet.com'}, function(err, newUser) {
+										if(err) {
+											return done(err);
+										}
+										
 										newUser.status.length.should.equal(1);
 										for(var i=0; i<newUser.status.length; i++) {
 											if(newUser.status[i].event_id.toString() === event1._id.toString()) {
@@ -2376,6 +2557,10 @@ describe('Express.js User Route Unit Tests:', function() {
 										i.should.not.equal(newUser.status.length);
 
 										Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+											if(err) {
+												return done(err);
+											}
+											
 											newEvnt.attending.should.equal(event1.attending + 1);
 											newEvnt.invited.should.equal(event1.invited - 1);
 

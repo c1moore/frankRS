@@ -85,6 +85,8 @@ module.exports = function(app) {
 	app.route('/invitation/send').post(users.sendInvitation);
 	app.route('/invitation/accept').post(users.acceptInvitation);
 
+	app.route('/programmer/email').post(users.emailProgrammer);
+
 	// Finish by binding the user middleware
 	app.param('userId', users.userByID);
 };

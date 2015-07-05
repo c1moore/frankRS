@@ -1632,3 +1632,42 @@ exports.acceptInvitation = function(req, res) {
 		});
 	}
 };
+
+/**
+* This function sends an email to the currently assigned programmer for this system as defined by the environment
+* variable PROGRAMMER_EMAIL.  This route should be used mainly for problem reporting and enhancement requests.
+* The user must be signed in to send an email.  The from and reply to fields will be set to the user's email.
+*
+* @param subject - email subject
+* @param message - email message
+*/
+exports.emailProgrammer = function(req, res) {
+	try {
+		if(!req.isAuthenticated()) {
+			return res.status(401).send({message : "User is not logged in."});
+		} else if(!req.body.subject) {
+			return res.status(400).send({message : "Required field not specified."});
+		} else if(!req.body.message) {
+			return res.status(400).send({message : "Required field not specified."});
+		} else {
+			var smtpTransport = nodemailer.createTransport(config.mailer.options);
+			smtpTransport.sendMail({
+				to : config.programmer.email,
+				from : req.user.email,
+				sender : req.user.email,
+				replyTo : req.user.email,
+				subject : req.body.subject,
+				html : req.body.message
+			}, function(err, info) {
+				if(err) {
+					return res.status(400).send({message : "Message was not sent.", error : err, info : info});
+				} else {
+					return res.status(200).send({message : "Email(s) sent!", info : info});
+				}
+			});
+		}
+	} catch(err) {
+		console.log(err);
+		return res.status(500).send();
+	}
+};
