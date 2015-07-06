@@ -1,0 +1,9 @@
+.light-label {
+	font-weight: normal;
+}
+.no-padding-top {
+	padding-top: 0 !important;
+}
+.padded-input {
+	margin-right: 5px;
+}

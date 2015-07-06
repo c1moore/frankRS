@@ -1,0 +1,145 @@
+<section class="row" data-ng-controller="ProblemController">
+	<h3 class="col-md-12 text-center">Report a Problem</h3>
+	<div class="col-xs-offset-1 col-xs-10 col-md-offset-3 col-md-6">
+		<form name="problemForm" data-ng-submit="submitProblem()" class="form-horizontal">
+			<fieldset>
+				<div class="form-group frank-form-group-1">
+					<label for="browser">Browser</label>
+					<br />
+					<div class="padded-input">
+						<select ng-model="problem.browser" name="browser" class="frank-form-element">
+							<option value="" disabled selected>Select One</option>
+							<option value="chrome">Chrome</option>
+							<option value="ff">Firefox</option>
+							<option value="ie">Internet Explorer</option>
+							<option value="opera">Opera</option>
+							<option value="operamini">Opera Mini</option>
+							<option value="safari">Safari</option>
+							<option value="other">Other</option>
+						</select>
+						<label ng-show="problem.browser === 'other'" class="light-label" style="width: 100%; margin-top: 15px; margin-left: 10px;">Which? <input class="frank-form-element" style="width:80%;" type="text" ng-model="problem.other" /></label>
+					</div>
+				</div>
+				<div class="form-group frank-form-group-1">
+					<label for="version">Version</label>
+					<br />
+					<div class="note text-muted form-help no-padding-top">
+						<span>You can usually find this information by clicking the menu button in the top (right-hand) corner of the screen and selecting "About <em>[Browser]</em>".</span>
+					</div>
+					<div class="padded-input">
+						<select ng-disabled="true" ng-show="!problem.browser" class="frank-form-element"></select>
+						<select ng-model="problem.version" name="version" ng-show="problem.browser === 'chrome'" class="frank-form-element">
+							<option value="" disabled selected>Select One</option>
+							<option value="31">31</option>
+							<option value="38">38</option>
+							<option value="39">39</option>
+							<option value="40">40</option>
+							<option value="41">41</option>
+							<option value="42">42</option>
+						</select>
+						<select ng-model="problem.version" name="version" ng-show="problem.browser === 'ff'" class="frank-form-element">
+							<option value="" disabled selected>Select One</option>
+							<option value="37">37</option>
+							<option value="39">39</option>
+							<option value="40">40</option>
+							<option value="42">42</option>
+							<option value="43">43</option>
+							<option value="44">44</option>
+							<option value="45">45</option>
+							<option value="46">46</option>
+						</select>
+						<select ng-model="problem.version" name="version" ng-show="problem.browser === 'ie'" class="frank-form-element">
+							<option value="" disabled selected>Select One</option>
+							<option value="8">8</option>
+							<option value="9">9</option>
+							<option value="10">10</option>
+							<option value="11">11</option>
+							<option value="Edge">Edge</option>
+						</select>
+						<select ng-model="problem.version" name="version" ng-show="problem.browser === 'opera'" class="frank-form-element">
+							<option value="" disabled selected>Select One</option>
+							<option value="30">30</option>
+							<option value="31">31</option>
+							<option value="32">32</option>
+						</select>
+						<select ng-model="problem.version" name="version" ng-show="problem.browser === 'operamini'" class="frank-form-element">
+							<option value="" disabled selected>Select One</option>
+							<option value="8">8</option>
+						</select>
+						<select ng-model="problem.version" name="version" ng-show="problem.browser === 'safari'" class="frank-form-element">
+							<option value="" disabled selected>Select One</option>
+							<option value="7">7</option>
+							<option value="7.1">7.1</option>
+							<option value="8">8</option>
+							<option value="9">9</option>
+						</select>
+						<input type="text" ng-model="problem.version" name="version" ng-show="problem.browser === 'other'" class="frank-form-element" />
+					</div>
+				</div>
+				<div class="form-group frank-form-group-1">
+					<label for="os">Operating System</label>
+					<br />
+					<div class="padded-input">
+						<select ng-model="problem.os" name="os" class="frank-form-element">
+							<option value="" disabled selected>Select One</option>
+							<option value="mac7">Mac OS X v10.7 (Lion)</option>
+							<option value="mac8">Mac OS X v10.8 (Mountain Lion)</option>
+							<option value="mac9">Mac OS X v10.9 (Mavericks)</option>
+							<option value="mac10">Mac OS X v10.10 (Yosemite)</option>
+							<option value="mac11">Mac OS X v10.11 (El Capitan)</option>
+							<option value="winxp">Windows XP</option>
+							<option value="winvista">Windows Vista</option>
+							<option value="win7">Windows 7</option>
+							<option value="win8">Windows 8</option>
+							<option value="win8_1">Windows 8.1</option>
+							<option value="win10">Windows 10</option>
+							<option value="other">Other</option>
+						</select>
+						<label ng-show="problem.os === 'other'" class="light-label" style="width: 100%; margin-top: 15px; margin-left: 10px;">Which? <input class="frank-form-element" type="text" ng-model="problem.os_other" style="width:80%;" /></label>
+					</div>
+				</div>
+				<div class="form-group frank-form-group-1">
+					<label for="page">Page</label>
+					<br />
+					<div class="padded-input">
+						<select ng-model="problem.page" name="page" class="frank-form-element">
+							<option value="" disabled selected>Select One</option>
+							<option value="admin_apps" ng-if="admin">Admin - Applications</option>
+							<option value="admin_attendees" ng-if="admin">Admin - Attendees</option>
+							<option value="admin_events" ng-if="admin">Admin - Events</option>
+							<option value="admin_recruiters" ng-if="admin">Admin - Recruiters</option>
+							<option value="control" ng-if="recruiter">Control Room</option>
+							<option value="leaderboard" ng-if="recruiter">Leaderboard</option>
+							<option value="memo">Memo Board</option>
+							<option value="recruiter_reg">Recruiter Registration</option>
+							<option value="homw">Home</option>
+							<option value="settings">Settings</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group frank-form-group-1">
+					<label for="description">Description</label>
+					<br />
+					<div class="padded-input">
+						<div class="note text-muted form-help no-padding-top">
+							<span>Please describe the issue you found and what led to this problem (i.e. how can we recreate this problem?).</span>
+						</div>
+						<textarea ng-model="problem.description" class="frank-admin-email-message"></textarea>
+					</div>
+				</div>
+				<div class="form-group frank-form-group-1">
+					<label for="contact"  class="light-label"><input type="checkbox" name="contact" id="contact" ng-model="problem.contact" value="true" checked="true" ng-true-value="true" ng-false-value="false"> May we contact you for more information regarding this problem?</label>
+				</div>
+				<div class="text-center form-group frank-form-group-1">
+					<button type="submit" class="btn btn-large btn-primary" ng-disabled="problemForm.$invalid">Submit</button>
+				</div>
+				<div data-ng-show="success" class="text-center text-success">
+					<strong>Problem submitted.  We will diligently work to solve this problem, ignoring sleep until it is solved (excluding our overnight naps, and one afternoon nap per day).</strong>
+				</div>
+				<div data-ng-show="error" class="text-center text-danger">
+					<strong data-ng-bind="error"></strong>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+</section>
