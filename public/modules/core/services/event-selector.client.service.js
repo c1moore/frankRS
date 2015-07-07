@@ -47,7 +47,7 @@ angular.module('core').service('eventSelector', ['$rootScope', '$http', '$locati
 				var checkEvent = function(needle) {
 					for (var i=0; i<thisService.events.length; i++) {
 						if(thisService.events[i]._id === needle)
-							return true;
+							return i;
 					}
 					return false;
 				};
@@ -60,23 +60,29 @@ angular.module('core').service('eventSelector', ['$rootScope', '$http', '$locati
 					$http.get('/users/events').success(function(data) {
 						thisService.events = data;
 
-						var cachedEvent = cache.getData('selectedEvent'), cachedId = cache.getData('eventId');
+						var cachedEvent = cache.getData('selectedEvent'), cachedId = cache.getData('eventId'), cachedUI = cache.getData('ui');
 
-						if(cachedEvent && cachedId && thisService.events.length && checkEvent(cachedId)) {
-							thisService.selectedEvent = cache.getData('selectedEvent');
-							thisService.postEventId = cache.getData('eventId');
-						}
-						else {
+						var index;
+						if(cachedEvent && cachedEvent != "undefined" && cachedId && cachedId != "undefined" && thisService.events.length && (index = checkEvent(cachedId)) && cachedUI && cachedUI === Authentication.user._id) {
+							thisService.selectedEvent = thisService.events[index].name;
+							thisService.postEventId = thisService.events[index]._id;
+						} else {
 							thisService.selectedEvent = thisService.events[0].name;
 							thisService.postEventId = thisService.events[0]._id;
+
+							put('selectedEvent', thisService.events[0].name);
+							put('eventId', thisService.events[0]._id);
+							put('ui', Authentication.user._id);
 						}
 					}).error(function(error, status) {
 						thisService.selectedEvent = "Error";
 
 						//Attempt again in 5 seconds.
-						$timeout(function() {
-							getEvents();
-						}, 5000);
+						if(status !== 401) {
+							$timeout(function() {
+								getEvents();
+							}, 5000);
+						}
 					});
 				};
 				getEvents();
@@ -84,23 +90,40 @@ angular.module('core').service('eventSelector', ['$rootScope', '$http', '$locati
 				thisService.changeEvent = function(event) {
 					thisService.selectedEvent = event.name;
 					thisService.postEventId = event._id;
+					
 					put('selectedEvent', event.name);
 					put('eventId', event._id);
 				};
 
 				/**
-				* Admins have permission to do anything with any event so there is no need for a divider
-				* or to make events disabled on any page.
+				* Admins have permission to do anything with any event so there is no need for a divider.
 				*/
 				thisService.showDivider = function() {
 					return false;
 				};
-
-				thisService.toggleDisabledEvents = function() {};
 			} else {
+				var restrictedPaths = ["/invite", "/leaderboard"];
+
+				$rootScope.$on('$locationChangeSuccess', function(event) {
+					var current_path = $location.path();
+
+					for(var i=0; i < restrictedPaths.length; i++) {
+						if(current_path === restrictedPaths[i]) {
+							thisService.nresDisabled = true;
+							break;
+						}
+					}
+
+					if(i === restrictedPaths.length) {
+						thisService.nresDisabled = false;
+					}
+				});
+
 				var checkEvent = function(needle) {
 					for (var i=0; i<thisService.events.length; i++) {
-						if (thisService.events[i].event_id._id === needle) return true;
+						if (thisService.events[i].event_id._id === needle) {
+							return i;
+						}
 					}
 					return false;
 				};
@@ -108,20 +131,28 @@ angular.module('core').service('eventSelector', ['$rootScope', '$http', '$locati
 				var getEvents = function() {
 					$http.get('/users/events').success(function(data) {
 						thisService.events = data.status;
+						console.log(data);
 						for(var i=0; i<thisService.events.length; i++) {
-							if(thisService.events[i].recruiter)
+							if(thisService.events[i].event_id.recruiter)
 								thisService.numRecruiting++;
 						}
 
-						var cachedEvent = cache.getData('selectedEvent'), cachedId = cache.getData('eventId');
+						var cachedEvent = cache.getData('selectedEvent'), cachedId = cache.getData('eventId'), cachedUI = cache.getData('ui');
 
-						if(cachedEvent && cachedId && thisService.events.length && checkEvent(cachedId)) {
-							thisService.selectedEvent = cache.getData('selectedEvent');
-							thisService.postEventId = cache.getData('eventId');
-							thisService.recruiterEvent = cache.getData('recruiterEvent');
+						var index;
+						if(cachedEvent && cachedEvent != "undefined" && cachedId && cachedId != "undefined" && thisService.events.length && (index = checkEvent(cachedId)) && cachedUI && cachedUI === Authentication.user._id) {
+							thisService.selectedEvent = thisService.events[index].event_id.name;
+							thisService.postEventId = thisService.events[index].event_id._id;
+							thisService.recruiterEvent = thisService.events[index].recruiter;
 						} else {
-							thisService.selectedEvent = thisService.events[0].name;
-							thisService.postEventId = thisService.events[0]._id;
+							thisService.selectedEvent = thisService.events[0].event_id.name;
+							thisService.postEventId = thisService.events[0].event_id._id;
+							thisService.recruiterEvent = thisService.events[0].recruiter;
+
+							put('selectedEvent', thisService.events[0].event_id.name);
+							put('eventId', thisService.events[0].event_id._id);
+							put('recruiterEvent', thisService.recruiterEvent);
+							put('ui', Authentication.user._id);
 						}
 					}).error(function(error, status) {
 						if(status === 400) {
@@ -130,9 +161,11 @@ angular.module('core').service('eventSelector', ['$rootScope', '$http', '$locati
 						}
 
 						//Attempt again in 5 seconds.
-						$timeout(function() {
-							getEvents();
-						}, 5000);
+						if(status !== 401) {
+							$timeout(function() {
+								getEvents();
+							}, 5000);
+						}
 					});
 				};
 				getEvents();
@@ -141,6 +174,7 @@ angular.module('core').service('eventSelector', ['$rootScope', '$http', '$locati
 					thisService.selectedEvent = event.event_id.name;
 					thisService.postEventId = event.event_id._id;
 					thisService.recruiterEvent = event.recruiter;
+					
 					put('selectedEvent',event.event_id.name);
 					put('eventId',event.event_id._id);
 					put('recruiterEvent', thisService.recruiterEvent);
@@ -148,10 +182,6 @@ angular.module('core').service('eventSelector', ['$rootScope', '$http', '$locati
 
 				thisService.showDivider = function() {
 					return ((thisService.numRecruiting > 0) && (thisService.events.length > thisService.numRecruiting));
-				};
-
-				thisService.toggleDisabledEvents = function() {
-					thisService.nresDisabled = !thisService.nresDisabled;
 				};
 			}
 		}
