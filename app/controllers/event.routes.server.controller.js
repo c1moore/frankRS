@@ -102,6 +102,8 @@ exports.getStartDate = function(req, res) {
 			res.status(401).json({message: "User is not logged in."});
 			return;
 		//Must have permission to make requests on this ID
+		} else if(!req.query.event_id) {
+			return res.status(400).send({message : "All required fields not specified."});
 		} else if (!canViewEvent(req.user,req.query.event_id,req.hasAuthorization)) {
 			res.status(401).json({message: "You do not have permission to request this ID"});
 			return;
@@ -128,6 +130,8 @@ exports.getEndDate = function(req, res) {
 			res.status(401).json({message: "User is not logged in."});
 			return;
 		//Must have permission to make requests on this ID
+		} else if(!req.query.event_id) {
+			return res.status(400).send({message : "All required fields not specified."});
 		} else if (!canViewEvent(req.user,req.query.event_id,req.hasAuthorization)) {
 			res.status(401).json({message: "You do not have permission to request this ID"});
 			return;
@@ -153,6 +157,8 @@ exports.getLocation = function(req, res) {
 			res.status(401).json({message: "User is not logged in."});
 			return;
 		//Must have permission to make requests on this ID
+		} else if(!req.query.event_id) {
+			return res.status(400).send({message : "All required fields not specified."});
 		} else if (!canViewEvent(req.user,req.query.event_id,req.hasAuthorization)) {
 			res.status(401).json({message: "You do not have permission to request this ID"});
 			return;
@@ -178,6 +184,8 @@ exports.getEventObj = function(req, res) {
 			res.status(401).json({message: "User is not logged in."});
 			return;
 		//Must have permission to make requests on this ID
+		} else if(!req.query.event_id) {
+			return res.status(400).send({message : "All required fields not specified."});
 		} else if (!canViewEvent(req.user,req.query.event_id,req.hasAuthorization)) {
 			res.status(401).json({message: "You do not have permission to request this ID"});
 			return;
@@ -203,6 +211,8 @@ exports.getSchedule = function(req, res) {
 			res.status(401).json({message: "User is not logged in."});
 			return;
 		//Must have permission to make requests on this ID
+		} else if(!req.query.event_id) {
+			return res.status(400).send({message : "All required fields not specified."});
 		} else if (!canViewEvent(req.user,req.query.event_id,req.hasAuthorization)) {
 			res.status(401).json({message: "You do not have permission to request this ID"});
 			return;
@@ -228,6 +238,8 @@ exports.getName = function(req, res) {
 			res.status(401).json({message: "User is not logged in."});
 			return;
 		//Must have permission to make requests on this ID
+		} else if(!req.query.event_id) {
+			return res.status(400).send({message : "All required fields not specified."});
 		} else if (!canViewEvent(req.user,req.query.event_id,req.hasAuthorization)) {
 			res.status(401).json({message: "You do not have permission to request this ID"});
 			return;
@@ -249,7 +261,7 @@ exports.getName = function(req, res) {
 
 exports.getCapacity = function(req, res) {
 	try {
-		if(req.query.event_id == undefined) {
+		if(!req.query.event_id) {
 			return res.status(400).send({message : 'Required field not specified.'});
 		}
 		if (!req.isAuthenticated()) { //Must be logged in
@@ -277,7 +289,7 @@ exports.getCapacity = function(req, res) {
 
 exports.getAttending = function(req, res) {
 	try {
-		if(req.query.event_id == undefined) {
+		if(!req.query.event_id) {
 			return res.status(400).send({message : 'Required field not specified.'});
 		}
 		if (!req.isAuthenticated()) { //Must be logged in
@@ -305,7 +317,7 @@ exports.getAttending = function(req, res) {
 
 exports.getInvited = function(req, res) {
 	try {
-		if(req.query.event_id == undefined) {
+		if(!req.query.event_id) {
 			return res.status(400).send({message : 'Required field not specified.'});
 		}
 		if (!req.isAuthenticated()) { //Must be logged in
@@ -333,7 +345,7 @@ exports.getInvited = function(req, res) {
 
 exports.getStats = function(req, res) {
 	try {
-		if(req.query.event_id == undefined) {
+		if(!req.query.event_id) {
 			return res.status(400).send({message : 'Required field not specified.'});
 		}
 		if (!req.isAuthenticated()) { //Must be logged in
@@ -370,6 +382,8 @@ exports.setStartDate = function(req, res) {
 		} else if (!req.hasAuthorization(req.user,["admin"])) {
 			res.status(401).json({message: "User does not have permission."});
 			return;
+		} else if(!req.body.event_id || !req.body.start_date) {
+			return res.status(400).send({message : "All required fields not specified."});
 		}
 		//Retrieve the requested field
 		var event_id = mongoose.Types.ObjectId(req.body.event_id);
@@ -406,6 +420,8 @@ exports.setEndDate = function(req, res) {
 		} else if (!req.hasAuthorization(req.user,["admin"])) {
 			res.status(401).json({message: "User does not have permission."});
 			return;
+		} else if(!req.body.event_id || !req.body.end_date) {
+			return res.status(400).send({message : "All required fields not specified."});
 		}
 		var id = req.session.id;
 		var event_id = req.body.event_id;
@@ -442,6 +458,8 @@ exports.setLocation = function(req, res) {
 		} else if (!req.hasAuthorization(req.user,["admin"])) {
 			res.status(401).json({message: "User does not have permission."});
 			return;
+		} else if (!req.body.event_id || !req.body.location) {
+			return res.status(400).send({message : "All required fields not specified."});
 		}
 		var id = req.user._id;
 		var event_id = req.body.event_id;
@@ -478,6 +496,8 @@ exports.setEventObj = function(req, res) {
 		} else if (!req.hasAuthorization(req.user,["admin"])) {
 			res.status(401).json({message: "User does not have permission."});
 			return;
+		} else if(!req.body.event_id || !req.body.event) {
+			return res.status(400).send({message : "All required fields not specified."});
 		}
 		var id = req.session.id;
 		var event_id = mongoose.Types.ObjectId(req.body.event_id);
@@ -533,6 +553,8 @@ exports.setSchedule = function(req, res) {
 		} else if (!req.hasAuthorization(req.user,["admin"])) {
 			res.status(401).json({message: "User does not have permission."});
 			return;
+		} else if(!req.body.event_id) {
+			return res.status(400).send({message : "All required fields not specified."});
 		}
 		var id = req.session.id;
 		var event_id = mongoose.Types.ObjectId(req.body.event_id);
@@ -569,6 +591,8 @@ exports.setName = function(req, res) {
 		} else if (!req.hasAuthorization(req.user,["admin"])) {
 			res.status(401).json({message: "User does not have permission."});
 			return;
+		} else if(!req.body.event_id || !req.body.name) {
+			return res.status(400).send({message : "All required fields not specified."});
 		}
 		var event_id = mongoose.Types.ObjectId(req.body.event_id);
 		var new_name = req.body.name;
@@ -598,7 +622,7 @@ exports.setName = function(req, res) {
 exports.setCapacity = function(req, res) {
 	try {
 		//Since capacity can be 0 and capacity could be a string, convert it to a number and check if it is NaN.  Just checking isNaN may give unexpected results.
-		if(!req.body.event_id || req.body.capacity == null || isNaN(new Number(req.body.capacity))) {
+		if(!req.body.event_id || (!req.body.capacity && req.body.capacity !== 0) || isNaN(new Number(req.body.capacity))) {
 			res.status(400).send({message : 'Required fields not specified.'});
 			return;
 		}
@@ -685,6 +709,8 @@ exports.delete = function(req, res) {
 		} else if (!req.hasAuthorization(req.user,["admin"])) {
 			res.status(401).json({message: "User does not have permission."});
 			return;
+		} else if(!req.body.event_id) {
+			return res.status(400).send({message : "All required fields not specified."});
 		}
 		var event_id = mongoose.Types.ObjectId(req.body.event_id);
 		var query = Event.findOne({_id: event_id});
@@ -739,6 +765,8 @@ exports.create = function(req, res) {
 		} else if (!req.hasAuthorization(req.user,["admin"])) {
 			res.status(401).json({message: "User does not have permission."});
 			return;
+		} else if(!req.body.name || !req.body.start_date || !req.body.end_date || !req.body.location || !req.body.capacity) {
+			return res.status(400).send({message : "All required fields not specified."});
 		}
 		var eventObj = {
 			name: 		req.body.name,

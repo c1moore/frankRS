@@ -58,6 +58,9 @@ exports.getCommentObj = function(req, res) {
 		res.status(401).json({message: "User is not logged in."});
 		return;
 	}
+	if(!req.body.comment_id) {
+		return res.status(400).send({message : "All required fields not specified."});
+	}
 	var id = mongoose.Types.ObjectId(req.body.comment_id);
 	var query = Comment.findOne({_id: id});
 	//Retrieve the comment
@@ -77,7 +80,7 @@ exports.getSocialCommentsForEvent = function(req, res) {
 	if (!req.isAuthenticated()) { //Check if the user is authenticated
 		return res.status(401).send({message: "User is not logged in."});
 	}
-	if(req.body.event_id == undefined) {
+	if(!req.body.event_id) {
 		return res.status(400).send({message : "Event not specified."});
 	}
 	if(!canViewEvent(req.user, req.body.event_id, req.hasAuthorization)) {
@@ -107,7 +110,7 @@ exports.getSocialCommentsForEvent = function(req, res) {
 exports.getRecruiterCommentsForEvent = function(req, res) {
 	if (!req.isAuthenticated()) { //Check if the user is authenticated
 		return res.status(401).json({message: "User is not logged in."});
-	} else 	if(req.body.event_id == undefined) {
+	} else 	if(!req.body.event_id) {
 		return res.status(400).send({message : "Event not specified."});
 	} else {
 		var id = mongoose.Types.ObjectId(req.body.event_id);
@@ -134,7 +137,7 @@ exports.postCommentSocial = function(req, res) {
 	if (!req.isAuthenticated()) { //Check if the user is authenticated
 		return res.status(401).json({message: "User is not logged in."});
 	}
-	if(req.body.comment == undefined || req.body.event_id == undefined) {
+	if(!req.body.comment || !req.body.event_id) {
 		return res.status(400).send({message : "Required field not specified."});
 	}
 	//Any authenticated user can post comments
@@ -223,6 +226,10 @@ exports.searchByInterests = function(req, res) {
 		res.status(401).json({message: "User is not logged in."});
 		return;
 	}
+	if(!req.body.event_id || req.body.interest) {
+		return res.status(400).send({message : "All required fields not specified."});
+	}
+	
 	var id = mongoose.Types.ObjectId(req.body.event_id);
 	var interest = req.body.interest;
 	if (!canViewEvent(req.user,id,req.hasAuthorization)) {

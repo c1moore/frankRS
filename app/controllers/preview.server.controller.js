@@ -11,12 +11,12 @@ var errorHandler = require('./errors'),
 
 exports.getPreviewTemplate = function(req, res) {
 	if(!req.isAuthenticated()) {
-		res.status(401).send({'message' : 'User is not logged in.'});
+		return res.status(401).send({'message' : 'User is not logged in.'});
 	} else {
 		if(!req.hasAuthorization(req.user, ["recruiter", "admin"])) {
-			res.status(401).send({'message' : 'User does not have permission.'});
+			return res.status(401).send({'message' : 'User does not have permission.'});
 		} else {
-			if(req.query.event_name == undefined || req.query.event_id == undefined) {
+			if(!req.query.event_name || !req.query.event_id) {
 				return res.status(400).send({'message' : 'Event name or id not specified.'});
 			}
 

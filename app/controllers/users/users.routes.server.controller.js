@@ -244,7 +244,6 @@ exports.removePermissions = function(req, res) {
 * Revoke a user's permissions for all events and set login_enabled to false for the user.
 *
 * @param user_id _id field of the user from which permissions should be revoked
-* @param event_id _id field of the event from which to revoke permissions for the user
 */
 exports.removeAllPermissions = function(req, res) {
 	if(!req.isAuthenticated()) {
@@ -419,7 +418,7 @@ exports.getDisplayName = function(req, res) {
 * and the inviteeList and attendeeList, properly populated with the displayName of each user in one of these lists.
 */
 exports.getLeaderboard = function(req, res) {
-	if(req.body.event_id == undefined) {
+	if(!req.body.event_id) {
 		res.status(400).send({'message' : 'Event not specified.'});
 		return;
 	}
@@ -561,7 +560,7 @@ exports.getUserEvents = function(req, res) {
 * Get the list of attendees for the event specified and the recruiter that is currently logged in.
 */
 exports.getRecruiterAttendees = function(req, res) {
-	if(req.body.event_id == undefined) {
+	if(!req.body.event_id) {
 		res.status(400).send({'message' : 'Event not specified.'});
 		return;
 	}
@@ -632,7 +631,7 @@ exports.getRecruiterAttendees = function(req, res) {
 * Get the invitee list of the currently logged in recruiter for the event specified.
 */
 exports.getRecruiterInvitees = function(req, res) {
-	if(req.body.event_id == undefined) {
+	if(!req.body.event_id) {
 		res.status(400).send({'message' : 'Event not specified.'});
 		return;
 	}
@@ -702,7 +701,7 @@ exports.getRecruiterInvitees = function(req, res) {
 * Get the almost list of the currently logged in recruiter for the event specified.
 */
 exports.getRecruiterAlmosts = function(req, res) {
-	if(req.body.event_id == undefined) {
+	if(!req.body.event_id) {
 		res.status(400).send({'message' : 'Event not specified.'});
 		return;
 	}
@@ -773,7 +772,7 @@ exports.getRecruiterAlmosts = function(req, res) {
 * Retrieve the list of all people who are signed up to attend the event.
 */
 exports.getAttendees = function(req, res) {
-	if(req.body.event_id == undefined) {
+	if(!req.body.event_id) {
 		res.status(400).send({'message' : 'Event not specified.'});
 		return;
 	}
@@ -827,7 +826,7 @@ exports.getAttendees = function(req, res) {
 * Retrieve the list of all people who are invited to attend the specified event.
 */
 exports.getInvitees = function(req, res) {
-	if(req.body.event_id == undefined) {
+	if(!req.body.event_id) {
 		res.status(400).send({'message' : 'Event not specified.'});
 		return;
 	}
@@ -884,7 +883,7 @@ exports.getRecruiterInfo = function(req, res) {
 	} else if(!req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
 		return res.status(401).send({message : 'User does not have permission.'});
 	} else {
-		if(req.query.event_id == undefined) {
+		if(!req.query.event_id) {
 			return res.status(400).send({message : 'Event not specified.'});
 		} else {
 			var id = req.user._id;
@@ -1058,7 +1057,7 @@ exports.getRecruiters = function(req, res) {
 * TODO: A much more efficient method for updating this information, especially the recruiter's rank, should be researched and used when time permits.
 */
 exports.sendInvitation = function(req, res) {
-	if(req.body.fName == undefined || req.body.lName == undefined || req.body.email == undefined || req.body.event_id == undefined || req.body.event_name == undefined) {
+	if(!req.body.fName || !req.body.lName || !req.body.email || !req.body.event_id || !req.body.event_name) {
 		return res.status(400).send({'message' : 'Required fields not specified.'});
 	}
 
@@ -1341,7 +1340,7 @@ exports.sendInvitation = function(req, res) {
 */
 exports.acceptInvitation = function(req, res) {
 	//We will use an API key to determine whether or not this is an authenticated request.
-	if(!(req.body.api_key === 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe')) {
+	if(req.body.api_key !== 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe') {
 		return res.status(400).send({message : 'You are not authorized to make this request.'});
 	} else {
 		/**
@@ -1353,7 +1352,7 @@ exports.acceptInvitation = function(req, res) {
 		var expectedFields = ['api_key', 'invitee_fName', 'invitee_lName', 'invitee_email', 'organization', 'event_name', 'recruiter_email'];
 
 		for(var i=0; i<expectedFields.length; i++) {
-			if(req.body[expectedFields[i]] == undefined) {
+			if(!req.body[expectedFields[i]]) {
 				return res.status(400).send({message : 'All required fields not specified.'});
 			} else if(typeof req.body[expectedFields[i]] !== 'string') {
 				return res.status(400).send({message : 'Illegal value for field ' + expectedFields[i] + '.'});

@@ -114,9 +114,12 @@ exports.getCandidatesByEvent = function(req, res) {
 
  exports.getfName = function(req, res) {
  	var user = req.user;
- 	if(!req.isAuthenticated())
+ 	if(!req.isAuthenticated()) {
  		return res.status(401).send({'message' : 'User is not logged in.'});
-
+ 	}
+ 	if(!req.body.candidate_id) {
+		return res.status(400).send({message : "All required fields not specified."});
+ 	}
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidate_id = mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id: candidate_id});
@@ -134,9 +137,12 @@ exports.getCandidatesByEvent = function(req, res) {
 
  exports.getlName= function(req, res) {
  	var user = req.user;
- 	if(!req.isAuthenticated())
+ 	if(!req.isAuthenticated()) {
  		return res.status(401).send({'message' : 'User is not logged in.'});
-
+ 	}
+ 	if(!req.body.candidate_id) {
+		return res.status(400).send({message : "All required fields not specified."});
+ 	}
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidate_id = mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id: candidate_id});
@@ -152,9 +158,12 @@ exports.getCandidatesByEvent = function(req, res) {
  		return res.status(401).send({message : "User does not have permission."});
  };
  exports.getEmail= function(req, res) {
- 	if(!req.isAuthenticated())
+ 	if(!req.isAuthenticated()) {
  		return res.status(401).send({'message' : 'User is not logged in.'});
-
+ 	}
+ 	if(!req.body.candidate_id) {
+		return res.status(400).send({message : "All required fields not specified."});
+	}
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id:candidate_id });
@@ -193,8 +202,12 @@ exports.getCandidatesByEvent = function(req, res) {
  		return res.status(401).send("User does not have permission.");
  };*/
  exports.getEvents= function(req, res) {
- 	if(!req.isAuthenticated())
+ 	if(!req.isAuthenticated()) {
  		return res.status(401).send({'message' : 'User is not logged in.'});
+ 	}
+ 	if(!req.body.candidate_id) {
+		return res.status(400).send({message : "All required fields not specified."});
+ 	}
 
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
@@ -217,8 +230,12 @@ exports.getCandidatesByEvent = function(req, res) {
  };
 
  exports.getNote= function(req, res) {
- 	if(!req.isAuthenticated())
+ 	if(!req.isAuthenticated()) {
  		return res.status(401).send({'message' : 'User is not logged in.'});
+ 	}
+ 	if(!req.body.candidate_id) {
+		return res.status(400).send({message : "All required fields not specified."});
+	}
 
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
@@ -238,8 +255,12 @@ exports.getCandidatesByEvent = function(req, res) {
  };
 
  exports.getUser_id= function(req, res) {
- 	if(!req.isAuthenticated())
+ 	if(!req.isAuthenticated()) {
  		return res.status(401).send({'message' : 'User is not logged in.'});
+ 	}
+ 	if(!req.body.candidate_id) {
+		return res.status(400).send({message : "All required fields not specified."});
+ 	}
 
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
@@ -260,8 +281,12 @@ exports.getCandidatesByEvent = function(req, res) {
 
  
  exports.setfName = function(req,res){
- 	if(!req.isAuthenticated())
+ 	if(!req.isAuthenticated()) {
  		return res.status(401).send({'message' : 'User is not logged in.'});
+ 	}
+ 	if(!req.body.candidate_id || !req.body.fName) {
+		return res.status(400).send({message : "All required fields not specified."});
+	}
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id:candidate_id });
@@ -298,8 +323,13 @@ exports.getCandidatesByEvent = function(req, res) {
 
  };
  exports.setlName = function(req,res){
- 	if(!req.isAuthenticated())
+ 	if(!req.isAuthenticated()) {
  		return res.status(401).send({'message' : 'User is not logged in.'});
+ 	}
+ 	if(!req.body.candidate_id || !req.body.lName) {
+		return res.status(400).send({message : "All required fields not specified."});
+	}
+
  	if (req.hasAuthorization(req.user, ["admin"])){
  		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
  		var query = Candidate.findOne({_id:candidate_id });
@@ -390,7 +420,7 @@ exports.getCandidatesByEvent = function(req, res) {
 exports.setEventStatus = function(req,res) {
 	if(!req.isAuthenticated()) {
 		return res.status(401).send({'message' : 'User is not logged in.'});
-	} else if(req.body.candidate_id == undefined || req.body.event_id == undefined || req.body.status == undefined) {
+	} else if(!req.body.candidate_id || !req.body.event_id || !req.body.status) {
 		return res.status(400).send({message : 'A required field is not specified.  Nice going.'});
 	} else if(req.hasAuthorization(req.user, ["admin"])) {
 
@@ -515,7 +545,7 @@ exports.setEventStatus = function(req,res) {
 exports.addEvent = function(req,res){
 	if(!req.isAuthenticated()) {
 		return res.status(401).send({'message' : 'User is not logged in.'});
-	} else if(req.body.candidate_id == undefined || req.body.event_id == undefined) {
+	} else if(!req.body.candidate_id || !req.body.event_id) {
 		return res.status(400).send({message : "A required field is not specified.  Nice going."});
 	} else if(req.hasAuthorization(req.user, ["admin"])) {
 		var candidate_id = mongoose.Types.ObjectId(req.body.candidate_id);
@@ -608,7 +638,7 @@ exports.addEvent = function(req,res){
 exports.setEventAccepted = function(req,res){
 	if(!req.isAuthenticated()) {
 		return res.status(401).send({message : "User is not logged in."});
-	} else if(req.body.candidate_id == undefined || req.body.event_id == undefined || req.body.accepted == undefined) {
+	} else if(!req.body.candidate_id || !req.body.event_id || req.body.accepted == undefined) {
 		return res.status(400).send({message : 'Required fields were not specified.  Nice going.'});
 	} else if(req.hasAuthorization(req.user, ["admin"])) {
 		var candidate_id = mongoose.Types.ObjectId(req.body.candidate_id);
@@ -726,8 +756,13 @@ exports.setEventAccepted = function(req,res){
 };
 
 exports.setNote = function(req,res){
-	if(!req.isAuthenticated())
+	if(!req.isAuthenticated()) {
 		return res.status(401).send({'message' : 'User is not logged in.'});
+	}
+	if(!req.body.candidate_id || !req.body.note) {
+		return res.status(400).send({message : "All required fields not specified."});
+	}
+
 	if (req.hasAuthorization(req.user, ["admin"])){
 		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
 		var query = Candidate.findOne({_id:candidate_id });
@@ -771,7 +806,7 @@ exports.updateCandidate = function(req, res) {
 		return res.status(401).send({message : "User does not have permission."});
 	}
 
-	if(req.body.candidate == undefined || req.body.candidate._id == undefined) {
+	if(!req.body.candidate || !req.body.candidate._id) {
 		return res.status(400).send({message : "A required field is not specified."});
 	}
 
@@ -845,7 +880,7 @@ exports.setCandidate = function(req,res){
 	if(!req.isAuthenticated()) {
 		return res.status(401).send({message : "User is not logged in."});
 	} else if(req.hasAuthorization(req.user, ["admin"])) {
-		if(req.body.fName == undefined || req.body.lName == undefined || req.body.email == undefined || req.body.events == undefined || req.body.events.length === 0) {
+		if(!req.body.fName || !req.body.lName || !req.body.email || !req.body.events || req.body.events.length === 0) {
 			return res.status(400).send({message : 'A required field is not specified.  Nice going.'});
 		}
 
@@ -967,7 +1002,7 @@ exports.setCandidate = function(req,res){
 * @param g-recaptcha-response - reCAPTCHA response
 */
 exports.createNonuserCandidate = function(req, res) {
-	if(req.body.fName == "" || req.body.fName == undefined || req.body.lName == "" || req.body.lName == undefined || req.body.email == "" || req.body.email == undefined || req.body.note == "" || req.body.note == undefined || req.body['g-recaptcha-response'] == "" || req.body['g-recaptcha-response'] == undefined) {
+	if(!req.body.fName || !req.body.lName || !req.body.email || !req.body.note || !req.body['g-recaptcha-response']) {
 		return res.status(400).send({message : "A required field is not specified."});
 	}
 
@@ -1019,8 +1054,12 @@ exports.createNonuserCandidate = function(req, res) {
 };
 
 exports.deleteCandidate = function(req,res){
-	if(!req.isAuthenticated())
+	if(!req.isAuthenticated()) {
 		return res.status(401).send({message : "User is not logged in."});
+	}
+	if(!req.body.candidate_id) {
+		return res.status(400).send({message : "All required fields not specified."});
+	}
 	if (req.hasAuthorization(req.user, ["admin"])){
 		var candidate_id=mongoose.Types.ObjectId(req.body.candidate_id);
 		var query = Candidate.findOne({_id:candidate_id });
@@ -1050,6 +1089,8 @@ exports.deleteCandidateByEvent = function(req, res) {
 		return res.status(401).send({message : "User is not logged in."});
 	} else if(!req.hasAuthorization(req.user, ["admin"])) {
 		return res.status(401).send({message : "User does not have permission."});
+	} else if(!req.body.candidate_id || !req.body.event_id) {
+		return res.status(400).send({message : "All required fields not specified."});
 	} else {
 		var candidate_id = new mongoose.Types.ObjectId(req.body.candidate_id);
 		var event_id = new mongoose.Types.ObjectId(req.body.event_id);
@@ -1101,7 +1142,7 @@ exports.sendCandidateEmail = function(req, res) {
 			return res.status(401).send({message : "User is not logged in."});
 		} else if(!req.hasAuthorization(req.user, ["admin"])) {
 			return res.status(401).send({message : "User does not have permission."});
-		} else if(!req.body.candidate_ids.length) {
+		} else if(!req.body.candidate_ids || !req.body.candidate_ids.length) {
 			return res.status(400).send({message : "At least one email is required."});
 		} else if(!req.body.message) {
 			return res.status(400).send({message : "Required field not specified."});

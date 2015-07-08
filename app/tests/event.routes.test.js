@@ -1043,7 +1043,7 @@ describe('Event Route Integration Tests:', function() {
 					.end(function(err,res) {
 						should.not.exist(err);
 						res.status.should.be.equal(400);
-						res.body.message.should.equal("Validation failed");
+						res.body.message.should.equal("All required fields not specified.");
 						agentAdmin
 							.get('http://localhost:3001/events/getName')
 							.query({event_id: event2._id.toString()})
@@ -1463,7 +1463,7 @@ describe('Event Route Integration Tests:', function() {
 					.end(function(err,res) {
 						should.not.exist(err);
 						res.status.should.be.equal(400);
-						res.body.message.should.equal("Validation failed");
+						res.body.message.should.equal("All required fields not specified.");
 						agentAdmin
 							.get('http://localhost:3001/events/getLocation')
 							.query({event_id: event2._id.toString()})
