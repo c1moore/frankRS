@@ -765,7 +765,7 @@ exports.create = function(req, res) {
 		} else if (!req.hasAuthorization(req.user,["admin"])) {
 			res.status(401).json({message: "User does not have permission."});
 			return;
-		} else if(!req.body.name || !req.body.start_date || !req.body.end_date || !req.body.location || !req.body.capacity) {
+		} else if(!req.body.name || !req.body.start_date || !req.body.end_date || !req.body.location || (!req.body.capacity && req.body.capacity !== 0)) {
 			return res.status(400).send({message : "All required fields not specified."});
 		}
 		var eventObj = {
