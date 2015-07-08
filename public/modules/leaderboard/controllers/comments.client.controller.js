@@ -37,8 +37,12 @@ angular.module('leaderboard').controller('commentsCtrl', ['$scope', 'Authenticat
 					$http.post('/comments/getRecruiterCommentsForEvent', {event_id : eventSelector.postEventId}).success(function(response) {
 						$scope.comments = response;
 					}).error(function(response, status) {
-						if(status === 400 && "No comments found!") {
+						if(status !== 401) {
 							$scope.commentErr = "Error retrieving comments.  Try refreshing the page.";
+
+							if(response.message === "No comments found!") {
+								$scope.commentErr = response.message;
+							}
 
 							//Fail silently, since the interceptor should handle any important cases and notices can be annoying.  Attempt again in 5 seconds.
 							$timeout(function() {

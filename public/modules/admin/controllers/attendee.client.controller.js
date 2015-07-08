@@ -36,9 +36,11 @@ angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTab
 						$scope.tabErr = res.message;
 					} else {
 						//Fail silently, since the interceptor should handle any important cases and notices can be annoying.  Attempt again in 5 seconds.
-						$timeout(function() {
-							$scope.getCandidates();
-						}, 5000);
+						if(status !== 401) {
+							$timeout(function() {
+								$scope.getCandidates();
+							}, 5000);
+						}
 					}
 				});
 			};
@@ -68,7 +70,7 @@ angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTab
 				$http.post("/remove", {user_id : aid}).success(function(res) {
 					getAttendees();
 				}).error(function(res, status) {
-					$window.alert("There was an error deleting " + aname + "'s account.\n\nError: " + res.message);
+					$window.alert("There was an error deleting " + aname + "'s account.\n\nError: " + res.message + "\nIf this error continues, please <a href='/#!/problems'>report it</a>.");
 					getAttendees();
 				});
 			};
@@ -78,7 +80,7 @@ angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTab
 				$http.post('/user/inactivate', {user_id : aid, event_id : eventSelector.postEventId}).success(function(res) {
 					getAttendees();
 				}).error(function(res, status) {
-					$window.alert("There was an error removing permissions for " + aname + ".\n\nError: " + res.message);
+					$window.alert("There was an error removing permissions for " + aname + ".\n\nError: " + res.message + "\nIf this error continues, please <a href='/#!/problems'>report it</a>.");
 					getAttendees();
 				});
 			};
@@ -88,7 +90,7 @@ angular.module('admin').controller('adminAttendeesController', ['$scope', 'ngTab
 				$http.post('/user/inactivate/all', {user_id : aid}).success(function(res) {
 					getAttendees();
 				}).error(function(res, status) {
-					$window.alert("There was an error removing permissions for " + aname + ".\n\nError: " + res.message);
+					$window.alert("There was an error removing permissions for " + aname + ".\n\nError: " + res.message + "\nIf this error continues, please <a href='/#!/problems'>report it</a>.");
 					getAttendees();
 				});
 			};

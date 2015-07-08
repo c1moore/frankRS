@@ -81,6 +81,9 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 				for (var i=0;i<data.length;i++) {
 					$scope.selectEvents.push({label:data[i].name, event_id:data[i]._id});
 				}
+			}).error(function(data) {
+				$scope.selectEvents = [];
+				$scope.selectEvents[0] = {label : "Error", event_id : "error"};
 			});
 
 			$scope.getCandidates = function() {
@@ -89,11 +92,17 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 					$scope.candidates = data;
 
 					rowUpdated = false;
-				}).error(function(error) {
-					//Fail silently, since the interceptor should handle any important cases and notices can be annoying.  Attempt again in 5 seconds.
-					$timeout(function() {
-						$scope.getCandidates();
-					}, 5000);
+				}).error(function(error, status) {
+					/**
+					* If the error was not an authentication problem, try reloading the data.  If the problem
+					* was related to authentication, the interceptor will take care of routing the user.
+					* Problems related to no events existing will be treated the same way for now from here.
+					*/
+					if(status !== 401) {
+						$timeout(function() {
+							$scope.getCandidates();
+						}, 5000);
+					}
 				});
 			};
 
@@ -112,24 +121,28 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 						$scope.candidateForm.$setPristine(true);
 						$scope.newCandidate = {};
 						$scope.newCanidateEvents = [];
-					}).error(function(res) {
-						//Warn the user.
-						$window.alert("Oops, something bad happened.  We couldn't save the new candidate.  Please make sure all fields are correct and try again.\n\nError: " + res.message);
+					}).error(function(res, status) {
+						//Warn the user iff there wasn't an authentication issue (window.alert will keep the page from redirecting immediately).
+						if(status !== 401) {
+							$window.alert("Oops, something bad happened.  We couldn't save the new candidate.  Please make sure all fields are correct and try again.\n\nError: " + res.message + "\nIf this error continues, please <a href='/#!/problems'>report this issue</a>");
+						}
 					});
 				}
 			};
 
 			$scope.acceptCandidate = function(candidate) {
-				var postObject = {candidate_id:candidate._id, event_id:eventSelector.postEventId, accepted:true};
+				var postObject = {candidate_id : candidate._id, event_id : eventSelector.postEventId, accepted : true};
 				$http.post('/candidate/setAccepted',postObject).success(function() {
 					//refresh table view
 					$scope.getCandidates();
-				}).error(function(res) {
+				}).error(function(res, status) {
 					//Warn the user.
-					$window.alert("Candidate not updated.  Please try again.\n\n" + res.message);
-					
-					//Refresh table view
-					$scope.getCandidates();
+					if(status !== 401) {
+						//Refresh table view so the candidate no longer appears as accepted.
+						$scope.getCandidates();
+
+						$window.alert("Candidate not updated.  Please try again.\n\n" + res.message + "\nIf this error continues, please <a href='/#!/problems'>report it</a>.");
+					}
 				});
 			};
 
@@ -137,16 +150,17 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 				$http.post('/candidate/deleteCandidate/event',{candidate_id:candidate._id, event_id:eventSelector.postEventId}).success(function() {
 					//refresh table view
 					$scope.getCandidates();
-				}).error(function(res) {
-					//Warn the user.
-					$window.alert("Candidate not updated.  Please try again.\n\nError: " + res.message);
-					
-					//Refresh table view
+				}).error(function(res) {					
+					//Refresh table view so the candidate's real status is displayed.
 					$scope.getCandidates();
+
+					//Warn the user.
+					$window.alert("Candidate not updated.  Please try again.\n\nError: " + res.message + "\nIf this error continues, please <a href='/#!/problems'>report it</a>.");
 				});
 			};
 
-			//this updates the table when the candidates variable is changed
+			//This updates the table when the candidates variable is changed.
+			//I may be able to move this safely into the getCandidates() function.  Tests are needed to confirm this.
 			$scope.$watch("candidates", function() {
 				$timeout(function() {
 					$scope.tableParams.reload();
@@ -235,7 +249,9 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 						usSpinnerService.stop('spinner-2');
 						$scope.sending = false;
 					}).error(function(response, status) {
-						$window.alert("There was an error sending the message.  Please try again later.\n\nError: " + response);
+						if(status !== 401) {
+							$window.alert("There was an error sending the message.  Please try again later.\n\nError: " + response.message + "\nIf this error continues, please <a href='/#!/problems'>report it</a>.");
+						}
 							
 						usSpinnerService.stop('spinner-2');
 						$scope.sending = false;
@@ -262,18 +278,22 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 						if(field === 'name') {
 							$http.post("/candidate/setfName", {fName : $scope.$data[index].fName, candidate_id : $scope.$data[index]._id}).success(function() {
 								$scope.getCandidates();
-							}).error(function(res) {
-								$scope.getCandidates();
+							}).error(function(res, status) {
+								if(status !== 401) {
+									$scope.getCandidates();
 
-								$window.alert("Error occurred while updating " + $scope.$data[index].fName + "'s name.\n\nError: " + res);
+									$window.alert("Error occurred while updating " + $scope.$data[index].fName + "'s name.\n\nError: " + res.message + "\nIf this error continues, please <a href='/#!/problems'>report it</a>.");
+								}
 							});
 
 							$http.post("/candidate/setlName", {lName : $scope.$data[index].lName, candidate_id : $scope.$data[index]._id}).success(function() {
 								$scope.getCandidates();
-							}).error(function(res) {
-								$scope.getCandidates();
+							}).error(function(res, status) {
+								if(status !== 401) {
+									$scope.getCandidates();
 
-								$window.alert("Error occurred while updating " + $scope.$data[index].fName + "'s name.\n\nError: " + res);
+									$window.alert("Error occurred while updating " + $scope.$data[index].fName + "'s name.\n\nError: " + res.message + "\nIf this error continues, please <a href='/#!/problems'>report it</a>.");
+								}
 							});
 						} else {
 							var address = "/candidate/set" + field;
@@ -284,16 +304,18 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 
 							$http.post(address, data).success(function() {
 								$scope.getCandidates();
-							}).error(function(res) {
-								$scope.getCandidates();
-
-								$window.alert("Error occurred while updating " + $scope.$data[index].fName + "'s record.\n\nError: " + res);
+							}).error(function(res, status) {
+								if(status !== 401) {
+									$scope.getCandidates();
+									
+									$window.alert("Error occurred while updating " + $scope.$data[index].fName + "'s record.\n\nError: " + res.message + "\nIf this error continues, please <a href='/#!/problems'>report it</a>.");
+								}
 							});
 						}
 					} else {
 						$scope.getCandidates();
 
-						$window.alert("Candidate could not be found.  Refresh the page and try again.");
+						$window.alert("Candidate could not be found.  Refresh the page and try again.\nIf this error continues, please <a href='/#!/problems'>report it</a>.");
 					}
 				}
 			};
@@ -341,30 +363,38 @@ angular.module("admin").controller("RecruiterInvitationCtrl", ["$scope", "$modal
 			$scope.sending = true;
 			$scope.error = false;
 
+			var invite = {};
+			angular.extend(invite, $scope.invite);
+
 			//Replace HTML unsafe characters with their proper HTML safe equivalents.
-			$scope.invite.message = _.escape($scope.invite.message);
+			invite.message = _.escape(invite.message);
 			
 			//Either add the link to the end of the email or replace the reserved word with the link.
-			if($scope.invite.message.search(linkRegex) === -1) {
-				$scope.invite.message += "\n\nYou can sign up at " + linkHtml;
+			if(invite.message.search(linkRegex) === -1) {
+				invite.message += "\n\nYou can sign up at " + linkHtml;
 			} else {
-				$scope.invite.message = $scope.invite.message.replace(linkRegex, linkHtml);
+				invite.message = invite.message.replace(linkRegex, linkHtml);
 			}
 
 			//Replace all newline characters with <br />.
-			$scope.invite.message = $scope.invite.message.replace(/\n/g, "<br />");
+			invite.message = invite.message.replace(/\n/g, "<br />");
 
 			//Split the string of emails into an array
-			$scope.invite.emails = $scope.invite.emails.split(/, */g);
+			invite.emails = invite.emails.split(/, */g);
 
-			$http.post("/candidate/send", $scope.invite).success(function() {
+			$http.post("/candidate/send", invite).success(function() {
 				$scope.sending = false;
 				$scope.sentMode = true;
+
+				$scope.invite = {subject : "We Want You to Be Our Next Great Recruiter"};
+
 				usSpinnerService.stop('admin-new-recruiter-spinner-1');
 			}).error(function(res, status) {
+				$scope.error = res.message + "  Error: " + res.error.code;
+				
 				$scope.sending = false;
-				$scope.error = res.message + "  Error: " + res.error;
 				$scope.editorMode = true;
+				
 				usSpinnerService.stop("admin-new-recruiter-spinner-1");
 			});
 		};

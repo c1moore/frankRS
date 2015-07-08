@@ -52,9 +52,11 @@ angular.module('admin').controller('recruitersController', ['$scope', 'ngTablePa
 						$scope.tabErr = res.message;
 					} else {
 						//Fail silently, since the interceptor should handle any important cases and notices can be annoying.  Attempt again in 5 seconds.
-						$timeout(function() {
-							$scope.getCandidates();
-						}, 5000);
+						if(status !==401) {
+							$timeout(function() {
+								$scope.getCandidates();
+							}, 5000);
+						}
 					}
 				});
 			};
@@ -84,9 +86,11 @@ angular.module('admin').controller('recruitersController', ['$scope', 'ngTablePa
 				$http.post("/remove/Recruiter", {user_id : rid, event_id : eventSelector.postEventId}).success(function(res) {
 					getRecruiters();
 				}).error(function(res, status) {
-					$window.alert("There was an error removing " + rname + "'s recruiter role.\n\n" + res.message);
+					if(status !== 401) {
+						getRecruiters();
 
-					getRecruiters();
+						$window.alert("There was an error removing " + rname + "'s recruiter role.\n\n" + res.message + "\nIf this error continues, please <a href='/#!/problems'>report this issue</a>");
+					}
 				});
 			};
 
@@ -95,9 +99,11 @@ angular.module('admin').controller('recruitersController', ['$scope', 'ngTablePa
 				$http.post("/remove", {user_id : rid}).success(function(res) {
 					getRecruiters();
 				}).error(function(res, status) {
-					$window.alert("There was an error deleting " + rname + "'s account.\n\nError: " + res.message);
-
-					getRecruiters();
+					if(status !== 401) {
+						getRecruiters();
+						
+						$window.alert("There was an error deleting " + rname + "'s account.\n\nError: " + res.message + "\nIf this error continues, please <a href='/#!/problems'>report this issue</a>");
+					}
 				});
 			};
 

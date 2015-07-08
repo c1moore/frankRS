@@ -61,8 +61,10 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 
 		        	$scope.newEvent = null;
 		        	$scope.eventForm.$setPristine(true);
-	        	}).error(function(response) {
-	        		$window.alert("There was an error adding " + newEvent.name + ".  Please make sure all information is correct and try again.\n\nError: " + response.message);
+	        	}).error(function(response, status) {
+	        		if(status !== 401) {
+		        		$window.alert("There was an error adding " + newEvent.name + ".  Please make sure all information is correct and try again.\n\nError: " + response.message + "\nIf this error continues, please <a href='/#!/problems'>report it</a>.");
+		        	}
 	        	});
 	  		};
 
@@ -72,10 +74,12 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 
 				$http.post('/events/setEventObj',{event_id : event._id, event:event}).success(function() {
 					getEvents();
-				}).error(function(response) {
-	        		$window.alert("There was an error updating " + event.name + ".  Please make sure all information is correct and try again.\n\nError: " + response.message);
-
-					getEvents();
+				}).error(function(response, status) {
+					if(status !== 401) {
+						getEvents();
+					
+		        		$window.alert("There was an error updating " + event.name + ".  Please make sure all information is correct and try again.\n\nError: " + response.message + "\nIf this error continues, please <a href='/#!/problems'>report it</a>.");
+		        	}
 				});
 			};
 
@@ -111,9 +115,11 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 				$http.post('/events/delete',{event_id:event._id}).success(function() {
 					getEvents();
 				}).error(function(res, status) {
-					$window.alert("An error occurred while deleting " + event.name +".\n\nError: " + res.message);
+					if(status !== 401) {
+						getEvents();
 
-					getEvents();
+						$window.alert("An error occurred while deleting " + event.name +".\n\nError: " + res.message + "\nIf this error continues, please <a href='/#!/problems'>report it</a>.");
+					}
 				});
 			};
 
@@ -141,9 +147,11 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 				$http.post('events/inactivate', {event_id : eid}).success(function() {
 					getEvents();
 				}).error(function(res, status) {
-					$window.alert("An error occurred while disabling " + ename + ".\n\nError: " + res.message);
-					
-					getEvents();
+					if(status !== 401) {
+						getEvents();
+						
+						$window.alert("An error occurred while disabling " + ename + ".\n\nError: " + res.message + "\nIf this error continues, please <a href='/#!/problems'>report it</a>.");
+					}
 				});
 			};
 

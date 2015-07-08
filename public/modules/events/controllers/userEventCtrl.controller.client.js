@@ -106,8 +106,6 @@ angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams',
 				});
 			};
 
-			$timeout(function() {$scope.launch($scope.events[0]);}, 5000);
-
 			/**
 			* Adopted from post made on stackoverflow.com by disfated.  Original post here:
 			* http://stackoverflow.com/questions/2332811/capitalize-words-in-string

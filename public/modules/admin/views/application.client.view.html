@@ -118,7 +118,7 @@
 				</label>
 				<br />
 				<button role="submit" class="btn invitation-button" id="admin-email-submit" ng-disabled="frankAdminEmail.$invalid" ng-hide="sending"><i class="fa fa-envelope-o"></i>Send</button>
-				<span us-spinner="{lines:13, length:5, width:2, radius:7}" spinner-key="spinner-2" ng-show="sending"></span>
+				<span us-spinner="{lines:13, length:5, width:2, radius:7, corners:0.5, opacity:0.05, shadow:true, color:['#73c92d', '#f7b518', '#c54e80']}" spinner-key="spinner-2" ng-show="sending"></span>
 				<br />
 	            <div class="alert alert-danger" role="alert" ng-if="email.error">
 	              <span ng-repeat="mess in email.errmess">

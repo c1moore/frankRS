@@ -19,12 +19,9 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 			$scope.sidebarColor = $scope.sidebarInactiveColor;
 			$scope.sidebarOpen = false;
 			
-			if(!eventSelector.nresDisabled) {
-				eventSelector.toggleDisabledEvents();
-				if(!eventSelector.recruiterEvent) {
-					angular.element("#invitation-submit-button").addClass("disabled");
-					angular.element("#invitation-preview-button").addClass("disabled");
-				}
+			if(!eventSelector.recruiterEvent) {
+				angular.element("#invitation-submit-button").addClass("disabled");
+				angular.element("#invitation-preview-button").addClass("disabled");
 			}
 
 			var tempEvent = cacheService.getData('selectedEvent');
@@ -102,13 +99,15 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 
 					usSpinnerService.stop('spinner-1');
 					$scope.sending = false;
-				}).error(function(response) {
-					$window.alert("There was an error sending this message.\n\nError: " + response.message);
+				}).error(function(response, status) {
+					if(status !== 400) {
+						angular.element("#invitation-submit-button").removeClass("disabled");
+						
+						usSpinnerService.stop('spinner-1');
+						$scope.sending = false;
 
-					angular.element("#invitation-submit-button").removeClass("disabled");
-					
-					usSpinnerService.stop('spinner-1');
-					$scope.sending = false;
+						$window.alert("There was an error sending this message.\n\nError: " + response.message + "\nIf this error continues, please <a href='/#!/problems'>report this issue</a>");
+					}
 				});
 			};
 

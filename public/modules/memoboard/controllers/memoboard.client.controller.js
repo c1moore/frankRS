@@ -34,13 +34,13 @@ angular.module('memoboard').controller('memoboardCtrl', ['$scope', 'Authenticati
 				if(eventSelector.postEventId) {
 					$http.post('/comments/getSocialCommentsForEvent', {event_id : eventSelector.postEventId}).success(function(response) {
 						$scope.comments = response;
+						$scope.commentsErr = "";
 					}).error(function(response, status) {
-						if(response.message !== "No comments found!") {
-							//Fail silently since the interceptor should handle any important cases and notices can be annoying.  Attempt again in 5 seconds.
-							$timeout(function() {
-								getEvents();
-							}, 5000);
+						if(typeof $scope.comments === 'string') {
+							$scope.comments = false;
 						}
+
+						$scope.commentsErr = response.message;
 					});
 				}
 			};

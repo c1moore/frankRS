@@ -17,13 +17,10 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 
 			$scope.mainTableFilter = {displayName : ''};
 
-			if(!eventSelector.nresDisabled) {
-				eventSelector.toggleDisabledEvents();
-				if(!eventSelector.recruiterEvent) {
-					eventSelector.selectedEvent = "Select Event";
-					eventSelector.recruiterEvent = true;
-					eventSelector.postEventId = null;
-				}
+			if(!eventSelector.recruiterEvent) {
+				eventSelector.selectedEvent = "Select Event";
+				eventSelector.recruiterEvent = true;
+				eventSelector.postEventId = null;
 			}
 			
 			$scope.returnInt = function(value) {
@@ -155,9 +152,11 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 					});
 				}).error(function(response, status) {
 					//Fail silently since the interceptor should handle any important cases and notices can be annoying.  Attempt again in 5 seconds.
-					$timeout(function() {
-						getStats();
-					}, 5000);
+					if(status !== 401) {
+						$timeout(function() {
+							getStats();
+						}, 5000);
+					}
 				});
 			};
 
