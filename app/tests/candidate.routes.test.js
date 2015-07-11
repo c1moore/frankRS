@@ -442,6 +442,7 @@ describe('Candidate Route Integration Tests:', function() {
 			});
 
 			it("admin should be able to send an email to multiple people.", function(done) {
+				this.timeout(10000);
 				userAgent
 					.post('http://localhost:3001/candidate/send')
 					.send({emails : ["anyString_cen3031.0.boom0625@spamgourmet.com", "test_cen3031.0.boom0625@spamgourmet.com", "cowsandbeans_cen3031.0.boom0625@spamgourmet.com"], subject : "Selling Cows for Beans", message : "Did you know that selling a cow for magic beans is typically a bad idea?"})
