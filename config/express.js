@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-var secret = "supersecretpassword";
+var secret = process.env.FRANK_SUPER_SECRET || "supersecretsecret";
 
 var express = require('express'),
 	morgan = require('morgan'),

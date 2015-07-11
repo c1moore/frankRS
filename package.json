@@ -1,16 +1,16 @@
 {
-  "name": "meanjs",
-  "description": "Full-Stack JavaScript with MongoDB, Express, AngularJS, and Node.js.",
-  "version": "0.3.2",
+  "name": "frankRS",
+  "description": "frank Recruiter System for help keep track of the entire recruiting process.",
+  "version": "0.0.1",
   "private": false,
-  "author": "https://github.com/meanjs/mean/graphs/contributors",
+  "author": "https://github.com/c1moore/frankRS#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/meanjs/mean.git"
+    "url": "https://github.com/c1moore/frankRS"
   },
   "engines": {
-    "node": "0.10.x",
-    "npm": "1.4.x"
+    "node": "0.12.x",
+    "npm": "2.11.x"
   },
   "scripts": {
     "start": "grunt",

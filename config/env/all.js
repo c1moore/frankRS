@@ -2,8 +2,8 @@
 
 module.exports = {
 	app: {
-		title: 'frank Recruiter System',
-		description: 'Recruiter system developed for frank for its annual invitation-only events.',
+		title: 'frankRS',
+		description: 'Recruiter system developed for frank to keep track of the entire recruiting process.',
 		keywords: 'Recruiter system, frank, attendee chatroom, recruiters, invitation-only events'
 	},
 	port: process.env.PORT || 3000,

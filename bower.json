@@ -1,7 +1,7 @@
 {
   "name": "frank-recruiter-system",
   "version": "0.0.1",
-  "description": "Recruiter system developed for frank for its annual invitation-only events.",
+  "description": "Recruiter system developed for frank to keep track of the entire recruiting process.",
   "dependencies": {
     "bootstrap": "~3",
     "angular": "~1.2",

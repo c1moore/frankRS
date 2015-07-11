@@ -63,6 +63,7 @@ module.exports = {
 		private_key: process.env.G_RECAPTCHA_PRIVATE_KEY || 'G_RECAPTCHA_PRIVATE_KEY'
 	},
 	programmer: {
-		email: process.env.PROGRAMMER_EMAIL || 'PROGRAMMER_EMAIL'
-	}
+		email: process.env.FRANK_PROGRAMMER_EMAIL || 'PROGRAMMER_EMAIL'
+	},
+	zapier_api: process.env.FRANK_ZAP_API_KEY || 'frank_zap_api_key'
 };
