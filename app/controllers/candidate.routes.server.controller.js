@@ -14,7 +14,8 @@
  smtpPool = require('nodemailer-smtp-pool'),
  config = require('../../config/config'),
  http = require('http'),
- querystring = require('querystring');
+ querystring = require('querystring'),
+ _ = require('lodash');
 
 /**
 * When a candidate without admin permissions submits a note, it must contain the following format:
@@ -68,6 +69,34 @@ var checkUserNote = function(note, replace, original) {
 	}
 
 	return note;
+};
+
+/**
+* Create a temporary password for a new candidate.  This password is the password that will
+* be sent to the candidate so they can log into their account.
+*
+* @param credentialsArr - An array that will be used to build the personalized password.  This
+* variable should follow the following format: [candidate_first_name, candidate_last_name,
+* candidate_email].
+*/
+var newCandidatePass = function(credentialsArr) {
+	var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	var password = [];
+	var salt = '';
+
+	for (var i=0; i<5; i++) {
+		salt += chars[Math.round(_.random(0, 1, true) * (chars.length - 1))];
+	}
+
+	var pos = _.random(0, 2, false);
+	password[pos] = salt;
+
+	for(var i=0; i<3; i++) {
+		if(!password[i])
+			_.random(0, credentialsArr.length, false);
+	}
+
+	return password.join('');
 };
 
 exports.getCandidates = function(req, res) {
@@ -489,7 +518,7 @@ exports.setEventStatus = function(req,res) {
 										roles: ['recruiter'],
 										email: result.email,
 										status: [{event_id: event_id, attending: false, recruiter:true}],
-										password: result.fName + result.lName,	//TODO Use the password creation method used in User routes controller.
+										password: newCandidatePass([result.fName, result.lName, result.email]),
 										login_enabled: true
 									});
 
@@ -699,8 +728,6 @@ exports.setEventAccepted = function(req,res){
 									});
 								/**
 								* The candidate is not already a user.  We need to create an account for them.
-								*
-								* TODO Use a better password generation function and send an email to the recruiter informing them of their new account.
 								*/
 								} else {
 									var newUser = new User({
@@ -709,7 +736,7 @@ exports.setEventAccepted = function(req,res){
 										roles: ['recruiter'],
 										email: result.email,
 										status: [{event_id: new mongoose.Types.ObjectId(req.body.event_id), attending: false, recruiter:true}],
-										password: result.fName + result.lName,	//TODO Use the password function in the users.routes.server.controller.js.
+										password: newCandidatePass([result.fName, result.lName, result.email]),
 										login_enabled: true
 									});
 
