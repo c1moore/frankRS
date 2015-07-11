@@ -1350,6 +1350,7 @@ exports.sendInvitation = function(req, res) {
 								var filepath = path.normalize(__dirname + "/../../views/templates/preview/" + fileName.toLowerCase());
 
 								res.render(filepath, {
+									recruiter_name: req.user.fName,
 									receiver_name: req.body.fName,
 									event_name: req.body.event_name,
 									message: req.body.message
@@ -1431,12 +1432,10 @@ exports.sendInvitation = function(req, res) {
 *
 * If the attendee is added to the db, we need to increment the number of people attending and decrement the total
 * number of people invited for this event (invitation count is only for those invited, but not attending).
-*
-* TODO: Change the API before production.
 */
 exports.acceptInvitation = function(req, res) {
 	//We will use an API key to determine whether or not this is an authenticated request.
-	if(req.body.api_key !== 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe') {
+	if(req.body.api_key !== config.zapier_api) {
 		return res.status(400).send({message : 'You are not authorized to make this request.'});
 	} else {
 		/**

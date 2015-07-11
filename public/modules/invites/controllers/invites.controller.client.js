@@ -100,13 +100,22 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 					usSpinnerService.stop('spinner-1');
 					$scope.sending = false;
 				}).error(function(response, status) {
-					if(status !== 400) {
-						angular.element("#invitation-submit-button").removeClass("disabled");
-						
-						usSpinnerService.stop('spinner-1');
-						$scope.sending = false;
+					if(status !== 401) {
+						if(status !== 500) {
+							angular.element("#invitation-submit-button").removeClass("disabled");
+							
+							usSpinnerService.stop('spinner-1');
+							$scope.sending = false;
 
-						$window.alert("There was an error sending this message.\n\nError: " + response.message + "\nIf this error continues, please <a href='/#!/problems'>report this issue</a>");
+							$window.alert("There was an error sending this message.\n\nError: " + response.message + "\nIf this error continues, please <a href='/#!/problems'>report this issue</a>");
+						} else {
+							angular.element("#invitation-submit-button").removeClass("disabled");
+							
+							usSpinnerService.stop('spinner-1');
+							$scope.sending = false;
+
+							$window.alert("We could not connect to the server right now.\nIf this error continues, please <a href='/#!/problems'>report this issue</a>");
+						}
 					}
 				});
 			};
@@ -194,20 +203,20 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 		*/
 		var previewOptions = {};
 
+		console.log($scope.authentication);
 
+		previewService.preview.recruiter_name = $scope.authentication.user.fName;
 		previewService.preview.sender_email = $scope.authentication.user.email;
 		previewService.preview.event_name = $scope.invite.event_name;
 		previewService.preview.receiver_email = $scope.invite.invitee_email;
-		previewService.preview.receiver_fname = $scope.invite.fName;
-		previewService.preview.receiver_lname = $scope.invite.lName;
+		previewService.preview.receiver_name = $scope.invite.fName;
 		previewService.preview.message = $scope.invite.message;
 
 		$scope.$watchCollection('invite', function() {
 			previewService.preview.sender_email = $scope.authentication.user.email;
 			previewService.preview.event_name = $scope.invite.event_name;
 			previewService.preview.receiver_email = $scope.invite.invitee_email;
-			previewService.preview.receiver_fname = $scope.invite.fName;
-			previewService.preview.receiver_lname = $scope.invite.lName;
+			previewService.preview.receiver_name = $scope.invite.fName;
 			previewService.preview.message = $scope.invite.message;
 		});
 
@@ -284,9 +293,9 @@ angular.module('invites').controller('modalCtrl', ['$scope', '$modalInstance', '
 		};
 
 		$scope.previewService = previewService;
+		$scope.recruiter_name = previewService.preview.recruiter_name;
 		$scope.event_name = previewService.preview.event_name;
-		$scope.receiver_fname = previewService.preview.receiver_fname;
-		$scope.receiver_lname = previewService.preview.receiver_lname;
+		$scope.receiver_name = previewService.preview.receiver_name;
 		$scope.receiver_email = previewService.preview.receiver_email;
 		$scope.sender_email = previewService.preview.sender_email;
 		$scope.message = previewService.preview.message;
@@ -294,8 +303,7 @@ angular.module('invites').controller('modalCtrl', ['$scope', '$modalInstance', '
 
 		$scope.$watchCollection('previewService.preview', function() {
 			$scope.event_name = previewService.preview.event_name;
-			$scope.receiver_fname = previewService.preview.receiver_fname;
-			$scope.receiver_lname = previewService.preview.receiver_lname;
+			$scope.receiver_name = previewService.preview.receiver_name;
 			$scope.receiver_email = previewService.preview.receiver_email;
 			$scope.sender_email = previewService.preview.sender_email;
 			$scope.message = previewService.preview.message;

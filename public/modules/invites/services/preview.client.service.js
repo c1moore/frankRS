@@ -6,11 +6,11 @@ angular.module('core').service('previewService', [
 		this.preview = {};
 
 		this.preview.modalInstance = null;
+		this.preview.recruiter_name = "";
 		this.preview.event_name = "";
 		this.preview.sender_email = "";
 		this.preview.receiver_email = "";
-		this.preview.receiver_fname = "";
-		this.preview.receiver_lname = "";
+		this.preview.receiver_name = "";
 		this.preview.message = "";
 	}
 ]);
