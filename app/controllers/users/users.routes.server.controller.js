@@ -79,36 +79,175 @@ var newAttendeePass = function(credentialsArr) {
 /**
 * Update the rank of all recruiters for the specified event.
 */
-var updateRanks = function(event_id) {
-	User.aggregate([
-		{$match : {'status' : {'event_id' : event_id, 'recruiter' : true}}},
-		//{$unwind : 'attendeeList'},
-		//{$unwind : 'inviteeList'},
-		//{$unwind : 'rank'},
-		{$match : {$or : [{'attendeeList' : {'event_id' : event_id}}, {'inviteeList' : {'event_id' : event_id}}]}},
-		{$project : {'_id' : 1, 'rank' : 1, 'attendeeLength' : {$size : "$attendeeList"}, 'inviteeLength' : {$size : "$inviteeList"}}},		//A better solution than this may be to add an additional field to the User schema and a presave method that will update this field everytime a user object is updated.
-		{$sort : {'attendeeLength' : -1, 'inviteeLength' : -1}}
-	], function(err, result) {
-		var aqueue = async.queue(function(recruiter, callback) {
-			User.findOne({'_id' : recruiter._id}, function(err, result) {
-				if(!err) {
-					for(var i=0; i<result.rank.length; i++) {
-						if(result.rank[i].event_id.toString() === event_id.toString()) {
-							result.rank.place = recruiter.place;
-							result.save(callback);
-							break;
-						}
+var updateRanks = function(event_id, cb) {
+	var mapReduceObj = {};
+	mapReduceObj.map = function() {
+		for(var i = 0; i < this.status.length; i++) {
+			if(this.status[i].event_id.toString() === event_id.toString() && this.status[i].recruiter) {
+				var hasPoints = false;		//Does the user have any points?
+
+				for(var j = 0; j < this.attendeeList.length; j++) {
+					if(this.attendeeList[j].event_id.toString() === event_id.toString()) {
+						emit(this._id, 10);		//People attending are worth 10 points.
+						hasPoints = true;
 					}
 				}
-			});
-		}, 10000);
+				for(var j = 0; j < this.inviteeList.length; j++) {
+					if(this.inviteeList[j].event_id.toString() === event_id.toString()) {
+						emit(this._id, 0.5);	//People invited are worth 0.5 points.  The only time invites will make a big enough contribution is when there is a tie between recruiters from number of people attending.
+						hasPoints = true;
+					}
+				}
 
-		for(var i=0; i<result.length; i++) {
-			var recruiter = {'_id' : result[i]._id, 'place' : i};
-			aqueue.push(recruiter);
+				if(!hasPoints) {
+					emit(this._id, 0);
+				}
+
+				break;
+			}
+		}
+	};
+	mapReduceObj.reduce = function(recruiterId, points) {
+		var totalPoints = 0;
+
+		for(var i = 0; i < points.length; i++) {
+			totalPoints += points[i];
+		}
+
+		return totalPoints;
+	};
+	mapReduceObj.scope = {event_id : event_id};
+	mapReduceObj.query = {roles : "recruiter"};
+	// User.aggregate([
+	// 	{$match : {'status' : {$elemMatch : {'event_id' : event_id, 'recruiter' : true}}, roles : "recruiter"}},
+	// 	// {$addToSet : {"$attendeeList" : {event_id : event_id}}},		//Adding a temporary attendee to each recruiter's list will not effect the recruiter's position and it will keep MongoDB from removing those recruiters that do not yet have people attending this event.
+	// 	// {$addToSet : {"$inviteeList" : {event_id : event_id}}},		//Adding a temporary invitee to each recruiter's list will not effect the recruiter's position and it will keep MongoDB from removing those recruiters that do not have people invited to this event.
+	// 	{$unwind : "$attendeeList"},
+	// 	{$match : {"attendeeList.event_id" : event_id}},
+	// 	{$group : {_id : "$_id", attendeeLength : {$sum : 1}, inviteeList : {$addToSet : {event_id : "$inviteeList.event_id", user_id : "$inviteeList.user_id"}}}},
+	// 	{$unwind : "$inviteeList"},
+	// 	{$match : {'inviteeList.event_id' : event_id}},
+	// 	{$group : {_id : "$_id", attendeeLength : {$first : "$attendeeLength"}, inviteeLength : {$sum : 1}}},		//A better solution than this may be to add an additional field to the User schema and a presave method that will update this field everytime a user object is updated.
+	// 	{$sort : {'attendeeLength' : -1, 'inviteeLength' : -1}}
+	// ], function(err, result) {
+	User.mapReduce(mapReduceObj, function(err, result) {
+		if(err) {
+			console.log("Error updating inviteeLists/almostLists (1): " + err);
+			cb(err);
+		} else if(!result || !result.length) {
+			cb(null);
+		} else {
+			var aqueue = async.queue(function(recruiter, callback) {
+				User.findOne({'_id' : recruiter._id}, function(err, result) {
+					if(!err) {
+						var i;
+						for(i=0; i<result.rank.length; i++) {
+							if(result.rank[i].event_id.toString() === event_id.toString()) {
+								result.rank[i].place = recruiter.place;
+								result.save(callback);
+								break;
+							}
+						}
+
+						if(i === result.rank.length) {
+							result.rank.addToSet({event_id : event_id, place : recruiter.place});
+							result.save(callback);
+						}
+					} else {
+						callback(err);
+					}
+				});
+			}, 10000);
+
+			var errs = false;
+			var task_cb = function(err, result) {
+				if(err) {
+					errs = err;
+					console.log("Error updating inviteeLists/almostLists (2): " + err);
+				}
+			};
+
+			var sortedResults = result.sort(function(a, b) {
+				return b.value - a.value;
+			});
+
+			console.log("Sorted IDs:\n");
+			console.log(sortedResults);
+
+			aqueue.pause();
+			for(var i=0; i<result.length; i++) {
+				var recruiter = {'_id' : sortedResults[i]._id, 'place' : (i + 1)};
+				aqueue.push(recruiter, task_cb);
+			}
+			aqueue.resume();
+
+			aqueue.drain = function() {
+				cb(errs);
+			};
 		}
 	});
 };
+
+/**
+* Update all recruiter's lists so as to reflect a new user attending an event.  Users that have invited the new
+* attendee will have their inviteeList reduced (the attendee will be removed) and almostList increased (the
+* attendee will be added).  This method must be called AFTER setting the victorious recruiter's attendeeList
+* and inviteeList to reflect their win.
+*
+* @param user_id - new attendee's id
+* @param event_id - id of event to update
+*/
+var updateEventLists = function(user_id, event_id, callback) {
+	event_id = new mongoose.Types.ObjectId(event_id);
+	user_id = new mongoose.Types.ObjectId(user_id);
+
+	User.find().elemMatch("inviteeList", {"event_id" : event_id, "user_id" : user_id}).exec(function(err, recruiters) {
+		if(err) {
+			console.log("Error updating inviteeLists/almostLists (1): " + err);
+			callback(err);
+		} else if(!recruiters || !recruiters.length) {
+			callback(null);
+		} else {
+			var aqueue = async.queue(function(recruiter, cb) {
+				var index = 0;
+				for(; index < recruiter.inviteeList.length; index++) {
+					if(recruiter.inviteeList[index].event_id.toString() === event_id.toString() && recruiter.inviteeList[index].user_id.toString() === user_id.toString()) {
+						break;
+					}
+				}
+
+				recruiter.almostList.push({event_id : event_id, user_id : user_id, read : recruiter.inviteeList[index].read});
+				recruiter.inviteeList.pull({event_id : event_id, user_id : user_id});
+
+				recruiter.save(function(err) {
+					if(err) {
+						console.log("Error updating inviteeLists/almostLists (2): " + err);
+						cb(err);
+					} else {
+						cb(null);
+					}
+				});
+			}, 10000);
+
+			var errs = false;
+			var task_cb = function(err) {
+				if(err) {
+					errs = err;
+				}
+			};
+
+			aqueue.pause();
+			for(var i = 0; i < recruiters.length; i++) {
+				aqueue.push(recruiters[i], task_cb);
+			}
+			aqueue.resume();
+
+			aqueue.drain = function() {
+				callback(errs);
+			};
+		}
+	});
+}
 
 
 /**
@@ -1237,53 +1376,10 @@ exports.sendInvitation = function(req, res) {
 									if(err) {
 										return res.status(400).send({'message' : 'Invitation was not sent.  Please try again later.', 'error' : err});
 									} else {
-										//updateRanks(req.body.event_id);
 										async.waterfall([
 											function(next) {
-												User.aggregate([
-													{$match : {'status.event_id' : new mongoose.Types.ObjectId(req.body.event_id), 'status.recruiter' : true}},
-													{$match : {$or : [{'attendeeList.event_id' : new mongoose.Types.ObjectId(req.body.event_id)}, {'inviteeList.event_id' : new mongoose.Types.ObjectId(req.body.event_id)}]}},
-													{$project : {'_id' : 1, 'rank' : 1, 'attendeeLength' : {$size : "$attendeeList"}, 'inviteeLength' : {$size : "$inviteeList"}}},
-													{$sort : {'attendeeLength' : -1, 'inviteeLength' : -1}}
-												], function(err, result) {
-													if(err) {
-														next(err, false);
-													} else {
-														var aqueue = async.queue(function(recruiter, callback) {
-															User.findOne({'_id' : recruiter._id}, function(err, result) {
-																if(!err) {
-																	for(var i=0; i<result.rank.length; i++) {
-																		if(result.rank[i].event_id.toString() === req.body.event_id.toString()) {
-																			result.rank.place = recruiter.place;
-																			result.save(function() {
-																				callback();
-																			});
-																			break;
-																		}
-																	}
-
-																	if(i===result.rank.length) {
-																		result.rank.push({event_id : new mongoose.Types.ObjectId(req.body.event_id), place : recruiter.place});
-																		result.save(function() {
-																			callback();
-																		});
-																	}
-																}
-															});
-														}, 20);
-
-														var i=0;
-
-														aqueue.drain = function() {
-															if(i===result.length)
-																next(null, true);
-														};
-
-														for(; i<result.length; i++) {
-															var recruiter = {'_id' : result[i]._id, 'place' : i};
-															aqueue.push(recruiter);
-														}
-													}
+												updateRanks(req.body.event_id, function(err) {
+													next(err, true);
 												});
 											}],
 											function(err, results) {
@@ -1444,23 +1540,34 @@ exports.acceptInvitation = function(req, res) {
 													callback(true, false);
 												} else {
 													result.attendeeList.addToSet({event_id : evnt._id, user_id : newAttendee._id});
+													result.inviteeList.pull({event_id : evnt._id, user_id : newAttendee._id});
 													result.save(function(err) {
 														if(err) {
 															return res.status(400).send({message : err});
 														} else {
-															res.render('templates/invitation-accepted-recruiter-email', {
-																recruiter_name : result.fName,
-																event: req.body.event_name,
-																attendee_name: req.body.invitee_fName + " " + req.body.invitee_lName,
-																address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard'
-															}, function(err, emailHTML) {
-																recruiterMailOptions.html = emailHTML;
-																smtpTransport.sendMail(recruiterMailOptions, function(err, info) {
+															updateEventLists(newAttendee._id, evnt._id, function(err) {
+																if(err) {
+																	//There's not much we can/should do at this point.  Returning an error would keep us from notifying the recruiter.  Resending this request from Zapier would cost extra mulah.  Since the error was logged already, we will ignore the error from here.
+																}
+																updateRanks(evnt._id, function(err) {
 																	if(err) {
-																		callback(err, false);
-																	} else {
-																		callback(false, info.response);
+																		//There's not much we can/should do at this point.  Returning an error would keep us from notifying the recruiter.  Resending this request from Zapier would cost extra mulah.  Since the error was logged already, we will ignore the error from here.
 																	}
+																	res.render('templates/invitation-accepted-recruiter-email', {
+																		recruiter_name : result.fName,
+																		event: req.body.event_name,
+																		attendee_name: req.body.invitee_fName + " " + req.body.invitee_lName,
+																		address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard'
+																	}, function(err, emailHTML) {
+																		recruiterMailOptions.html = emailHTML;
+																		smtpTransport.sendMail(recruiterMailOptions, function(err, info) {
+																			if(err) {
+																				callback(err, false);
+																			} else {
+																				callback(false, info.response);
+																			}
+																		});
+																	});
 																});
 															});
 														}
@@ -1582,23 +1689,34 @@ exports.acceptInvitation = function(req, res) {
 													callback(true, false);
 												} else {
 													result.attendeeList.addToSet({event_id : evnt._id, user_id : attendee._id});
-													result.save(function(err) {
+													result.inviteeList.pull({event_id : evnt._id, user_id : attendee._id});
+													result.save(function(err, result) {
 														if(err) {
 															return res.status(400).send({message : err});
 														} else {
-															res.render('templates/invitation-accepted-recruiter-email', {
-																recruiter_name : result.fName,
-																event: req.body.event_name,
-																attendee_name: req.body.invitee_fName + " " + req.body.invitee_lName,
-																address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard'
-															}, function(err, emailHTML) {
-																recruiterMailOptions.html = emailHTML;
-																smtpTransport.sendMail(recruiterMailOptions, function(err, info) {
+															updateEventLists(attendee._id, evnt._id, function(err) {
+																if(err) {
+																	//There's not much we can/should do at this point.  Returning an error would keep us from notifying the recruiter.  Resending this request from Zapier would cost extra mulah.  Since the error was logged already, we will ignore the error from here.
+																}
+																updateRanks(evnt._id, function(err) {
 																	if(err) {
-																		callback(err, false);
-																	} else {
-																		callback(false, info.response);
+																		//There's not much we can/should do at this point.  Returning an error would keep us from notifying the recruiter.  Resending this request from Zapier would cost extra mulah.  Since the error was logged already, we will ignore the error from here.
 																	}
+																	res.render('templates/invitation-accepted-recruiter-email', {
+																		recruiter_name : result.fName,
+																		event: req.body.event_name,
+																		attendee_name: req.body.invitee_fName + " " + req.body.invitee_lName,
+																		address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard'
+																	}, function(err, emailHTML) {
+																		recruiterMailOptions.html = emailHTML;
+																		smtpTransport.sendMail(recruiterMailOptions, function(err, info) {
+																			if(err) {
+																				callback(err, false);
+																			} else {
+																				callback(false, info.response);
+																			}
+																		});
+																	});
 																});
 															});
 														}

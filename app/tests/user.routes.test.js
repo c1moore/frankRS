@@ -174,7 +174,7 @@ describe('Express.js User Route Unit Tests:', function() {
 							email : 'test_cen3031.0.boom0625@spamgourmet.com',
 							roles : ['recruiter'],
 							status : [{'event_id':event1._id, 'attending':true, 'recruiter':true}, {'event_id':event2._id, 'attending':false, 'recruiter':true}, {'event_id':event3._id, 'attending':true, 'recruiter':true}, {'event_id':event4._id, 'attending':true, 'recruiter':false}],
-							rank : [{'event_id':event1._id, 'place':1}, {'event_id':event2._id, 'place':2}, {'event_id':event3._id, 'place':3}],
+							rank : [{'event_id':event1._id, 'place':2}, {'event_id':event2._id, 'place':2}, {'event_id':event3._id, 'place':3}],
 							password : 'password',
 							attendeeList : [{'user_id' : user2._id, 'event_id' : event1._id}, {'user_id' : user3._id, 'event_id' : event2._id}, {'user_id' : user4._id, 'event_id' : event1._id}],
 							inviteeList : [{'user_id' : user3._id, 'event_id' : event1._id}],
@@ -1087,8 +1087,6 @@ describe('Express.js User Route Unit Tests:', function() {
 									}
 								}
 
-								console.log(ruser.roles);
-
 								if(_.intersection(["recruiter"], ruser.roles).length) {
 									return done(new Error("Recruiter permissions not revoked."));
 								}
@@ -1191,7 +1189,6 @@ describe('Express.js User Route Unit Tests:', function() {
 						.send({user_id : user._id})
 						.end(function(err, res) {
 							should.not.exist(err);
-							console.log(res.body);
 							res.status.should.equal(200);
 
 							User.findOne({_id : user._id}, function(err, ruser) {
@@ -1204,7 +1201,6 @@ describe('Express.js User Route Unit Tests:', function() {
 									}
 								}
 
-								console.log(ruser.roles);
 								if(_.intersection(['recruiter'], ruser.roles).length) {
 									return done(new Error("User recruiter role not removed."));
 								}
@@ -1407,6 +1403,7 @@ describe('Express.js User Route Unit Tests:', function() {
 
 	describe('Programmer email routes:', function() {
 		it('should allow an admin to send an email to the programmer.', function(done) {
+			this.timeout(10000);
 			var tempAdmin = agent.agent();
 			tempAdmin
 				.post('http://localhost:3001/auth/signin')
@@ -1435,6 +1432,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 
 		it('should allow a recruiter to send an email to the programmer.', function(done) {
+			this.timeout(10000);
 			useragent
 				.post('http://localhost:3001/programmer/email')
 				.send({subject : "Hello Mr. Programmer", message : "How are you doing today?"})
@@ -1450,6 +1448,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 
 		it('should allow an attendee to send an email to the programmer.', function(done) {
+			this.timeout(10000);
 			useragent2
 				.post('http://localhost:3001/programmer/email')
 				.send({subject : "Hello Mr. Programmer", message : "How are you doing today?"})
@@ -1532,7 +1531,7 @@ describe('Express.js User Route Unit Tests:', function() {
 
 	          		res.body[i].attending.should.equal(2);
 	          		res.body[i].invited.should.equal(1);
-	          		res.body[i].place.should.equal(1);
+	          		res.body[i].place.should.equal(2);
 					done();
 				});
 		});
@@ -1656,7 +1655,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					res.status.should.equal(200);
 					res.body.attending.should.equal(2);
 					res.body.invited.should.equal(1);
-					res.body.place.should.equal(1);
+					res.body.place.should.equal(2);
 					done();
 				});
 		});
@@ -2376,7 +2375,7 @@ describe('Express.js User Route Unit Tests:', function() {
 
 	describe('Accepting an invitation', function() {
 		it('should allow an outside source to send data when the correct API key is sent and update the a user\'s account and the number of attendees for the event accordingly if they were already invited.', function(done) {
-			this.timeout(10000);
+			this.timeout(100000);
 			User.findOne({_id : user._id}, function(err, oldRectr) {
 				if(err) {
 					return done(err);
@@ -2399,7 +2398,7 @@ describe('Express.js User Route Unit Tests:', function() {
 									return done(err);
 								}
 								
-								(oldRectr.inviteeList.length === rectr.inviteeList.length).should.be.true;
+								((oldRectr.inviteeList.length - 1) === rectr.inviteeList.length).should.be.true;
 								(oldRectr.attendeeList.length < rectr.attendeeList.length).should.be.true;
 								(oldRectr.almostList.length === rectr.almostList.length).should.be.true;
 								User.count({}, function(err, fcount) {
@@ -2464,7 +2463,7 @@ describe('Express.js User Route Unit Tests:', function() {
 									return done(err);
 								}
 								
-								(oldRectr.inviteeList.length === rectr.inviteeList.length).should.be.true;
+								((oldRectr.inviteeList.length - 1) === rectr.inviteeList.length).should.be.true;
 								(oldRectr.attendeeList.length < rectr.attendeeList.length).should.be.true;
 								(oldRectr.almostList.length === rectr.almostList.length).should.be.true;
 								User.count({}, function(err, fcount) {
@@ -2506,7 +2505,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 
 		it('should allow an outside source to send data when the correct API key is sent and create a user\'s account correctly and update the number attending if they were not invited via the recruiter system.', function(done) {
-			this.timeout(10000);
+			this.timeout(100000);
 			User.findOne({_id : user._id}, function(err, oldRectr) {
 				if(err) {
 					return done(err);
@@ -2533,7 +2532,7 @@ describe('Express.js User Route Unit Tests:', function() {
 									return done(err);
 								}
 								
-								(oldRectr.inviteeList.length === rectr.inviteeList.length).should.be.true;
+								((oldRectr.inviteeList.length - 1) === rectr.inviteeList.length).should.be.true;
 								(oldRectr.attendeeList.length < rectr.attendeeList.length).should.be.true;
 								(oldRectr.almostList.length === rectr.almostList.length).should.be.true;
 								User.count({}, function(err, fcount) {
@@ -2548,7 +2547,8 @@ describe('Express.js User Route Unit Tests:', function() {
 										}
 										
 										newUser.status.length.should.equal(1);
-										for(var i=0; i<newUser.status.length; i++) {
+										var i;
+										for(i=0; i<newUser.status.length; i++) {
 											if(newUser.status[i].event_id.toString() === event1._id.toString()) {
 												newUser.status[i].attending.should.be.true;
 												break;
@@ -2570,6 +2570,172 @@ describe('Express.js User Route Unit Tests:', function() {
 								});
 							});
 						});
+				});
+			});
+		});
+
+		it('should allow an outside source to send data when the correct API key is sent and update the a user\'s account, the number of attendees, all other recruiter\'s lists, and ranks for the event accordingly if they were already invited.', function(done) {
+			this.timeout(100000);
+			User.findOne({_id : user._id}, function(err, oldRectr) {
+				if(err) {
+					return done(err);
+				}
+
+				var tempUser1 = new User({
+					fName : 'Calvin',
+					lName : 'Moore',
+					displayName : 'Moore, Calvin',
+					email : 'tempUser1_cen3031.0.boom0625@spamgourmet.com',
+					roles : ['recruiter'],
+					status : [{'event_id':event1._id, 'attending':true, 'recruiter':true}],
+					rank : [{'event_id':event1._id, 'place':1}],
+					password : 'password',
+					attendeeList : [{'user_id' : user2._id, 'event_id' : event1._id}, {'user_id' : user4._id, 'event_id' : event1._id}, {'user_id' : user3._id, 'event_id' : event1._id}],
+					inviteeList : [{'user_id' : user5._id, 'event_id' : event1._id}],
+					almostList : [{'user_id' : user2._id, 'event_id' : event2._id}],
+					login_enabled : true
+				});
+
+				var tempUser2 = new User({
+					fName : 'Calvin',
+					lName : 'Moore',
+					displayName : 'Moore, Calvin',
+					email : 'tempUser2_cen3031.0.boom0625@spamgourmet.com',
+					roles : ['recruiter'],
+					status : [{'event_id':event1._id, 'attending':true, 'recruiter':true}],
+					rank : [{'event_id':event1._id, 'place': 3}],
+					password : 'password',
+					attendeeList : [],
+					inviteeList : [{'user_id' : user5._id, 'event_id' : event1._id, read : true}],
+					almostList : [{'user_id' : user2._id, 'event_id' : event2._id}],
+					login_enabled : true
+				});
+
+				var tempUser3 = new User({
+					fName : 'Calvin',
+					lName : 'Moore',
+					displayName : 'Moore, Calvin',
+					email : 'tempUser3_cen3031.0.boom0625@spamgourmet.com',
+					roles : ['recruiter'],
+					status : [{'event_id':event1._id, 'attending':true, 'recruiter':true}],
+					rank : [{'event_id':event1._id, 'place': 4}],
+					password : 'password',
+					attendeeList : [{'user_id' : user2._id, 'event_id' : event1._id}],
+					inviteeList : [{'user_id' : user5._id, 'event_id' : event1._id}],
+					almostList : [],
+					login_enabled : true
+				});
+
+				tempUser1.save(function(err) {
+					should.not.exist(err);
+
+					tempUser2.save(function(err) {
+						should.not.exist(err);
+
+						tempUser3.save(function(err) {
+							should.not.exist(err);
+
+							User.count({}, function(err, scount) {
+								if(err) {
+									return done(err);
+								}
+
+								var tempagent = agent.agent();
+								tempagent
+									.post('http://localhost:3001/invitation/accept')
+									.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : user5.fName, 'invitee_lName' : user5.lName, 'invitee_email' : user5.email, 'organization' : 'frank', 'event_name' : event1.name, 'recruiter_email' : user.email})
+									.end(function(err, res) {
+										should.not.exist(err);
+										res.status.should.equal(200);
+										User.findOne({_id : user._id}, function(err, rectr) {
+											if(err) {
+												return done(err);
+											}
+											
+											((oldRectr.inviteeList.length - 1) === rectr.inviteeList.length).should.be.true;
+											(oldRectr.attendeeList.length < rectr.attendeeList.length).should.be.true;
+											(oldRectr.almostList.length === rectr.almostList.length).should.be.true;
+
+											var i;
+											for(i = 0; i < rectr.rank.length; i++) {
+												if(rectr.rank[i].event_id.toString() === event1._id.toString()) {
+													rectr.rank[i].place.should.equal(1);
+													break;
+												}
+											}
+											i.should.not.equal(rectr.rank.length);
+
+											User.count({}, function(err, fcount) {
+												if(err) {
+													return done(err);
+												}
+												
+												fcount.should.equal(scount);
+												User.findOne({_id : user5._id}, function(err, newUser5) {
+													if(err) {
+														return done(err);
+													}
+													
+													newUser5.status.length.should.equal(user5.status.length);
+													for(i=0; i<newUser5.status.length; i++) {
+														if(newUser5.status[i].event_id.toString() === event1._id.toString()) {
+															newUser5.status[i].attending.should.be.true;
+															break;
+														}
+													}
+													i.should.not.equal(newUser5.status.length);
+
+													Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+														if(err) {
+															return done(err);
+														}
+														
+														newEvnt.attending.should.equal(event1.attending + 1);
+														newEvnt.invited.should.equal(event1.invited - 1);
+
+														User.findOne({_id : tempUser1._id}, function(err, newTempUser1) {
+															should.not.exist(err);
+
+															newTempUser1.rank[0].place.should.equal(2);
+															newTempUser1.inviteeList.length.should.equal(0);
+															newTempUser1.almostList.length.should.equal(2);
+
+															User.findOne({_id : tempUser2._id}, function(err, newTempUser2) {
+																should.not.exist(err);
+
+																console.log(event1._id);
+																console.log(newTempUser2);
+
+																newTempUser2.rank[0].place.should.equal(5);
+																newTempUser2.inviteeList.length.should.equal(0);
+																newTempUser2.almostList.length.should.equal(2);
+																for(i = 0; i < newTempUser2.almostList.length; i++) {
+																	if(newTempUser2.almostList[i].user_id.toString() === user5._id.toString() && newTempUser2.almostList[i].event_id.toString() === event1._id.toString()) {
+																		newTempUser2.almostList[i].read.should.be.true;
+																		break;
+																	}
+																}
+																i.should.not.equal(newTempUser2.almostList.length);
+
+																User.findOne({_id : tempUser3._id}, function(err, newTempUser3) {
+																	should.not.exist(err);
+
+																	newTempUser3.rank[0].place.should.equal(4);
+																	newTempUser3.inviteeList.length.should.equal(0);
+																	newTempUser3.almostList.length.should.equal(1);
+
+																	done();
+																});
+															});
+														});
+													});
+												});
+											});
+										});
+									});
+							});
+						});
+					});
 				});
 			});
 		});
