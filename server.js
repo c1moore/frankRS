@@ -12,7 +12,12 @@ var init = require('./config/init')(),
  */
 
 // Bootstrap db connection
-var db = mongoose.connect(config.db, function(err) {
+var db_opts = {};
+if(config.db_options.username && config.db_options.pwd) {
+	db_opts.user = config.db_options.username;
+	db_opts.pass = config.db_options.pwd;
+}
+var db = mongoose.connect(config.db, db_opts, function(err) {
 	if (err) {
 		console.error('\x1b[31m', 'Could not connect to MongoDB!');
 		console.log(err);

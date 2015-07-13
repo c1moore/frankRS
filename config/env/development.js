@@ -2,6 +2,10 @@
 
 module.exports = {
 	db: 'mongodb://localhost/frank-recruiter-system-dev',
+	db_options: {
+		username : process.env.MONGO_USER || "",
+		pwd : process.env.MONGO_PWD || ""
+	},
 	app: {
 		title: 'frank Recruiter System - Development Environment'
 	},
