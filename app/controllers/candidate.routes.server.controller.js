@@ -5,17 +5,18 @@
 /**
  * Module dependencies.
  */
- var errorHandler = require('./errors'),
- mongoose = require('mongoose'),
- User = mongoose.model('User'),
- Event = mongoose.model('Event'),
- Candidate = mongoose.model('Candidate'),
- nodemailer = require("nodemailer"),
- smtpPool = require('nodemailer-smtp-pool'),
- config = require('../../config/config'),
- http = require('http'),
- querystring = require('querystring'),
- _ = require('lodash');
+var errorHandler = require('./errors'),
+	mongoose = require('mongoose'),
+	User = mongoose.model('User'),
+	Event = mongoose.model('Event'),
+	Candidate = mongoose.model('Candidate'),
+	nodemailer = require("nodemailer"),
+	smtpPool = require('nodemailer-smtp-pool'),
+	config = require('../../config/config'),
+	http = require('http'),
+	querystring = require('querystring'),
+	_ = require('lodash'),
+	path = require('path');
 
 /**
 * When a candidate without admin permissions submits a note, it must contain the following format:
@@ -95,6 +96,7 @@ var newCandidatePass = function(credentialsArr) {
 		if(!password[i])
 			_.random(0, credentialsArr.length, false);
 	}
+	console.log(password.join(''));
 
 	return password.join('');
 };
@@ -469,9 +471,7 @@ exports.setEventStatus = function(req,res) {
 						result.events[i].status = req.body.status;
 
 						//If we updated the status to be 'accepted' and an admin has accepted their request, make them a recruiter.
-						if (req.body.status ==='accepted' && result.events[i].accepted) {
-							//User is no longer a candidate for this event, now they are a recruiter.
-							result.events.pull({event_id : event_id});
+						if (req.body.status ==='accepted' && result.events[i].accepted) {							
 
 							//Check if this candidate is already a user, but the user_id field was not filled out (possible if they were invited after being a candidate, for example).
 							User.findOne({email : result.email}, function(err, user) {
@@ -491,12 +491,14 @@ exports.setEventStatus = function(req,res) {
 
 									//User does not have this event in their status array, add it.
 									if(j===user.status.length) {
-										user.status.addToSet({event_id : req.body.event_id, attending : false, recruiter : true});
+										user.status.addToSet({event_id : event_id, attending : false, recruiter : true});
 									}
 		 							
 		 							user.roles.addToSet("recruiter");
 
-		 							result.save(function(err) {
+									//User is no longer a candidate for this event, now they are a recruiter.
+
+									result.update({$set : {user_id : user._id}, $pull : {events : {event_id : event_id}}}, function(err) {
 		 								if(err) {
 		 									return res.status(400).send({message : err});
 		 								} else {
@@ -504,27 +506,57 @@ exports.setEventStatus = function(req,res) {
 												if(err) {
 													return res.status(400).send({message : err});
 												} else {
-													return res.status(200).send({message : "New recruiter added and notification sent!"});
+													Event.findOne({_id : event_id}, function(err, _event) {
+														var smtpTransport = nodemailer.createTransport(config.mailer.options);
+														var mailOptions = {
+															to: 		user.email,
+															from: 		"frank@jou.ufl.edu",
+															sender: 	"frank@jou.ufl.edu",
+															replyTo: 	"frank@jou.ufl.edu",
+															subject: 	"Congrats, You are a Recruiter for " + _event.name
+														};
+
+														var filepath = path.normalize(__dirname + "/../views/templates/new-recruiter-email");
+
+														res.render(filepath, {
+															name: user.fName,
+															event_name: _event.name
+														}, function(err, emailHTML) {
+															if(err) {
+																return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
+															}
+
+															mailOptions.html = emailHTML;
+
+															smtpTransport.sendMail(mailOptions, function(err) {
+																if(err) {
+																	return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
+																} else {
+																	return res.status(200).send({message : "New recruiter added and notification sent!"});
+																}
+															});
+														});
+													});
 												}
 											});
 										}
 									});
 								} else {
 									//There is not already a user for this candidate.  Create one and send notification.
+									var newUserPassword = newCandidatePass([result.fName, result.lName, result.email]);
 									
 									var newUser = new User({
 										fName: result.fName,
 										lName: result.lName,
+										displayName: result.lName + ", " + result.fName,
 										roles: ['recruiter'],
 										email: result.email,
 										status: [{event_id: event_id, attending: false, recruiter:true}],
-										password: newCandidatePass([result.fName, result.lName, result.email]),
+										password: newUserPassword,
 										login_enabled: true
 									});
 
-									result.user_id = newUser._id;
-
-									result.save(function(err) {
+									result.update({$set : {user_id : newUser._id}, $pull : {events : {event_id : event_id}}}, function(err) {
 										if(err) {
 											return res.status(400).send({message : err});
 										} else {
@@ -532,7 +564,38 @@ exports.setEventStatus = function(req,res) {
 												if (err) {
 													return res.status(400).send({message : err});
 												} else {
-													return res.status(200).send({message : "New recruiter added and notification sent!"});
+													Event.findOne({_id : event_id}, function(err, _event) {
+														var smtpTransport = nodemailer.createTransport(config.mailer.options);
+														var mailOptions = {
+															to: 		newUser.email,
+															from: 		"frank@jou.ufl.edu",
+															sender: 	"frank@jou.ufl.edu",
+															replyTo: 	"frank@jou.ufl.edu",
+															subject: 	"Congrats, You are a Recruiter for " + _event.name
+														};
+
+														var filepath = path.normalize(__dirname + "/../views/templates/new-recruiter-email");
+
+														res.render(filepath, {
+															name: newUser.fName,
+															event_name: _event.name,
+															password: newUserPassword
+														}, function(err, emailHTML) {
+															if(err) {
+																return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
+															}
+
+															mailOptions.html = emailHTML;
+
+															smtpTransport.sendMail(mailOptions, function(err) {
+																if(err) {
+																	return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
+																} else {
+																	return res.status(200).send({message : "New recruiter added and notification sent!"});
+																}
+															});
+														});
+													});
 												}
 											});
 										}
@@ -657,8 +720,8 @@ exports.addEvent = function(req,res){
 /**
 * This function updates the 'accepted' field of the specified candidate.  If this candidate has been accepted and their status is 'accepted' we can make them
 * a recruiter, in which case we need to determine if the candidate is already a user or needs an account created.  In either case, an email should be sent to
-* the recruiter informing them of their status update.  If the user is not a candidate for this event, we inform the admin that they need to add this event
-* to the candidate's events array first.
+* the recruiter informing them of their status update and this event should be removed from their events array..  If the user is not a candidate for this event,
+* we inform the admin that they need to add this event to the candidate's events array first.
 *
 * @param candidate_id - The id of the candidate we will update
 * @param event_id - The id of the event for which we need to update the accepted field
@@ -687,9 +750,6 @@ exports.setEventAccepted = function(req,res){
 
 						//If we updated the accepted field to be true and their status is 'accepted', make them a recruiter.
 						if (req.body.accepted && result.events[i].status  ==='accepted') {
-							//User is no longer a candidate for this event, now they are a recruiter.
-							result.events.pull({event_id : event_id});
-
 							//Check if this candidate is already a user, but the user_id field was not filled out (possible if they were invited after being a candidate, for example).
 							User.findOne({email : result.email}, function(err, user) {
 								if(err) {
@@ -708,12 +768,14 @@ exports.setEventAccepted = function(req,res){
 
 									//User does not have this event in their status array, add it.
 									if(j===user.status.length) {
-										user.status.addToSet({event_id : req.body.event_id, attending : false, recruiter : true});
+										user.status.addToSet({event_id : event_id, attending : false, recruiter : true});
 									}
 		 							
 		 							user.roles.addToSet("recruiter");
 
-		 							result.save(function(err) {
+									//User is no longer a candidate for this event, now they are a recruiter.
+
+									result.update({$set : {user_id : user._id}, $pull : {events : {event_id : event_id}}}, function(err) {
 		 								if(err) {
 		 									return res.status(400).send({message : err});
 		 								} else {
@@ -721,7 +783,37 @@ exports.setEventAccepted = function(req,res){
 												if(err) {
 													return res.status(400).send({message : err});
 												} else {
-													return res.status(200).send({message : "New recruiter added and notification sent!"});
+													Event.findOne({_id : event_id}, function(err, _event) {
+														var smtpTransport = nodemailer.createTransport(config.mailer.options);
+														var mailOptions = {
+															to: 		user.email,
+															from: 		"frank@jou.ufl.edu",
+															sender: 	"frank@jou.ufl.edu",
+															replyTo: 	"frank@jou.ufl.edu",
+															subject: 	"Congrats, You are a Recruiter for " + _event.name
+														};
+
+														var filepath = path.normalize(__dirname + "/../views/templates/new-recruiter-email");
+
+														res.render(filepath, {
+															name: user.fName,
+															event_name: _event.name
+														}, function(err, emailHTML) {
+															if(err) {
+																return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
+															}
+
+															mailOptions.html = emailHTML;
+
+															smtpTransport.sendMail(mailOptions, function(err) {
+																if(err) {
+																	return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
+																} else {
+																	return res.status(200).send({message : "New recruiter added and notification sent!"});
+																}
+															});
+														});
+													});
 												}
 											});
 										}
@@ -729,21 +821,21 @@ exports.setEventAccepted = function(req,res){
 								/**
 								* The candidate is not already a user.  We need to create an account for them.
 								*/
+								var newUserPassword = newCandidatePass([result.fName, result.lName, result.email]);
+
 								} else {
 									var newUser = new User({
 										fName: result.fName,
 										lName: result.lName,
+										displayName: result.lName + ", " + result.fName,
 										roles: ['recruiter'],
 										email: result.email,
 										status: [{event_id: new mongoose.Types.ObjectId(req.body.event_id), attending: false, recruiter:true}],
-										password: newCandidatePass([result.fName, result.lName, result.email]),
+										password: newUserPassword,
 										login_enabled: true
 									});
 
-									result.user_id = newUser._id;
-									result.events.pull({event_id : event_id});
-									
-									result.save(function(err){
+									result.update({$set : {user_id : newUser._id}, $pull : {events : {event_id : event_id}}}, function(err) {
 										if (err) {
 											return res.status(400).send({message : err});
 										} else {
@@ -751,7 +843,38 @@ exports.setEventAccepted = function(req,res){
 												if (err) {
 													return res.status(400).send({message : err});
 												} else {
-													return res.status(200).send({message : "New recruiter added and notification sent!"});
+													Event.findOne({_id : event_id}, function(err, _event) {
+														var smtpTransport = nodemailer.createTransport(config.mailer.options);
+														var mailOptions = {
+															to: 		newUser.email,
+															from: 		"frank@jou.ufl.edu",
+															sender: 	"frank@jou.ufl.edu",
+															replyTo: 	"frank@jou.ufl.edu",
+															subject: 	"Congrats, You are a Recruiter for " + _event.name
+														};
+
+														var filepath = path.normalize(__dirname + "/../views/templates/new-recruiter-email");
+
+														res.render(filepath, {
+															name: newUser.fName,
+															event_name: _event.name,
+															password: newUserPassword
+														}, function(err, emailHTML) {
+															if(err) {
+																return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
+															}
+
+															mailOptions.html = emailHTML;
+
+															smtpTransport.sendMail(mailOptions, function(err) {
+																if(err) {
+																	return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
+																} else {
+																	return res.status(200).send({message : "New recruiter added and notification sent!"});
+																}
+															});
+														});
+													});
 												}
 											});
 										}
