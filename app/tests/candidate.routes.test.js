@@ -696,6 +696,7 @@ describe('Candidate Route Integration Tests:', function() {
 			});
 
 			it("admin should be able to set candidate event status field", function(done) {
+				candidate2.events[0].accepted = false;
 				candidate2.save(function(err) {
 					if(err) {
 						throw err;
@@ -785,10 +786,7 @@ describe('Candidate Route Integration Tests:', function() {
 
 								res.status.should.equal(200);
 								res.body.should.have.property('events');
-
-								(res.body.events[0].event_id.name.toString()).should.be.equal(event2.name);
-								(res.body.events[0].accepted.toString()).should.be.equal('true');
-								(res.body.events[0].status.toString()).should.be.equal('accepted');
+								res.body.events.length.should.equal(0);
 
 								var query = User.findOne({'email': acceptedCandidate.email});
 								query.exec(function(err, user){
