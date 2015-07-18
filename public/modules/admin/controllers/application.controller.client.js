@@ -299,8 +299,14 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 							var address = "/candidate/set" + field;
 							var data = {};
 
-							data[field.toLowerCase()] = $scope.$data[index][field.toLowerCase()];
 							data.candidate_id = $scope.$data[index]._id;
+
+							if(field === "Status") {
+								data[field.toLowerCase()] = $scope.$data[index].events[field.toLowerCase()];
+								data.event_id = eventSelector.postEventId;
+							} else {
+								data[field.toLowerCase()] = $scope.$data[index][field.toLowerCase()];
+							}
 
 							$http.post(address, data).success(function() {
 								$scope.getCandidates();
