@@ -83,7 +83,7 @@
 							</div>
 						</td>
 						<td data-title="'Accept'" width="5%" class="text-center">
-							<a href="#" class="text-success" ng-click="acceptCandidate(candidate)"><i class="fa fa-check"></i></a>
+							<a href="#" class="text-success" ng-click="acceptCandidate(candidate)" ng-class="{disabled : candidate.events.accepted}"><i class="fa fa-check"></i></a>
 							<span> / </span>
 							<a href="#" class="text-danger" ng-click="denyCandidate(candidate)"><i class="fa fa-times"></i></a>
 						</td>
