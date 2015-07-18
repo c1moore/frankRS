@@ -88,6 +88,10 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 
 			$scope.getCandidates = function() {
 				$http.post('/candidate/getCandidatesByEvent', {event_id:eventSelector.postEventId}).success(function(data) {
+					for(var i = 0; i < data.length; i++) {
+						data[i].displayName = data[i].lName + ", " + data[i].fName;
+					}
+					
 					$scope.candidates = [];
 					$scope.candidates = data;
 

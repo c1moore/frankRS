@@ -41,9 +41,9 @@
 						<td class="text-center" data-title="'Send Message'" width="5%">
 							<input type="checkbox" ng-click="setSelected(candidate._id, candidate.email)" ng-model="selectedCandidates" />
 						</td>
-						<td data-title="'Candidate'" sortable="'lName'" filter="{'lName':'text'}" width="20%">
+						<td data-title="'Candidate'" sortable="'displayName'" filter="{'displayName':'text'}" width="20%">
 							<div ng-if="!candidate.user_id">
-								<span ng-if="!candidate.$edit.name" ng-click="candidate.$edit.name = true; $edit.row = $index;">{{candidate.lName + ', ' + candidate.fName}}</span>
+								<span ng-if="!candidate.$edit.name" ng-click="candidate.$edit.name = true; $edit.row = $index;">{{candidate.displayName}}</span>
 								<div ng-if="candidate.$edit.name">
 									<input type="text" class="form-control" ng-model="candidate.lName" ng-blur="$edit.lName = false" ng-focus="$edit.lName = true" autofocus required />, 
 									<br />
@@ -51,7 +51,7 @@
 								</div>
 							</div>
 							<div ng-if="candidate.user_id">
-								{{candidate.lName + ', ' + candidate.fName}}
+								{{candidate.displayName}}
 							</div>
 						</td>
 						<td data-title="'Email'" sortable="'email'" filter="{'email' : 'text'}" width="20%">
