@@ -42,7 +42,7 @@
 		});
 		
 		it('should return the right named views', function() {
-			expect(scope.names).toEqual(["Admin Page", "Memo Board", "Leaderboard", "Control Room", "Request to Become a Recruiter"]);
+			expect(scope.names).toEqual(["Admin Page", "frank Lounge", "Leaderboard", "Control Room", "Request to Become a Recruiter"]);
 		});
 		
 		it('should return no users', function() {

@@ -4,8 +4,8 @@ angular.module('memoboard').config(['$stateProvider', '$urlRouterProvider',
 	function($stateProvider, $urlRouterProvider) {
 
 		$stateProvider.
-		state("memoboard", { 
-			url:"/memoboard", 
+		state("franklounge", { 
+			url:"/franklounge", 
 			templateUrl:"modules/memoboard/views/memoboard.client.view.html" 
 		});
 	}
