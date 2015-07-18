@@ -1223,14 +1223,16 @@ exports.sendInvitation = function(req, res) {
 				* user has access to this event (i.e. active in the status array is not false).
 				*/
 				var tempi = 0;
-				for(; tempi < recruiter.status.length; tempi++) {
-					if(recruiter.status[tempi].event_id.toString() === req.body.event_id.toString()) {
-						if(!recruiter.status[tempi].recruiter || !recruiter.status[tempi].active) {
-							//This user should not be recruiting for this event.
-							return res.status(401).send({message : 'User does not have permission to send invitations for this event.'});
-						}
+				if(!req.hasAuthorization(req.user, ['admin'])) {
+					for(; tempi < recruiter.status.length; tempi++) {
+						if(recruiter.status[tempi].event_id.toString() === req.body.event_id.toString()) {
+							if(!recruiter.status[tempi].recruiter || !recruiter.status[tempi].active) {
+								//This user should not be recruiting for this event.
+								return res.status(401).send({message : 'User does not have permission to send invitations for this event.'});
+							}
 
-						break;
+							break;
+						}
 					}
 				}
 
