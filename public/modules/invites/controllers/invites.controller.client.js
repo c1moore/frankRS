@@ -116,6 +116,13 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 
 							$window.alert("We could not connect to the server right now.\nIf this error continues, please <a href='/#!/problems'>report this issue</a>");
 						}
+					} else {
+						angular.element("#invitation-submit-button").removeClass("disabled");
+						
+						usSpinnerService.stop('spinner-1');
+						$scope.sending = false;
+
+						$location.path("/");	
 					}
 				});
 			};
