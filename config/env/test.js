@@ -7,6 +7,7 @@ module.exports = {
 		pwd : process.env.MONGO_PWD || ""
 	},
 	port: 3001,
+	forks: process.env.FRANK_PROCESSES || 1,
 	app: {
 		title: 'frank Recruiter System - Test Environment'
 	},

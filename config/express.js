@@ -22,15 +22,68 @@ var express = require('express'),
 	config = require('./config'),
 	consolidate = require('consolidate'),
 	path = require('path'),
-	formidable = require('formidable');
+	formidable = require('formidable'),
+	domain = require('domain'),
+	cluster = require('cluster');
 
-module.exports = function(db) {
+var appServer = null;
+
+module.exports = {};
+
+module.exports.setServer = function(server) {
+	appServer = server;
+};
+
+module.exports.initialize = function(db) {
 	// Initialize express app
 	var app = express();
 
 	// Globbing model files
 	config.getGlobbedFiles('./app/models/**/*.js').forEach(function(modelPath) {
 		require(path.resolve(modelPath));
+	});
+
+	//Set up domain for requests.
+	app.use(function(req, res, next) {
+		//Create domain for this request
+		var reqdomain = domain.create();
+		reqdomain.on('error', function(err) {
+			console.error('Error: ', err.stack);
+
+			try {
+				//Shut down the process within 30 seconds to avoid errors.
+				var killtimer = setTimeout(function() {
+					console.error("Failsafe shutdown.");
+					process.exit(1);
+				}, 30000);
+
+				//No need to let the process live just for the timer.
+				killtimer.unref();
+
+				//No more requests should be allowed for this process.
+				appServer.close();
+
+				//Tell master we have died so he can get another worker started.
+				if(cluster.worker) {
+					cluster.worker.disconnect();
+				}
+
+				//Send an error to the request that caused this failure.
+				res.statusCode = 500;
+				res.setHeader('Content-Type', 'text/plain');
+				res.end('Oops, there was a problem.  How embarrassing.');
+			} catch(err2) {
+				//Well, something is pretty screwed up.  Not much we can do now.
+				console.error('Error sending 500!\nError2: ', err2.stack);
+			}
+		});
+
+		//Add request and response objects to domain.
+		reqdomain.add(req);
+		reqdomain.add(res);
+
+		//Execute the rest of the request chain in the domain.
+		reqdomain.run(next);
 	});
 
 	// Setting application local variables

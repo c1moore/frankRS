@@ -6,6 +6,7 @@ module.exports = {
 		username : process.env.MONGO_USER || "",
 		pwd : process.env.MONGO_PWD || ""
 	},
+	forks: process.env.FRANK_PROCESSES || 1,
 	app: {
 		title: 'frank Recruiter System - Development Environment'
 	},
