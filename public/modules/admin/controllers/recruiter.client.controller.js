@@ -65,9 +65,7 @@ angular.module('admin').controller('recruitersController', ['$scope', 'ngTablePa
 			$scope.recruiterTableParams = new ngTableParams({
 				page: 	1,
 				count: 	10,
-				filter: {
-					displayName: 	''
-				},
+				filter: {},
 				sorting: {
 					displayName: 	'asc'
 				}
