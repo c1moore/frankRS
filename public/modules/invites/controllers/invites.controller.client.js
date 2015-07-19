@@ -86,7 +86,7 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 				usSpinnerService.spin('spinner-1');
 				angular.element("#invitation-submit-button").addClass("disabled");
 
-				$http.post('/invitation/send', $scope.invite).success(function(response) {
+				$http.post('/send/evite', $scope.invite).success(function(response) {
 					//Set all form fields to blank so the user can send another invitation.
 					$scope.invite.fName = "";
 					$scope.invite.lName = "";

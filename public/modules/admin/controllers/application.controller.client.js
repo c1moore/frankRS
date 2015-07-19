@@ -238,7 +238,8 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 					var body = {
 						candidate_ids : $scope.selected.ids,
 						subject : $scope.email.subject,
-						message : $scope.email.message
+						message : $scope.email.message,
+						event_id : eventSelector.postEventId
 					};
 					$http.post('/admin/send', body).success(function(response) {
 						$scope.selected = {};
@@ -392,7 +393,9 @@ angular.module("admin").controller("RecruiterInvitationCtrl", ["$scope", "$modal
 			//Split the string of emails into an array
 			invite.emails = invite.emails.split(/, */g);
 
-			$http.post("/candidate/send", invite).success(function() {
+			invite.event_id = eventSelector.postEventId;
+
+			$http.post("/send/nonuser", invite).success(function() {
 				$scope.sending = false;
 				$scope.sentMode = true;
 

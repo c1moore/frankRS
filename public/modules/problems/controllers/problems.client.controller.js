@@ -17,7 +17,7 @@ angular.module('problems').controller('ProblemController', ['$scope', '$http', '
 			$scope.problem.contact = "true";
 
 			$scope.submitProblem = function() {
-				var data = {subject : "Problem Reported on frankRS"};
+				var data = {subject : "Problem Reported on frankRS", event_id : eventSelector.postEventId};
 				var permissions = ($scope.problem.contact === "true") ? "can" : "cannot";
 
 				var message = "<p>A problem was reported for the frank recruiter system.  Here are a few details:</p>" +
@@ -38,7 +38,7 @@ angular.module('problems').controller('ProblemController', ['$scope', '$http', '
 
 				data.message = angular.toJson(message);
 
-				$http.post("/programmer/email", data).success(function() {
+				$http.post("/send/programmer", data).success(function() {
 					$scope.error = false;
 					$scope.success = true;
 

@@ -31,11 +31,13 @@ angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams',
 						$scope.events[i].start_date = $filter('date')($scope.events[i].start_date, "EEE, MMM d, yyyy");
 						$scope.events[i].end_date = $filter('date')($scope.events[i].end_date, "EEE, MMM d, yyyy");
 					}
-				}).error(function(error) {
+				}).error(function(error, status) {
 					//Fail silently, since the interceptor should handle any important cases and notices can be annoying.  Attempt again in 5 seconds.
-					$timeout(function() {
-						getEvents();
-					}, 5000);
+					if(status !== 401) {
+						$timeout(function() {
+							getEvents();
+						}, 5000);
+					}
 				});
 			};
 			getEvents();

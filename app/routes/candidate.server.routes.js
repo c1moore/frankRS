@@ -34,7 +34,4 @@ module.exports = function(app){
 	app.route('/candidate/setCandidate').post(dan_candidate_routes.setCandidate);
 	app.route('/candidate/deleteCandidate').post(dan_candidate_routes.deleteCandidate);
 	app.route('/candidate/deleteCandidate/event').post(dan_candidate_routes.deleteCandidateByEvent);
-
-	app.route('/admin/send').post(dan_candidate_routes.sendCandidateEmail);
-	app.route('/candidate/send').post(dan_candidate_routes.sendNewCandidateEmail);
 };

@@ -1417,8 +1417,8 @@ describe('Express.js User Route Unit Tests:', function() {
 					tempAdmin.saveCookies(res);
 
 					tempAdmin
-						.post('http://localhost:3001/programmer/email')
-						.send({subject : "Hello Mr. Programmer", message : "How are you doing today?"})
+						.post('http://localhost:3001/send/programmer')
+						.send({subject : "Hello Mr. Programmer", message : "How are you doing today?", event_id : event2._id})
 						.end(function(err, res) {
 							if(err) {
 								return done(err);
@@ -1434,8 +1434,8 @@ describe('Express.js User Route Unit Tests:', function() {
 		it('should allow a recruiter to send an email to the programmer.', function(done) {
 			this.timeout(10000);
 			useragent
-				.post('http://localhost:3001/programmer/email')
-				.send({subject : "Hello Mr. Programmer", message : "How are you doing today?"})
+				.post('http://localhost:3001/send/programmer')
+				.send({subject : "Hello Mr. Programmer", message : "How are you doing today?", event_id : event2._id})
 				.end(function(err, res) {
 					if(err) {
 						return done(err);
@@ -1450,8 +1450,8 @@ describe('Express.js User Route Unit Tests:', function() {
 		it('should allow an attendee to send an email to the programmer.', function(done) {
 			this.timeout(10000);
 			useragent2
-				.post('http://localhost:3001/programmer/email')
-				.send({subject : "Hello Mr. Programmer", message : "How are you doing today?"})
+				.post('http://localhost:3001/send/programmer')
+				.send({subject : "Hello Mr. Programmer", message : "How are you doing today?", event_id : event2._id})
 				.end(function(err, res) {
 					if(err) {
 						return done(err);
@@ -1466,8 +1466,8 @@ describe('Express.js User Route Unit Tests:', function() {
 		it('should not allow a "guest" to send an email to the programmer.', function(done) {
 			var tempAgent = agent.agent();
 			tempAgent
-				.post('http://localhost:3001/programmer/email')
-				.send({subject : "Hello Mr. Programmer", message : "How are you doing today?"})
+				.post('http://localhost:3001/send/programmer')
+				.send({subject : "Hello Mr. Programmer", message : "How are you doing today?", event_id : event2._id})
 				.end(function(err, res) {
 					if(err) {
 						return done(err);
@@ -1482,8 +1482,8 @@ describe('Express.js User Route Unit Tests:', function() {
 
 		it('should not allow anybody to send an email to the programmer when the subject is not specified.', function(done) {
 			useragent
-				.post('http://localhost:3001/programmer/email')
-				.send({message : "How are you doing today?"})
+				.post('http://localhost:3001/send/programmer')
+				.send({message : "How are you doing today?", event_id : event2._id})
 				.end(function(err, res) {
 					if(err) {
 						return done(err);
@@ -1498,8 +1498,24 @@ describe('Express.js User Route Unit Tests:', function() {
 
 		it('should not allow anybody to send an email to the programmer when the message is not specified.', function(done) {
 			useragent
-				.post('http://localhost:3001/programmer/email')
-				.send({subject : "How are you doing today?"})
+				.post('http://localhost:3001/send/programmer')
+				.send({subject : "How are you doing today?", event_id : event2._id})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(400);
+					res.body.message.should.equal("Required field not specified.");
+
+					done();
+				});
+		});
+
+		it('should not allow anybody to send an email to the programmer when the event_id is not specified.', function(done) {
+			useragent
+				.post('http://localhost:3001/send/programmer')
+				.send({subject : "Hellow Mr. Programmer!", message : "How are you doing today?"})
 				.end(function(err, res) {
 					if(err) {
 						return done(err);
@@ -1984,10 +2000,10 @@ describe('Express.js User Route Unit Tests:', function() {
 
 	describe('Sending an invitation', function() {
 		it('should send an invitation and update the recruiter\'s rank and inviteeList accordingly when an invitee is already in the database and has been invited, but not attending the event, without adding a new user.', function(done) {
-			this.timeout(10000);
+			this.timeout(100000);
 			User.count({}, function(err, scount) {
 				useragent
-					.post('http://localhost:3001/invitation/send')
+					.post('http://localhost:3001/send/evite')
 					.send({'fName' : user5.fName, 'lName' : user5.lName, 'email' : user5.email, 'event_id' : event1._id, 'event_name' : event1.name})
 					.end(function(err, res) {
 						should.not.exist(err);
@@ -2014,10 +2030,10 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 
 		it('should send an invitation and update the recruiter\'s rank and inviteeList and the number invited to the event accordingly when an invitee is already in the database, but has not been invited to the event, without adding a new user.', function(done) {
-			this.timeout(10000);
+			this.timeout(100000);
 			User.count({}, function(err, scount) {
 				useragent
-					.post('http://localhost:3001/invitation/send')
+					.post('http://localhost:3001/send/evite')
 					.send({'fName' : user6.fName, 'lName' : user6.lName, 'email' : user6.email, 'event_id' : event1._id, 'event_name' : event1.name})
 					.end(function(err, res) {
 						should.not.exist(err);
@@ -2051,10 +2067,10 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 
 		it('should send an invitation, but not add an invitee to the inviteeList or increment the number invited to the event when this invitee has already been invited by this recruiter.', function(done) {
-			this.timeout(10000);
+			this.timeout(100000);
 			User.count({}, function(err, scount) {
 				useragent
-					.post('http://localhost:3001/invitation/send')
+					.post('http://localhost:3001/send/evite')
 					.send({'fName' : user3.fName, 'lName' : user3.lName, 'email' : user3.email, 'event_id' : event1._id, 'event_name' : event1.name})
 					.end(function(err, res) {
 						should.not.exist(err);
@@ -2088,10 +2104,10 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 
 		it('should send an invitation, create a new user, and update the recruiter\'s rank and inviteeList and the number invited to the event accordingly when an invitee is not in the db yet.', function(done) {
-			this.timeout(10000);
+			this.timeout(100000);
 			User.count({}, function(err, scount) {
 				useragent
-					.post('http://localhost:3001/invitation/send')
+					.post('http://localhost:3001/send/evite')
 					.send({'lName' : 'Moore', 'fName' : 'Calvin', 'email' : 'h.m.murdock95@gmail.com', 'event_id' : event1._id, 'event_name' : event1.name})
 					.end(function(err, res) {
 						should.not.exist(err);
@@ -2120,7 +2136,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		it('should not send an invitation or update the number invited to the event, but update the recruiter\'s almostList when that user is attending.', function(done) {
 			User.findOne({_id : user._id}, function(err, oldRectr) {
 				useragent
-					.post('http://localhost:3001/invitation/send')
+					.post('http://localhost:3001/send/evite')
 					.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id, 'event_name' : event1.name})
 					.end(function(err, res) {
 						should.not.exist(err);
@@ -2143,7 +2159,7 @@ describe('Express.js User Route Unit Tests:', function() {
 
 		it('should not send an invitation if the user is a recruiter, but not a recruiter for this event.', function(done) {
 			useragent
-				.post('http://localhost:3001/invitation/send')
+				.post('http://localhost:3001/send/evite')
 				.send({lName : 'Moore', fName : 'Calvin', email : 'donotsend_cen3031.0.boom0625@spamgourmet.com', event_id : event4._id, event_name : event4.name})
 				.end(function(err, res) {
 					should.not.exist(err);
@@ -2185,7 +2201,7 @@ describe('Express.js User Route Unit Tests:', function() {
 							res.status.should.equal(200);
 							
 							useragent
-								.post('http://localhost:3001/invitation/send')
+								.post('http://localhost:3001/send/evite')
 								.send({lName : 'Moore', fName : 'Calvin', email : 'donotsend_cen3031.0.boom0625@spamgourmet.com', event_id : event4._id, event_name : event4.name})
 								.end(function(err, res) {
 									should.not.exist(err);
@@ -2229,7 +2245,7 @@ describe('Express.js User Route Unit Tests:', function() {
 							res.status.should.equal(200);
 							
 							useragent
-								.post('http://localhost:3001/invitation/send')
+								.post('http://localhost:3001/send/evite')
 								.send({lName : 'Moore', fName : 'Calvin', email : 'donotsend_cen3031.0.boom0625@spamgourmet.com', event_id : event4._id, event_name : event4.name})
 								.end(function(err, res) {
 									should.not.exist(err);
@@ -2254,7 +2270,7 @@ describe('Express.js User Route Unit Tests:', function() {
 
 		it('should not send an invitation when the user does not have the proper permissions.', function(done) {
 			useragent2
-				.post('http://localhost:3001/invitation/send')
+				.post('http://localhost:3001/send/evite')
 				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
@@ -2272,7 +2288,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		it('should not send an invitation when the user is not signed in to their account.', function(done) {
 			var useragent3 = agent.agent();
 			useragent3
-				.post('http://localhost:3001/invitation/send')
+				.post('http://localhost:3001/send/evite')
 				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
@@ -2289,7 +2305,7 @@ describe('Express.js User Route Unit Tests:', function() {
 
 		it('should return an error when invitee first name is not specified.', function(done) {
 			useragent
-				.post('http://localhost:3001/invitation/send')
+				.post('http://localhost:3001/send/evite')
 				.send({'lName' : user2.lName, 'email' : user2.email, 'event_id' : event1._id, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
@@ -2306,7 +2322,7 @@ describe('Express.js User Route Unit Tests:', function() {
 
 		it('should return an error when invitee last name is not specified.', function(done) {
 			useragent
-				.post('http://localhost:3001/invitation/send')
+				.post('http://localhost:3001/send/evite')
 				.send({'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
@@ -2323,7 +2339,7 @@ describe('Express.js User Route Unit Tests:', function() {
 
 		it('should return an error when invitee email is not specified.', function(done) {
 			useragent
-				.post('http://localhost:3001/invitation/send')
+				.post('http://localhost:3001/send/evite')
 				.send({'lName' : user2.lName, 'fName' : user2.fName, 'event_id' : event1._id, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
@@ -2340,7 +2356,7 @@ describe('Express.js User Route Unit Tests:', function() {
 
 		it('should return an error when the event ID is not specified.', function(done) {
 			useragent
-				.post('http://localhost:3001/invitation/send')
+				.post('http://localhost:3001/send/evite')
 				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
@@ -2357,7 +2373,7 @@ describe('Express.js User Route Unit Tests:', function() {
 
 		it('should return an error when the event name is not specified.', function(done) {
 			useragent
-				.post('http://localhost:3001/invitation/send')
+				.post('http://localhost:3001/send/evite')
 				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id})
 				.end(function(err, res) {
 					should.not.exist(err);
@@ -2388,7 +2404,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					
 					var tempagent = agent.agent();
 					tempagent
-						.post('http://localhost:3001/invitation/accept')
+						.post('http://localhost:3001/accept/invitation')
 						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : user5.fName, 'invitee_lName' : user5.lName, 'invitee_email' : user5.email, 'organization' : 'frank', 'event_name' : event1.name, 'recruiter_email' : user.email})
 						.end(function(err, res) {
 							should.not.exist(err);
@@ -2453,7 +2469,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					
 					var tempagent = agent.agent();
 					tempagent
-						.post('http://localhost:3001/invitation/accept')
+						.post('http://localhost:3001/accept/invitation')
 						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : user5.fName, 'invitee_lName' : user5.lName, 'invitee_email' : user5.email, 'organization' : 'frank', 'event_name' : event2.name, 'recruiter_email' : user.email})
 						.end(function(err, res) {
 							should.not.exist(err);
@@ -2518,7 +2534,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					
 					var tempagent = agent.agent();
 					tempagent
-						.post('http://localhost:3001/invitation/accept')
+						.post('http://localhost:3001/accept/invitation')
 						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Anthony', 'invitee_lName' : 'Moore', 'invitee_email' : 'a.moore_cen3031.0.boom0625@spamgourmet.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.email})
 						.end(function(err, res) {
 							if(err) {
@@ -2642,7 +2658,7 @@ describe('Express.js User Route Unit Tests:', function() {
 
 								var tempagent = agent.agent();
 								tempagent
-									.post('http://localhost:3001/invitation/accept')
+									.post('http://localhost:3001/accept/invitation')
 									.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : user5.fName, 'invitee_lName' : user5.lName, 'invitee_email' : user5.email, 'organization' : 'frank', 'event_name' : event1.name, 'recruiter_email' : user.email})
 									.end(function(err, res) {
 										should.not.exist(err);
@@ -2745,7 +2761,7 @@ describe('Express.js User Route Unit Tests:', function() {
 				User.count({}, function(err, scount) {
 					var tempagent = agent.agent();
 					tempagent
-						.post('http://localhost:3001/invitation/accept')
+						.post('http://localhost:3001/accept/invitation')
 						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_lName' : 'Moore', 'invitee_email' : 'a.moore_cen3031.0.boom0625@spamgourmet.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.email})
 						.end(function(err, res) {
 							should.not.exist(err);
@@ -2768,7 +2784,7 @@ describe('Express.js User Route Unit Tests:', function() {
 				User.count({}, function(err, scount) {
 					var tempagent = agent.agent();
 					tempagent
-						.post('http://localhost:3001/invitation/accept')
+						.post('http://localhost:3001/accept/invitation')
 						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Moore', 'invitee_email' : 'a.moore_cen3031.0.boom0625@spamgourmet.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.email})
 						.end(function(err, res) {
 							should.not.exist(err);
@@ -2791,7 +2807,7 @@ describe('Express.js User Route Unit Tests:', function() {
 				User.count({}, function(err, scount) {
 					var tempagent = agent.agent();
 					tempagent
-						.post('http://localhost:3001/invitation/accept')
+						.post('http://localhost:3001/accept/invitation')
 						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Calvin', 'invitee_lName' : 'Moore', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.email})
 						.end(function(err, res) {
 							should.not.exist(err);
@@ -2814,7 +2830,7 @@ describe('Express.js User Route Unit Tests:', function() {
 				User.count({}, function(err, scount) {
 					var tempagent = agent.agent();
 					tempagent
-						.post('http://localhost:3001/invitation/accept')
+						.post('http://localhost:3001/accept/invitation')
 						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Calvin', 'invitee_lName' : 'Moore', 'invitee_email' : 'h.m.murdock95@gmail.com', 'event_name' : event1.name, 'recruiter_email' : user.email})
 						.end(function(err, res) {
 							should.not.exist(err);
@@ -2837,7 +2853,7 @@ describe('Express.js User Route Unit Tests:', function() {
 				User.count({}, function(err, scount) {
 					var tempagent = agent.agent();
 					tempagent
-						.post('http://localhost:3001/invitation/accept')
+						.post('http://localhost:3001/accept/invitation')
 						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Calvin', 'invitee_lName' : 'Moore', 'invitee_email' : 'h.m.murdock95@gmail.com', 'organization' : 'frank', 'recruiter_email' : user.email})
 						.end(function(err, res) {
 							should.not.exist(err);
@@ -2860,7 +2876,7 @@ describe('Express.js User Route Unit Tests:', function() {
 				User.count({}, function(err, scount) {
 					var tempagent = agent.agent();
 					tempagent
-						.post('http://localhost:3001/invitation/accept')
+						.post('http://localhost:3001/accept/invitation')
 						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Calvin', 'invitee_lName' : 'Moore', 'invitee_email' : 'h.m.murdock95@gmail.com', 'organization' : 'frank', 'event_name' : 'EventName that is not in our db!!!', 'recruiter_email' : user.email})
 						.end(function(err, res) {
 							should.not.exist(err);
@@ -2883,7 +2899,7 @@ describe('Express.js User Route Unit Tests:', function() {
 				User.count({}, function(err, scount) {
 					var tempagent = agent.agent();
 					tempagent
-						.post('http://localhost:3001/invitation/accept')
+						.post('http://localhost:3001/accept/invitation')
 						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Calvin', 'invitee_lName' : 'Moore', 'invitee_email' : 'h.m.murdock95@gmail.com', 'organization' : 'frank', 'event_name' : event2.name})
 						.end(function(err, res) {
 							should.not.exist(err);
@@ -2906,7 +2922,7 @@ describe('Express.js User Route Unit Tests:', function() {
 				User.count({}, function(err, scount) {
 					var tempagent = agent.agent();
 					tempagent
-						.post('http://localhost:3001/invitation/accept')
+						.post('http://localhost:3001/accept/invitation')
 						.send({'invitee_fName' : 'Anthony', 'invitee_lName' : 'Moore', 'invitee_email' : 'a.moore_cen3031.0.boom0625@spamgourmet.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.email})
 						.end(function(err, res) {
 							should.not.exist(err);
@@ -2929,7 +2945,7 @@ describe('Express.js User Route Unit Tests:', function() {
 				User.count({}, function(err, scount) {
 					var tempagent = agent.agent();
 					tempagent
-						.post('http://localhost:3001/invitation/accept')
+						.post('http://localhost:3001/accept/invitation')
 						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Calvin', 'invitee_lName' : 'Moore', 'invitee_email' : 'h.m.murdock95@gmail.com', 'organization' : 'frank', 'event_name' : event2.name, 'recruiter_email' : 1234})
 						.end(function(err, res) {
 							should.not.exist(err);
@@ -2949,10 +2965,10 @@ describe('Express.js User Route Unit Tests:', function() {
 
 
 		/*it('should send an invitation and update the recruiter\'s rank and inviteeList accordingly when an invitee is already in the database, but not not even invited the event, without adding a new user.', function(done) {
-			this.timeout(10000);
+			this.timeout(100000);
 			User.count({}, function(err, scount) {
 				useragent
-					.post('http://localhost:3001/invitation/accept')
+					.post('http://localhost:3001/accept/invitation')
 					.send({'fName' : user3.fName, 'lName' : user3.lName, 'email' : user3.email, 'event_id' : event1._id, 'event_name' : event1.name})
 					.end(function(err, res) {
 						should.not.exist(err);
@@ -2974,10 +2990,10 @@ describe('Express.js User Route Unit Tests:', function() {
 		});
 
 		it('should send an invitation, create a new user, and update the recruiter\'s rank and inviteeList accordingly when an invitee is not in the db yet.', function(done) {
-			this.timeout(10000);
+			this.timeout(100000);
 			User.count({}, function(err, scount) {
 				useragent
-					.post('http://localhost:3001/invitation/accept')
+					.post('http://localhost:3001/accept/invitation')
 					.send({'lName' : 'Moore', 'fName' : 'Calvin', 'email' : 'h.m.murdock95@gmail.com', 'event_id' : event1._id, 'event_name' : event1.name})
 					.end(function(err, res) {
 						should.not.exist(err);
@@ -3001,7 +3017,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		it('should not send an invitation, but update the recruiter\'s almostList when that user is attending.', function(done) {
 			User.findOne({_id : user._id}, function(err, oldRectr) {
 				useragent
-					.post('http://localhost:3001/invitation/accept')
+					.post('http://localhost:3001/accept/invitation')
 					.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id, 'event_name' : event1.name})
 					.end(function(err, res) {
 						should.not.exist(err);
@@ -3019,7 +3035,7 @@ describe('Express.js User Route Unit Tests:', function() {
 
 		it('should not send an invitation when the user does not have the proper permissions.', function(done) {
 			useragent2
-				.post('http://localhost:3001/invitation/accept')
+				.post('http://localhost:3001/accept/invitation')
 				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
@@ -3032,7 +3048,7 @@ describe('Express.js User Route Unit Tests:', function() {
 		it('should not send an invitation when the user is not signed in to their account.', function(done) {
 			var useragent3 = agent.agent();
 			useragent3
-				.post('http://localhost:3001/invitation/accept')
+				.post('http://localhost:3001/accept/invitation')
 				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
@@ -3044,7 +3060,7 @@ describe('Express.js User Route Unit Tests:', function() {
 
 		it('should return an error when invitee first name is not specified.', function(done) {
 			useragent
-				.post('http://localhost:3001/invitation/accept')
+				.post('http://localhost:3001/accept/invitation')
 				.send({'lName' : user2.lName, 'email' : user2.email, 'event_id' : event1._id, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
@@ -3056,7 +3072,7 @@ describe('Express.js User Route Unit Tests:', function() {
 
 		it('should return an error when invitee last name is not specified.', function(done) {
 			useragent
-				.post('http://localhost:3001/invitation/accept')
+				.post('http://localhost:3001/accept/invitation')
 				.send({'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
@@ -3068,7 +3084,7 @@ describe('Express.js User Route Unit Tests:', function() {
 
 		it('should return an error when invitee email is not specified.', function(done) {
 			useragent
-				.post('http://localhost:3001/invitation/accept')
+				.post('http://localhost:3001/accept/invitation')
 				.send({'lName' : user2.lName, 'fName' : user2.fName, 'event_id' : event1._id, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
@@ -3080,7 +3096,7 @@ describe('Express.js User Route Unit Tests:', function() {
 
 		it('should return an error when the event ID is not specified.', function(done) {
 			useragent
-				.post('http://localhost:3001/invitation/accept')
+				.post('http://localhost:3001/accept/invitation')
 				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_name' : event1.name})
 				.end(function(err, res) {
 					should.not.exist(err);
@@ -3092,7 +3108,7 @@ describe('Express.js User Route Unit Tests:', function() {
 
 		it('should return an error when the event name is not specified.', function(done) {
 			useragent
-				.post('http://localhost:3001/invitation/accept')
+				.post('http://localhost:3001/accept/invitation')
 				.send({'lName' : user2.lName, 'fName' : user2.fName, 'email' : user2.email, 'event_id' : event1._id})
 				.end(function(err, res) {
 					should.not.exist(err);
