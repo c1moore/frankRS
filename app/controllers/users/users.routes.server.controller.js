@@ -10,9 +10,11 @@ var errorHandler = require('../errors'),
 	Event = mongoose.model('Event'),
 	Candidate = mongoose.model('Candidate'),
 	Comment = mongoose.model('Comment'),
+	Email = mongoose.model('Email'),
 	config = require('../../../config/config'),
 	crypto = require('crypto'),
-	path = require('path');
+	path = require('path'),
+	async = require('async');
 
 /**
 * Helper function to search through one of the lists (invitee, attendee, almost) and return only those users who are attending the
@@ -511,38 +513,61 @@ exports.getRecruiterAttendees = function(req, res) {
 						res.status(400).send(err);
 					}
 
+					/**
+					* Search the database for an email to the attendee from the recruiter for this event that the attendee
+					* has read.  If found, set the attendeeList[data.index].read = true; else set it to false.
+					*
+					* @param data - object with following fields
+					* 					- attendeeEmail - email address for attendee
+					* 					- index - index in attendeeList for this attendee's entry
+					* @param cb - callback function that should handle errors if any occur
+					*/
+					var aqueue = async.queue(function(data, cb) {
+						//Find an email to this attendee from this recruiter for this event that has been read.
+						//If none are found, the attendee has not read any of this recruiter's emails.
+						Email.findOne({to : data.attendeeEmail, from : req.user.email, event_id : eid, read : true}, function(err, result) {
+							if(err) {
+								cb(err);
+							} else {
+								if(!result) {
+									attendeeList[data.index].read = false;
+								} else {
+									attendeeList[data.index].read = true;
+								}
+
+								cb(false);
+							}
+						});
+					});
+
+					var aqueueErrors = false;
+					var aqueueCallback = function(err) {
+						if(err) {
+							aqueueErrors = err;
+						}
+					};
+
+					aqueue.drain = function() {
+						if(aqueueErrors) {
+							return res.status(400).send(err);
+						} else {
+							return res.status(200).send(attendeeList);
+						}
+					};
+
+					aqueue.pause();
 					var attendeeList = [];
 					for(var i = 0; i < populatedAttendees.length; i++) {
 						populatedAttendees[i].attendeeList.user_id = populatedAttendees[i].attendeeList.user_id.toObject();
-						populatedAttendees[i].attendeeList.user_id.read = populatedAttendees[i].attendeeList.read;
+						
+						aqueue.push({attendeeEmail : populatedAttendees[i].attendeeList.user_id.email, index : i}, aqueueCallback);
+
 						attendeeList.push(populatedAttendees[i].attendeeList.user_id);
 					}
-
-					res.status(200).send(attendeeList);
+					aqueue.resume();
 				});
 			}
 		});
-
-		// var query = User.findOne({'_id' : id});
-		// query.select('attendeeList');
-		// query.populate('attendeeList.user_id', 'displayName email');
-		// query.exec(function(err, result) {
-		// 	if(err) {
-		// 		res.status(400).send(err);
-		// 	} else if(!result || !result.attendeeList.length) {
-		// 		res.status(400).json({'message' : 'User not found or nobody the user invited has signed up to attend yet.'});
-		// 	} else {
-		// 		var attendeeList = [], j=0;
-		// 		result = result.toObject();
-		// 		for(var i=0; i<result.attendeeList.length; i++) {
-		// 			if(result.attendeeList[i].event_id.toString() === req.body.event_id.toString() && result.attendeeList[i].user_id) {
-		// 				attendeeList[j] =result.attendeeList[i];
-		// 				j++;
-		// 			}
-		// 		}
-		// 		res.status(200).send(attendeeList);
-		// 	}
-		// });
 	} else {
 		res.status(401).send({'message' : 'User does not have permission.'});
 	}
@@ -582,37 +607,61 @@ exports.getRecruiterInvitees = function(req, res) {
 						res.status(400).send(err);
 					}
 
+					/**
+					* Search the database for an email to the invitee from the recruiter for this event that the invitee
+					* has read.  If found, set the inviteeList[data.index].read = true; else set it to false.
+					*
+					* @param data - object with following fields
+					* 					- inviteeEmail - email address for invitee
+					* 					- index - index in inviteeList for this invitee's entry
+					* @param cb - callback function that should handle errors if any occur
+					*/
+					var aqueue = async.queue(function(data, cb) {
+						//Find an email to this invitee from this recruiter for this event that has been read.
+						//If none are found, the invitee has not read any of this recruiter's emails.
+						Email.findOne({to : data.inviteeEmail, from : req.user.email, event_id : eid, read : true}, function(err, result) {
+							if(err) {
+								cb(err);
+							} else {
+								if(!result) {
+									inviteeList[data.index].read = false;
+								} else {
+									inviteeList[data.index].read = true;
+								}
+
+								cb(false);
+							}
+						});
+					});
+
+					var aqueueErrors = false;
+					var aqueueCallback = function(err) {
+						if(err) {
+							aqueueErrors = err;
+						}
+					};
+
+					aqueue.drain = function() {
+						if(aqueueErrors) {
+							return res.status(400).send(err);
+						} else {
+							return res.status(200).send(inviteeList);
+						}
+					};
+
+					aqueue.pause();
 					var inviteeList = [];
 					for(var i = 0; i < populatedInvitees.length; i++) {
 						populatedInvitees[i].inviteeList.user_id = populatedInvitees[i].inviteeList.user_id.toObject();
-						populatedInvitees[i].inviteeList.user_id.read = populatedInvitees[i].inviteeList.read;
+						
+						aqueue.push({inviteeEmail : populatedInvitees[i].inviteeList.user_id.email, index : i}, aqueueCallback);
+
 						inviteeList.push(populatedInvitees[i].inviteeList.user_id);
 					}
-
-					res.status(200).send(inviteeList);
+					aqueue.resume();
 				});
 			}
 		});
-
-		// var query = User.findOne({'_id' : id});
-		// query.select('inviteeList');
-		// query.populate('inviteeList.user_id', 'displayName email');
-		// query.exec(function(err, result) {
-		// 	if(err) {
-		// 		res.status(400).send(err);
-		// 	} else if(!result || !result.inviteeList.length) {
-		// 		res.status(400).json({'message' : 'User not found or the user has not invited anybody yet.'});
-		// 	} else {
-		// 		var inviteeList = [], j=0;
-		// 		for(var i=0; i<result.inviteeList.length; i++) {
-		// 			if(result.inviteeList[i].event_id.toString() === req.body.event_id.toString() && result.inviteeList[i].user_id) {
-		// 				inviteeList[j] =result.inviteeList[i];
-		// 				j++;
-		// 			}
-		// 		}
-		// 		res.status(200).send(inviteeList);
-		// 	}
-		// });
 	} else {
 		res.status(401).send({'message' : 'User does not have permission.'});
 	}
@@ -652,38 +701,61 @@ exports.getRecruiterAlmosts = function(req, res) {
 						res.status(400).send(err);
 					}
 
+					/**
+					* Search the database for an email to the attendee from the recruiter for this event that the attendee
+					* has read.  If found, set the almostList[data.index].read = true; else set it to false.
+					*
+					* @param data - object with following fields
+					* 					- almostEmail - email address for attendee
+					* 					- index - index in almostList for this attendee's entry
+					* @param cb - callback function that should handle errors if any occur
+					*/
+					var aqueue = async.queue(function(data, cb) {
+						//Find an email to this attendee from this recruiter for this event that has been read.
+						//If none are found, the attendee has not read any of this recruiter's emails.
+						Email.findOne({to : data.almostEmail, from : req.user.email, event_id : eid, read : true}, function(err, result) {
+							if(err) {
+								cb(err);
+							} else {
+								if(!result) {
+									almostList[data.index].read = false;
+								} else {
+									almostList[data.index].read = true;
+								}
+
+								cb(false);
+							}
+						});
+					});
+
+					var aqueueErrors = false;
+					var aqueueCallback = function(err) {
+						if(err) {
+							aqueueErrors = err;
+						}
+					};
+
+					aqueue.drain = function() {
+						if(aqueueErrors) {
+							return res.status(400).send(err);
+						} else {
+							return res.status(200).send(almostList);
+						}
+					};
+
+					aqueue.pause();
 					var almostList = [];
 					for(var i = 0; i < populatedAlmosts.length; i++) {
 						populatedAlmosts[i].almostList.user_id = populatedAlmosts[i].almostList.user_id.toObject();
-						populatedAlmosts[i].almostList.user_id.read = populatedAlmosts[i].almostList.read;
+						
+						aqueue.push({almostEmail : populatedAlmosts[i].almostList.user_id.email, index : i}, aqueueCallback);
+
 						almostList.push(populatedAlmosts[i].almostList.user_id);
 					}
-
-					res.status(200).send(almostList);
+					aqueue.resume();
 				});
 			}
 		});
-
-		// var id = req.user._id;
-		// var query = User.findOne({'_id' : id});
-		// query.select('almostList');
-		// query.populate('almostList.user_id', 'displayName email');
-		// query.exec(function(err, result) {
-		// 	if(err) {
-		// 		res.status(400).send(err);
-		// 	} else if(!result || !result.almostList.length) {
-		// 		res.status(400).json({'message' : 'User not found or the user has not invited anybody yet.'});
-		// 	} else {
-		// 		var almostList = [], j=0;
-		// 		for(var i=0; i<result.almostList.length; i++) {
-		// 			if(result.almostList[i].event_id.toString() === req.body.event_id.toString() && result.almostList[i].user_id) {
-		// 				almostList[j] =result.almostList[i];
-		// 				j++;
-		// 			}
-		// 		}
-		// 		res.status(200).send(almostList);
-		// 	}
-		// });
 	} else {
 		res.status(401).send({'message' : 'User does not have permission.'});
 	}

@@ -10,6 +10,7 @@ var errorHandler = require('./errors'),
 	User = mongoose.model('User'),
 	Event = mongoose.model('Event'),
 	Candidate = mongoose.model('Candidate'),
+	Email = mongoose.model('Email'),
 	nodemailer = require("nodemailer"),
 	smtpPool = require('nodemailer-smtp-pool'),
 	config = require('../../config/config'),
@@ -507,32 +508,45 @@ exports.setEventStatus = function(req,res) {
 													return res.status(400).send({message : err});
 												} else {
 													Event.findOne({_id : event_id}, function(err, _event) {
-														var smtpTransport = nodemailer.createTransport(config.mailer.options);
-														var mailOptions = {
+														var candidateEmail = new Email({
 															to: 		user.email,
 															from: 		"frank@jou.ufl.edu",
-															sender: 	"frank@jou.ufl.edu",
-															replyTo: 	"frank@jou.ufl.edu",
-															subject: 	"Congrats, You are a Recruiter for " + _event.name
+															subject: 	"Congrats, You are a Recruiter for " + _event.name,
+															event_id: 	event_id
+														});
+
+														var smtpTransport = nodemailer.createTransport(config.mailer.options);
+														var mailOptions = {
+															to: 		candidateEmail.to,
+															from: 		candidateEmail.from,
+															sender: 	candidateEmail.from,
+															replyTo: 	candidateEmail.from,
+															subject: 	candidateEmail.subject
 														};
 
 														var filepath = path.normalize(__dirname + "/../views/templates/new-recruiter-email");
 
 														res.render(filepath, {
-															name: user.fName,
-															event_name: _event.name
+															name: 		user.fName,
+															event_name: _event.name,
+															email_id: 	candidateEmail._id
 														}, function(err, emailHTML) {
 															if(err) {
 																return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
 															}
 
-															mailOptions.html = emailHTML;
+															candidateEmail.message = mailOptions.html = emailHTML;
 
 															smtpTransport.sendMail(mailOptions, function(err) {
 																if(err) {
 																	return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
 																} else {
-																	return res.status(200).send({message : "New recruiter added and notification sent!"});
+																	candidateEmail.save(function(err) {
+																		if(err) {
+																			console.log("Error saving candidate email 546");
+																		}
+																		return res.status(200).send({message : "New recruiter added and notification sent!"});
+																	});
 																}
 															});
 														});
@@ -565,33 +579,46 @@ exports.setEventStatus = function(req,res) {
 													return res.status(400).send({message : err});
 												} else {
 													Event.findOne({_id : event_id}, function(err, _event) {
-														var smtpTransport = nodemailer.createTransport(config.mailer.options);
-														var mailOptions = {
+														var candidateEmail = new Email({
 															to: 		newUser.email,
 															from: 		"frank@jou.ufl.edu",
-															sender: 	"frank@jou.ufl.edu",
-															replyTo: 	"frank@jou.ufl.edu",
-															subject: 	"Congrats, You are a Recruiter for " + _event.name
+															subject: 	"Congrats, You are a Recruiter for " + _event.name,
+															event_id: 	event_id
+														});
+
+														var smtpTransport = nodemailer.createTransport(config.mailer.options);
+														var mailOptions = {
+															to: 		candidateEmail.to,
+															from: 		candidateEmail.from,
+															sender: 	candidateEmail.from,
+															replyTo: 	candidateEmail.from,
+															subject: 	candidateEmail.subject
 														};
 
 														var filepath = path.normalize(__dirname + "/../views/templates/new-recruiter-email");
 
 														res.render(filepath, {
-															name: newUser.fName,
+															name: 		newUser.fName,
 															event_name: _event.name,
-															password: newUserPassword
+															password: 	newUserPassword,
+															email_id: 	candidateEmail._id
 														}, function(err, emailHTML) {
 															if(err) {
 																return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
 															}
 
-															mailOptions.html = emailHTML;
+															candidateEmail.message = mailOptions.html = emailHTML;
 
 															smtpTransport.sendMail(mailOptions, function(err) {
 																if(err) {
 																	return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
 																} else {
-																	return res.status(200).send({message : "New recruiter added and notification sent!"});
+																	candidateEmail.save(function() {
+																		if(err) {
+																			console.log("Error saving message to candidate 615.");
+																		}
+																		return res.status(200).send({message : "New recruiter added and notification sent!"});
+																	});
 																}
 															});
 														});
@@ -784,20 +811,28 @@ exports.setEventAccepted = function(req,res){
 													return res.status(400).send({message : err});
 												} else {
 													Event.findOne({_id : event_id}, function(err, _event) {
-														var smtpTransport = nodemailer.createTransport(config.mailer.options);
-														var mailOptions = {
+														var candidateEmail = new Email({
 															to: 		user.email,
 															from: 		"frank@jou.ufl.edu",
-															sender: 	"frank@jou.ufl.edu",
-															replyTo: 	"frank@jou.ufl.edu",
-															subject: 	"Congrats, You are a Recruiter for " + _event.name
+															subject: 	"Congrats, You are a Recruiter for " + _event.name,
+															event_id: 	event_id
+														});
+
+														var smtpTransport = nodemailer.createTransport(config.mailer.options);
+														var mailOptions = {
+															to: 		candidateEmail.to,
+															from: 		candidateEmail.from,
+															sender: 	candidateEmail.from,
+															replyTo: 	candidateEmail.from,
+															subject: 	candidateEmail.subject
 														};
 
 														var filepath = path.normalize(__dirname + "/../views/templates/new-recruiter-email");
 
 														res.render(filepath, {
-															name: user.fName,
-															event_name: _event.name
+															name: 		user.fName,
+															event_name: _event.name,
+															email_id: 	candidateEmail._id
 														}, function(err, emailHTML) {
 															if(err) {
 																return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
@@ -809,7 +844,12 @@ exports.setEventAccepted = function(req,res){
 																if(err) {
 																	return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
 																} else {
-																	return res.status(200).send({message : "New recruiter added and notification sent!"});
+																	candidateEmail.save(function() {
+																		if(err) {
+																			console.log("Error saving message to candidate 615.");
+																		}
+																		return res.status(200).send({message : "New recruiter added and notification sent!"});
+																	});
 																}
 															});
 														});
@@ -844,21 +884,28 @@ exports.setEventAccepted = function(req,res){
 													return res.status(400).send({message : err});
 												} else {
 													Event.findOne({_id : event_id}, function(err, _event) {
-														var smtpTransport = nodemailer.createTransport(config.mailer.options);
-														var mailOptions = {
+														var candidateEmail = new Email({
 															to: 		newUser.email,
 															from: 		"frank@jou.ufl.edu",
-															sender: 	"frank@jou.ufl.edu",
-															replyTo: 	"frank@jou.ufl.edu",
-															subject: 	"Congrats, You are a Recruiter for " + _event.name
-														};
+															subject: 	"Congrats, You are a Recruiter for " + _event.name,
+															event_id: 	event_id
+														});
 
+														var smtpTransport = nodemailer.createTransport(config.mailer.options);
+														var mailOptions = {
+															to: 		candidateEmail.to,
+															from: 		candidateEmail.from,
+															sender: 	candidateEmail.from,
+															replyTo: 	candidateEmail.from,
+															subject: 	candidateEmail.subject
+														};
 														var filepath = path.normalize(__dirname + "/../views/templates/new-recruiter-email");
 
 														res.render(filepath, {
-															name: newUser.fName,
+															name: 		newUser.fName,
 															event_name: _event.name,
-															password: newUserPassword
+															password: 	newUserPassword,
+															email_id: 	candidateEmail._id
 														}, function(err, emailHTML) {
 															if(err) {
 																return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
@@ -870,7 +917,12 @@ exports.setEventAccepted = function(req,res){
 																if(err) {
 																	return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
 																} else {
-																	return res.status(200).send({message : "New recruiter added and notification sent!"});
+																	candidateEmail.save(function() {
+																		if(err) {
+																			console.log("Error saving message to candidate 615.");
+																		}
+																		return res.status(200).send({message : "New recruiter added and notification sent!"});
+																	});
 																}
 															});
 														});

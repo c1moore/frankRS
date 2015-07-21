@@ -143,9 +143,6 @@ var updateRanks = function(event_id, cb) {
 				return b.value - a.value;
 			});
 
-			console.log("Sorted IDs:\n");
-			console.log(sortedResults);
-
 			aqueue.pause();
 			for(var i=0; i<result.length; i++) {
 				var recruiter = {'_id' : sortedResults[i]._id, 'place' : (i + 1)};
@@ -188,7 +185,7 @@ var updateEventLists = function(user_id, event_id, callback) {
 					}
 				}
 
-				recruiter.almostList.push({event_id : event_id, user_id : user_id, read : recruiter.inviteeList[index].read});
+				recruiter.almostList.push({event_id : event_id, user_id : user_id});
 				recruiter.inviteeList.pull({event_id : event_id, user_id : user_id});
 
 				recruiter.save(function(err) {
@@ -397,7 +394,8 @@ exports.sendInvitation = function(req, res) {
 									recruiter_name: req.user.fName,
 									receiver_name: req.body.fName,
 									event_name: req.body.event_name,
-									message: req.body.message
+									message: req.body.message,
+									email_id: invitationEmail._id
 								}, function(err, emailHTML) {
 									invitationEmail.message = mailOptions.html = emailHTML;
 									callback(err, invitee);
@@ -596,7 +594,8 @@ exports.acceptInvitation = function(req, res) {
 												name: req.body.invitee_fName,
 												event: req.body.event_name,
 												password : pass,
-												address : 'http://frank.jou.ufl.edu/recruiters'
+												address : 'http://frank.jou.ufl.edu/recruiters',
+												email_id: attendeeEmail._id
 											}, function(err, emailHTML) {
 												attendeeEmail.message = attendeeMailOptions.html = emailHTML;
 												smtpTransport.sendMail(attendeeMailOptions, function(err, info) {
@@ -640,7 +639,8 @@ exports.acceptInvitation = function(req, res) {
 																		recruiter_name : result.fName,
 																		event: req.body.event_name,
 																		attendee_name: req.body.invitee_fName + " " + req.body.invitee_lName,
-																		address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard'
+																		address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard',
+																		email_id: recruiterEmail._id
 																	}, function(err, emailHTML) {
 																		recruiterEmail.message = recruiterMailOptions.html = emailHTML;
 																		smtpTransport.sendMail(recruiterMailOptions, function(err, info) {
@@ -757,7 +757,8 @@ exports.acceptInvitation = function(req, res) {
 												res.render('templates/invitation-accepted-user-email', {
 													name: req.body.invitee_fName,
 													event: req.body.event_name,
-													address : 'http://frank.jou.ufl.edu/recruiters'
+													address : 'http://frank.jou.ufl.edu/recruiters',
+													email_id: attendeeEmail._id
 												}, function(err, emailHTML) {
 													attendeeEmail.message = attendeeMailOptions.html = emailHTML;
 													smtpTransport.sendMail(attendeeMailOptions, function(err, info) {
@@ -779,7 +780,8 @@ exports.acceptInvitation = function(req, res) {
 													name: req.body.invitee_fName,
 													event: req.body.event_name,
 													password : pass,
-													address : 'http://frank.jou.ufl.edu/recruiters'
+													address : 'http://frank.jou.ufl.edu/recruiters',
+													email_id: attendeeEmail._id
 												}, function(err, emailHTML) {
 													attendeeEmail.message = attendeeMailOptions.html = emailHTML;
 													smtpTransport.sendMail(attendeeMailOptions, function(err, info) {
@@ -824,7 +826,8 @@ exports.acceptInvitation = function(req, res) {
 																		recruiter_name : result.fName,
 																		event: req.body.event_name,
 																		attendee_name: req.body.invitee_fName + " " + req.body.invitee_lName,
-																		address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard'
+																		address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard',
+																		email_id: recruiterEmail._id
 																	}, function(err, emailHTML) {
 																		recruiterEmail.message = recruiterMailOptions.html = emailHTML;
 																		smtpTransport.sendMail(recruiterMailOptions, function(err, info) {
