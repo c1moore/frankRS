@@ -968,55 +968,65 @@ exports.sendCandidateEmail = function(req, res) {
 				}
 
 				var smtpTransport = nodemailer.createTransport(smtpPool(config.mailer.options));
-				smtpTransport.sendMail({
-					to: 		emails,
-					from: 		"frank@jou.ufl.edu",
-					sender: 	"frank@jou.ufl.edu",
-					replyTo: 	"frank@jou.ufl.edu",
-					subject: 	req.body.subject,
-					html: 		req.body.message
-				}, function(err) {
-					if(err) {
-						return res.status(400).send({message : err});
-					} else {
-						var aqueue = async.queue(function(email, callback) {
-							new Email({
-								to: 		email.to,
-								from: 		'frank@jou.ufl.edu',
-								subject: 	req.body.subject,
-								message: 	req.body.message,
-								event_id: 	new mongoose.Types.ObjectId(req.body.event_id)
-							}).save(function(err) {
+
+				var aqueue = async.queue(function(email, callback) {
+					var tempmail = new Email({
+						to: 		email.to,
+						from: 		'frank@jou.ufl.edu',
+						subject: 	req.body.subject,
+						event_id: 	new mongoose.Types.ObjectId(req.body.event_id)
+					});
+
+					tempmail.message = "<img src='http://www.frank2016.net/image?eid=" + tempmail._id.toString() + "&amp;image=email_header.png' /><br />" + req.body.message;
+					
+					smtpTransport.sendMail({
+						to: 		tempmail.to,
+						from: 		tempmail.from,
+						sender: 	tempmail.from,
+						replyTo: 	tempmail.from,
+						subject: 	tempmail.subject,
+						html: 		tempmail.message
+					}, function(err) {
+						if(err) {
+							return callback({error : err, email : tempmail.to});
+						} else {
+							tempmail.save(function(err) {
 								if(err) {
-									return callback(err);
+									return callback({error : err});
 								}
 								
-								return callback(false);
+								return callback({error : false});
 							});
-						}, 10000);
-
-						var errs = false;
-						var task_cb = function(err) {
-							if(err) {
-								errs = err;
-							}
-						};
-
-						aqueue.pause();
-						for(var i = 0; i < emails.length; i++) {
-							aqueue.push(emails[i], task_cb);
 						}
-						aqueue.resume();
+					});
+				}, 10000);
 
-						aqueue.drain = function() {
-							if(err) {
-								return res.status(400).send({message : "Email(s) sent, but some cannot be tracked."});
-							}
-
-							return res.status(200).send({message : "Email(s) sent!"});
-						};
+				var errs = false;
+				var emails = [];
+				var task_cb = function(errObj) {
+					if(errObj.error) {
+						errs = err;
+						if(errObj.email) {
+							emails.push(errObj.email);
+						}
 					}
-				});
+				};
+
+				aqueue.pause();
+				for(var i = 0; i < req.body.emails.length; i++) {
+					aqueue.push(emails[i], task_cb);
+				}
+				aqueue.resume();
+
+				aqueue.drain = function() {
+					if(errs) {
+						if(emails.length) {
+							return res.status(400).send({message : "Some emails were not sent.", emails : emails});
+						}
+						return res.status(400).send({message : "Email(s) sent, but some cannot be tracked."});
+					}
+					return res.status(200).send({message : "Email(s) sent!"});
+				};
 			}
 		});
 	}
@@ -1047,54 +1057,64 @@ exports.sendNonuserEmail = function(req, res) {
 		return res.status(400).send({message : "Required field not specified."})
 	} else {
 		var smtpTransport = nodemailer.createTransport(smtpPool(config.mailer.options));
-		smtpTransport.sendMail({
-			to: 		req.body.emails,
-			from: 		"frank@jou.ufl.edu",
-			sender: 	"frank@jou.ufl.edu",
-			replyTo: 	"frank@jou.ufl.edu",
-			subject: 	req.body.subject,
-			html: 		req.body.message
-		}, function(err) {
-			if(err) {
-				return res.status(400).send({message : "Message was not sent.", error : err});
-			} else {
-				var aqueue = async.queue(function(email, callback) {
-					new Email({
-						to: 		email.to,
-						from: 		'frank@jou.ufl.edu',
-						subject: 	req.body.subject,
-						message: 	req.body.message,
-						event_id: 	new mongoose.Types.ObjectId(req.body.event_id)
-					}).save(function(err) {
+
+		var aqueue = async.queue(function(email, callback) {
+			var tempmail = new Email({
+				to: 		email,
+				from: 		'frank@jou.ufl.edu',
+				subject: 	req.body.subject,
+				event_id: 	new mongoose.Types.ObjectId(req.body.event_id)
+			});
+
+			tempmail.message = "<img src='http://www.frank2016.net/image?eid=" + tempmail._id.toString() + "&amp;image=email_header.png' /><br />" + req.body.message;
+			
+			smtpTransport.sendMail({
+				to: 		tempmail.to,
+				from: 		tempmail.from,
+				sender: 	tempmail.from,
+				replyTo: 	tempmail.from,
+				subject: 	tempmail.subject,
+				html: 		tempmail.message
+			}, function(err) {
+				if(err) {
+					return callback({error : err, email : tempmail.to});
+				} else {
+					tempmail.save(function(err) {
 						if(err) {
-							return callback(err);
+							return callback({error : err});
 						}
 						
-						return callback(false);
+						return callback({error : false});
 					});
-				}, 10000);
-
-				var errs = false;
-				var task_cb = function(err) {
-					if(err) {
-						errs = err;
-					}
-				};
-
-				aqueue.pause();
-				for(var i = 0; i < req.body.emails.length; i++) {
-					aqueue.push(req.body.emails[i], task_cb);
 				}
-				aqueue.resume();
+			});
+		}, 10000);
 
-				aqueue.drain = function() {
-					if(err) {
-						return res.status(400).send({message : "Email(s) sent, but some cannot be tracked."});
-					}
-
-					return res.status(200).send({message : "Email(s) sent!"});
-				};
+		var errs = false;
+		var emails = [];
+		var task_cb = function(errObj) {
+			if(errObj.error) {
+				errs = err;
+				if(errObj.email) {
+					emails.push(errObj.email);
+				}
 			}
-		});
+		};
+
+		aqueue.pause();
+		for(var i = 0; i < req.body.emails.length; i++) {
+			aqueue.push(req.body.emails[i], task_cb);
+		}
+		aqueue.resume();
+
+		aqueue.drain = function() {
+			if(errs) {
+				if(emails.length) {
+					return res.status(400).send({message : "Some emails were not sent.", emails : emails});
+				}
+				return res.status(400).send({message : "Email(s) sent, but some cannot be tracked."});
+			}
+			return res.status(200).send({message : "Email(s) sent!"});
+		};
 	}
 };
