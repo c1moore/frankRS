@@ -6,6 +6,7 @@
 var mongoose = require('mongoose'),
     _ = require('lodash'),
     User = mongoose.model('User'),
+    Email = mongoose.model('Email'),
     errorHandler = require('./errors'),
     fs = require('fs'),
     path = require('path');
@@ -20,86 +21,14 @@ var mongoose = require('mongoose'),
  * @param eid _id field of event for which the invitation was sent
  */
 exports.sendImage = function(req, res) {
-	if(req.query.rid && req.query.uemail && req.query.eid) {
-		//Update recruiter's lists.
-		User.findOne({_id : new mongoose.Types.ObjectId(req.query.rid)}, function(err, recruiter) {
-			if(err) {
-				return res.status(400).send();
-			}
-			if(!recruiter) {
-				return res.status(400).send();
-			}
-
-			User.findOne({email : req.query.uemail}, function(err, invitee) {
-				if(err) {
-					return res.status(400).send();
-				}
-				if(!invitee) {
-					return res.status(400).send();
-				}
-
-				var i = 0;
-				var user_id = invitee._id.toString();
-				var event_id = req.query.eid.toString();
-				if(recruiter.inviteeList) {
-					for(; i < recruiter.inviteeList.length; i++) {
-						if(recruiter.inviteeList[i].user_id.toString() === user_id && recruiter.inviteeList[i].event_id.toString() === event_id) {
-							recruiter.inviteeList[i].read = true;
-							break;
-						}
-					}
-				}
-
-				if(!recruiter.inviteeList || i === recruiter.inviteeList.length) {
-					//Invitee not found in inviteeList, check attendeeList.
-					if(recruiter.attendeeList) {
-						for(i = 0; i < recruiter.attendeeList.length; i++) {
-							if(recruiter.attendeeList[i].user_id.toString() === user_id && recruiter.attendeeList[i].event_id.toString() === event_id) {
-								recruiter.attendeeList[i].read = true;
-								break;
-							}
-						}
-					}
-
-					if(!recruiter.attendeeList || i === recruiter.attendeeList.length) {
-						//Invitee not found in attendeeList, check almostList.
-						if(recruiter.almostList) {
-							for(i = 0; i < recruiter.almostList.length; i++) {
-								if(recruiter.almostList[i].user_id.toString() === user_id && recruiter.almostList[i].event_id.toString() === event_id) {
-									recruiter.almostList[i].read = true;
-									break;
-								}
-							}
-						}
-
-						if(!recruiter.almostList || i === recruiter.almostList.length) {
-							//User not found, return error.
-							return res.status(400).send();
-						}
-					}
-				}
-
-				recruiter.save(function(err) {
-					if(err) {
-						return res.status(400).send();
-					}
-
-					var filepath = path.join(__dirname, "..", "..", "public/modules/core/img/brand/logo.png");
-					var fileStats = fs.statSync(filepath);
-
-					res.writeHead(200, {
-						'Content-Type' : 'image/gif',
-						'Content-Length' : fileStats.size
-					});
-
-					var readStream = fs.createReadStream(filepath);
-					readStream.pipe(res);
-				});
-			});
-		});
-	} else if(!req.query.rid && !req.query.uemail && !req.query.eid){
-		//Just return the image.
-		var filepath = path.join(__dirname, "..", "..", "public/modules/core/img/brand/logo.png");
+	if(req.query.eid) {
+		//Send the image immediately.
+		var filepath;
+		if(req.query.image) {
+			filepath = path.join(__dirname, "..", "..", "public/modules/core/img/email/", req.query.image);
+		} else {
+			filepath = path.join(__dirname, "..", "..", "public/modules/core/img/email/logo.png");
+		}
 		var fileStats = fs.statSync(filepath);
 
 		res.writeHead(200, {
@@ -109,7 +38,36 @@ exports.sendImage = function(req, res) {
 
 		var readStream = fs.createReadStream(filepath);
 		readStream.pipe(res);
+
+		//Update email entry for this email.
+		var email_id = mongoose.Types.ObjectId(req.query.eid);
+		Email.findOne({_id : email_id}, function(err, email) {
+			if(!err) {
+				if(email) {
+					email.read = true;
+					email.save(function(err) {
+						if(err) {
+							console.log("Error updating emails for record " + email._id.toString());
+						}
+					});
+				} else {
+					console.log("Email document not found for " + req.query.eid);
+				}
+			} else {
+				console.log("Error2 updating emails for record " + email._id.toString());
+			}
+		});
 	} else {
-		return res.status(400).send();
+		//Just return the frank logo.
+		var filepath = path.join(__dirname, "..", "..", "public/modules/core/img/email/logo.png");
+		var fileStats = fs.statSync(filepath);
+
+		res.writeHead(200, {
+			'Content-Type' : 'image/gif',
+			'Content-Length' : fileStats.size
+		});
+
+		var readStream = fs.createReadStream(filepath);
+		readStream.pipe(res);
 	}
 };

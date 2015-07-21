@@ -9,6 +9,7 @@ var should = require('should'),
 	mongoose = require('mongoose'),
 	User = mongoose.model('User'),
 	Evnt = mongoose.model('Event'),
+	Email = mongoose.model('Email'),
 	http = require('http'),
 	request = require('supertest'),
 	agent = require('superagent');
@@ -16,7 +17,7 @@ var should = require('should'),
 /**
  * Globals
  */
-var user, user2, event1, event2,
+var user, user2, event1, event2, email,
 	anonymAgent = agent.agent();
 
 /**
@@ -25,43 +26,36 @@ var user, user2, event1, event2,
 describe('Images Functional Tests:', function() {
 
 	before(function(done) {
-		User.remove(function(err) {
+		Email.remove(function(err) {
 			if(err) {
 				return done(err);
 			}
 
-			Evnt.remove(function(err) {
+			User.remove(function(err) {
 				if(err) {
 					return done(err);
 				}
 
-		  		var millisInMonth = new Date(1970, 0, 31, 11, 59, 59).getTime();			//Number of milliseconds in a typical month.
-				var startDate = new Date(Date.now() + millisInMonth).getTime();				//Start date for 1 month from now.
-				var endDate = new Date(Date.now() + millisInMonth + 86400000).getTime();	//Event lasts 1 day.
-
-				event1 = new Evnt({
-					name: 			'Testing',
-					start_date: 	startDate,
-					end_date: 		endDate,
-					location: 		'Work',
-					capacity: 		200
-				});
-				event2 = new Evnt({
-					name: 			'Testing2',
-					start_date: 	startDate,
-					end_date: 		endDate,
-					location: 		'Work',
-					capacity: 		200
-				});
-
-				event1.save(function(err) {
+				Evnt.remove(function(err) {
 					if(err) {
 						return done(err);
 					}
 
-					event2.save(done);
+			  		var millisInMonth = new Date(1970, 0, 31, 11, 59, 59).getTime();			//Number of milliseconds in a typical month.
+					var startDate = new Date(Date.now() + millisInMonth).getTime();				//Start date for 1 month from now.
+					var endDate = new Date(Date.now() + millisInMonth + 86400000).getTime();	//Event lasts 1 day.
+
+					event1 = new Evnt({
+						name: 			'Testing',
+						start_date: 	startDate,
+						end_date: 		endDate,
+						location: 		'Work',
+						capacity: 		200
+					});
+
+					event1.save(done);
 				});
-			});
+			});	
 		});
 	});
 
@@ -83,8 +77,16 @@ describe('Images Functional Tests:', function() {
 				email: 			'recruiter_cen3031.0.boom0625@spamgourmet.com',
 				password: 		'password',
 				rank: 			[{'event_id': event1._id, 'place': 1}],
-				inviteeList: 	[{user_id : user2._id, event_id : event2._id}, {user_id : user2._id, event_id : event1._id}],
 				login_enabled: 	true
+			});
+
+			email = new Email({
+				to: 		'invitee_cen3031.0.boom0625@spamgourmet.com',
+				from: 		'recruiter_cen3031.0.boom0625@spamgourmet.com',
+				subject: 	'Test Email, Not Sent',
+				message: 	'This message will not be sent, it is only for testing purposes.',
+				read: 		false,
+				event_id: 	event1._id
 			});
 
 			user2.save(function(err) {
@@ -97,175 +99,115 @@ describe('Images Functional Tests:', function() {
 						return done(err);
 					}
 
-					done();
+					email.save(done);
 				});
 			});
 		});
 
-		it('should update the inviteeList and return an image.', function(done) {
+		it('should update an email record when all data is given', function(done) {
+			this.timeout(4000);
 			anonymAgent
 				.get("http://localhost:3001/image/logo")
-				.query({rid : user._id.toString(), uemail : user2.email, eid : event1._id.toString()})
+				.query({eid : email._id.toString(), image : 'logo.png'})
 				.end(function(err, res) {
 					should.not.exist(err);
 
 					res.status.should.equal(200);
+					parseInt(res.headers['content-length'], 10).should.be.greaterThan(1000);
+					res.headers['content-type'].should.equal('image/gif');
 
-					User.findOne({_id : user._id}, function(err, user) {
-						if(err) {
-							return done(err);
-						}
+					//Since we return the image immediately before updating the db, we should wait a few seconds to give the db time to update.
+					setTimeout(function() {
+						Email.findOne({_id : email._id}, function(err, result) {
+							should.not.exist(err);
+							should.exist(result);
 
-						user.inviteeList.length.should.equal(2);
-
-						var i;
-						for(i = 0; i < user.inviteeList.length; i++) {
-							if(user.inviteeList[i].event_id.toString() === event1._id.toString()) {
-								user.inviteeList[i].read.should.be.true;
-								break;
-							}
-						}
-
-						i.should.be.lessThan(user.inviteeList.length);
-
-						done();
-					});
-				});
-		});
-
-		it('should update the attendeeList and return an image.', function(done) {
-			user.attendeeList = user.inviteeList;
-			user.inviteeList = [];
-
-			user.save(function(err) {
-				if(err) {
-					return done(err);
-				}
-
-				anonymAgent
-					.get("http://localhost:3001/image/logo")
-					.query({rid : user._id.toString(), uemail : user2.email, eid : event1._id.toString()})
-					.end(function(err, res) {
-						should.not.exist(err);
-
-						res.status.should.equal(200);
-
-						User.findOne({_id : user._id}, function(err, user) {
-							if(err) {
-								return done(err);
-							}
-
-							user.attendeeList.length.should.equal(2);
-
-							var i;
-							for(i = 0; i < user.attendeeList.length; i++) {
-								if(user.attendeeList[i].event_id.toString() === event1._id.toString()) {
-									user.attendeeList[i].read.should.be.true;
-									break;
-								}
-							}
-
-							i.should.be.lessThan(user.attendeeList.length);
+							result.read.should.be.true;
 
 							done();
 						});
-					});
-			});
+					}, 2000);
+				});
 		});
 
-		it('should update the almostList and return an image.', function(done) {
-			user.almostList = user.inviteeList;
-			user.inviteeList = [];
+		it('should update the email record and return the logo when the image is not specified.', function(done) {
+			this.timeout(4000);
+			anonymAgent
+				.get("http://localhost:3001/image/logo")
+				.query({eid : email._id.toString()})
+				.end(function(err, res) {
+					should.not.exist(err);
 
-			user.save(function(err) {
-				if(err) {
-					return done(err);
-				}
+					res.status.should.equal(200);
+					parseInt(res.headers['content-length'], 10).should.be.greaterThan(1000);
+					res.headers['content-type'].should.equal('image/gif');
 
-				anonymAgent
-					.get("http://localhost:3001/image/logo")
-					.query({rid : user._id.toString(), uemail : user2.email, eid : event1._id.toString()})
-					.end(function(err, res) {
-						should.not.exist(err);
+					//Since we return the image immediately before updating the db, we should wait a few seconds to give the db time to update.
+					setTimeout(function() {
+						Email.findOne({_id : email._id}, function(err, result) {
+							should.not.exist(err);
+							should.exist(result);
 
-						res.status.should.equal(200);
-
-						User.findOne({_id : user._id}, function(err, user) {
-							if(err) {
-								return done(err);
-							}
-
-							user.almostList.length.should.equal(2);
-
-							var i;
-							for(i = 0; i < user.almostList.length; i++) {
-								if(user.almostList[i].event_id.toString() === event1._id.toString()) {
-									user.almostList[i].read.should.be.true;
-									break;
-								}
-							}
-
-							i.should.be.lessThan(user.almostList.length);
+							result.read.should.be.true;
 
 							done();
 						});
-					});
-			});
+					}, 2000);
+				});
 		});
 
-		it('should return a 400 error when the invitee email is not found.', function(done) {
+		it('should only return the image when the email is not found.', function(done) {
 			anonymAgent
 				.get("http://localhost:3001/image/logo")
-				.query({rid : user._id.toString(), eid : event1._id.toString()})
+				.query({eid : (new mongoose.Types.ObjectId()).toString(), image : 'logo.png'})
 				.end(function(err, res) {
 					should.not.exist(err);
-
-					res.status.should.equal(400);
+					
+					res.status.should.equal(200);
+					parseInt(res.headers['content-length'], 10).should.be.greaterThan(1000);
+					res.headers['content-type'].should.equal('image/gif');
 
 					done();
 				});
 		});
 
-		it('should return a 400 error when the recruiter id is not found.', function(done) {
+		it('should return the image when the email id is not specified.', function(done) {
 			anonymAgent
 				.get("http://localhost:3001/image/logo")
-				.query({uemail : user2.email, eid : event1._id.toString()})
+				.query({image : 'logo.png'})
 				.end(function(err, res) {
 					should.not.exist(err);
 
-					res.status.should.equal(400);
+					res.status.should.equal(200);
+					parseInt(res.headers['content-length'], 10).should.be.greaterThan(1000);
+					res.headers['content-type'].should.equal('image/gif');
 
 					done();
 				});
 		});
 
-		it('should return a 400 error when the event id is not found.', function(done) {
-			anonymAgent
-				.get("http://localhost:3001/image/logo")
-				.query({rid : user._id.toString(), uemail : user2.email})
-				.end(function(err, res) {
-					should.not.exist(err);
-
-					res.status.should.equal(400);
-
-					done();
-				});
-		});
-
-		it('should return an image when no data is passed to it.', function(done) {
+		it('should return an image when nothing is specified.', function(done) {
 			anonymAgent
 				.get("http://localhost:3001/image/logo")
 				.end(function(err, res) {
 					should.not.exist(err);
 
 					res.status.should.equal(200);
+					parseInt(res.headers['content-length'], 10).should.be.greaterThan(1000);
+					res.headers['content-type'].should.equal('image/gif');
 
 					done();
 				});
 		});
 
 		afterEach(function(done) {
-			User.remove(done);
+			User.remove(function(err) {
+				if(err) {
+					return done(err);
+				}
+
+				Email.remove(done);
+			});
 		});
 	});
 
