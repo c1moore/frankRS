@@ -16,7 +16,8 @@ var validateRequiredProperty = function(property) {
 };
 
 /**
-* Email Schema
+* Email Schema - we will use emails instead of the user's _id since some emails
+* may go to someone who is not a user in the system.
 */
 var EmailSchema = new Schema({
 	to: {

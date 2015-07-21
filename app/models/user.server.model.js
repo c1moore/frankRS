@@ -73,8 +73,7 @@ var validateRole = function(property) {
 */
 var ListSchema = new Schema({
 	user_id: 	{type: mongoose.Schema.Types.ObjectId, ref:'User'},
-	event_id: 	{type: mongoose.Schema.Types.ObjectId, ref:'Event'},
-	read: 		{type: Boolean, default: false}
+	event_id: 	{type: mongoose.Schema.Types.ObjectId, ref:'Event'}
 }, {_id:false});
 
 //mongoose.model('List', ListSchema);
