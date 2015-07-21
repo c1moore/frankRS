@@ -12,13 +12,12 @@ var mongoose = require('mongoose'),
     path = require('path');
 
 /**
- * Return image to the requester.  If rid and uemail are specified, the entry in the
- * recruiter's inviteeList/attendeeList will be updated to show the invitee has read
- * their invitation.
+ * Return image to the requester.  If eid is not specified, either the specified image or the default
+ * image will be returned.  The default image is the logo.png image located in
+ * public/modules/core/img/email.
  *
- * @param rid _id field of recruiter that sent the invitation
- * @param uemail email of the user that received the invitation
- * @param eid _id field of event for which the invitation was sent
+ * @param eid _id	field of email document to update
+ * @param image 	file to return
  */
 exports.sendImage = function(req, res) {
 	if(req.query.eid) {
@@ -59,7 +58,12 @@ exports.sendImage = function(req, res) {
 		});
 	} else {
 		//Just return the frank logo.
-		var filepath = path.join(__dirname, "..", "..", "public/modules/core/img/email/logo.png");
+		var filepath;
+		if(req.query.image) {
+			filepath = path.join(__dirname, "..", "..", "public/modules/core/img/email/", req.query.image);
+		} else {
+			filepath = path.join(__dirname, "..", "..", "public/modules/core/img/email/logo.png");
+		}
 		var fileStats = fs.statSync(filepath);
 
 		res.writeHead(200, {
