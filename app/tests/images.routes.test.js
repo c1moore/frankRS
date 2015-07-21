@@ -107,7 +107,7 @@ describe('Images Functional Tests:', function() {
 		it('should update an email record when all data is given', function(done) {
 			this.timeout(4000);
 			anonymAgent
-				.get("http://localhost:3001/image/logo")
+				.get("http://localhost:3001/image")
 				.query({eid : email._id.toString(), image : 'logo.png'})
 				.end(function(err, res) {
 					should.not.exist(err);
@@ -133,7 +133,7 @@ describe('Images Functional Tests:', function() {
 		it('should update the email record and return the logo when the image is not specified.', function(done) {
 			this.timeout(4000);
 			anonymAgent
-				.get("http://localhost:3001/image/logo")
+				.get("http://localhost:3001/image")
 				.query({eid : email._id.toString()})
 				.end(function(err, res) {
 					should.not.exist(err);
@@ -158,7 +158,7 @@ describe('Images Functional Tests:', function() {
 
 		it('should only return the image when the email is not found.', function(done) {
 			anonymAgent
-				.get("http://localhost:3001/image/logo")
+				.get("http://localhost:3001/image")
 				.query({eid : (new mongoose.Types.ObjectId()).toString(), image : 'logo.png'})
 				.end(function(err, res) {
 					should.not.exist(err);
@@ -173,7 +173,7 @@ describe('Images Functional Tests:', function() {
 
 		it('should return the image when the email id is not specified.', function(done) {
 			anonymAgent
-				.get("http://localhost:3001/image/logo")
+				.get("http://localhost:3001/image")
 				.query({image : 'logo.png'})
 				.end(function(err, res) {
 					should.not.exist(err);
@@ -188,7 +188,7 @@ describe('Images Functional Tests:', function() {
 
 		it('should return an image when nothing is specified.', function(done) {
 			anonymAgent
-				.get("http://localhost:3001/image/logo")
+				.get("http://localhost:3001/image")
 				.end(function(err, res) {
 					should.not.exist(err);
 
