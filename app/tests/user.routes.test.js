@@ -2622,7 +2622,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					rank : [{'event_id':event1._id, 'place': 3}],
 					password : 'password',
 					attendeeList : [],
-					inviteeList : [{'user_id' : user5._id, 'event_id' : event1._id, read : true}],
+					inviteeList : [{'user_id' : user5._id, 'event_id' : event1._id}],
 					almostList : [{'user_id' : user2._id, 'event_id' : event2._id}],
 					login_enabled : true
 				});
@@ -2719,19 +2719,9 @@ describe('Express.js User Route Unit Tests:', function() {
 															User.findOne({_id : tempUser2._id}, function(err, newTempUser2) {
 																should.not.exist(err);
 
-																console.log(event1._id);
-																console.log(newTempUser2);
-
 																newTempUser2.rank[0].place.should.equal(5);
 																newTempUser2.inviteeList.length.should.equal(0);
 																newTempUser2.almostList.length.should.equal(2);
-																for(i = 0; i < newTempUser2.almostList.length; i++) {
-																	if(newTempUser2.almostList[i].user_id.toString() === user5._id.toString() && newTempUser2.almostList[i].event_id.toString() === event1._id.toString()) {
-																		newTempUser2.almostList[i].read.should.be.true;
-																		break;
-																	}
-																}
-																i.should.not.equal(newTempUser2.almostList.length);
 
 																User.findOne({_id : tempUser3._id}, function(err, newTempUser3) {
 																	should.not.exist(err);
