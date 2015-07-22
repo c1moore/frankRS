@@ -105,8 +105,8 @@
 						<tbody>
 							<tr class="animate-repeat"  ng-repeat="invitee in (results = (invitees.list | filter:q))" ng-class="{'frank-invite-sb-read' : invitee.read}">
 								<td>
-									<i class="octicon octicon-mail" ng-if="!attendee.read" tooltip="This invitee has NOT read your invitation.  Maybe you should reinvite them..." tooltip-placement="left" tooltip-class="frank-tooltip"></i>
-									<i class="octicon octicon-mail-read" ng-if="attendee.read" tooltip="This attendee has read your invitation.  They may need a little nudge." tooltip-placement="left" tooltip-class="frank-tooltip"></i>
+									<i class="octicon octicon-mail" ng-if="!invitee.read" tooltip="This invitee has NOT read your invitation.  Maybe you should reinvite them..." tooltip-placement="left" tooltip-class="frank-tooltip"></i>
+									<i class="octicon octicon-mail-read" ng-if="invitee.read" tooltip="This invitee has read your invitation, but has not signed up yet.  They may need a little nudge." tooltip-placement="left" tooltip-class="frank-tooltip"></i>
 								</td>
 								<td>
 							 		{{invitee.displayName}}
@@ -149,8 +149,8 @@
 						<tbody>
 							<tr class="animate-repeat"  ng-repeat="almost in (results = (almosts.list | filter:q))" ng-class="{'frank-invite-sb-read' : almost.read}">
 								<td>
-									<i class="octicon octicon-mail" ng-if="!attendee.read" tooltip="This attendee has NOT read your invitation.  Maybe that's why they didn't accept your invitation." tooltip-placement="left" tooltip-class="frank-tooltip"></i>
-									<i class="octicon octicon-mail-read" ng-if="attendee.read" tooltip="This attendee has read your invitation.  It's too bad they did not accept your invitation." tooltip-placement="left" tooltip-class="frank-tooltip"></i>
+									<i class="octicon octicon-mail" ng-if="!almost.read" tooltip="This attendee has NOT read your invitation." tooltip-placement="left" tooltip-class="frank-tooltip"></i>
+									<i class="octicon octicon-mail-read" ng-if="almost.read" tooltip="This attendee has read your invitation.  It's too bad they did not accept your invitation." tooltip-placement="left" tooltip-class="frank-tooltip"></i>
 								</td>
 								<td>
 							 		{{almost.displayName}}
