@@ -395,7 +395,7 @@ exports.sendInvitation = function(req, res) {
 									receiver_name: req.body.fName,
 									event_name: req.body.event_name,
 									message: req.body.message,
-									email_id: invitationEmail._id
+									email_id: invitationEmail._id.toString()
 								}, function(err, emailHTML) {
 									invitationEmail.message = mailOptions.html = emailHTML;
 									callback(err, invitee);
@@ -595,7 +595,7 @@ exports.acceptInvitation = function(req, res) {
 												event: req.body.event_name,
 												password : pass,
 												address : 'http://frank.jou.ufl.edu/recruiters',
-												email_id: attendeeEmail._id
+												email_id: attendeeEmail._id.toString()
 											}, function(err, emailHTML) {
 												attendeeEmail.message = attendeeMailOptions.html = emailHTML;
 												smtpTransport.sendMail(attendeeMailOptions, function(err, info) {
@@ -640,7 +640,7 @@ exports.acceptInvitation = function(req, res) {
 																		event: req.body.event_name,
 																		attendee_name: req.body.invitee_fName + " " + req.body.invitee_lName,
 																		address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard',
-																		email_id: recruiterEmail._id
+																		email_id: recruiterEmail._id.toString()
 																	}, function(err, emailHTML) {
 																		recruiterEmail.message = recruiterMailOptions.html = emailHTML;
 																		smtpTransport.sendMail(recruiterMailOptions, function(err, info) {
@@ -758,7 +758,7 @@ exports.acceptInvitation = function(req, res) {
 													name: req.body.invitee_fName,
 													event: req.body.event_name,
 													address : 'http://frank.jou.ufl.edu/recruiters',
-													email_id: attendeeEmail._id
+													email_id: attendeeEmail._id.toString()
 												}, function(err, emailHTML) {
 													attendeeEmail.message = attendeeMailOptions.html = emailHTML;
 													smtpTransport.sendMail(attendeeMailOptions, function(err, info) {
@@ -781,7 +781,7 @@ exports.acceptInvitation = function(req, res) {
 													event: req.body.event_name,
 													password : pass,
 													address : 'http://frank.jou.ufl.edu/recruiters',
-													email_id: attendeeEmail._id
+													email_id: attendeeEmail._id.toString()
 												}, function(err, emailHTML) {
 													attendeeEmail.message = attendeeMailOptions.html = emailHTML;
 													smtpTransport.sendMail(attendeeMailOptions, function(err, info) {
@@ -827,7 +827,7 @@ exports.acceptInvitation = function(req, res) {
 																		event: req.body.event_name,
 																		attendee_name: req.body.invitee_fName + " " + req.body.invitee_lName,
 																		address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard',
-																		email_id: recruiterEmail._id
+																		email_id: recruiterEmail._id.toString()
 																	}, function(err, emailHTML) {
 																		recruiterEmail.message = recruiterMailOptions.html = emailHTML;
 																		smtpTransport.sendMail(recruiterMailOptions, function(err, info) {

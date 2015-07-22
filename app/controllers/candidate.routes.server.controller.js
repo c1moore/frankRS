@@ -529,7 +529,7 @@ exports.setEventStatus = function(req,res) {
 														res.render(filepath, {
 															name: 		user.fName,
 															event_name: _event.name,
-															email_id: 	candidateEmail._id
+															email_id: 	candidateEmail._id.toString()
 														}, function(err, emailHTML) {
 															if(err) {
 																return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
@@ -601,7 +601,7 @@ exports.setEventStatus = function(req,res) {
 															name: 		newUser.fName,
 															event_name: _event.name,
 															password: 	newUserPassword,
-															email_id: 	candidateEmail._id
+															email_id: 	candidateEmail._id.toString()
 														}, function(err, emailHTML) {
 															if(err) {
 																return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
@@ -832,7 +832,7 @@ exports.setEventAccepted = function(req,res){
 														res.render(filepath, {
 															name: 		user.fName,
 															event_name: _event.name,
-															email_id: 	candidateEmail._id
+															email_id: 	candidateEmail._id.toString()
 														}, function(err, emailHTML) {
 															if(err) {
 																return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
@@ -905,7 +905,7 @@ exports.setEventAccepted = function(req,res){
 															name: 		newUser.fName,
 															event_name: _event.name,
 															password: 	newUserPassword,
-															email_id: 	candidateEmail._id
+															email_id: 	candidateEmail._id.toString()
 														}, function(err, emailHTML) {
 															if(err) {
 																return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
