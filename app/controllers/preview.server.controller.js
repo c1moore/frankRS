@@ -71,8 +71,16 @@ exports.getPreviewTemplate = function(req, res) {
 					if(err) {
 						return res.status(400).send({message : err});
 					} else {
-						if(results[1])
+						if(results[1]) {
+							//For now, remove items we do not want.  Eventually we may translate a conditional section in swig to a conditional element in Angular (this would be done by replacing {% if testvar %}{% endif %} => <div ng-if="testvar"></div>)
+							var conditonals = /{%.*?%}/g;
+							var email_id = /{{email_id}}/g;
+
+							results[0] = results[0].replace(email_id, "");
+							results[0] = results[0].replace(conditonals, "");
+							
 							return res.status(200).send({'preview' : results[0]});
+						}
 						else
 							return res.status(401).send({message : 'You do not have permission to view this template.'});
 					}
