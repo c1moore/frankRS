@@ -16,17 +16,15 @@
 		<div>
 			<!-- app launcher area -->
 			<div ng-class="buttonsGrid" id="frank-buttons-containter" class="frank-main-view">
-					<!-- these divs col values will generatgoogle mapse dynamicaly through angular -->
+				<center>
 					<div ng-repeat="button in data.buttons | roles:userRoles" class="homeButtonContainer">
 						<div class="homeButton text-center">
 							<a href="{{button.link}}">
 								<img src="{{button.image}}" class="homepage-nav-buttons" alt="Place holder">
-								<div class="caption">
-									<h3 id="{{button.titleId}}">{{button.name}}</h3>
-								</div>
 							</a>
 						</div>
 					</div>
+				</center>
 			</div>
 
 			<!-- <div ng-show='displayComments' class="panel panel-primary col-md-2 homepage-comments">
