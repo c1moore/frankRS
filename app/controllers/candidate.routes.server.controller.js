@@ -1333,23 +1333,18 @@ exports.deleteCandidateByEvent = function(req, res) {
 * candidate.  Of course, this requires a user to be logged in.
 */
 exports.userCandidate = function(req, res) {
-	try {
-		if(!req.isAuthenticated()) {
-			return res.status(401).send({message : "User is not logged in."});
-		} else {
-			var user_id = new mongoose.Types.ObjectId(req.user._id);
-			Candidate.findOne({user_id : user_id}, function(err, candidate) {
-				if(err) {
-					return res.status(400).send(err);
-				} else if(!candidate) {
-					return res.status(204).send({message : "User not found."});
-				} else {
-					return res.status(200).send(candidate);
-				}
-			});
-		}
-	} catch(err) {
-		console.log(err);
-		return res.status(500).send();
+	if(!req.isAuthenticated()) {
+		return res.status(401).send({message : "User is not logged in."});
+	} else {
+		var user_id = new mongoose.Types.ObjectId(req.user._id);
+		Candidate.findOne({user_id : user_id}, function(err, candidate) {
+			if(err) {
+				return res.status(400).send(err);
+			} else if(!candidate) {
+				return res.status(204).send({message : "User not found."});
+			} else {
+				return res.status(200).send(candidate);
+			}
+		});
 	}
 };
