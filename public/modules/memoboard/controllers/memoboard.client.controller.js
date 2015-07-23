@@ -10,7 +10,6 @@ angular.module('memoboard').controller('memoboardCtrl', ['$scope', 'Authenticati
 			}
 		} else {
 			$scope.authentication = Authentication;
-
 			$scope.editorExpanded = true;
 
 			$scope.removable = function(user_id) {
@@ -30,13 +29,13 @@ angular.module('memoboard').controller('memoboardCtrl', ['$scope', 'Authenticati
 				return date.toLocaleDateString() + " " + date.toLocaleTimeString();
 			};
 
-			$scope.getComments = function() {
+			$scope.getComments = function(eventChanged) {
 				if(eventSelector.postEventId) {
 					$http.post('/comments/getSocialCommentsForEvent', {event_id : eventSelector.postEventId}).success(function(response) {
 						$scope.comments = response;
 						$scope.commentsErr = "";
 					}).error(function(response, status) {
-						if(typeof $scope.comments === 'string') {
+						if(typeof $scope.comments === 'string' || eventChanged) {
 							$scope.comments = false;
 						}
 
@@ -51,10 +50,12 @@ angular.module('memoboard').controller('memoboardCtrl', ['$scope', 'Authenticati
 			//Watch for changes in the selected event and update the comments accordingly.
 			$scope.$watch(function() {
 				return eventSelector.selectedEvent;
-			}, $scope.getComments);
+			}, function() {
+				$scope.getComments(true);
+			});
 
 			//Update comments every 1 minute.
-			$interval($scope.getComments(), 60000);
+			$interval($scope.getComments(false), 60000);
 
 			$scope.interests = {
 				"Arts" : "img/interests/arts.png",
