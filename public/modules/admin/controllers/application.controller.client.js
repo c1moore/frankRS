@@ -102,7 +102,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 					* was related to authentication, the interceptor will take care of routing the user.
 					* Problems related to no events existing will be treated the same way for now from here.
 					*/
-					if(status !== 401) {
+					if(status !== 401 && $location.path()=== "/leaderboard") {
 						$timeout(function() {
 							$scope.getCandidates();
 						}, 5000);

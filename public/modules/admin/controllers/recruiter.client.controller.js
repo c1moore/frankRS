@@ -52,7 +52,7 @@ angular.module('admin').controller('recruitersController', ['$scope', 'ngTablePa
 						$scope.tabErr = res.message;
 					} else {
 						//Fail silently, since the interceptor should handle any important cases and notices can be annoying.  Attempt again in 5 seconds.
-						if(status !==401) {
+						if(status !==401 && $location.path()=== "/leaderboard") {
 							$timeout(function() {
 								$scope.getCandidates();
 							}, 5000);

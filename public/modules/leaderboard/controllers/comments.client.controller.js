@@ -45,9 +45,11 @@ angular.module('leaderboard').controller('commentsCtrl', ['$scope', 'Authenticat
 							}
 
 							//Fail silently, since the interceptor should handle any important cases and notices can be annoying.  Attempt again in 5 seconds.
-							$timeout(function() {
-								$scope.getComments();
-							}, 5000);
+							if($location.path()=== "/leaderboard") {
+								$timeout(function() {
+									$scope.getComments();
+								}, 5000);
+							}
 						}
 					});
 				}

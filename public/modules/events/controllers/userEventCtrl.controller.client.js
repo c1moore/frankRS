@@ -33,7 +33,7 @@ angular.module('events').controller('userEventCtrl', ['$scope', 'ngTableParams',
 					}
 				}).error(function(error, status) {
 					//Fail silently, since the interceptor should handle any important cases and notices can be annoying.  Attempt again in 5 seconds.
-					if(status !== 401) {
+					if(status !== 401 && $location.path()=== "/events") {
 						$timeout(function() {
 							getEvents();
 						}, 5000);
