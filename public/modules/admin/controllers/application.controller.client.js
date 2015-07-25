@@ -71,7 +71,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 					if($scope.isEventSelected) {
 						$scope.selectedEvent = eventSelector.selectedEvent;
 						$scope.selectedEvent = selectedEvent;
-						$scope.getCandidates();
+						$scope.getCandidates(true);
 					}
 				}
 			);
@@ -86,7 +86,7 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 				$scope.selectEvents[0] = {label : "Error", event_id : "error"};
 			});
 
-			$scope.getCandidates = function() {
+			$scope.getCandidates = function(eventChanged) {
 				$http.post('/candidate/getCandidatesByEvent', {event_id:eventSelector.postEventId}).success(function(data) {
 					for(var i = 0; i < data.length; i++) {
 						data[i].displayName = data[i].lName + ", " + data[i].fName;
@@ -97,6 +97,10 @@ angular.module('admin').controller('applicationController', ['$scope', 'ngTableP
 
 					rowUpdated = false;
 				}).error(function(error, status) {
+					if(eventChanged || error.message === "No candidates found.") {
+						$scope.candidates = [];
+					}
+					
 					/**
 					* If the error was not an authentication problem, try reloading the data.  If the problem
 					* was related to authentication, the interceptor will take care of routing the user.
