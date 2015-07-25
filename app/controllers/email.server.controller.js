@@ -977,7 +977,8 @@ exports.sendCandidateEmail = function(req, res) {
 						event_id: 	new mongoose.Types.ObjectId(req.body.event_id)
 					});
 
-					tempmail.message = "<img src='http://www.frank2016.net/image?eid=" + tempmail._id.toString() + "&amp;image=email_header.png' /><br />" + req.body.message;
+					tempmail.message =	"<!DOCTYPE html><html><head><title>" + tempmail.subject + "</title><meta http-equiv='Content-Type' content='text/html; charset=UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'></head><body style='font-family: \"Helvetica\", sans-serif; width: 750px;'>" +
+										"<img src='http://www.frank2016.net/image?eid=" + tempmail._id.toString() + "&amp;image=email_header.png' /><br /><div style='width: 600px; margin: auto;'>" + req.body.message + "</div></body></html>";
 					
 					smtpTransport.sendMail({
 						to: 		tempmail.to,
@@ -1066,7 +1067,8 @@ exports.sendNonuserEmail = function(req, res) {
 				event_id: 	new mongoose.Types.ObjectId(req.body.event_id)
 			});
 
-			tempmail.message = "<img src='http://www.frank2016.net/image?eid=" + tempmail._id.toString() + "&amp;image=email_header.png' /><br />" + req.body.message;
+			tempmail.message = 	"<!DOCTYPE html><html><head><title>" + tempmail.subject + "</title><meta http-equiv='Content-Type' content='text/html; charset=UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'></head><body style='font-family: \"Helvetica\", sans-serif; width: 750px;'>" +
+								"<img src='http://www.frank2016.net/image?eid=" + tempmail._id.toString() + "&amp;image=email_header.png' /><br /><div style='width: 600px; margin: auto;'>" + req.body.message + "</div></body></html>";
 			
 			smtpTransport.sendMail({
 				to: 		tempmail.to,
