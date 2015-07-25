@@ -6,7 +6,7 @@
   margin-bottom: 5px;
 }
 .frank-invite-preview-modal {
-  width: 650px;
+  width: 760px !important;
   height: 425px;
   margin: auto;
 }
@@ -213,7 +213,7 @@ body {
 }
 
 .frank-invite-preview-modal .modal-dialog {
-  width: 625px;
+  width: 750px;
 }
 .frank-invite-preview-modal .modal-body {
   width: 100%;
