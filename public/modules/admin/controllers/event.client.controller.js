@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams', '$http', '$timeout', '$filter', '$modal', '$window', 'Authentication', '$location',
-	function($scope, ngTableParams, $http, $timeout, $filter, $modal, $window, Authentication, $location) {
+angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams', '$http', '$timeout', '$filter', '$modal', '$window', 'Authentication', '$location', 'eventSelector',
+	function($scope, ngTableParams, $http, $timeout, $filter, $modal, $window, Authentication, $location, eventSelector) {
 		if(!Authentication.user || _.intersection(Authentication.user.roles, ['admin']).length === 0) {
 			if(!Authentication.user) {
 				$location.path('/signin');
@@ -61,6 +61,8 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 
 		        	$scope.newEvent = null;
 		        	$scope.eventForm.$setPristine(true);
+
+		        	eventSelector.eventSelect();
 	        	}).error(function(response, status) {
 	        		if(status !== 401) {
 		        		$window.alert("There was an error adding " + newEvent.name + ".  Please make sure all information is correct and try again.\n\nError: " + response.message + "\nIf this error continues, please <a href='/#!/problems'>report it</a>.");
@@ -74,6 +76,8 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 
 				$http.post('/events/setEventObj',{event_id : event._id, event:event}).success(function() {
 					getEvents();
+
+		        	eventSelector.eventSelect();
 				}).error(function(response, status) {
 					if(status !== 401) {
 						getEvents();
@@ -114,6 +118,8 @@ angular.module('admin').controller ('eventController', ['$scope', 'ngTableParams
 			var deleteEvent = function(event) {
 				$http.post('/events/delete',{event_id:event._id}).success(function() {
 					getEvents();
+
+		        	eventSelector.eventSelect();
 				}).error(function(res, status) {
 					if(status !== 401) {
 						getEvents();
