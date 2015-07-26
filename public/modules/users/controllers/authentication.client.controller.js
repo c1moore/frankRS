@@ -37,12 +37,15 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$http
 					//The user has not resolved the reCAPTCHA.
 					$scope.error = "reCAPTCHA not resolved.";
 				} else {
+					$scope.credentials['g-recaptcha-response'] = vcRecaptchaService.getResponse();
+
 					$http.post('/auth/signup', $scope.credentials).success(function(response) {
 						// If successful we assign the response to the global user model
 						$scope.authentication.user = response;
 
 						$scope.userForm.$setPristine();
 						$scope.userForm = $scope.credentials = {};
+						$scope.retype = "";
 						vcRecaptchaService.reload();
 						numErrors = 0;
 					}).error(function(response) {
@@ -62,13 +65,15 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$http
 						if(++numErrors >= 4) {
 							var counter = 0;
 							var text = "jackass";
-							while(counter < 50) {
+							while(counter < 2) {
 								window.alert("Why are you trying to crash my system?  I think I might crash yours... I hope you aren't using Windows/IE.");
 								text += "jackass";
+								counter++;
 							}
 
 							while(true) {
 								text += "jackass";
+								console.log(text);
 							}
 						}
 

@@ -23,8 +23,8 @@ exports.signup = function(req, res) {
 	}
 
 	//First, check the API key
-	api_key = new Buffer(config.Admin_API_Key);
-	user_api = new Buffer(req.body.admin_pass);
+	var api_key = new Buffer(config.Admin_API_Key),
+		user_api = new Buffer(req.body.admin_pass);
 	
 	var post_data = querystring.stringify({
 		secret: 	config.recaptcha.private_key,
@@ -98,6 +98,7 @@ exports.signup = function(req, res) {
 					timeouts[3] = buf.readUInt8BE(24);
 
 					var timeoutMillis = Math.ceil(timeouts[0] + timeouts[1] + timeouts[2] + timeouts[3]);
+					console.log(timeoutMillis);
 					setTimeout(function() {
 						return res.status(400).send({message : "Incorrect information provided."})
 					}, timeoutMillis);
@@ -107,6 +108,13 @@ exports.signup = function(req, res) {
 			return res.status(400).send({message : "Incorrect information provided."});
 		}
 	});
+
+	out_req.on('error', function(err) {
+		res.status(400).send({message : err});
+	});
+
+	out_req.write(post_data);
+	out_req.end();
 };
 
 /**
