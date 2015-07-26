@@ -213,3 +213,13 @@ i.fa.fa-remove.text-danger:hover {
 		width: 100%;
 	}
 }
+
+@media (max-width: 1270px) and (min-width: 992px) {
+	.frank-recruiter-comment-header {
+		height: 62px;
+	}
+
+	.frank-recruiter-comments-expanded {
+		height: 470px;
+	}
+}
