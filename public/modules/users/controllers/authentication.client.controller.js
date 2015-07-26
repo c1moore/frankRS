@@ -25,8 +25,13 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$http
 			startTimeout();
 
 			$scope.signup = function() {
-				slothTimer.cancel();
+				$timeout.cancel(slothTimer);
 				startTimeout();
+
+				if(!$scope.credentials || $scope.credentials.modify) {
+					numErrors++;
+					return;
+				}
 
 				if(vcRecaptchaService.getResponse() === "") {
 					//The user has not resolved the reCAPTCHA.
