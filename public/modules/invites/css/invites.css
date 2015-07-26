@@ -121,10 +121,9 @@
 #invitation_buttons {
   width: 244px;
   margin: auto;
+  margin-bottom: 25px;
 }
 #invite {
-  min-height: 465px;
-  height: 60vh;
   position: absolute;
   margin-left: 5%;
   width: 60vw;
