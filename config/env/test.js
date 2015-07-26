@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-	db: 'mongodb://localhost/frank-recruiter-system-test',
+	db: 'mongodb://127.0.0.1/frank-recruiter-system-test',
 	db_options: {
 		username : process.env.MONGO_USER || "",
 		pwd : process.env.MONGO_PWD || ""
@@ -51,7 +51,7 @@ module.exports = {
 		private_key: process.env.G_RECAPTCHA_PRIVATE_KEY || 'G_RECAPTCHA_PRIVATE_KEY'
 	},
 	programmer: {
-		email: process.env.PROGRAMMER_EMAIL || 'PROGRAMMER_EMAIL'
+		email: process.env.FRANK_PROGRAMMER_EMAIL || 'PROGRAMMER_EMAIL'
 	},
 	zapier_api: process.env.FRANK_ZAP_API_KEY || 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe',
 	Admin_API_Key: process.env.FRANK_ADMIN_API_KEY || 'frank_admin_api_key'
