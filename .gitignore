@@ -3,9 +3,10 @@
 .sass-cache/
 npm-debug.log
 node_modules/
-public/lib
+public/lib/
 app/tests/coverage/
 .bower-*/
 .idea/
 populator/user_summary.txt
 populator/__pycache__
+

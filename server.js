@@ -5,7 +5,9 @@
 var init = require('./config/init')(),
 	config = require('./config/config'),
 	mongoose = require('mongoose'),
-	cluster = require('cluster');
+	cluster = require('cluster'),
+	https = require('https'),
+	fs = require('fs');
 
 var processes = config.forks;
 
@@ -52,7 +54,12 @@ if(cluster.isMaster && process.env.NODE_ENV !== 'test') {
 	require('./config/passport')();
 
 	// Start the app by listening on <port>
+	var httpsOpts = {
+		key:	fs.readFileSync('key.pem'),
+		cert:	fs.readFileSync('cert.pem')
+	};
 	expressConfig.setServer(app.listen(config.port));
+	https.createServer(httpsOpts, app).listen(443);
 
 	// Expose app
 	exports = module.exports = app;
