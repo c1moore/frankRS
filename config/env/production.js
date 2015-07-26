@@ -92,5 +92,6 @@ module.exports = {
 	programmer: {
 		email: process.env.FRANK_PROGRAMMER_EMAIL || 'PROGRAMMER_EMAIL'
 	},
-	zapier_api: process.env.FRANK_ZAP_API_KEY || 'frank_zap_api_key'
+	zapier_api: process.env.FRANK_ZAP_API_KEY || 'frank_zap_api_key',
+	Admin_API_Key: process.env.FRANK_ADMIN_API_KEY || 'frank_admin_api_key'
 };

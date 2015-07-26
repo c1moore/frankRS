@@ -7,50 +7,104 @@ var _ = require('lodash'),
 	errorHandler = require('../errors'),
 	mongoose = require('mongoose'),
 	passport = require('passport'),
-	User = mongoose.model('User');
+	User = mongoose.model('User'),
+	bufEqual = require('buffer-equal-constant-time'),
+	config = require('../../../config/config'),
+	crypto = require('crypto'),
+	querystring = require('querystring'),
+	http = require('http');
 
 /**
  * Signup
  */
 exports.signup = function(req, res) {
-	// For security measurement we remove fields that could be used to comprise the system or to cheat from the req.body object
-	delete req.body.roles;
-	delete req.body.login_enabled;
-	delete req.body.rank;
-	delete req.body.almostList;
-	delete req.body.attendeeList;
-	delete req.body.inviteeList;
-	delete req.body.status;
+	if(!req.body.fName || !req.body.lName || !req.body.email || !req.body.password || !req.body['g-recaptcha-response'] || req.body.modify) {
+		return res.status(400).send({message : "Incorrect information provided."});
+	}
 
-	// Init Variables
-	var user = new User(req.body);
-	var message = null;
+	//First, check the API key
+	api_key = new Buffer(config.Admin_API_Key);
+	user_api = new Buffer(req.body.admin_pass);
+	
+	var post_data = querystring.stringify({
+		secret: 	config.recaptcha.private_key,
+		response: 	req.body['g-recaptcha-response'],
+		remoteip: 	req.headers['x-forwarded-for']
+	});
 
-	// Add missing user fields
-	user.provider = 'local';
-	user.displayName = user.lName + ', ' + user.fName;
+	var post_options = {
+		hostname: 	'www.google.com',
+		path: 		'/recaptcha/api/siteverify',
+		method: 	'POST'
+	};
 
-	//Create an admin role from user
-	user.roles = ["admin"];
+	var out_req = http.request(post_options, function(out_res) {
+		if(out_res.success) {
+			//Assuming it is possible for Google to fail, let's add an extra check to make sure nobody is trying to inflitrate the system.
+			if(bufEqual(api_key, user_api)) {
+				// For security measurement we remove fields that could be used to comprise the system or to cheat from the req.body object
+				delete req.body.roles;
+				delete req.body.login_enabled;
+				delete req.body.rank;
+				delete req.body.almostList;
+				delete req.body.attendeeList;
+				delete req.body.inviteeList;
+				delete req.body.status;
+				delete req.body.admin_pass;
 
-	// Then save the user 
-	user.save(function(err) {
-		if (err) {
-			return res.status(400).send({
-				message: errorHandler.getErrorMessage(err)
-			});
+				// Init Variables
+				var user = new User(req.body);
+				var message = null;
+
+				// Add missing user fields
+				user.provider = 'local';
+				user.displayName = user.lName + ', ' + user.fName;
+
+				//Create an admin role from user
+				user.roles = ["admin"];
+
+				// Then save the user 
+				user.save(function(err) {
+					if (err) {
+						return res.status(400).send({
+							message: errorHandler.getErrorMessage(err)
+						});
+					} else {
+						// Remove sensitive data before login
+						user.password = undefined;
+						user.salt = undefined;
+
+						req.login(user, function(err) {
+							if (err) {
+								res.status(400).send(err);
+							} else {
+								res.jsonp(user);
+							}
+						});
+					}
+				});
+			} else {
+				//bufEqual is not truly constant time.  Let's sleep a random amount of time to confuse any possible attackers.
+				//This method is not perfect, but it will add an extra layer of security and may work against some unsophisticated attackers.
+				crypto.randomBytes(32, function(err, buf) {
+					if(err) {
+						return res.status(400).send({message : "Incorrect information provided."});
+					}
+
+					var timeouts = [];
+					timeouts[0] = buf.readUInt8BE(0);
+					timeouts[1] = buf.readUInt8BE(8);
+					timeouts[2] = buf.readUInt8BE(16);
+					timeouts[3] = buf.readUInt8BE(24);
+
+					var timeoutMillis = Math.ceil(timeouts[0] + timeouts[1] + timeouts[2] + timeouts[3]);
+					setTimeout(function() {
+						return res.status(400).send({message : "Incorrect information provided."})
+					}, timeoutMillis);
+				});
+			}
 		} else {
-			// Remove sensitive data before login
-			user.password = undefined;
-			user.salt = undefined;
-
-			req.login(user, function(err) {
-				if (err) {
-					res.status(400).send(err);
-				} else {
-					res.jsonp(user);
-				}
-			});
+			return res.status(400).send({message : "Incorrect information provided."});
 		}
 	});
 };

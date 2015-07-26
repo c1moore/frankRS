@@ -1,45 +1,43 @@
 <section class="row" data-ng-controller="AuthenticationController">
-	<h3 class="col-md-12 text-center">Sign up using your social accounts</h3>
-	<div class="col-md-12 text-center">
-		<a href="/auth/facebook" class="undecorated-link">
-			<img src="/modules/users/img/buttons/facebook.png">
-		</a>
-		<a href="/auth/twitter" class="undecorated-link">
-			<img src="/modules/users/img/buttons/twitter.png">
-		</a>
-		<a href="/auth/google" class="undecorated-link">
-			<img src="/modules/users/img/buttons/google.png">
-		</a>
-		<a href="/auth/linkedin" class="undecorated-link">
-			<img src="/modules/users/img/buttons/linkedin.png">
-		</a>
-		<a href="/auth/github" class="undecorated-link">
-			<img src="/modules/users/img/buttons/github.png">
-		</a>
-	</div>
-	<h3 class="col-md-12 text-center">Or with your email</h3>
-	<div class="col-xs-offset-2 col-xs-8 col-md-offset-5 col-md-2">
+	<h3 class="col-md-12 text-center">Create A New Admin Account</h3>
+	<p class="col-md-12 text-center">Since this page is very dangerous in the wrong hands, there are several checks to make sure you are not a robot and you have proper access to this page.  Please be patient and make sure to read all instructions.  Don't take too long (or be too quick).</p>
+	<div class="alert alert-danger" style="width:90%; margin: auto;" role="alert"><i class="fa fa-exclamation-triangle"></i> <b>WARNING:</b> Use this page at your own risk.  Neither the developer nor <em>frank</em> are responsible for any problems that may occur from misuse of this page.</div>
+	<div class="col-md-12">
 		<form name="userForm" data-ng-submit="signup()" class="signin form-horizontal" novalidate autocomplete="off">
 			<fieldset>
 				<div class="form-group frank-form-group-1">
-					<label for="fName">First Name</label>
+					<label for="fName">Admin First Name</label>
 					<input type="text" required id="fName" name="fName" class="form-control" data-ng-model="credentials.fName" placeholder="First Name">
 				</div>
 				<div class="form-group frank-form-group-1">
-					<label for="lName">Last Name</label>
+					<label for="lName">Admin Last Name</label>
 					<input type="text" id="lName" name="lName" class="form-control" data-ng-model="credentials.lName" placeholder="Last Name">
 				</div>
 				<div class="form-group frank-form-group-1">
-					<label for="email">Email</label>
+					<label for="email">Admin Email</label>
 					<input type="email" id="email" name="email" class="form-control" data-ng-model="credentials.email" placeholder="Email">
 				</div>
 				<div class="form-group frank-form-group-1">
-					<label for="password">Password</label>
+					<label for="password">Admin Password</label>
 					<input type="password" id="password" name="password" class="form-control" data-ng-model="credentials.password" placeholder="Password">
 				</div>
+				<div class="form-group frank-form-group-1">
+					<label for="organization">Admin Organization</label>
+					<input type="text" id="organization" name="organization" class="form-control" data-ng-model="credentials.organization" placeholder="Organization">
+				</div>
+				<div class="form-group frank-form-group-1">
+					<label for="modify">Do NOT Modify This Field</label>
+					<input type="text" id="modify" name="modify" class="form-control" data-ng-model="credentials.modify" placeholder="Password">
+				</div>
+				<div class="form-group frank-form-group-1">
+					<label for="admin_pass">Admin API Key</label>
+					<input type="text" id="admin_pass" name="admin_pass" class="form-control" data-ng-model="credentials.admin_pass" placeholder="API Key">
+				</div>
+				<center class="form-group frank-form-group-1">
+					<div vc-recaptcha key="'6LftBAgTAAAAAGbAPuGbghxHSZvWFlibSulA3RFO'"></div>
+				</center>
 				<div class="text-center form-group frank-form-group-1">
-					<button type="submit" class="btn btn-large btn-primary">Sign up</button>&nbsp; or&nbsp;
-					<a href="/#!/signin" class="show-signup">Sign in</a>
+					<button type="submit" class="btn btn-large btn-primary frank-main-view">Create Admin</button>
 				</div>
 				<div data-ng-show="error" class="text-center text-danger">
 					<strong data-ng-bind="error"></strong>
