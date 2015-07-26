@@ -433,15 +433,10 @@ exports.sendInvitation = function(req, res) {
 														super_next(err, false);
 													}
 
-													console.log("No error");
-													console.log(super_next);
 													super_next(false, true);
-													console.log("Maybe error");
-
 												});
 											}],
 											function(err, results) {
-												console.log("Here");
 												if(err) {
 													console.log("Line 435", err);
 													return res.status(400).send({message: 'Invitation has been sent to ' + req.body.fName + ', but an error occurred.  Please contact frank about this error.', error : err});
