@@ -27,7 +27,7 @@ exports.signup = function(req, res) {
 		user_api = new Buffer(req.body.admin_pass);
 
 	var post_data = querystring.stringify({
-		private: 	config.recaptcha.private_key,
+		secret: 	config.recaptcha.private_key,
 		response: 	req.body['g-recaptcha-response']
 	});
 

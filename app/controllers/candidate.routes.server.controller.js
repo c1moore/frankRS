@@ -14,7 +14,7 @@ var errorHandler = require('./errors'),
 	nodemailer = require("nodemailer"),
 	smtpPool = require('nodemailer-smtp-pool'),
 	config = require('../../config/config'),
-	http = require('http'),
+	https = require('https'),
 	querystring = require('querystring'),
 	_ = require('lodash'),
 	path = require('path');
@@ -1210,48 +1210,60 @@ exports.createNonuserCandidate = function(req, res) {
 
 	var post_data = querystring.stringify({
 		secret: 	config.recaptcha.private_key,
-		response: 	req.body['g-recaptcha-response'],
-		remoteip: 	req.headers['x-forwarded-for']
+		response: 	req.body['g-recaptcha-response']
 	});
 
 	var post_options = {
 		hostname: 	'www.google.com',
 		path: 		'/recaptcha/api/siteverify',
-		method: 	'POST'
+		method: 	'POST',
+		port:		443,
+		headers:	{
+			'Content-Type':		'application/x-www-form-urlencoded',
+			'Content-Length':	post_data.length
+		}
 	};
 
-	var out_req = http.request(post_options, function(out_res) {
-		//Only add candidate if the request was successful or if the private key is Google's fake private key.
-		if(out_res.success || config.recaptcha.private_key === "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe") {
-			if(!req.body.note || checkUserNote(req.body.note) === "") {
-				return res.status(400).send({message : "Note does not have proper format or not sent."});
-			}
+	var out_req = https.request(post_options, function(out_res) {
+		var body = '';
+		out_res.on('data', function(chunk) {
+			body += chunk;
+		});
 
-			var candidate = new Candidate({
-				fName: 			req.body.fName,
-				lName: 			req.body.lName,
-				email: 			req.body.email,
-				organization: 	req.body.organization,
-				note: 			req.body.note
-			});
-
-			candidate.save(function(err) {
-				if(err) {
-					return res.status(400).send({message : err});
-				} else {
-					return res.status(200).send({message : "Form submitted."});
+		out_res.on('end', function() {
+			body = JSON.parse(body);
+			//Only add candidate if the request was successful or if the private key is Google's fake private key.
+			if(out_res.success || config.recaptcha.private_key === "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe") {
+				if(!req.body.note || checkUserNote(req.body.note) === "") {
+					return res.status(400).send({message : "Note does not have proper format or not sent."});
 				}
-			});
-		} else {
-			return res.status(400).send({message : false, 'g-errors' : out_res['error-codes']});
-		}
+
+				var candidate = new Candidate({
+					fName: 			req.body.fName,
+					lName: 			req.body.lName,
+					email: 			req.body.email,
+					organization: 	req.body.organization,
+					note: 			req.body.note
+				});
+
+				candidate.save(function(err) {
+					if(err) {
+						return res.status(400).send({message : err});
+					} else {
+						return res.status(200).send({message : "Form submitted."});
+					}
+				});
+			} else {
+				return res.status(400).send({message : false, 'g-errors' : out_res['error-codes']});
+			}
+		});
 	});
 
 	out_req.on('error', function(err) {
 		res.status(400).send({message : err});
 	});
 
-	out_req.write(post_data);
+	out_req.write(post_data, 'utf8');
 	out_req.end();
 };
 
