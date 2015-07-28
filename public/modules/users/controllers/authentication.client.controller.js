@@ -4,9 +4,6 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$http
 	function($scope, $http, $location, Authentication, eventSelector, $window, vcRecaptchaService, $timeout) {
 		$scope.authentication = Authentication;
 
-		// If user is signed in then redirect back home
-		if ($scope.authentication.user) $location.path('/');
-
 		if($location.path() === "/create/admin") {
 			var numErrors = 0,
 				superhuman = true,
@@ -83,23 +80,28 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$http
 			};
 		}
 
-		$scope.signin = function() {
-			$http.post('/auth/signin', $scope.credentials).success(function(response) {
-				// If successful we assign the response to the global user model
-				$scope.authentication.user = response;
+		if($location.path() === "/signin") {
+			// If user is signed in then redirect back home
+			if ($scope.authentication.user) $location.path('/');
 
-				//Tell eventSelector to get data from db.
-				eventSelector.eventSelect();
+			$scope.signin = function() {
+				$http.post('/auth/signin', $scope.credentials).success(function(response) {
+					// If successful we assign the response to the global user model
+					$scope.authentication.user = response;
 
-				// And redirect to the index page
-				if(!response.updated || response.updated === response.created) {
-					$location.path('/settings/password');
-				} else {
-					$location.path('/');
-				}
-			}).error(function(response) {
-				$scope.error = response.message;
-			});
-		};
+					//Tell eventSelector to get data from db.
+					eventSelector.eventSelect();
+
+					// And redirect to the index page
+					if(!response.updated || response.updated === response.created) {
+						$location.path('/settings/password');
+					} else {
+						$location.path('/');
+					}
+				}).error(function(response) {
+					$scope.error = response.message;
+				});
+			};
+		}
 	}
 ]);
