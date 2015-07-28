@@ -70,6 +70,7 @@ exports.signup = function(req, res) {
 					// Add missing user fields
 					user.provider = 'local';
 					user.displayName = user.lName + ', ' + user.fName;
+					user.login_enabled = true;
 	
 					//Create an admin role from user
 					user.roles = ["admin"];
