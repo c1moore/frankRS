@@ -508,6 +508,12 @@ exports.acceptInvitation = function(req, res) {
 			}
 		}
 
+		//Remove the name.
+		var startRegex = /.*?\(/g;
+		var endRegex = /\).*/g;
+		req.body.recruiter_email = req.body.recruiter_email.replace(startRegex, '');
+		req.body.recruiter_email = req.body.recruiter_email.replace(endRegex, '');
+
 		User.findOne({email : req.body.invitee_email}, function(err, attendee) {
 			if(err) {
 				return res.status(400).send({message : err});
