@@ -17,7 +17,7 @@ angular.module('recruiter-form').controller('NewRecruiterCtrl', ['$scope', '$htt
 				$scope.error = "reCAPTCHA not resolved.";
 			} else {
 				$scope.recruiter['g-recaptcha-response'] = vcRecaptchaService.getResponse();
-				$scope.note = "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Reason:\n" + $scope.recruiter.reason + "\n\n***Connections:\n" + $scope.recruiter.connections + "\n\n***Recruiter Skills:\n" + $scope.recruiter.skills + "\n***************";
+				$scope.recruiter.note = "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Reason:\n" + $scope.recruiter.reason + "\n\n***Connections:\n" + $scope.recruiter.connections + "\n\n***Recruiter Skills:\n" + $scope.recruiter.skills + "\n***************";
 
 				$http.post('/candidate/new/no_user', $scope.recruiter).success(function(res) {
 					$scope.success = true;

@@ -1233,7 +1233,7 @@ exports.createNonuserCandidate = function(req, res) {
 		out_res.on('end', function() {
 			body = JSON.parse(body);
 			//Only add candidate if the request was successful or if the private key is Google's fake private key.
-			if(out_res.success || config.recaptcha.private_key === "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe") {
+			if(body.success || config.recaptcha.private_key === "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe") {
 				if(!req.body.note || checkUserNote(req.body.note) === "") {
 					return res.status(400).send({message : "Note does not have proper format or not sent."});
 				}
@@ -1254,7 +1254,7 @@ exports.createNonuserCandidate = function(req, res) {
 					}
 				});
 			} else {
-				return res.status(400).send({message : false, 'g-errors' : out_res['error-codes']});
+				return res.status(400).send({message : false, 'g-errors' : body['error-codes']});
 			}
 		});
 	});
