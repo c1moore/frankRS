@@ -637,10 +637,12 @@ exports.acceptInvitation = function(req, res) {
 															updateEventLists(newAttendee._id, evnt._id, function(err) {
 																if(err) {
 																	//There's not much we can/should do at this point.  Returning an error would keep us from notifying the recruiter.  Resending this request from Zapier would cost extra mulah.  Since the error was logged already, we will ignore the error from here.
+																	console.log(err);
 																}
 																updateRanks(evnt._id, function(err) {
 																	if(err) {
 																		//There's not much we can/should do at this point.  Returning an error would keep us from notifying the recruiter.  Resending this request from Zapier would cost extra mulah.  Since the error was logged already, we will ignore the error from here.
+																		console.log(err);
 																	}
 																	res.render('templates/invitation-accepted-recruiter-email', {
 																		recruiter_name : result.fName,
@@ -824,10 +826,12 @@ exports.acceptInvitation = function(req, res) {
 															updateEventLists(attendee._id, evnt._id, function(err) {
 																if(err) {
 																	//There's not much we can/should do at this point.  Returning an error would keep us from notifying the recruiter.  Resending this request from Zapier would cost extra mulah.  Since the error was logged already, we will ignore the error from here.
+																	console.log(err);
 																}
 																updateRanks(evnt._id, function(err) {
 																	if(err) {
 																		//There's not much we can/should do at this point.  Returning an error would keep us from notifying the recruiter.  Resending this request from Zapier would cost extra mulah.  Since the error was logged already, we will ignore the error from here.
+																		console.log(err);
 																	}
 																	res.render('templates/invitation-accepted-recruiter-email', {
 																		recruiter_name : result.fName,

@@ -843,15 +843,15 @@ exports.setEventAccepted = function(req,res){
 																return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
 															}
 
-															mailOptions.html = emailHTML;
+															candidateEmail.message = mailOptions.html = emailHTML;
 
 															smtpTransport.sendMail(mailOptions, function(err) {
 																if(err) {
 																	return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
 																} else {
-																	candidateEmail.save(function() {
+																	candidateEmail.save(function(err) {
 																		if(err) {
-																			console.log("Error saving message to candidate 615.");
+																			console.log("Error saving message to candidate 615.", err);
 																		}
 																		return res.status(200).send({message : "New recruiter added and notification sent!"});
 																	});
@@ -916,15 +916,15 @@ exports.setEventAccepted = function(req,res){
 																return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
 															}
 
-															mailOptions.html = emailHTML;
+															candidateEmail.message = mailOptions.html = emailHTML;
 
 															smtpTransport.sendMail(mailOptions, function(err) {
 																if(err) {
 																	return res.status(400).send({message : "Recruiter was not notified.  Please report this problem immediately and include the candidate's name."});
 																} else {
-																	candidateEmail.save(function() {
+																	candidateEmail.save(function(err) {
 																		if(err) {
-																			console.log("Error saving message to candidate 615.");
+																			console.log("Error saving message to candidate 615.", err);
 																		}
 																		return res.status(200).send({message : "New recruiter added and notification sent!"});
 																	});
