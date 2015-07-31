@@ -1100,7 +1100,8 @@ exports.sendNonuserEmail = function(req, res) {
 		var emails = [];
 		var task_cb = function(errObj) {
 			if(errObj.error) {
-				errs = err;
+				errs = errObj.error;
+				console.log(errObj);
 				if(errObj.email) {
 					emails.push(errObj.email);
 				}
