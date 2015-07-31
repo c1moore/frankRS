@@ -866,9 +866,9 @@ exports.setEventAccepted = function(req,res){
 								/**
 								* The candidate is not already a user.  We need to create an account for them.
 								*/
-								var newUserPassword = newCandidatePass([result.fName, result.lName, result.email]);
-
 								} else {
+									var newUserPassword = newCandidatePass([result.fName, result.lName, result.email]);
+									
 									var newUser = new User({
 										fName: result.fName,
 										lName: result.lName,
