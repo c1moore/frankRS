@@ -124,7 +124,7 @@
   margin-bottom: 25px;
 }
 #invite {
-  position: absolute;
+  min-height: 580px;
   margin-left: 5%;
   width: 60vw;
   background-color: white;
@@ -283,5 +283,9 @@ body {
   #invitee_email {
     display: block;
     margin-left: 0;
+  }
+
+  #invite {
+    min-height: 660px;
   }
 }
