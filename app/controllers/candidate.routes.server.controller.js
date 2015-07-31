@@ -82,24 +82,29 @@ var checkUserNote = function(note, replace, original) {
 * candidate_email].
 */
 var newCandidatePass = function(credentialsArr) {
-	var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-	var password = [];
-	var salt = '';
+	var pwd = '';
+	while(!pwd) {
+		var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_-+=<>?.";
+		var password = [];
+		var salt = '';
 
-	for (var i=0; i<5; i++) {
-		salt += chars[Math.round(_.random(0, 1, true) * (chars.length - 1))];
+		for (var i=0; i<5; i++) {
+			salt += chars[Math.round(_.random(0, 1, true) * (chars.length - 1))];
+		}
+
+		var pos = _.random(0, 2, false);
+		password[pos] = salt;
+
+		for(var i=0; i<3; i++) {
+			if(!password[i]) {
+				password[i] = _.random(0, credentialsArr.length, false);
+			}
+		}
+
+		pwd = password.join('');
 	}
 
-	var pos = _.random(0, 2, false);
-	password[pos] = salt;
-
-	for(var i=0; i<3; i++) {
-		if(!password[i])
-			_.random(0, credentialsArr.length, false);
-	}
-	console.log(password.join(''));
-
-	return password.join('');
+	return pwd;
 };
 
 exports.getCandidates = function(req, res) {
@@ -799,9 +804,9 @@ exports.setEventAccepted = function(req,res){
 									}
 		 							
 		 							user.roles.addToSet("recruiter");
+		 							user.login_enabled = true;
 
 									//User is no longer a candidate for this event, now they are a recruiter.
-
 									result.update({$set : {user_id : user._id}, $pull : {events : {event_id : event_id}}}, function(err) {
 		 								if(err) {
 		 									return res.status(400).send({message : err});

@@ -41,23 +41,29 @@ var tempPass = function() {
 * attendee_email, attendee_organization].
 */
 var newAttendeePass = function(credentialsArr) {
-	var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-	var password = [];
-	var salt = '';
+	var pwd = '';
+	while(!pwd) {
+		var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_-+=<>?.";
+		var password = [];
+		var salt = '';
 
-	for (var i=0; i<5; i++) {
-		salt += chars[Math.round(_.random(0, 1, true) * (chars.length - 1))];
+		for (var i=0; i<5; i++) {
+			salt += chars[Math.round(_.random(0, 1, true) * (chars.length - 1))];
+		}
+
+		var pos = _.random(0, 2, false);
+		password[pos] = salt;
+
+		for(var i=0; i<3; i++) {
+			if(!password[i]) {
+				password[i] = _.random(0, credentialsArr.length, false);
+			}
+		}
+
+		pwd = password.join('');
 	}
 
-	var pos = _.random(0, 2, false);
-	password[pos] = salt;
-
-	for(var i=0; i<3; i++) {
-		if(!password[i])
-			_.random(0, credentialsArr.length, false);
-	}
-
-	return password.join('');
+	return pwd;
 };
 
 /**
@@ -499,7 +505,6 @@ exports.acceptInvitation = function(req, res) {
 		*/
 
 		var expectedFields = ['api_key', 'invitee_fName', 'invitee_lName', 'invitee_email', 'organization', 'event_name', 'recruiter_email'];
-		console.log(req.body.recruiter_email);
 
 		for(var i=0; i<expectedFields.length; i++) {
 			if(!req.body[expectedFields[i]]) {
@@ -509,13 +514,11 @@ exports.acceptInvitation = function(req, res) {
 			}
 		}
 
-		console.log(req.body.recruiter_email);
 		//Remove the name.
 		var startRegex = /.*?\(/g;
 		var endRegex = /\).*/g;
 		req.body.recruiter_email = req.body.recruiter_email.replace(startRegex, '');
 		req.body.recruiter_email = req.body.recruiter_email.replace(endRegex, '');
-		console.log(req.body.recruiter_email);
 
 		User.findOne({email : req.body.invitee_email}, function(err, attendee) {
 			if(err) {
@@ -1101,7 +1104,6 @@ exports.sendNonuserEmail = function(req, res) {
 		var task_cb = function(errObj) {
 			if(errObj.error) {
 				errs = errObj.error;
-				console.log(errObj);
 				if(errObj.email) {
 					emails.push(errObj.email);
 				}
