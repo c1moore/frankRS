@@ -499,6 +499,7 @@ exports.acceptInvitation = function(req, res) {
 		*/
 
 		var expectedFields = ['api_key', 'invitee_fName', 'invitee_lName', 'invitee_email', 'organization', 'event_name', 'recruiter_email'];
+		console.log(req.body.recruiter_email);
 
 		for(var i=0; i<expectedFields.length; i++) {
 			if(!req.body[expectedFields[i]]) {
@@ -508,11 +509,13 @@ exports.acceptInvitation = function(req, res) {
 			}
 		}
 
+		console.log(req.body.recruiter_email);
 		//Remove the name.
 		var startRegex = /.*?\(/g;
 		var endRegex = /\).*/g;
 		req.body.recruiter_email = req.body.recruiter_email.replace(startRegex, '');
 		req.body.recruiter_email = req.body.recruiter_email.replace(endRegex, '');
+		console.log(req.body.recruiter_email);
 
 		User.findOne({email : req.body.invitee_email}, function(err, attendee) {
 			if(err) {

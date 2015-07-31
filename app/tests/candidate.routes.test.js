@@ -1929,7 +1929,7 @@ describe('Candidate Route Integration Tests:', function() {
 		it('should allow guests to become candidates.', function(done) {
 			tempAgent
 				.post("http://localhost:3001/candidate/new/no_user")
-				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************", 'g-recaptcha-response' : "testrun"})
+				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************", 'g-recaptcha-response' : "testrun", event_id : event2._id.toString()})
 				.end(function(err, res) {
 					if(err) {
 						return done(err);
@@ -1950,6 +1950,8 @@ describe('Candidate Route Integration Tests:', function() {
 						newCandidate.fName.should.equal("Calvin");
 						newCandidate.lName.should.equal("Moore");
 						newCandidate.note.search(/PLEASE DO NOT DELETE OR EDIT THIS SECTION:/).should.be.greaterThan(-1);
+						newCandidate.events.length.should.equal(1);
+						newCandidate.events[0].event_id.toString().should.equal(event2._id.toString());
 						done();
 					});
 				});
@@ -1958,7 +1960,7 @@ describe('Candidate Route Integration Tests:', function() {
 		it('should reject guests that do not specify the fName field.', function(done) {
 			tempAgent
 				.post("http://localhost:3001/candidate/new/no_user")
-				.send({lName : "Moore", email : 'nicetry@noemail.com', note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************", 'g-recaptcha-response' : "testrun"})
+				.send({lName : "Moore", email : 'nicetry@noemail.com', note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************", 'g-recaptcha-response' : "testrun", event_id : event2._id.toString()})
 				.end(function(err, res) {
 					if(err) {
 						return done(err);
@@ -1984,7 +1986,7 @@ describe('Candidate Route Integration Tests:', function() {
 		it('should reject guests that do not specify the lName field.', function(done) {
 			tempAgent
 				.post("http://localhost:3001/candidate/new/no_user")
-				.send({fName : "Moore", email : 'nicetry@noemail.com', note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************", 'g-recaptcha-response' : "testrun"})
+				.send({fName : "Moore", email : 'nicetry@noemail.com', note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************", 'g-recaptcha-response' : "testrun", event_id : event2._id.toString()})
 				.end(function(err, res) {
 					if(err) {
 						return done(err);
@@ -2010,7 +2012,7 @@ describe('Candidate Route Integration Tests:', function() {
 		it('should reject guests that do not specify the note field.', function(done) {
 			tempAgent
 				.post("http://localhost:3001/candidate/new/no_user")
-				.send({fName : "Calvin", lName : "Moore", email : 'nicetry@noemail.com', 'g-recaptcha-response' : "testrun"})
+				.send({fName : "Calvin", lName : "Moore", email : 'nicetry@noemail.com', 'g-recaptcha-response' : "testrun", event_id : event2._id.toString()})
 				.end(function(err, res) {
 					if(err) {
 						return done(err);
@@ -2036,7 +2038,23 @@ describe('Candidate Route Integration Tests:', function() {
 		it('should reject guests that do not specify the email field.', function(done) {
 			tempAgent
 				.post("http://localhost:3001/candidate/new/no_user")
-				.send({fName : "Calvin", lName : "Moore", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************", 'g-recaptcha-response' : "testrun"})
+				.send({fName : "Calvin", lName : "Moore", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************", 'g-recaptcha-response' : "testrun", event_id : event2._id.toString()})
+				.end(function(err, res) {
+					if(err) {
+						return done(err);
+					}
+
+					res.status.should.equal(400);
+					res.body.message.should.equal("A required field is not specified.");
+
+					done();
+				});
+		});
+
+		it('should reject guests that do not specify the event_id field.', function(done) {
+			tempAgent
+				.post("http://localhost:3001/candidate/new/no_user")
+				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************", 'g-recaptcha-response' : "testrun"})
 				.end(function(err, res) {
 					if(err) {
 						return done(err);
@@ -2052,7 +2070,7 @@ describe('Candidate Route Integration Tests:', function() {
 		it('should reject guests without a valid g-recaptcha-response field.', function(done) {
 			tempAgent
 				.post("http://localhost:3001/candidate/new/no_user")
-				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************", 'g-recaptcha-response' : ""})
+				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Field:\nData\n***************", 'g-recaptcha-response' : "", event_id : event2._id.toString()})
 				.end(function(err, res) {
 					if(err) {
 						return done(err);
@@ -2079,7 +2097,7 @@ describe('Candidate Route Integration Tests:', function() {
 			this.timeout(10000);
 			tempAgent
 				.post("http://localhost:3001/candidate/new/no_user")
-				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n*******\n***Field:\nData\n***************", 'g-recaptcha-response' : "testrun"})
+				.send({fName : "Calvin", lName : "Moore", email : "nicetry@noemail.com", note : "PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n*******\n***Field:\nData\n***************", 'g-recaptcha-response' : "testrun", event_id : event2._id.toString()})
 				.end(function(err, res) {
 					if(err) {
 						return done(err);

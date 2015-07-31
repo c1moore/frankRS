@@ -357,7 +357,7 @@ angular.module("admin").controller("RecruiterInvitationCtrl", ["$scope", "$modal
 		$scope.sentMode = false;
 		$scope.error = false;
 
-		var link = "http://" + $location.host() + "/#!/recruiter/form";
+		var link = "http://" + $location.host() + "/#!/recruiter/form?eid=" + encodeURIComponent(eventSelector.postEventId.toString());
 		var linkHtml = "<a href='" + link + "'>" + link + "</a>";
 		var linkRegex = /#link#/g;
 

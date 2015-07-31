@@ -1204,7 +1204,7 @@ exports.setCandidate = function(req,res){
 * @param g-recaptcha-response - reCAPTCHA response
 */
 exports.createNonuserCandidate = function(req, res) {
-	if(!req.body.fName || !req.body.lName || !req.body.email || !req.body.note || !req.body['g-recaptcha-response']) {
+	if(!req.body.fName || !req.body.lName || !req.body.email || !req.body.note || !req.body['g-recaptcha-response'] || !req.body.event_id) {
 		return res.status(400).send({message : "A required field is not specified."});
 	}
 
@@ -1243,6 +1243,7 @@ exports.createNonuserCandidate = function(req, res) {
 					lName: 			req.body.lName,
 					email: 			req.body.email,
 					organization: 	req.body.organization,
+					events: 		[{event_id : mongoose.Types.ObjectId(req.body.event_id)}],
 					note: 			req.body.note
 				});
 
