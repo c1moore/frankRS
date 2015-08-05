@@ -1131,3 +1131,34 @@ exports.sendNonuserEmail = function(req, res) {
 		};
 	}
 };
+
+/**
+* Route that will render email messages in the browser so all information displayed in the email can be displayed in the browser.
+*
+* @param filename (string) - path to file from the templates folder
+* @param [field] (string, optional) - any fields that should be rendered and the value of that field (e.g. displayName=Moore,Calvin)
+*/
+exports.renderEmailTemplate = function(req, res) {
+	if(!req.query.filename) {
+		return res.status(400).send({message : "No file specified."});
+	}
+
+	var filename = path.normalize(__dirname + "/../views/templates/" + req.query.filename);
+	delete req.query.filename;
+
+	//Since security is a concern and Object.keys() only returns enumerable fields (i.e. not functions), I will build an object to pass into res.render().
+	var queryFields = Object.keys(req.query);
+	var templateObj = {};
+	for(var i = 0; i < queryFields.length; i++) {
+		templateObj[queryFields[i]] = req.query[queryFields[i]];
+	}
+
+	return res.render(filename, templateObj, function(err, renderedTemplate) {
+		if(err) {
+			return res.status(400).send({message : "File not found."});
+		}
+
+		res.setHeader('Content-Type', 'text/html');
+		return res.status(200).send(renderedTemplate);
+	});
+};
