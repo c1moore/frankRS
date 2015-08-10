@@ -72,28 +72,61 @@ var newAttendeePass = function(credentialsArr) {
 var updateRanks = function(event_id, cb) {
 	var mapReduceObj = {};
 	mapReduceObj.map = function() {
-		for(var i = 0; i < this.status.length; i++) {
-			if(this.status[i].event_id.toString() === event_id.toString() && this.status[i].recruiter) {
-				var hasPoints = false;		//Does the user have any points?
-
-				for(var j = 0; j < this.attendeeList.length; j++) {
-					if(this.attendeeList[j].event_id.toString() === event_id.toString()) {
-						emit(this._id, 10);		//People attending are worth 10 points.
-						hasPoints = true;
-					}
-				}
-				for(var j = 0; j < this.inviteeList.length; j++) {
-					if(this.inviteeList[j].event_id.toString() === event_id.toString()) {
-						emit(this._id, 0.5);	//People invited are worth 0.5 points.  The only time invites will make a big enough contribution is when there is a tie between recruiters from number of people attending.
-						hasPoints = true;
-					}
-				}
-
-				if(!hasPoints) {
-					emit(this._id, 0);
-				}
-
+		var isAdmin = false;
+		for(var i = 0; i < this.roles.length; i++) {
+			if(this.roles[i] === 'admin') {
+				isAdmin = true;
 				break;
+			}
+		}
+
+		if(isAdmin) {
+			var hasPoints = false;		//Does the user have any points?
+
+			for(var j = 0; j < this.attendeeList.length; j++) {
+				if(this.attendeeList[j].event_id.toString() === event_id.toString()) {
+					emit(this._id, 10);		//People attending are worth 10 points.
+					hasPoints = true;
+				}
+			}
+			for(var j = 0; j < this.inviteeList.length; j++) {
+				if(this.inviteeList[j].event_id.toString() === event_id.toString()) {
+					emit(this._id, 0.5);	//People invited are worth 0.5 points.  The only time invites will make a big enough contribution is when there is a tie between recruiters from number of people attending.
+					hasPoints = true;
+				}
+			}
+
+			if(!hasPoints) {
+				emit(this._id, 0);
+			}
+		} else {
+			for(var i = 0; i < this.status.length; i++) {
+				if(this.status[i].event_id.toString() === event_id.toString()) {
+					if(!this.status[i].recruiter) {
+						break;
+					}
+
+					var hasPoints = false;		//Does the user have any points?
+
+					for(var j = 0; j < this.attendeeList.length; j++) {
+						if(this.attendeeList[j].event_id.toString() === event_id.toString()) {
+							emit(this._id, 10);		//People attending are worth 10 points.
+							hasPoints = true;
+						}
+					}
+					for(var j = 0; j < this.inviteeList.length; j++) {
+						if(this.inviteeList[j].event_id.toString() === event_id.toString()) {
+							emit(this._id, 0.5);	//People invited are worth 0.5 points.  The only time invites will make a big enough contribution is when there is a tie between recruiters from number of people attending.
+							hasPoints = true;
+						}
+					}
+
+					if(!hasPoints) {
+						emit(this._id, 0);
+					}
+
+					break;
+				}
 			}
 		}
 	};
@@ -267,8 +300,9 @@ exports.sendInvitation = function(req, res) {
 				* First, determine if the user is in fact a recruiter for this event and that the
 				* user has access to this event (i.e. active in the status array is not false).
 				*/
+				var isAdmin = req.hasAuthorization(req.user, ['admin']);
 				var tempi = 0;
-				if(!req.hasAuthorization(req.user, ['admin'])) {
+				if(!isAdmin) {
 					for(; tempi < recruiter.status.length; tempi++) {
 						if(recruiter.status[tempi].event_id.toString() === req.body.event_id.toString()) {
 							if(!recruiter.status[tempi].recruiter || !recruiter.status[tempi].active) {
@@ -281,7 +315,7 @@ exports.sendInvitation = function(req, res) {
 					}
 				}
 
-				if(tempi === recruiter.status.length) {
+				if(tempi === recruiter.status.length && !isAdmin) {
 					//This user is not even associated with this event.
 					return res.status(401).send({message : 'User does not have permission to send invitations for this event.'});
 				}
