@@ -207,13 +207,10 @@ body {
   color: white;
   text-decoration: none;
 }
-
-.frank-invite-preview-modal .modal-dialog {
-  width: 750px;
-}
 .frank-invite-preview-modal .modal-body {
   width: 100%;
   height: 280px;
+  overflow: auto;
 }
 
 /*Overwritten jQuery-UI*/
