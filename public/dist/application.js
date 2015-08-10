@@ -427,7 +427,7 @@ angular.module('admin').controller('RecruiterInvitationCtrl', [
     $scope.sending = false;
     $scope.sentMode = false;
     $scope.error = false;
-    var link = 'http://' + $location.host() + '/#!/recruiter/form';
+    var link = 'http://' + $location.host() + '/#!/recruiter/form?eid=' + encodeURIComponent(eventSelector.postEventId.toString());
     var linkHtml = '<a href=\'' + link + '\'>' + link + '</a>';
     var linkRegex = /#link#/g;
     $scope.spinnerOpts = {
@@ -1305,7 +1305,8 @@ angular.module('core').controller('HomeController', [
               'recruiter',
               'admin'
             ],
-            image: '/modules/core/img/icons/register.png'
+            image: '/modules/core/img/icons/register.png',
+            newTab: true
           }
         ]
       };  //changes button width based on the number of buttons the user can see
@@ -2219,12 +2220,6 @@ angular.module('invites').controller('invitesCtrl', [
           getPreview();
         }
       });
-      $scope.$watch(function () {
-        return eventSelector.postEventId;
-      }, function () {
-        $scope.invite.event_id = eventSelector.postEventId;
-        getSideTables();
-      });
       $scope.sending = false;
       $scope.send = function () {
         $scope.sending = true;
@@ -2262,8 +2257,8 @@ angular.module('invites').controller('invitesCtrl', [
         });
       };
       /*
-		* Logic for sidebars
-		*/
+			* Logic for sidebars
+			*/
       $scope.firstSelected = true;
       $scope.secondSelected = false;
       $scope.thirdSelected = false;
@@ -2327,22 +2322,39 @@ angular.module('invites').controller('invitesCtrl', [
       };
       getSideTables();
       /*
-		* Logic for preview.
-		*/
+			* Logic for preview.
+			*/
       var previewOptions = {};
-      console.log($scope.authentication);
+      var minPreviewWindowSize = 750;
+      //Miniumum size (inclusive) of the window before the window will open the preview in a new tab.
+      $scope.previewNewTab = false;
+      $scope.previewQuery = '';
+      if ($window.innerWidth <= minPreviewWindowSize) {
+        $scope.previewNewTab = true;
+      }
+      $scope.$watch(function () {
+        return $window.innerWidth;
+      }, function () {
+        if ($window.innerWidth <= minPreviewWindowSize) {
+          $scope.previewNewTab = true;
+        } else if ($scope.previewNewTab) {
+          $scope.previewNewTab = false;
+        }
+      });
       previewService.preview.recruiter_name = $scope.authentication.user.fName;
       previewService.preview.sender_email = $scope.authentication.user.email;
       previewService.preview.event_name = $scope.invite.event_name;
       previewService.preview.receiver_email = $scope.invite.invitee_email;
       previewService.preview.receiver_name = $scope.invite.fName;
       previewService.preview.message = $scope.invite.message;
+      $scope.previewQuery = 'filename=' + encodeURIComponent(eventSelector.selectedEvent.replace(/\s{2,}/, ' ').replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()\[\]'\\@+"|<>?]/g, '').replace(/\s/g, '_')) + '&recruiter_name=' + encodeURIComponent(previewService.preview.recruiter_name) + '&sender_email=' + encodeURIComponent(previewService.preview.sender_email) + '&event_name=' + encodeURIComponent(previewService.preview.event_name) + '&receiver_email=' + encodeURIComponent(previewService.preview.receiver_email) + '&receiver_name=' + encodeURIComponent(previewService.preview.receiver_name) + '&message=' + encodeURIComponent(previewService.preview.message);
       $scope.$watchCollection('invite', function () {
         previewService.preview.sender_email = $scope.authentication.user.email;
         previewService.preview.event_name = $scope.invite.event_name;
         previewService.preview.receiver_email = $scope.invite.invitee_email;
         previewService.preview.receiver_name = $scope.invite.fName;
         previewService.preview.message = $scope.invite.message;
+        $scope.previewQuery = 'filename=' + encodeURIComponent(eventSelector.selectedEvent.replace(/\s{2,}/, ' ').replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()\[\]'\\@+"|<>?]/g, '').replace(/\s/g, '_')) + '&recruiter_name=' + encodeURIComponent(previewService.preview.recruiter_name) + '&sender_email=' + encodeURIComponent(previewService.preview.sender_email) + '&event_name=' + encodeURIComponent(previewService.preview.event_name) + '&receiver_email=' + encodeURIComponent(previewService.preview.receiver_email) + '&receiver_name=' + encodeURIComponent(previewService.preview.receiver_name) + '&message=' + encodeURIComponent(previewService.preview.message);
       });
       var getPreview = function () {
         var request = {
@@ -2355,24 +2367,7 @@ angular.module('invites').controller('invitesCtrl', [
         }).error(function (response, status) {
           previewOptions = {};
           previewOptions.template = response.message;
-          previewOptions.template = '<div class=\'modal-header\'>' + '<h3 class=\'modal-title\'>{{eventSelector.selectedEvent}} Invitation Preview</h3>' + '</div>' + '<div class=\'modal-body\' style=\'overflow: auto;\'>' + previewOptions.template + '</div>' + '<div class=\'modal-footer\'>' + '<button class=\'btn btn-primary\' ng-click=\'closePreview()\'>Got it!</button>' + '</div>';  // if(status === 401) {
-                                                                                                                                                                                                                                                                                                                                                                                                   // 	if(response.message === "User is not logged in.") {
-                                                                                                                                                                                                                                                                                                                                                                                                   // 		$location.path('/signin');
-                                                                                                                                                                                                                                                                                                                                                                                                   // 	} else {
-                                                                                                                                                                                                                                                                                                                                                                                                   // 		$location.path('/');
-                                                                                                                                                                                                                                                                                                                                                                                                   // 	}
-                                                                                                                                                                                                                                                                                                                                                                                                   // } else if(status === 400) {
-                                                                                                                                                                                                                                                                                                                                                                                                   // 	previewOptions.template = response.message;//"There was an error getting the template.  Please try refreshing the page or selecting an event in the top right-hand corner.";
-                                                                                                                                                                                                                                                                                                                                                                                                   // 	previewOptions.template = "<div class='modal-header'>" +
-                                                                                                                                                                                                                                                                                                                                                                                                   // 									"<h3 class='modal-title'>{{eventSelector.selectedEvent}} Invitation Preview</h3>" +
-                                                                                                                                                                                                                                                                                                                                                                                                   // 								"</div>" +
-                                                                                                                                                                                                                                                                                                                                                                                                   // 								"<div class='modal-body' style='overflow: auto;'>" +
-                                                                                                                                                                                                                                                                                                                                                                                                   // 									previewOptions.template +
-                                                                                                                                                                                                                                                                                                                                                                                                   // 								"</div>" +
-                                                                                                                                                                                                                                                                                                                                                                                                   // 								"<div class='modal-footer'>" +
-                                                                                                                                                                                                                                                                                                                                                                                                   // 									"<button class='btn btn-primary' ng-click='closePreview()'>Got it!</button>" +
-                                                                                                                                                                                                                                                                                                                                                                                                   // 								"</div>";
-                                                                                                                                                                                                                                                                                                                                                                                                   // }
+          previewOptions.template = '<div class=\'modal-header\'>' + '<h3 class=\'modal-title\'>{{eventSelector.selectedEvent}} Invitation Preview</h3>' + '</div>' + '<div class=\'modal-body\' style=\'overflow: auto;\'>' + previewOptions.template + '</div>' + '<div class=\'modal-footer\'>' + '<button class=\'btn btn-primary\' ng-click=\'closePreview()\'>Got it!</button>' + '</div>';
         });
       };
       $scope.togglePreview = function () {
@@ -2385,6 +2380,13 @@ angular.module('invites').controller('invitesCtrl', [
           previewService.preview.modalInstance = $modal.open(previewOptions);
         }
       };
+      $scope.$watch(function () {
+        return eventSelector.postEventId;
+      }, function () {
+        $scope.invite.event_id = eventSelector.postEventId;
+        $scope.previewQuery = 'filename=' + encodeURIComponent(eventSelector.selectedEvent.replace(/\s{2,}/, ' ').replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()\[\]'\\@+"|<>?]/g, '').replace(/\s/g, '_')) + '&recruiter_name=' + encodeURIComponent(previewService.preview.recruiter_name) + '&sender_email=' + encodeURIComponent(previewService.preview.sender_email) + '&event_name=' + encodeURIComponent(previewService.preview.event_name) + '&receiver_email=' + encodeURIComponent(previewService.preview.receiver_email) + '&receiver_name=' + encodeURIComponent(previewService.preview.receiver_name) + '&message=' + encodeURIComponent(previewService.preview.message);
+        getSideTables();
+      });
     }
   }
 ]);
@@ -2869,6 +2871,7 @@ angular.module('problems').controller('ProblemController', [
             event_id: eventSelector.postEventId
           };
         var permissions = $scope.problem.contact === 'true' ? 'can' : 'cannot';
+        $scope.user.email = $scope.user.email.replace(/\n/, '<br />');
         var message = '<p>A problem was reported for the frank recruiter system.  Here are a few details:</p>' + '<br />' + '<br />' + '<b>Browser: </b>' + ($scope.problem.browser !== 'other' ? $scope.problem.browser : $scope.problem.other) + '<br />' + '<b>Version: </b>' + $scope.problem.version + '<br />' + '<b>OS: </b>' + ($scope.problem.os !== 'other' ? $scope.problem.os : $scope.problem.os_other) + '<br />' + '<b>Page: </b>' + $scope.problem.page + '<br />' + '<b>Description: </b>' + $scope.problem.description + '<br />' + '<br />' + '<b>***User Information***</b><br />' + '&nbsp;&nbsp;&nbsp;&nbsp;<b>Name: </b>' + $scope.user.fName + $scope.user.lName + '<br />' + '&nbsp;&nbsp;&nbsp;&nbsp;<b>Email: </b>' + $scope.user.email + '<br />' + '&nbsp;&nbsp;&nbsp;&nbsp;<b>Roles: </b>' + $scope.user.roles + '<br />' + '<br />' + 'You <b>' + permissions + '</b> reply to this message for more information.';
         data.message = angular.toJson(message);
         $http.post('/send/programmer', data).success(function () {
@@ -2916,7 +2919,8 @@ angular.module('recruiter-form').controller('NewRecruiterCtrl', [
         $scope.error = 'reCAPTCHA not resolved.';
       } else {
         $scope.recruiter['g-recaptcha-response'] = vcRecaptchaService.getResponse();
-        $scope.note = 'PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Reason:\n' + $scope.recruiter.reason + '\n\n***Connections:\n' + $scope.recruiter.connections + '\n\n***Recruiter Skills:\n' + $scope.recruiter.skills + '\n***************';
+        $scope.recruiter.note = 'PLEASE DO NOT DELETE OR EDIT THIS SECTION:\n**********\n***Reason:\n' + $scope.recruiter.reason + '\n\n***Connections:\n' + $scope.recruiter.connections + '\n\n***Recruiter Skills:\n' + $scope.recruiter.skills + '\n***************';
+        $scope.recruiter.event_id = $location.search().eid;
         $http.post('/candidate/new/no_user', $scope.recruiter).success(function (res) {
           $scope.success = true;
         }).error(function (res, status) {
@@ -3024,9 +3028,6 @@ angular.module('users').controller('AuthenticationController', [
   '$timeout',
   function ($scope, $http, $location, Authentication, eventSelector, $window, vcRecaptchaService, $timeout) {
     $scope.authentication = Authentication;
-    // If user is signed in then redirect back home
-    if ($scope.authentication.user)
-      $location.path('/');
     if ($location.path() === '/create/admin') {
       var numErrors = 0, superhuman = true, slothTimer;
       $timeout(function () {
@@ -3090,22 +3091,27 @@ angular.module('users').controller('AuthenticationController', [
         }
       };
     }
-    $scope.signin = function () {
-      $http.post('/auth/signin', $scope.credentials).success(function (response) {
-        // If successful we assign the response to the global user model
-        $scope.authentication.user = response;
-        //Tell eventSelector to get data from db.
-        eventSelector.eventSelect();
-        // And redirect to the index page
-        if (!response.updated || response.updated === response.created) {
-          $location.path('/settings/password');
-        } else {
-          $location.path('/');
-        }
-      }).error(function (response) {
-        $scope.error = response.message;
-      });
-    };
+    if ($location.path() === '/signin') {
+      // If user is signed in then redirect back home
+      if ($scope.authentication.user)
+        $location.path('/');
+      $scope.signin = function () {
+        $http.post('/auth/signin', $scope.credentials).success(function (response) {
+          // If successful we assign the response to the global user model
+          $scope.authentication.user = response;
+          //Tell eventSelector to get data from db.
+          eventSelector.eventSelect();
+          // And redirect to the index page
+          if (!response.updated || response.updated === response.created) {
+            $location.path('/settings/password');
+          } else {
+            $location.path('/');
+          }
+        }).error(function (response) {
+          $scope.error = response.message;
+        });
+      };
+    }
   }
 ]);'use strict';
 angular.module('users').controller('PasswordController', [
