@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>You're going to {{event_name}}</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<style type="text/css">
+			a {
+				color: #73c92d;
+			}
+			
+			p {
+				padding: 10px 20px;
+				text-align: left;
+				color: black;
+			}
+			
+			@media only screen and (max-width: 480px){
+				body{
+					width:100% !important;
+					min-width:100% !important;
+				}
+			}
+		</style>
+	</head>
+	<body style="font-family: 'Helvetica', sans-serif; width: 750px;">
+		<div style="width: 600px; text-align: right; display: inline-block; margin-left: 75px;">
+			<a href="http://www.frank2016.net/" target="_blank" style="font-size:9px; float: right;">View in browser</a>
+		</div>
+		<hr style="margin-top: 0; margin-bottom: 0;" />
+		<br />
+			<img src="http://www.frank2016.net/image?eid={{email_id}}&amp;image=email_header.png" />
+		<div style="width: 600px; margin: auto;">
+			<center><h1>YOUR INVITATION TO <em>frank</em>2016 IS HERE</h1></center>
+			<br />
+			{% if message %}
+				<center>
+					<div style="border: 1px solid black; border-radius: 7px; width: 75%;">
+						<h4 style="text-align:left; margin-left:5px;">{{recruiter_name}} says:</h4>
+						<p style="margin-left:10px;">{{message}}</p>
+					</div>
+				</center>
+				<br />
+			{% endif %}
+			<p>You're invited to join us for <em>frank</em>, the foremost gathering of movement builders and rabble-rousers who use strategic communications to drive change.  Each year, strategists, scholars, journalists, storytellers, non-profit leaders and activists come to the historic Hippodome Theatre in Gainesville, Florida, to share the best of what they know about using strategic communications to drive change.</p>
+			<p>Last year's speakers included Anastasia Khoo of the Human Rights Campaign, Grist's Chip Giller, cognitive scientist Stephen Pinker and NPR's Shankar Vedantam.  Check out videos of last year's speakers and a highlight reel <a href="http://frank.jou.ufl.edu/frank-2015/frank-2015-recap">here</a>.</p>
+			<p>When you come to <em>frank</em>, you join a vibrant community of the world's most sophisticated communicators &mdash; people taking on big challenges like climate change, marriage equality, poverty and better health.</p>
+			<p>This is your personal invitation to <em>frank</em>.  It's kind of a big deal.  We put a lot of thought into who we invite to the gathering to make sure we have a balance of perspectives from the corporate, foundation, academic and non-profit sectors.</p>
+			<p>At <em>frank</em>, you'll get great talks rooted in fresh scientific insights from scholars like Brendan Nyhan, lessons learned in the front lines of change from activists like Ai-Jen Poo mixed up with plenty of opportunities to spend time with speakers and other <em>frank</em>sters in Gainesville's vibrant downtown scene.</p>
+			<p>We'll kick things off with a Welcome Rally Tuesday, February 23 at 6 pm, and the program will begin in earnest at noon the following day.  We'll wrap up Friday, February 26, at 1:30 pm.</p>
+			<p>Register <a href="https://www.eventbrite.com/e/frank2016-test-tickets-17966594568" target="_blank">here</a> to join us.  Use the password "frankster" and the promo code <b>StaKalo</b> to get 15% off your registration fee when you register before September 1.</p>
+			<p>And grab your hotel room at the <a href="http://www.hilton.com/en/hi/reservations/index.jhtml?hotel=GNVDTHX&amp;groupCode=FGB/" target="_blank">Hampton Inn</a> or <a href="http://www.holidayinn.com/hotels/us/en/gainesville/gnvuc/hoteldetail?qAdlt=1&amp;qBrs=6c.hi.ex.rs.ic.cp.in.sb.cw.cv.ul.vn&amp;qChld=0&amp;qFRA=1&amp;qGRM=0&amp;qGrpCd=FK6&amp;qPSt=0&amp;qRRSrt=rt&amp;qRef=df&amp;qRms=1&amp;qRpn=1&amp;qRpp=12&amp;qSHp=1&amp;qSmP=3&amp;qSrt=sBR&amp;qWch=0&amp;srb_u=1&amp;icdv=99801505&amp;icdv=99801505/%E2%80%9C" target="_blank">Holiday Inn</a> now.</p>
+		</div>
+	</body>
+</html>
