@@ -6,17 +6,13 @@
   margin-bottom: 5px;
 }
 .frank-invite-preview-modal {
-  width: 760px !important;
+  width: 792px !important;
   height: 425px;
   margin: auto;
 }
 .frank-invite-preview-modal .modal-dialog{
   margin: 0;
-}
-.frank-invite-preview-modal .modal-body {
-  width: 568px;
-  height: 250px;
-  overflow: auto;
+  width: 782px;
 }
 .frank-invites-sidebar{
   position: fixed;
@@ -188,6 +184,7 @@ body {
 }
 .modal.ui-draggable {
   position: relative;
+  top: -615px;
 }
 .panel-group .panel + .panel{
   margin-top: 0;
@@ -210,13 +207,10 @@ body {
   color: white;
   text-decoration: none;
 }
-
-.frank-invite-preview-modal .modal-dialog {
-  width: 750px;
-}
 .frank-invite-preview-modal .modal-body {
   width: 100%;
   height: 280px;
+  overflow: auto;
 }
 
 /*Overwritten jQuery-UI*/

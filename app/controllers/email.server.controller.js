@@ -72,28 +72,61 @@ var newAttendeePass = function(credentialsArr) {
 var updateRanks = function(event_id, cb) {
 	var mapReduceObj = {};
 	mapReduceObj.map = function() {
-		for(var i = 0; i < this.status.length; i++) {
-			if(this.status[i].event_id.toString() === event_id.toString() && this.status[i].recruiter) {
-				var hasPoints = false;		//Does the user have any points?
-
-				for(var j = 0; j < this.attendeeList.length; j++) {
-					if(this.attendeeList[j].event_id.toString() === event_id.toString()) {
-						emit(this._id, 10);		//People attending are worth 10 points.
-						hasPoints = true;
-					}
-				}
-				for(var j = 0; j < this.inviteeList.length; j++) {
-					if(this.inviteeList[j].event_id.toString() === event_id.toString()) {
-						emit(this._id, 0.5);	//People invited are worth 0.5 points.  The only time invites will make a big enough contribution is when there is a tie between recruiters from number of people attending.
-						hasPoints = true;
-					}
-				}
-
-				if(!hasPoints) {
-					emit(this._id, 0);
-				}
-
+		var isAdmin = false;
+		for(var i = 0; i < this.roles.length; i++) {
+			if(this.roles[i] === 'admin') {
+				isAdmin = true;
 				break;
+			}
+		}
+
+		if(isAdmin) {
+			var hasPoints = false;		//Does the user have any points?
+
+			for(var j = 0; j < this.attendeeList.length; j++) {
+				if(this.attendeeList[j].event_id.toString() === event_id.toString()) {
+					emit(this._id, 10);		//People attending are worth 10 points.
+					hasPoints = true;
+				}
+			}
+			for(var j = 0; j < this.inviteeList.length; j++) {
+				if(this.inviteeList[j].event_id.toString() === event_id.toString()) {
+					emit(this._id, 0.5);	//People invited are worth 0.5 points.  The only time invites will make a big enough contribution is when there is a tie between recruiters from number of people attending.
+					hasPoints = true;
+				}
+			}
+
+			if(!hasPoints) {
+				emit(this._id, 0);
+			}
+		} else {
+			for(var i = 0; i < this.status.length; i++) {
+				if(this.status[i].event_id.toString() === event_id.toString()) {
+					if(!this.status[i].recruiter) {
+						break;
+					}
+
+					var hasPoints = false;		//Does the user have any points?
+
+					for(var j = 0; j < this.attendeeList.length; j++) {
+						if(this.attendeeList[j].event_id.toString() === event_id.toString()) {
+							emit(this._id, 10);		//People attending are worth 10 points.
+							hasPoints = true;
+						}
+					}
+					for(var j = 0; j < this.inviteeList.length; j++) {
+						if(this.inviteeList[j].event_id.toString() === event_id.toString()) {
+							emit(this._id, 0.5);	//People invited are worth 0.5 points.  The only time invites will make a big enough contribution is when there is a tie between recruiters from number of people attending.
+							hasPoints = true;
+						}
+					}
+
+					if(!hasPoints) {
+						emit(this._id, 0);
+					}
+
+					break;
+				}
 			}
 		}
 	};
@@ -267,8 +300,9 @@ exports.sendInvitation = function(req, res) {
 				* First, determine if the user is in fact a recruiter for this event and that the
 				* user has access to this event (i.e. active in the status array is not false).
 				*/
+				var isAdmin = req.hasAuthorization(req.user, ['admin']);
 				var tempi = 0;
-				if(!req.hasAuthorization(req.user, ['admin'])) {
+				if(!isAdmin) {
 					for(; tempi < recruiter.status.length; tempi++) {
 						if(recruiter.status[tempi].event_id.toString() === req.body.event_id.toString()) {
 							if(!recruiter.status[tempi].recruiter || !recruiter.status[tempi].active) {
@@ -281,7 +315,7 @@ exports.sendInvitation = function(req, res) {
 					}
 				}
 
-				if(tempi === recruiter.status.length) {
+				if(tempi === recruiter.status.length && !isAdmin) {
 					//This user is not even associated with this event.
 					return res.status(401).send({message : 'User does not have permission to send invitations for this event.'});
 				}
@@ -1130,4 +1164,35 @@ exports.sendNonuserEmail = function(req, res) {
 			return res.status(200).send({message : "Email(s) sent!"});
 		};
 	}
+};
+
+/**
+* Route that will render email messages in the browser so all information displayed in the email can be displayed in the browser.
+*
+* @param filename (string) - path to file from the templates folder
+* @param [field] (string, optional) - any fields that should be rendered and the value of that field (e.g. displayName=Moore,Calvin)
+*/
+exports.renderEmailTemplate = function(req, res) {
+	if(!req.query.filename) {
+		return res.status(400).send({message : "No file specified."});
+	}
+
+	var filename = path.normalize(__dirname + "/../views/templates/" + req.query.filename);
+	delete req.query.filename;
+
+	//Since security is a concern and Object.keys() only returns enumerable fields (i.e. not functions), I will build an object to pass into res.render().
+	var queryFields = Object.keys(req.query);
+	var templateObj = {};
+	for(var i = 0; i < queryFields.length; i++) {
+		templateObj[queryFields[i]] = req.query[queryFields[i]];
+	}
+
+	return res.render(filename, templateObj, function(err, renderedTemplate) {
+		if(err) {
+			return res.status(400).send({message : "File not found."});
+		}
+
+		res.setHeader('Content-Type', 'text/html');
+		return res.status(200).send(renderedTemplate);
+	});
 };

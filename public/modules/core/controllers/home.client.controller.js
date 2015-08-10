@@ -29,7 +29,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 					{name:"Leaderboard", description:"See how your friends and competitors rank against you.", link:'/#!/leaderboard', roles:['recruiter','admin'], image: "/modules/core/img/icons/leaderboard.png"},
 					{name:"frank Lounge", description:"Take a look at what people are saying about the events you are attending and weigh in on the chatter.", link:'/#!/franklounge', roles:['admin', 'recruiter', 'attendee'], image: "/modules/core/img/icons/frank_lounge.png"},
 					{name:"Recruiter Registration", description:"Think you got what it takes to be a recruiter for frank?  Then sign up here.  Warning: we only accept the best.", link:'/#!/events', roles:['recruiter', 'attendee'], titleId:"recruiter-request-button-title", image: "/modules/core/img/icons/recruiter_registration.png"},
-					{name:"Register", description:"Register to attend frank 2016.", link:'https://frank2016.eventbrite.com/', roles:['recruiter', 'admin'], image: "/modules/core/img/icons/register.png"}
+					{name:"Register", description:"Register to attend frank 2016.", link:'https://frank2016.eventbrite.com/', roles:['recruiter', 'admin'], image: "/modules/core/img/icons/register.png", newTab : true}
 				]
 				/*,
 				comments: ["Comment 1", "Comment 2"]

@@ -70,16 +70,6 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 				}
 			);
 
-			$scope.$watch (
-				function() {
-					return eventSelector.postEventId;
-				},
-				function() {
-					$scope.invite.event_id = eventSelector.postEventId;
-					getSideTables();
-				}
-			);
-
 			$scope.sending = false;
 			$scope.send = function() {
 				$scope.sending = true;
@@ -127,168 +117,196 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 				});
 			};
 
-		/*
-		* Logic for sidebars
-		*/
-		$scope.firstSelected = true;
-		$scope.secondSelected = false;
-		$scope.thirdSelected = false;
-		$scope.attendees = {}, $scope.attendees.list = [];
-		$scope.invitees = {}, $scope.invitees.list = [];
-		$scope.almosts = {}, $scope.almosts.list = [];
+			/*
+			* Logic for sidebars
+			*/
+			$scope.firstSelected = true;
+			$scope.secondSelected = false;
+			$scope.thirdSelected = false;
+			$scope.attendees = {}, $scope.attendees.list = [];
+			$scope.invitees = {}, $scope.invitees.list = [];
+			$scope.almosts = {}, $scope.almosts.list = [];
 
-		var getSideTables = function() {
-			if($scope.invite.event_id) {
-				var request = {event_id : $scope.invite.event_id};
-				$http.post('/recruiter/attendees', request).success(function(response) {
-					$scope.attendees.list = response;
+			var getSideTables = function() {
+				if($scope.invite.event_id) {
+					var request = {event_id : $scope.invite.event_id};
+					$http.post('/recruiter/attendees', request).success(function(response) {
+						$scope.attendees.list = response;
 
-					if(response.length) {
-						$scope.attendees.error = '';
-					} else {
-						$scope.attendees.error = "What?  How could this be?  Nobody has accepted one of your invitations yet!?!";
-					}
+						if(response.length) {
+							$scope.attendees.error = '';
+						} else {
+							$scope.attendees.error = "What?  How could this be?  Nobody has accepted one of your invitations yet!?!";
+						}
 
-				}).error(function(response, status) {
-					$scope.attendees.list = [];
-					//Since the http interceptor handles 401 cases, simply display a message despite the error code.
-					if(status === 400 && response.message === "User not found or nobody the user invited has signed up to attend yet.") {
-						$scope.attendees.error = "What?  How could this be?  Nobody has accepted one of your invitations yet!?!";
-					} else {
-						$scope.attendees.error = response.message;		//If the interceptor has not redirected the user, this message may contain helpful information.
-					}
-				});
-				
-				$http.post('/recruiter/invitees', request).success(function(response) {
-					$scope.invitees.list = response;
+					}).error(function(response, status) {
+						$scope.attendees.list = [];
+						//Since the http interceptor handles 401 cases, simply display a message despite the error code.
+						if(status === 400 && response.message === "User not found or nobody the user invited has signed up to attend yet.") {
+							$scope.attendees.error = "What?  How could this be?  Nobody has accepted one of your invitations yet!?!";
+						} else {
+							$scope.attendees.error = response.message;		//If the interceptor has not redirected the user, this message may contain helpful information.
+						}
+					});
 					
-					if(response.length) {
-						$scope.invitees.error = '';
-					} else {
-						$scope.invitees.error = "How will anybody have be able to enjoy " + eventSelector.selectedEvent + " without wonderful people like you inviting them?  You should invite more people.";
-					}
-				
-				}).error(function(response, status) {
-					$scope.invitees.list = [];
+					$http.post('/recruiter/invitees', request).success(function(response) {
+						$scope.invitees.list = response;
+						
+						if(response.length) {
+							$scope.invitees.error = '';
+						} else {
+							$scope.invitees.error = "How will anybody have be able to enjoy " + eventSelector.selectedEvent + " without wonderful people like you inviting them?  You should invite more people.";
+						}
 					
-					if(status === 400 && response.message === "User not found or nobody the user invited has signed up to attend yet.") {
-						$scope.invitees.error = "How will anybody have be able to enjoy " + eventSelector.selectedEvent + " without wonderful people like you inviting them?  You should invite more people.";
-					} else {
-						$scope.attendees.error = response.message;
-					}
-				});
+					}).error(function(response, status) {
+						$scope.invitees.list = [];
+						
+						if(status === 400 && response.message === "User not found or nobody the user invited has signed up to attend yet.") {
+							$scope.invitees.error = "How will anybody have be able to enjoy " + eventSelector.selectedEvent + " without wonderful people like you inviting them?  You should invite more people.";
+						} else {
+							$scope.attendees.error = response.message;
+						}
+					});
 
-				$http.post('/recruiter/almosts', request).success(function(response) {
-					$scope.almosts.list = response;
+					$http.post('/recruiter/almosts', request).success(function(response) {
+						$scope.almosts.list = response;
 
-					if(response.length) {
-						$scope.almosts.error = '';
-					} else {
-						$scope.almosts.error = "Nobody has chosen somebody else's invitation over your invitation.  Looks like somebody is popular.";
-					}
+						if(response.length) {
+							$scope.almosts.error = '';
+						} else {
+							$scope.almosts.error = "Nobody has chosen somebody else's invitation over your invitation.  Looks like somebody is popular.";
+						}
 
-				}).error(function(response, status) {
-					$scope.almosts.list = [];
-					
-					if(status === 400 && response.message === "User not found or nobody the user invited has signed up to attend yet.") {
-						$scope.almosts.error = "Nobody has chosen somebody else's invitation over your invitation.  Looks like somebody is popular.";
-					} else {
-						$scope.almosts.error = response.message;
-					}
-				});
-			} else {
-				$scope.attendees.error = "You have not selected an event.  You can do so in the top right-hand corner.";
-				$scope.invitees.error = "You have not selected an event.  You can do so in the top right-hand corner.";
-				$scope.almosts.error = "You have not selected an event.  You can do so in the top right-hand corner.";
+					}).error(function(response, status) {
+						$scope.almosts.list = [];
+						
+						if(status === 400 && response.message === "User not found or nobody the user invited has signed up to attend yet.") {
+							$scope.almosts.error = "Nobody has chosen somebody else's invitation over your invitation.  Looks like somebody is popular.";
+						} else {
+							$scope.almosts.error = response.message;
+						}
+					});
+				} else {
+					$scope.attendees.error = "You have not selected an event.  You can do so in the top right-hand corner.";
+					$scope.invitees.error = "You have not selected an event.  You can do so in the top right-hand corner.";
+					$scope.almosts.error = "You have not selected an event.  You can do so in the top right-hand corner.";
+				}
+			};
+
+			getSideTables();
+
+			/*
+			* Logic for preview.
+			*/
+			var previewOptions = {};
+			var minPreviewWindowSize = 750;		//Miniumum size (inclusive) of the window before the window will open the preview in a new tab.
+			$scope.previewNewTab = false;
+			$scope.previewQuery = "";
+
+			if($window.innerWidth <= minPreviewWindowSize) {
+				$scope.previewNewTab = true;
 			}
-		};
 
-		getSideTables();
+			$scope.$watch(function() {
+				return $window.innerWidth;
+			}, function() {
+				if($window.innerWidth <= minPreviewWindowSize) {
+					$scope.previewNewTab = true;
+				} else if($scope.previewNewTab) {
+					$scope.previewNewTab = false;
+				}
+			});
 
-		/*
-		* Logic for preview.
-		*/
-		var previewOptions = {};
-
-		console.log($scope.authentication);
-
-		previewService.preview.recruiter_name = $scope.authentication.user.fName;
-		previewService.preview.sender_email = $scope.authentication.user.email;
-		previewService.preview.event_name = $scope.invite.event_name;
-		previewService.preview.receiver_email = $scope.invite.invitee_email;
-		previewService.preview.receiver_name = $scope.invite.fName;
-		previewService.preview.message = $scope.invite.message;
-
-		$scope.$watchCollection('invite', function() {
+			previewService.preview.recruiter_name = $scope.authentication.user.fName;
 			previewService.preview.sender_email = $scope.authentication.user.email;
 			previewService.preview.event_name = $scope.invite.event_name;
 			previewService.preview.receiver_email = $scope.invite.invitee_email;
 			previewService.preview.receiver_name = $scope.invite.fName;
 			previewService.preview.message = $scope.invite.message;
-		});
+			$scope.previewQuery =	"filename="			+ encodeURIComponent(eventSelector.selectedEvent.replace(/\s{2,}/, " ").replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()\[\]'\\@+"|<>?]/g, "").replace(/\s/g, "_"))	+
+									"&recruiter_name="	+ encodeURIComponent(previewService.preview.recruiter_name) +
+									"&sender_email="	+ encodeURIComponent(previewService.preview.sender_email)	+
+									"&event_name="		+ encodeURIComponent(previewService.preview.event_name)		+
+									"&receiver_email="	+ encodeURIComponent(previewService.preview.receiver_email)	+
+									"&receiver_name="	+ encodeURIComponent(previewService.preview.receiver_name)	+
+									"&message="			+ encodeURIComponent(previewService.preview.message);
 
-		var getPreview = function() {
-			var request = {event_id : eventSelector.postEventId, event_name : eventSelector.selectedEvent};
-			$http.get('/preview/invitation', {params : request}).success(function(response) {
-				previewOptions.template = response.preview;
-				
-				previewOptions.template = "<div class='modal-header'>" +
-												"<h3 class='modal-title'>{{eventSelector.selectedEvent}} Invitation Preview</h3>" +
-											"</div>" +
-											"<div class='modal-body'>" +
-												previewOptions.template +
-											"</div>" +
-											"<div class='modal-footer'>" +
-												"<button class='btn btn-primary' ng-click='closePreview()'>Got it!</button>" +
-											"</div>";
-			}).error(function(response, status) {
-				previewOptions = {};
-
-				previewOptions.template = response.message;
-				
-				previewOptions.template = "<div class='modal-header'>" +
-												"<h3 class='modal-title'>{{eventSelector.selectedEvent}} Invitation Preview</h3>" +
-											"</div>" +
-											"<div class='modal-body' style='overflow: auto;'>" +
-												previewOptions.template +
-											"</div>" +
-											"<div class='modal-footer'>" +
-												"<button class='btn btn-primary' ng-click='closePreview()'>Got it!</button>" +
-											"</div>";
-
-				// if(status === 401) {
-				// 	if(response.message === "User is not logged in.") {
-				// 		$location.path('/signin');
-				// 	} else {
-				// 		$location.path('/');
-				// 	}
-				// } else if(status === 400) {
-				// 	previewOptions.template = response.message;//"There was an error getting the template.  Please try refreshing the page or selecting an event in the top right-hand corner.";
-					
-				// 	previewOptions.template = "<div class='modal-header'>" +
-				// 									"<h3 class='modal-title'>{{eventSelector.selectedEvent}} Invitation Preview</h3>" +
-				// 								"</div>" +
-				// 								"<div class='modal-body' style='overflow: auto;'>" +
-				// 									previewOptions.template +
-				// 								"</div>" +
-				// 								"<div class='modal-footer'>" +
-				// 									"<button class='btn btn-primary' ng-click='closePreview()'>Got it!</button>" +
-				// 								"</div>";
-				// }
+			$scope.$watchCollection('invite', function() {
+				previewService.preview.sender_email = $scope.authentication.user.email;
+				previewService.preview.event_name = $scope.invite.event_name;
+				previewService.preview.receiver_email = $scope.invite.invitee_email;
+				previewService.preview.receiver_name = $scope.invite.fName;
+				previewService.preview.message = $scope.invite.message;
+				$scope.previewQuery =	"filename="			+ encodeURIComponent(eventSelector.selectedEvent.replace(/\s{2,}/, " ").replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()\[\]'\\@+"|<>?]/g, "").replace(/\s/g, "_"))	+
+										"&recruiter_name="	+ encodeURIComponent(previewService.preview.recruiter_name) +
+										"&sender_email="	+ encodeURIComponent(previewService.preview.sender_email)	+
+										"&event_name="		+ encodeURIComponent(previewService.preview.event_name)		+
+										"&receiver_email="	+ encodeURIComponent(previewService.preview.receiver_email)	+
+										"&receiver_name="	+ encodeURIComponent(previewService.preview.receiver_name)	+
+										"&message="			+ encodeURIComponent(previewService.preview.message);
 			});
-		};
 
-		$scope.togglePreview = function() {
-			if(!previewService.preview.modalInstance) {
-				previewOptions.controller = 'modalCtrl';
-				previewOptions.backdrop = false;
-				previewOptions.windowClass = 'frank-invite-preview-modal';
-				previewOptions.modalDraggable = true;
-				previewOptions.keyboard = false;
-				previewService.preview.modalInstance = $modal.open(previewOptions);
-			}
-		};
-	  }
+			var getPreview = function() {
+				var request = {event_id : eventSelector.postEventId, event_name : eventSelector.selectedEvent};
+				$http.get('/preview/invitation', {params : request}).success(function(response) {
+					previewOptions.template = response.preview;
+					
+					previewOptions.template = "<div class='modal-header'>" +
+													"<h3 class='modal-title'>{{eventSelector.selectedEvent}} Invitation Preview</h3>" +
+												"</div>" +
+												"<div class='modal-body'>" +
+													previewOptions.template +
+												"</div>" +
+												"<div class='modal-footer'>" +
+													"<button class='btn btn-primary' ng-click='closePreview()'>Got it!</button>" +
+												"</div>";
+				}).error(function(response, status) {
+					previewOptions = {};
+
+					previewOptions.template = response.message;
+					
+					previewOptions.template = "<div class='modal-header'>" +
+													"<h3 class='modal-title'>{{eventSelector.selectedEvent}} Invitation Preview</h3>" +
+												"</div>" +
+												"<div class='modal-body' style='overflow: auto;'>" +
+													previewOptions.template +
+												"</div>" +
+												"<div class='modal-footer'>" +
+													"<button class='btn btn-primary' ng-click='closePreview()'>Got it!</button>" +
+												"</div>";
+				});
+			};
+
+			$scope.togglePreview = function() {
+				if(!previewService.preview.modalInstance) {
+					previewOptions.controller = 'modalCtrl';
+					previewOptions.backdrop = false;
+					previewOptions.windowClass = 'frank-invite-preview-modal';
+					previewOptions.modalDraggable = true;
+					previewOptions.keyboard = false;
+					previewService.preview.modalInstance = $modal.open(previewOptions);
+				}
+			};
+
+			$scope.$watch (
+				function() {
+					return eventSelector.postEventId;
+				},
+				function() {
+					$scope.invite.event_id = eventSelector.postEventId;
+
+					$scope.previewQuery =	"filename="			+ encodeURIComponent(eventSelector.selectedEvent.replace(/\s{2,}/, " ").replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()\[\]'\\@+"|<>?]/g, "").replace(/\s/g, "_"))	+
+											"&recruiter_name="	+ encodeURIComponent(previewService.preview.recruiter_name) +
+											"&sender_email="	+ encodeURIComponent(previewService.preview.sender_email)	+
+											"&event_name="		+ encodeURIComponent(previewService.preview.event_name)		+
+											"&receiver_email="	+ encodeURIComponent(previewService.preview.receiver_email)	+
+											"&receiver_name="	+ encodeURIComponent(previewService.preview.receiver_name)	+
+											"&message="			+ encodeURIComponent(previewService.preview.message);
+											
+					getSideTables();
+				}
+			);
+		}
 	}
 ]);
 
