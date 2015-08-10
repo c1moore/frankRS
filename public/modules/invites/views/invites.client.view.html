@@ -33,7 +33,8 @@
 		</div>
 		<br>
 		<div id="invitation_buttons">
-			<a id="previewbutton" class="btn invitation-button" id="invitation-preview-button" href="#" ng-click="togglePreview()"><i class="fa fa-eye"></i> Preview</a>
+			<a id="previewbutton" class="btn invitation-button" id="invitation-preview-button" href="#" ng-click="togglePreview()" ng-if="!previewNewTab"><i class="fa fa-eye"></i> Preview</a>
+			<a id="previewbutton" class="btn invitation-button" id="invitation-preview-button" href="{{'http://www.frank2016.net/view/template?' + previewQuery}}" target="_blank" ng-if="previewNewTab"><i class="fa fa-eye"></i> Preview</a>
 			<button type="submit" value="Send" class="btn btn-lg invitation-button" id="invitation-submit-button" ng-disabled="invite.$invalid"><i class="fa fa-envelope-o"></i> Send</button>
 			<span us-spinner="{lines:11, length:12, width:5, radius:14, corners:0.5, opacity:0.05, shadow:true, color:['#73c92d', '#f7b518', '#C54E90']}" spinner-key="spinner-1" ng-show="sending"></span>
 		</div>
