@@ -76,6 +76,8 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 				usSpinnerService.spin('spinner-1');
 				angular.element("#invitation-submit-button").addClass("disabled");
 
+				$scope.invite.message = $scope.invite.message.replace(/\n/, "<br />");
+
 				$http.post('/send/evite', $scope.invite).success(function(response) {
 					//Set all form fields to blank so the user can send another invitation.
 					$scope.invite.fName = "";
@@ -90,6 +92,7 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 					usSpinnerService.stop('spinner-1');
 					$scope.sending = false;
 				}).error(function(response, status) {
+					$scope.invite.message = $scope.invite.message.replace(/<br \/>/, "\n");
 					if(status !== 401) {
 						if(status !== 500) {
 							angular.element("#invitation-submit-button").removeClass("disabled");
@@ -222,28 +225,28 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 			previewService.preview.event_name = $scope.invite.event_name;
 			previewService.preview.receiver_email = $scope.invite.invitee_email;
 			previewService.preview.receiver_name = $scope.invite.fName;
-			previewService.preview.message = $scope.invite.message;
+			previewService.preview.message = $scope.invite.message.replace(/\n/, "<br />");
 			$scope.previewQuery =	"filename="			+ encodeURIComponent(eventSelector.selectedEvent.replace(/\s{2,}/, " ").replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()\[\]'\\@+"|<>?]/g, "").replace(/\s/g, "_"))	+
 									"&recruiter_name="	+ encodeURIComponent(previewService.preview.recruiter_name) +
 									"&sender_email="	+ encodeURIComponent(previewService.preview.sender_email)	+
 									"&event_name="		+ encodeURIComponent(previewService.preview.event_name)		+
 									"&receiver_email="	+ encodeURIComponent(previewService.preview.receiver_email)	+
 									"&receiver_name="	+ encodeURIComponent(previewService.preview.receiver_name)	+
-									"&message="			+ encodeURIComponent(previewService.preview.message);
+									"&message="			+ encodeURIComponent(previewService.preview.message.replace(/\n/, "<br />"));
 
 			$scope.$watchCollection('invite', function() {
 				previewService.preview.sender_email = $scope.authentication.user.email;
 				previewService.preview.event_name = $scope.invite.event_name;
 				previewService.preview.receiver_email = $scope.invite.invitee_email;
 				previewService.preview.receiver_name = $scope.invite.fName;
-				previewService.preview.message = $scope.invite.message;
+				previewService.preview.message = $scope.invite.message.replace(/\n/, "<br />");
 				$scope.previewQuery =	"filename="			+ encodeURIComponent(eventSelector.selectedEvent.replace(/\s{2,}/, " ").replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()\[\]'\\@+"|<>?]/g, "").replace(/\s/g, "_"))	+
 										"&recruiter_name="	+ encodeURIComponent(previewService.preview.recruiter_name) +
 										"&sender_email="	+ encodeURIComponent(previewService.preview.sender_email)	+
 										"&event_name="		+ encodeURIComponent(previewService.preview.event_name)		+
 										"&receiver_email="	+ encodeURIComponent(previewService.preview.receiver_email)	+
 										"&receiver_name="	+ encodeURIComponent(previewService.preview.receiver_name)	+
-										"&message="			+ encodeURIComponent(previewService.preview.message);
+										"&message="			+ encodeURIComponent(previewService.preview.message.replace(/\n/, "<br />"));
 			});
 
 			var getPreview = function() {
@@ -301,7 +304,7 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 											"&event_name="		+ encodeURIComponent(previewService.preview.event_name)		+
 											"&receiver_email="	+ encodeURIComponent(previewService.preview.receiver_email)	+
 											"&receiver_name="	+ encodeURIComponent(previewService.preview.receiver_name)	+
-											"&message="			+ encodeURIComponent(previewService.preview.message);
+											"&message="			+ encodeURIComponent(previewService.preview.message.replace(/\n/, "<br />"));
 											
 					getSideTables();
 				}
@@ -323,7 +326,7 @@ angular.module('invites').controller('modalCtrl', ['$scope', '$modalInstance', '
 		$scope.receiver_name = previewService.preview.receiver_name;
 		$scope.receiver_email = previewService.preview.receiver_email;
 		$scope.sender_email = previewService.preview.sender_email;
-		$scope.message = previewService.preview.message;
+		$scope.message = previewService.preview.message.replace(/\n/, "<br />");
 		$scope.modalInstance = previewService.preview.modalInstance;
 
 		$scope.$watchCollection('previewService.preview', function() {
@@ -331,7 +334,7 @@ angular.module('invites').controller('modalCtrl', ['$scope', '$modalInstance', '
 			$scope.receiver_name = previewService.preview.receiver_name;
 			$scope.receiver_email = previewService.preview.receiver_email;
 			$scope.sender_email = previewService.preview.sender_email;
-			$scope.message = previewService.preview.message;
+			$scope.message = previewService.preview.message.replace(/\n/, "<br />");
 			$scope.modalInstance = previewService.preview.modalInstance;
 		});
 

@@ -20,6 +20,8 @@ angular.module('problems').controller('ProblemController', ['$scope', '$http', '
 				var data = {subject : "Problem Reported on frankRS", event_id : eventSelector.postEventId};
 				var permissions = ($scope.problem.contact === "true") ? "can" : "cannot";
 
+				$scope.user.email = $scope.user.email.replace(/\n/, "<br />");
+
 				var message = "<p>A problem was reported for the frank recruiter system.  Here are a few details:</p>" +
 				"<br />" +
 				"<br />" +
