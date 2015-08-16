@@ -2235,6 +2235,7 @@ angular.module('invites').controller('invitesCtrl', [
           getSideTables();
           usSpinnerService.stop('spinner-1');
           $scope.sending = false;
+          $window.alert(response.message);
         }).error(function (response, status) {
           if (status !== 401) {
             if (status !== 500) {
