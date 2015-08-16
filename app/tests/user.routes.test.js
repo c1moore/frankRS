@@ -2405,7 +2405,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					var tempagent = agent.agent();
 					tempagent
 						.post('http://localhost:3001/accept/invitation')
-						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : user5.fName, 'invitee_lName' : user5.lName, 'invitee_email' : user5.email, 'organization' : 'frank', 'event_name' : event1.name, 'recruiter_email' : user.fName + " " user.lName + " (" + user.email + ")"})
+						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : user5.fName, 'invitee_lName' : user5.lName, 'invitee_email' : user5.email, 'organization' : 'frank', 'event_name' : event1.name, 'recruiter_email' : user.fName + " " + user.lName + " (" + user.email + ")"})
 						.end(function(err, res) {
 							should.not.exist(err);
 							res.status.should.equal(200);
@@ -2470,7 +2470,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					var tempagent = agent.agent();
 					tempagent
 						.post('http://localhost:3001/accept/invitation')
-						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : user5.fName, 'invitee_lName' : user5.lName, 'invitee_email' : user5.email, 'organization' : 'frank', 'event_name' : event2.name, 'recruiter_email' : user.fName + " " user.lName + " (" + user.email + ")"})
+						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : user5.fName, 'invitee_lName' : user5.lName, 'invitee_email' : user5.email, 'organization' : 'frank', 'event_name' : event2.name, 'recruiter_email' : user.fName + " " + user.lName + " (" + user.email + ")"})
 						.end(function(err, res) {
 							should.not.exist(err);
 							res.status.should.equal(200);
@@ -2535,7 +2535,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					var tempagent = agent.agent();
 					tempagent
 						.post('http://localhost:3001/accept/invitation')
-						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Anthony', 'invitee_lName' : 'Moore', 'invitee_email' : 'a.moore_cen3031.0.boom0625@spamgourmet.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.fName + " " user.lName + " (" + user.email + ")"})
+						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Anthony', 'invitee_lName' : 'Moore', 'invitee_email' : 'a.moore_cen3031.0.boom0625@spamgourmet.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.fName + " " + user.lName + " (" + user.email + ")"})
 						.end(function(err, res) {
 							if(err) {
 								return done(err);
@@ -2659,7 +2659,7 @@ describe('Express.js User Route Unit Tests:', function() {
 								var tempagent = agent.agent();
 								tempagent
 									.post('http://localhost:3001/accept/invitation')
-									.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : user5.fName, 'invitee_lName' : user5.lName, 'invitee_email' : user5.email, 'organization' : 'frank', 'event_name' : event1.name, 'recruiter_email' : user.fName + " " user.lName + " (" + user.email + ")"})
+									.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : user5.fName, 'invitee_lName' : user5.lName, 'invitee_email' : user5.email, 'organization' : 'frank', 'event_name' : event1.name, 'recruiter_email' : user.fName + " " + user.lName + " (" + user.email + ")"})
 									.end(function(err, res) {
 										should.not.exist(err);
 										res.status.should.equal(200);
@@ -2752,7 +2752,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					var tempagent = agent.agent();
 					tempagent
 						.post('http://localhost:3001/accept/invitation')
-						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_lName' : 'Moore', 'invitee_email' : 'a.moore_cen3031.0.boom0625@spamgourmet.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.fName + " " user.lName + " (" + user.email + ")"})
+						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_lName' : 'Moore', 'invitee_email' : 'a.moore_cen3031.0.boom0625@spamgourmet.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.fName + " " + user.lName + " (" + user.email + ")"})
 						.end(function(err, res) {
 							should.not.exist(err);
 							res.status.should.equal(400);
@@ -2775,7 +2775,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					var tempagent = agent.agent();
 					tempagent
 						.post('http://localhost:3001/accept/invitation')
-						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Moore', 'invitee_email' : 'a.moore_cen3031.0.boom0625@spamgourmet.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.fName + " " user.lName + " (" + user.email + ")"})
+						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Moore', 'invitee_email' : 'a.moore_cen3031.0.boom0625@spamgourmet.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.fName + " " + user.lName + " (" + user.email + ")"})
 						.end(function(err, res) {
 							should.not.exist(err);
 							res.status.should.equal(400);
@@ -2798,7 +2798,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					var tempagent = agent.agent();
 					tempagent
 						.post('http://localhost:3001/accept/invitation')
-						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Calvin', 'invitee_lName' : 'Moore', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.fName + " " user.lName + " (" + user.email + ")"})
+						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Calvin', 'invitee_lName' : 'Moore', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.fName + " " + user.lName + " (" + user.email + ")"})
 						.end(function(err, res) {
 							should.not.exist(err);
 							res.status.should.equal(400);
@@ -2821,7 +2821,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					var tempagent = agent.agent();
 					tempagent
 						.post('http://localhost:3001/accept/invitation')
-						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Calvin', 'invitee_lName' : 'Moore', 'invitee_email' : 'h.m.murdock95@gmail.com', 'event_name' : event1.name, 'recruiter_email' : user.fName + " " user.lName + " (" + user.email + ")"})
+						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Calvin', 'invitee_lName' : 'Moore', 'invitee_email' : 'h.m.murdock95@gmail.com', 'event_name' : event1.name, 'recruiter_email' : user.fName + " " + user.lName + " (" + user.email + ")"})
 						.end(function(err, res) {
 							should.not.exist(err);
 							res.status.should.equal(400);
@@ -2844,7 +2844,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					var tempagent = agent.agent();
 					tempagent
 						.post('http://localhost:3001/accept/invitation')
-						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Calvin', 'invitee_lName' : 'Moore', 'invitee_email' : 'h.m.murdock95@gmail.com', 'organization' : 'frank', 'recruiter_email' : user.fName + " " user.lName + " (" + user.email + ")"})
+						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Calvin', 'invitee_lName' : 'Moore', 'invitee_email' : 'h.m.murdock95@gmail.com', 'organization' : 'frank', 'recruiter_email' : user.fName + " " + user.lName + " (" + user.email + ")"})
 						.end(function(err, res) {
 							should.not.exist(err);
 							res.status.should.equal(400);
@@ -2867,7 +2867,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					var tempagent = agent.agent();
 					tempagent
 						.post('http://localhost:3001/accept/invitation')
-						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Calvin', 'invitee_lName' : 'Moore', 'invitee_email' : 'h.m.murdock95@gmail.com', 'organization' : 'frank', 'event_name' : 'EventName that is not in our db!!!', 'recruiter_email' : user.fName + " " user.lName + " (" + user.email + ")"})
+						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Calvin', 'invitee_lName' : 'Moore', 'invitee_email' : 'h.m.murdock95@gmail.com', 'organization' : 'frank', 'event_name' : 'EventName that is not in our db!!!', 'recruiter_email' : user.fName + " " + user.lName + " (" + user.email + ")"})
 						.end(function(err, res) {
 							should.not.exist(err);
 							res.status.should.equal(400);
@@ -2913,7 +2913,7 @@ describe('Express.js User Route Unit Tests:', function() {
 					var tempagent = agent.agent();
 					tempagent
 						.post('http://localhost:3001/accept/invitation')
-						.send({'invitee_fName' : 'Anthony', 'invitee_lName' : 'Moore', 'invitee_email' : 'a.moore_cen3031.0.boom0625@spamgourmet.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.fName + " " user.lName + " (" + user.email + ")"})
+						.send({'invitee_fName' : 'Anthony', 'invitee_lName' : 'Moore', 'invitee_email' : 'a.moore_cen3031.0.boom0625@spamgourmet.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : user.fName + " " + user.lName + " (" + user.email + ")"})
 						.end(function(err, res) {
 							should.not.exist(err);
 							res.status.should.equal(400);
