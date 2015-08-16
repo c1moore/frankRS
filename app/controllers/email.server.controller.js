@@ -73,10 +73,13 @@ var updateRanks = function(event_id, cb) {
 	var mapReduceObj = {};
 	mapReduceObj.map = function() {
 		var isAdmin = false;
+		var isRecruiter = false;
 		for(var i = 0; i < this.roles.length; i++) {
 			if(this.roles[i] === 'admin') {
 				isAdmin = true;
 				break;
+			} else if(this.roles[i] === 'recruiter') {
+				isRecruiter = true;
 			}
 		}
 
@@ -99,7 +102,7 @@ var updateRanks = function(event_id, cb) {
 			if(!hasPoints) {
 				emit(this._id, 0);
 			}
-		} else {
+		} else if(isRecruiter) {
 			for(var i = 0; i < this.status.length; i++) {
 				if(this.status[i].event_id.toString() === event_id.toString()) {
 					if(!this.status[i].recruiter) {
@@ -140,7 +143,6 @@ var updateRanks = function(event_id, cb) {
 		return totalPoints;
 	};
 	mapReduceObj.scope = {event_id : event_id};
-	mapReduceObj.query = {roles : "recruiter"};
 	User.mapReduce(mapReduceObj, function(err, result) {
 		if(err) {
 			console.log("Error updating inviteeLists/almostLists (1): " + err);

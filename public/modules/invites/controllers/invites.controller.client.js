@@ -89,6 +89,8 @@ angular.module('invites').controller('invitesCtrl', ['$scope', 'Authentication',
 
 					usSpinnerService.stop('spinner-1');
 					$scope.sending = false;
+
+					$window.alert(response.message);
 				}).error(function(response, status) {
 					if(status !== 401) {
 						if(status !== 500) {
