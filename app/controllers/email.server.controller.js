@@ -257,7 +257,7 @@ var updateEventLists = function(user_id, event_id, callback) {
 			};
 		}
 	});
-}
+};
 
 /*
 * This method sends an invitation to the invitee through the recruiter's email address.  If the invitee has not been invited before, the invitee is added to our database.  If the
@@ -550,11 +550,18 @@ exports.acceptInvitation = function(req, res) {
 			}
 		}
 
-		//Remove the name.
-		var startRegex = /.*?\(/g;
-		var endRegex = /\).*/g;
-		req.body.recruiter_email = req.body.recruiter_email.replace(startRegex, '');
-		req.body.recruiter_email = req.body.recruiter_email.replace(endRegex, '');
+		//If the recruiter field does not specify a recruiter, set the field to null.
+		if(req.body.recruiter_email === "Other" || req.body.recruiter_email === "The frank team - I'm an original") {
+			req.body.recruiter_email = null;
+		}
+
+		//Remove the name from the recruiter field.
+		if(req.body.recruiter_email) {
+			var startRegex = /.*?\(/g;
+			var endRegex = /\).*/g;
+			req.body.recruiter_email = req.body.recruiter_email.replace(startRegex, '');
+			req.body.recruiter_email = req.body.recruiter_email.replace(endRegex, '');
+		}
 
 		User.findOne({email : req.body.invitee_email}, function(err, attendee) {
 			if(err) {
@@ -605,14 +612,6 @@ exports.acceptInvitation = function(req, res) {
 										subject: 	'New frank Account for ' + req.body.event_name,
 										event_id: 	evnt._id
 									});
-									var recruiterEmail = new Email({
-										to: 		req.body.recruiter_email,
-										from: 		'frank@jou.ufl.edu',
-										sender: 	'frank@jou.ufl.edu',
-										replyTo: 	'frank@jou.ufl.edu',
-										subject: 	'Yet Another Invitation Accepted',
-										event_id: 	evnt._id
-									});
 
 									var smtpTransport = nodemailer.createTransport(config.mailer.options);
 									var attendeeMailOptions = {
@@ -622,13 +621,25 @@ exports.acceptInvitation = function(req, res) {
 										replyTo: 	attendeeEmail.from,
 										subject: 	attendeeEmail.subject
 									};
-									var recruiterMailOptions = {
-										to: 		recruiterEmail.to,
-										from: 		recruiterEmail.from,
-										sender: 	recruiterEmail.from,
-										replyTo: 	recruiterEmail.from,
-										subject: 	recruiterEmail.subject
-									};
+
+									if(req.body.recruiter_email) {
+										var recruiterEmail = new Email({
+											to: 		req.body.recruiter_email,
+											from: 		'frank@jou.ufl.edu',
+											sender: 	'frank@jou.ufl.edu',
+											replyTo: 	'frank@jou.ufl.edu',
+											subject: 	'Yet Another Invitation Accepted',
+											event_id: 	evnt._id
+										});
+
+										var recruiterMailOptions = {
+											to: 		recruiterEmail.to,
+											from: 		recruiterEmail.from,
+											sender: 	recruiterEmail.from,
+											replyTo: 	recruiterEmail.from,
+											subject: 	recruiterEmail.subject
+										};
+									}
 									
 									async.parallel([
 										//Send message to attendee.
@@ -658,56 +669,67 @@ exports.acceptInvitation = function(req, res) {
 										},
 										//Get recruiter information and send notification.
 										function(callback) {
-											User.findOne({email : req.body.recruiter_email}, function(err, result) {
-												if(err) {
-													callback(err, false);
-												} else if(!result) {
-													callback(true, false);
-												} else {
-													result.attendeeList.addToSet({event_id : evnt._id, user_id : newAttendee._id});
-													result.inviteeList.pull({event_id : evnt._id, user_id : newAttendee._id});
-													result.save(function(err) {
-														if(err) {
-															return res.status(400).send({message : err});
-														} else {
-															updateEventLists(newAttendee._id, evnt._id, function(err) {
-																if(err) {
-																	//There's not much we can/should do at this point.  Returning an error would keep us from notifying the recruiter.  Resending this request from Zapier would cost extra mulah.  Since the error was logged already, we will ignore the error from here.
-																	console.log(err);
-																}
-																updateRanks(evnt._id, function(err) {
+											if(req.body.recruiter_email) {
+												User.findOne({email : req.body.recruiter_email}, function(err, result) {
+													if(err) {
+														callback(err, false);
+													} else if(!result) {
+														callback(true, false);
+													} else {
+														result.attendeeList.addToSet({event_id : evnt._id, user_id : newAttendee._id});
+														result.inviteeList.pull({event_id : evnt._id, user_id : newAttendee._id});
+														result.save(function(err) {
+															if(err) {
+																return res.status(400).send({message : err});
+															} else {
+																updateEventLists(newAttendee._id, evnt._id, function(err) {
 																	if(err) {
 																		//There's not much we can/should do at this point.  Returning an error would keep us from notifying the recruiter.  Resending this request from Zapier would cost extra mulah.  Since the error was logged already, we will ignore the error from here.
 																		console.log(err);
 																	}
-																	res.render('templates/invitation-accepted-recruiter-email', {
-																		recruiter_name : result.fName,
-																		event: req.body.event_name,
-																		attendee_name: req.body.invitee_fName + " " + req.body.invitee_lName,
-																		address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard',
-																		email_id: recruiterEmail._id.toString()
-																	}, function(err, emailHTML) {
-																		recruiterEmail.message = recruiterMailOptions.html = emailHTML;
-																		smtpTransport.sendMail(recruiterMailOptions, function(err, info) {
-																			if(err) {
-																				callback(err, false);
-																			} else {
-																				recruiterEmail.save(function(err) {
-																					if(err) {
-																						callback(err, false);
-																					} else {
-																						callback(false, info.response);
-																					}
-																				});
-																			}
+																	updateRanks(evnt._id, function(err) {
+																		if(err) {
+																			//There's not much we can/should do at this point.  Returning an error would keep us from notifying the recruiter.  Resending this request from Zapier would cost extra mulah.  Since the error was logged already, we will ignore the error from here.
+																			console.log(err);
+																		}
+																		res.render('templates/invitation-accepted-recruiter-email', {
+																			recruiter_name : result.fName,
+																			event: req.body.event_name,
+																			attendee_name: req.body.invitee_fName + " " + req.body.invitee_lName,
+																			address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard',
+																			email_id: recruiterEmail._id.toString()
+																		}, function(err, emailHTML) {
+																			recruiterEmail.message = recruiterMailOptions.html = emailHTML;
+																			smtpTransport.sendMail(recruiterMailOptions, function(err, info) {
+																				if(err) {
+																					callback(err, false);
+																				} else {
+																					recruiterEmail.save(function(err) {
+																						if(err) {
+																							callback(err, false);
+																						} else {
+																							callback(false, info.response);
+																						}
+																					});
+																				}
+																			});
 																		});
 																	});
 																});
-															});
-														}
-													});
-												}
-											});
+															}
+														});
+													}
+												});
+											} else {
+												updateEventLists(newAttendee._id, evnt._id, function(err) {
+													if(err) {
+														//There's not much we can/should do at this point.  Returning an error would keep us from notifying the recruiter.  Resending this request from Zapier would cost extra mulah.  Since the error was logged already, we will ignore the error from here.
+														console.log(err);
+													}
+
+													callback(false, true);
+												});
+											}
 										},
 									],
 										//Callback function.
@@ -770,14 +792,6 @@ exports.acceptInvitation = function(req, res) {
 										subject: 	'New frank Account for ' + req.body.event_name,
 										event_id: 	evnt._id
 									});
-									var recruiterEmail = new Email({
-										to: 		req.body.recruiter_email,
-										from: 		'frank@jou.ufl.edu',
-										sender: 	'frank@jou.ufl.edu',
-										replyTo: 	'frank@jou.ufl.edu',
-										subject: 	'Yet Another Invitation Accepted',
-										event_id: 	evnt._id
-									});
 
 									var smtpTransport = nodemailer.createTransport(config.mailer.options);
 									var attendeeMailOptions = {
@@ -787,13 +801,25 @@ exports.acceptInvitation = function(req, res) {
 										replyTo: 	attendeeEmail.from,
 										subject: 	attendeeEmail.subject
 									};
-									var recruiterMailOptions = {
-										to: 		recruiterEmail.to,
-										from: 		recruiterEmail.from,
-										sender: 	recruiterEmail.from,
-										replyTo: 	recruiterEmail.from,
-										subject: 	recruiterEmail.subject
-									};
+
+									if(req.body.recruiter_email) {
+										var recruiterEmail = new Email({
+											to: 		req.body.recruiter_email,
+											from: 		'frank@jou.ufl.edu',
+											sender: 	'frank@jou.ufl.edu',
+											replyTo: 	'frank@jou.ufl.edu',
+											subject: 	'Yet Another Invitation Accepted',
+											event_id: 	evnt._id
+										});
+
+										var recruiterMailOptions = {
+											to: 		recruiterEmail.to,
+											from: 		recruiterEmail.from,
+											sender: 	recruiterEmail.from,
+											replyTo: 	recruiterEmail.from,
+											subject: 	recruiterEmail.subject
+										};
+									}
 									
 									async.parallel([
 										//Send message to attendee.
@@ -847,56 +873,67 @@ exports.acceptInvitation = function(req, res) {
 										},
 										//Get recruiter information and send notification.
 										function(callback) {
-											User.findOne({email : req.body.recruiter_email}, function(err, result) {
-												if(err) {
-													callback(err, false);
-												} else if(!result) {
-													callback(true, false);
-												} else {
-													result.attendeeList.addToSet({event_id : evnt._id, user_id : attendee._id});
-													result.inviteeList.pull({event_id : evnt._id, user_id : attendee._id});
-													result.save(function(err, result) {
-														if(err) {
-															return res.status(400).send({message : err});
-														} else {
-															updateEventLists(attendee._id, evnt._id, function(err) {
-																if(err) {
-																	//There's not much we can/should do at this point.  Returning an error would keep us from notifying the recruiter.  Resending this request from Zapier would cost extra mulah.  Since the error was logged already, we will ignore the error from here.
-																	console.log(err);
-																}
-																updateRanks(evnt._id, function(err) {
+											if(req.body.recruiter_email) {
+												User.findOne({email : req.body.recruiter_email}, function(err, result) {
+													if(err) {
+														callback(err, false);
+													} else if(!result) {
+														callback(true, false);
+													} else {
+														result.attendeeList.addToSet({event_id : evnt._id, user_id : attendee._id});
+														result.inviteeList.pull({event_id : evnt._id, user_id : attendee._id});
+														result.save(function(err, result) {
+															if(err) {
+																return res.status(400).send({message : err});
+															} else {
+																updateEventLists(attendee._id, evnt._id, function(err) {
 																	if(err) {
 																		//There's not much we can/should do at this point.  Returning an error would keep us from notifying the recruiter.  Resending this request from Zapier would cost extra mulah.  Since the error was logged already, we will ignore the error from here.
 																		console.log(err);
 																	}
-																	res.render('templates/invitation-accepted-recruiter-email', {
-																		recruiter_name : result.fName,
-																		event: req.body.event_name,
-																		attendee_name: req.body.invitee_fName + " " + req.body.invitee_lName,
-																		address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard',
-																		email_id: recruiterEmail._id.toString()
-																	}, function(err, emailHTML) {
-																		recruiterEmail.message = recruiterMailOptions.html = emailHTML;
-																		smtpTransport.sendMail(recruiterMailOptions, function(err, info) {
-																			if(err) {
-																				callback(err, false);
-																			} else {
-																				recruiterEmail.save(function(err) {
-																					if(err) {
-																						callback(err, false);
-																					} else {
-																						callback(false, info.response);
-																					}
-																				});
-																			}
+																	updateRanks(evnt._id, function(err) {
+																		if(err) {
+																			//There's not much we can/should do at this point.  Returning an error would keep us from notifying the recruiter.  Resending this request from Zapier would cost extra mulah.  Since the error was logged already, we will ignore the error from here.
+																			console.log(err);
+																		}
+																		res.render('templates/invitation-accepted-recruiter-email', {
+																			recruiter_name : result.fName,
+																			event: req.body.event_name,
+																			attendee_name: req.body.invitee_fName + " " + req.body.invitee_lName,
+																			address : 'http://frank.jou.ufl.edu/recruiters/!#/leaderboard',
+																			email_id: recruiterEmail._id.toString()
+																		}, function(err, emailHTML) {
+																			recruiterEmail.message = recruiterMailOptions.html = emailHTML;
+																			smtpTransport.sendMail(recruiterMailOptions, function(err, info) {
+																				if(err) {
+																					callback(err, false);
+																				} else {
+																					recruiterEmail.save(function(err) {
+																						if(err) {
+																							callback(err, false);
+																						} else {
+																							callback(false, info.response);
+																						}
+																					});
+																				}
+																			});
 																		});
 																	});
 																});
-															});
-														}
-													});
-												}
-											});
+															}
+														});
+													}
+												});
+											} else {
+												updateEventLists(attendee._id, evnt._id, function(err) {
+													if(err) {
+														//There's not much we can/should do at this point.  Returning an error would keep us from notifying the recruiter.  Resending this request from Zapier would cost extra mulah.  Since the error was logged already, we will ignore the error from here.
+														console.log(err);
+													}
+
+													callback(false, true);
+												});
+											}
 										},
 									],
 										//Callback function.
@@ -941,7 +978,7 @@ exports.emailProgrammer = function(req, res) {
 	} else if(!req.body.message) {
 		return res.status(400).send({message : "Required field not specified."});
 	} else if(!req.body.event_id) {
-		return res.status(400).send({message : "Required field not specified."})
+		return res.status(400).send({message : "Required field not specified."});
 	} else {
 		var programmerEmail = new Email({
 			to: 		config.programmer.email,
@@ -993,7 +1030,7 @@ exports.sendCandidateEmail = function(req, res) {
 	} else if(!req.body.message) {
 		return res.status(400).send({message : "Required field not specified."});
 	} else if(!req.body.event_id) {
-		return res.status(400).send({message : "Required field not specified."})
+		return res.status(400).send({message : "Required field not specified."});
 	} else {
 		var candidateIds = [];
 		for(var i=0; i<req.body.candidate_ids.length; i++) {
@@ -1100,9 +1137,9 @@ exports.sendNonuserEmail = function(req, res) {
 	} else if(!req.body.message) {
 		return res.status(400).send({message : "Required field not specified."});
 	} else if(!req.body.subject) {
-		return res.status(400).send({message : "Required field not specified."})
+		return res.status(400).send({message : "Required field not specified."});
 	} else if(!req.body.event_id) {
-		return res.status(400).send({message : "Required field not specified."})
+		return res.status(400).send({message : "Required field not specified."});
 	} else {
 		var smtpTransport = nodemailer.createTransport(smtpPool(config.mailer.options));
 

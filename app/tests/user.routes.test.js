@@ -2455,6 +2455,63 @@ describe('Express.js User Route Unit Tests:', function() {
 			});
 		});
 
+		it('should allow an outside source to send data when the correct API key is sent and update the a user\'s account and the number of attendees for the event accordingly if they were already invited and the recruiter_email is "The frank team - I\'m an original".', function(done) {
+			this.timeout(100000);
+			User.findOne({_id : user._id}, function(err, oldRectr) {
+				if(err) {
+					return done(err);
+				}
+
+				User.count({}, function(err, scount) {
+					if(err) {
+						return done(err);
+					}
+					
+					var tempagent = agent.agent();
+					tempagent
+						.post('http://localhost:3001/accept/invitation')
+						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : user5.fName, 'invitee_lName' : user5.lName, 'invitee_email' : user5.email, 'organization' : 'frank', 'event_name' : event1.name, 'recruiter_email' : "The frank team - I'm an original"})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(200);
+
+							User.count({}, function(err, fcount) {
+								if(err) {
+									return done(err);
+								}
+								
+								fcount.should.equal(scount);
+								User.findOne({_id : user5._id}, function(err, newUser5) {
+									if(err) {
+										return done(err);
+									}
+									
+									newUser5.status.length.should.equal(user5.status.length);
+									for(var i=0; i<newUser5.status.length; i++) {
+										if(newUser5.status[i].event_id.toString() === event1._id.toString()) {
+											newUser5.status[i].attending.should.be.true;
+											break;
+										}
+									}
+									i.should.not.equal(newUser5.status.length);
+
+									Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+										if(err) {
+											return done(err);
+										}
+										
+										newEvnt.attending.should.equal(event1.attending + 1);
+										newEvnt.invited.should.equal(event1.invited - 1);
+
+										done();
+									});
+								});
+							});
+						});
+				});
+			});
+		});
+
 		it('should allow an outside source to send data when the correct API key is sent and update the user\'s account and the number attending this event accordingly if they have an account but were not invited to this event.', function(done) {
 			this.timeout(100000);
 			User.findOne({_id : user._id}, function(err, oldRectr) {
@@ -2582,6 +2639,68 @@ describe('Express.js User Route Unit Tests:', function() {
 
 											done();
 										});
+									});
+								});
+							});
+						});
+				});
+			});
+		});
+
+		it('should allow an outside source to send data when the correct API key is sent and create a user\'s account correctly and update the number attending if they were not invited via the recruiter system when recruiter_email is "Other".', function(done) {
+			this.timeout(100000);
+			User.findOne({_id : user._id}, function(err, oldRectr) {
+				if(err) {
+					return done(err);
+				}
+				
+				User.count({}, function(err, scount) {
+					if(err) {
+						return done(err);
+					}
+					
+					var tempagent = agent.agent();
+					tempagent
+						.post('http://localhost:3001/accept/invitation')
+						.send({'api_key' : 'qCTuno3HzNfqIL5ctH6IM4ckg46QWJCI7kGDuBoe', 'invitee_fName' : 'Anthony', 'invitee_lName' : 'Moore', 'invitee_email' : 'a.moore_cen3031.0.boom0625@spamgourmet.com', 'organization' : 'Marines', 'event_name' : event1.name, 'recruiter_email' : 'Other'})
+						.end(function(err, res) {
+							if(err) {
+								return done(err);
+							}
+							
+							should.not.exist(err);
+							res.status.should.equal(200);
+
+							User.count({}, function(err, fcount) {
+								if(err) {
+									return done(err);
+								}
+								
+								fcount.should.be.greaterThan(scount);
+								User.findOne({email : 'a.moore_cen3031.0.boom0625@spamgourmet.com'}, function(err, newUser) {
+									if(err) {
+										return done(err);
+									}
+									
+									newUser.status.length.should.equal(1);
+									var i;
+									for(i=0; i<newUser.status.length; i++) {
+										if(newUser.status[i].event_id.toString() === event1._id.toString()) {
+											newUser.status[i].attending.should.be.true;
+											break;
+										}
+									}
+									i.should.not.equal(newUser.status.length);
+
+									Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
+										if(err) {
+											return done(err);
+										}
+										
+										newEvnt.attending.should.equal(event1.attending + 1);
+										newEvnt.invited.should.equal(event1.invited - 1);
+
+										done();
 									});
 								});
 							});
