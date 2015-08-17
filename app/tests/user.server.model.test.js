@@ -404,6 +404,20 @@ describe('User Model Unit Tests:', function() {
 			});
 		});
 
+		it('should confirm that saving user model doesnt change the password', function(done) {
+			user.save(function(err) {
+				should.not.exist(err);
+				
+				user.firstName = 'test';
+				var passwordBefore = user.password;
+				return user.save(function(err) {
+					var passwordAfter = user.password;
+					passwordBefore.should.equal(passwordAfter);
+					done();
+				});
+			});
+		});
+
 		afterEach(function(done) {
 			User.remove(function(err) {
 				if(err)
