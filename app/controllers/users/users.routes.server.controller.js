@@ -348,17 +348,30 @@ exports.getLeaderboard = function(req, res) {
 	if(!req.isAuthenticated()) {
 		res.status(401).send({'message' : "User is not logged in."});
 	} else if(req.hasAuthorization(req.user, ["recruiter", "admin"])) {
-		var query = User.find({'roles' : 'recruiter', 'status.event_id' : req.body.event_id, 'status.recruiter' : true});
-		query.select('displayName rank inviteeList attendeeList');
-		query.exec(function(err, result) {
+		User.aggregate([
+			{$match : {
+					$or : [
+						{'rank.event_id' : new mongoose.Types.ObjectId(req.body.event_id)},
+						{$and : [
+								{'status.event_id' : new mongoose.Types.ObjectId(req.body.event_id)},
+								{'status.recruiter' : true}
+						]}
+					]
+				}
+			},
+			{$project : {
+				displayName : 1,
+				rank : 1,
+				inviteeList : 1,
+				attendeeList : 1
+			}}
+		], function(err, result) {
 			if(err) {
 				res.status(400).send(err);
 			} else if(!result.length) {
 				res.status(400).send({message : 'No recruiters found!'});
 			} else {
 				for(var i=0; i<result.length; i++) {
-					result[i] = result[i].toObject();
-					
 					result[i].inviteeList = searchByEvent(req.body.event_id, result[i].inviteeList);
 					result[i].attendeeList = searchByEvent(req.body.event_id, result[i].attendeeList);
 					result[i].invited = result[i].inviteeList.length;
@@ -773,7 +786,7 @@ exports.getAttendees = function(req, res) {
 		res.status(401).send({'message' : 'User is not logged in.'});
 	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
 		User.aggregate([
-			{$match : {roles : 'recruiter', "status.event_id" : new mongoose.Types.ObjectId(req.body.event_id), "status.recruiter" : true}},
+			{$match : {$or : [{roles : 'recruiter'}, {roles : 'admin'}]}},
 			{$project : {recruiterName : "$displayName", attendeeList : 1, _id : 0}},
 			{$unwind : "$attendeeList"},
 			{$match : {"attendeeList.event_id" : new mongoose.Types.ObjectId(req.body.event_id)}}
@@ -827,7 +840,7 @@ exports.getInvitees = function(req, res) {
 		res.status(401).send({'message' : 'User is not logged in.'});
 	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
 		User.aggregate([
-			{$match : {roles : 'recruiter', "status.event_id" : new mongoose.Types.ObjectId(req.body.event_id), "status.recruiter" : true}},
+			{$match : {$or : [{roles : 'recruiter'}, {roles : 'admin'}]}},
 			{$project : {recruiterName : "$displayName", inviteeList : 1, _id : -1}},
 			{$unwind : "$inviteeList"},
 			{$match : {"inviteeList.event_id" : new mongoose.Types.ObjectId(req.body.event_id)}}
