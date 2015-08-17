@@ -102,12 +102,12 @@ exports.signup = function(req, res) {
 						var timeoutMillis = Math.ceil(timeouts[0] + timeouts[1] + timeouts[2] + timeouts[3]);
 						console.log(timeoutMillis);
 						setTimeout(function() {
-							return res.status(400).send({message : "Incorrect information provided."})
+							return res.status(400).send({message : "Incorrect information provided."});
 						}, timeoutMillis);
 					});
 				}
 			} else {
-				return res.status(400).send({message : "Incorrect information provided. Recaptcha.", errors : body['error-codes'], body : body});
+				return res.status(400).send({message : "Incorrect information provided."});
 			}
 		});
 	});

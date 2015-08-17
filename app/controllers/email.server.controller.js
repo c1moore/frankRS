@@ -15,7 +15,8 @@ var errorHandler = require('./errors'),
 	config = require('../../config/config'),
 	crypto = require('crypto'),
 	async = require('async'),
-	path = require('path');
+	path = require('path'),
+	bufEqual = require('buffer-equal-constant-time');
 
 
 /**
@@ -531,8 +532,33 @@ exports.sendInvitation = function(req, res) {
 */
 exports.acceptInvitation = function(req, res) {
 	//We will use an API key to determine whether or not this is an authenticated request.
-	if(req.body.api_key !== config.zapier_api) {
+	if(!req.body.api_key) {
 		return res.status(400).send({message : 'You are not authorized to make this request.'});
+	}
+	
+	var api_key = new Buffer(req.body.api_key),
+		zapier_api = new Buffer(config.zapier_api);
+
+	if(!bufEqual(api_key, zapier_api)) {
+		//bufEqual is not truly constant time.  Let's sleep a random amount of time to confuse any possible attackers.
+		//This method is not perfect, but it will add an extra layer of security and may work against some unsophisticated attackers.
+		crypto.randomBytes(32, function(err, buf) {
+			if(err) {
+				return res.status(400).send({message : 'You are not authorized to make this request.'});
+			}
+
+			var timeouts = [];
+			timeouts[0] = buf.readUInt8BE(0);
+			timeouts[1] = buf.readUInt8BE(8);
+			timeouts[2] = buf.readUInt8BE(16);
+			timeouts[3] = buf.readUInt8BE(24);
+
+			var timeoutMillis = Math.ceil(timeouts[0] + timeouts[1] + timeouts[2] + timeouts[3]);
+			console.log(timeoutMillis);
+			setTimeout(function() {
+				return res.status(400).send({message : 'You are not authorized to make this request.'});
+			}, timeoutMillis);
+		});
 	} else {
 		/**
 		* These are the fields we will expect from Zapier.  We need to check to make sure
