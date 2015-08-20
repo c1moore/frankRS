@@ -15,7 +15,6 @@
   width: 782px;
 }
 .frank-invites-sidebar{
-  position: fixed;
   height: 100vh;
   width: 325px;
   right: 0;
@@ -23,6 +22,8 @@
   margin-top: -30px;
   background-color: #E8E9EB;
   z-index: 0;
+  display: inline-block;
+  float: right;
 }
 .frank-invites-sidebar table {
   border-spacing: 3px;
@@ -91,6 +92,15 @@
   color: white;
   font-size: 20px;
 }
+.slider {
+  background-color: #E8E9EB;
+  height: 100vh;
+  position: fixed;
+  width: 325px;
+  right: 0;
+  top: 0;
+  z-index: -1;
+}
 .to_field {
   border: 1px solid rgb(169, 169, 169);
   border-radius: 5px;
@@ -125,6 +135,7 @@
   width: 60vw;
   background-color: white;
   margin-top: 10px;
+  display: inline-block;
 }
 #invitee_email {
   margin-left: 33px;
@@ -225,7 +236,7 @@ body {
   }
 }
 
-@media (max-width: 935px) {
+@media (max-width: 970px) {
   .accordion-hidden {
     display: none;
   }
@@ -234,10 +245,15 @@ body {
     display: inline-flex;
     width: 370px;
     z-index: 0;
+    position: fixed;
   }
 
   .frank-invites-sidebar-closed {
     width: 25px;
+  }
+
+  .hide-slider {
+    display: none;
   }
 
   .jumbotron {
@@ -247,6 +263,11 @@ body {
 
   .panel-group {
     width: 345px;
+    margin-left: 25px;
+  }
+
+  .panel-group:first-child {
+    margin-top: 183px;
   }
 
   .sidebar-display {
@@ -254,6 +275,8 @@ body {
     height: 100vh;
     width: 25px;
     background: #6C6969;
+    position: fixed;
+    top: 0;
   }
 
   #invite {

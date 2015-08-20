@@ -39,12 +39,13 @@
 			<span us-spinner="{lines:11, length:12, width:5, radius:14, corners:0.5, opacity:0.05, shadow:true, color:['#73c92d', '#f7b518', '#C54E90']}" spinner-key="spinner-1" ng-show="sending"></span>
 		</div>
 	</form>
+	<div class="slider" ng-class="{'hide-slider' : !sidebarOpen}"></div>
 	<div class="frank-invites-sidebar" ng-class="{'frank-invites-sidebar-closed' : !sidebarOpen}">
 		<div class="sidebar-display" ng-style="{'background-color' : sidebarColor}" ng-mouseenter="sidebarColor = sidebarActiveColor" ng-mouseleave="sidebarColor = sidebarInactiveColor" ng-click="sidebarOpen = !sidebarOpen">
 			<i class='fa' ng-class="{'fa-chevron-left' : !sidebarOpen, 'fa-chevron-right' : sidebarOpen}"></i>
 		</div>
 		<accordion close-others="false" ng-class="{'accordion-hidden' : !sidebarOpen}">
-			<accordion-group is-open="firstSelected" style="margin-top: 183px;">
+			<accordion-group is-open="firstSelected" style="/*margin-top: 183px;*/">
 				<accordion-heading>
 					Awesome People Attending <i class="pull-right fa" ng-class="{'fa-chevron-right' : !firstSelected, 'fa-chevron-down' : firstSelected}"></i>
 				</accordion-heading>
@@ -132,7 +133,7 @@
 					<b>Total: {{invitees.list.length}}</b>
 				</div>
 			</accordion-group>
-			<accordion-group is-open="thirdSelected">
+			<accordion-group is-open="thirdSelected" class="frank-main-view">
 				<accordion-heading>
 					Accepted Another's Invitation <i class="pull-right fa" ng-class="{'fa-chevron-right' : !thirdSelected, 'fa-chevron-down' : thirdSelected}"></i>
 				</accordion-heading>
