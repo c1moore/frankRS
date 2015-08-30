@@ -9,4 +9,4 @@ app/tests/coverage/
 .idea/
 populator/user_summary.txt
 populator/__pycache__
-
+*.pem
