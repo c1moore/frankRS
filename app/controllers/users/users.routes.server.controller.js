@@ -349,6 +349,7 @@ exports.getLeaderboard = function(req, res) {
 		res.status(401).send({'message' : "User is not logged in."});
 	} else if(req.hasAuthorization(req.user, ["recruiter", "admin"])) {
 		User.aggregate([
+			{$unwind : "$status"},
 			{$match : {
 					$or : [
 						{'rank.event_id' : new mongoose.Types.ObjectId(req.body.event_id)},
@@ -359,11 +360,12 @@ exports.getLeaderboard = function(req, res) {
 					]
 				}
 			},
-			{$project : {
-				displayName : 1,
-				rank : 1,
-				inviteeList : 1,
-				attendeeList : 1
+			{$group : {
+				_id : "$_id",
+				displayName : {$first : "$displayName"},
+				rank : {$first : "$rank"},
+				inviteeList : {$first : "$inviteeList"},
+				attendeeList : {$first : "$attendeeList"}
 			}}
 		], function(err, result) {
 			if(err) {
@@ -382,10 +384,15 @@ exports.getLeaderboard = function(req, res) {
 					for(var j=0; j<result[i].rank.length; j++) {
 						if(result[i].rank[j].event_id.toString() === req.body.event_id.toString()) {
 							var temp = parseInt(result[i].rank[j].place);
-							delete result[i].rank;//result[i].rank = null;
-							result[i].place = temp;//result[i].rank[j].place;
+							delete result[i].rank;
+							result[i].place = temp;
 							break;
 						}
+					}
+
+					if(!result[i].place) {
+						delete result[i].rank;
+						result[i].place = Number.POSITIVE_INFINITY;
 					}
 				}
 
@@ -785,42 +792,92 @@ exports.getAttendees = function(req, res) {
 	if(!req.isAuthenticated()) {
 		res.status(401).send({'message' : 'User is not logged in.'});
 	} else if(req.hasAuthorization(req.user, ['recruiter', 'admin'])) {
-		User.aggregate([
-			{$match : {$or : [{roles : 'recruiter'}, {roles : 'admin'}]}},
-			{$project : {recruiterName : "$displayName", attendeeList : 1, _id : 0}},
-			{$unwind : "$attendeeList"},
-			{$match : {"attendeeList.event_id" : new mongoose.Types.ObjectId(req.body.event_id)}}
-		], function(err, results) {
-			if(err) {
-				res.status(400).send(err);
-			} else if(!results || !results.length) {
-				res.status(400).json({'message' : 'Nobody is attending yet.'});
-			} else {
-				User.populate(
-					results, {
-						path : "attendeeList.user_id",
-						model : 'User',
-						select : 'displayName organization -_id'
-					}, function(err, pResults) {
-						if(err) {
-							res.status(400).send({message : err});
-						} else {
-							for(var i=0; i<pResults.length; i++) {
-								//If this user was deleted, just delete the record.
-								if(pResults[i].attendeeList.user_id) {
-									pResults[i].attendeeName = pResults[i].attendeeList.user_id.displayName;
-									pResults[i].organization = pResults[i].attendeeList.user_id.organization;
-
-									delete pResults[i].attendeeList;
+		async.parallel([
+			function(next) {
+				User.aggregate([
+					{$match : {$or : [{roles : 'recruiter'}, {roles : 'admin'}]}},
+					{$project : {recruiterName : "$displayName", attendeeList : 1, _id : 0}},
+					{$unwind : "$attendeeList"},
+					{$match : {"attendeeList.event_id" : new mongoose.Types.ObjectId(req.body.event_id)}}
+				], function(err, results) {
+					if(err) {
+						next(err, false);
+					} else if(!results || !results.length) {
+						next(false, []);
+					} else {
+						User.populate(
+							results, {
+								path : "attendeeList.user_id",
+								model : 'User',
+								select : 'displayName organization'
+							}, function(err, pResults) {
+								if(err) {
+									next(err, false);
 								} else {
-									pResults.splice(i--, 1);
+									for(var i=0; i<pResults.length; i++) {
+										//If this user was deleted, just delete the record.
+										if(pResults[i].attendeeList.user_id) {
+											pResults[i].attendeeName = pResults[i].attendeeList.user_id.displayName;
+											pResults[i].organization = pResults[i].attendeeList.user_id.organization;
+											pResults[i]._id = pResults[i].attendeeList.user_id._id;
+
+											delete pResults[i].attendeeList;
+										} else {
+											pResults.splice(i--, 1);
+										}
+									}
+
+									next(false, pResults);	
 								}
 							}
-
-							res.status(200).send(pResults);	
+						);
+					}
+				});
+			}, function(next) {
+				User.aggregate([
+					{$unwind : "$status"},
+					{$match : {$and : [{'status.event_id' : new mongoose.Types.ObjectId(req.body.event_id), 'status.attending' : true}]}},
+					{$project : {attendeeName : "$displayName", organization : 1, recruiterName : {$literal : "N/A"}}}
+				],	function(err, results) {
+						if(err) {
+							next(err, false);
+						} else {
+							next(false, results);
 						}
 					}
 				);
+			}
+		], function(err, results) {
+			if(err) {
+				console.log(err);
+				return res.status(400).send({message : err.toString()});
+			} else {
+				/**
+				* After performing several tests on jsperf.com
+				* (http://jsperf.com/removing-duplicates-using-hashmap/4), it appears that a linear search for
+				* duplicates performs the better than using a sort method such as merge sort or using a hash map.
+				* These tests were performed on a dataset of 100+ records with a same format to the one expected.
+				*/
+
+				var attendees = results[0].concat(results[1]);
+
+				for(var i = 0; i < attendees.length; i++) {
+					for(var j = (i + 1); j < attendees.length; j++) {
+						if(attendees[i]._id.toString() === attendees[j]._id.toString()) {
+							if(attendees[i].recruiterName === "N/A") {
+								attendees.splice(i, 1);
+
+								j = i + 1;
+							} else {
+								attendees.splice(j, 1);
+
+								--j;
+							}
+						}
+					}
+				}
+
+				return res.status(200).send(attendees);
 			}
 		});
 	} else {

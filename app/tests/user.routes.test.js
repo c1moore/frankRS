@@ -1537,7 +1537,7 @@ describe('Express.js User Route Unit Tests:', function() {
 				.end(function(err, res) {
 	         		should.not.exist(err);
 	          		res.status.should.equal(200);
-	          		res.body.length.should.equal(2);
+	          		res.body.length.should.equal(3);
 
 	          		var i;
 	          		for(i=0; i<res.body.length; i++) {
@@ -1886,13 +1886,16 @@ describe('Express.js User Route Unit Tests:', function() {
 
 					var recruiter1=0, recruiter2=0;
 					for(var i=0; i<res.body.length; i++) {
-						if(res.body[i].recruiterName === "Moore, Calvin")
+						if(res.body[i].recruiterName === "Moore, Calvin") {
 							recruiter1++;
-						else if(res.body[i].recruiterName === "Name, Example")
+						} else if(res.body[i].recruiterName === "Name, Example") {
 							recruiter2++;
+						} else {
+							res.body[i].recruiterName.should.equal("N/A");
+						}
 					}
 
-					recruiter1.should.equal(2);
+					recruiter1.should.equal(1);
 					recruiter2.should.equal(1);
 					
 					done();

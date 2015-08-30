@@ -144,6 +144,7 @@ var updateRanks = function(event_id, cb) {
 		return totalPoints;
 	};
 	mapReduceObj.scope = {event_id : event_id};
+	mapReduceObj.sort = {_id : 1};
 	User.mapReduce(mapReduceObj, function(err, result) {
 		if(err) {
 			console.log("Error updating inviteeLists/almostLists (1): " + err);
@@ -152,25 +153,42 @@ var updateRanks = function(event_id, cb) {
 			cb(null);
 		} else {
 			var aqueue = async.queue(function(recruiter, callback) {
-				User.findOne({'_id' : recruiter._id}, function(err, result) {
-					if(!err) {
-						var i;
-						for(i=0; i<result.rank.length; i++) {
-							if(result.rank[i].event_id.toString() === event_id.toString()) {
-								result.rank[i].place = recruiter.place;
-								result.save(callback);
-								break;
-							}
+				User.update(
+					{"_id" : recruiter._id, "rank.event_id" : event_id},
+					{$set : {"rank.$.place" : recruiter.place}},
+					function(err, numAffected) {
+						if(err) {
+							return callback(err);
+						} else if(numAffected === 0) {
+							User.update(
+								{_id : recruiter._id},
+								{$addToSet : {rank : {event_id : event_id, place : recruiter.place}}},
+								callback
+							);
+						} else {
+							callback(false);
 						}
-
-						if(i === result.rank.length) {
-							result.rank.addToSet({event_id : event_id, place : recruiter.place});
-							result.save(callback);
-						}
-					} else {
-						callback(err);
 					}
-				});
+				);
+				// User.findOne({'_id' : recruiter._id}, function(err, result) {
+				// 	if(!err) {
+				// 		var i;
+				// 		for(i=0; i<result.rank.length; i++) {
+				// 			if(result.rank[i].event_id.toString() === event_id.toString()) {
+				// 				result.rank[i].place = recruiter.place;
+				// 				result.save(callback);
+				// 				break;
+				// 			}
+				// 		}
+
+				// 		if(i === result.rank.length) {
+				// 			result.rank.addToSet({event_id : event_id, place : recruiter.place});
+				// 			result.save(callback);
+				// 		}
+				// 	} else {
+				// 		callback(err);
+				// 	}
+				// });
 			}, 10000);
 
 			var errs = false;
@@ -220,24 +238,38 @@ var updateEventLists = function(user_id, event_id, callback) {
 			callback(null);
 		} else {
 			var aqueue = async.queue(function(recruiter, cb) {
-				var index = 0;
-				for(; index < recruiter.inviteeList.length; index++) {
-					if(recruiter.inviteeList[index].event_id.toString() === event_id.toString() && recruiter.inviteeList[index].user_id.toString() === user_id.toString()) {
-						break;
+				User.findOneAndUpdate(
+					{_id : recruiter._id},
+					{$push : {almostList : {event_id : event_id, user_id : user_id}}, $pull : {inviteeList : {event_id : event_id, user_id : user_id}}},
+					function(err) {
+						if(err) {
+							console.log("Error updating inviteeLists/almostLists (2): " + err);
+							cb(err);
+						} else {
+							cb(null);
+						}
 					}
-				}
+				);
 
-				recruiter.almostList.push({event_id : event_id, user_id : user_id});
-				recruiter.inviteeList.pull({event_id : event_id, user_id : user_id});
+				// var index = 0;
 
-				recruiter.save(function(err) {
-					if(err) {
-						console.log("Error updating inviteeLists/almostLists (2): " + err);
-						cb(err);
-					} else {
-						cb(null);
-					}
-				});
+				// for(; index < recruiter.inviteeList.length; index++) {
+				// 	if(recruiter.inviteeList[index].event_id.toString() === event_id.toString() && recruiter.inviteeList[index].user_id.toString() === user_id.toString()) {
+				// 		break;
+				// 	}
+				// }
+
+				// recruiter.almostList.push({event_id : event_id, user_id : user_id});
+				// recruiter.inviteeList.pull({event_id : event_id, user_id : user_id});
+
+				// recruiter.save(function(err) {
+				// 	if(err) {
+				// 		console.log("Error updating inviteeLists/almostLists (2): " + err);
+				// 		cb(err);
+				// 	} else {
+				// 		cb(null);
+				// 	}
+				// });
 			}, 10000);
 
 			var errs = false;
