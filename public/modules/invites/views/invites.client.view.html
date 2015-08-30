@@ -2,10 +2,11 @@
 	<div class="jumbotron text-center">
 		<div class="container-fluid">
 			<h2>Recruiter Control Room</h2>
+			<p>Send electronic invitations to the people you want to invite to {{invite.event_name}}.</p>
 		</div>
 	</div>
 	<form id="invite" name="invite" data-ng-submit="send()" class="frank-main-view">
-		<div id="from" class="invitation_field">
+		<div id="from" class="invitation_field" tooltip="Your email address from which the invitation will be sent." tooltip-placement="right" tooltip-class="frank-tooltip">
 			<strong>From: </strong>
 			<br />
 			<p id="recruiter_email">{{recruiter_email}}</p>
@@ -14,21 +15,21 @@
 			<strong>To: </strong>
 			<br />
 			<div id="to_fields">
-				<label for="invitation_fName">First Name: 
+				<label for="invitation_fName" tooltip="First name of the person you are inviting." tooltip-placement="right" tooltip-class="frank-tooltip">First Name: 
 					<input type="text" id="invitation_fName" class="to_field invitation_fName" ng-model="invite.fName" placeholder="Frank" required />
 				</label>
 				<br />
-				<label for="invitation_lName">Last Name: 
+				<label for="invitation_lName" tooltip="Last name of the person you are inviting." tooltip-placement="right" tooltip-class="frank-tooltip">Last Name: 
 					<input type="text" id="invitation_lName" class="to_field" ng-model="invite.lName" placeholder="Karel" required />
 				</label>
 				<br />
-				<label for="invitee_email">Email: 
+				<label for="invitee_email" tooltip="Email address to which you want to send this invitation." tooltip-placement="right" tooltip-class="frank-tooltip">Email: 
 					<input type="email" class="to_field" id="invitee_email" ng-model="invite.email" placeholder="frankis@wesome.edu" required />
 				</label>
 			</div>
 		</div>
 		<div id="message">
-			<b>Personal Message:</b><br />
+			<b tooltip="Customize your invitation with a personal note." tooltip-placement="right" tooltip-class="frank-tooltip">Personal Message:</b><br />
 			<textarea id="p_message" ng-model="invite.message" rows="12" cols="50"></textarea>
 		</div>
 		<br>

@@ -27,5 +27,8 @@
     "angular-spinner": "~0.5.1",
     "angular-recaptcha": "~2.2.2",
     "octicons": "*"
+  },
+  "resolutions": {
+    "angular": "1.2.28"
   }
 }
