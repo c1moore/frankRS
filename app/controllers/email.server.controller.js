@@ -136,8 +136,9 @@ var updateRanks = function(event_id, cb) {
 	};
 	mapReduceObj.reduce = function(recruiterId, points) {
 		var totalPoints = 0;
+		var pointsLength = points.length
 
-		for(var i = 0; i < points.length; i++) {
+		for(var i = 0; i < pointsLength; i++) {
 			totalPoints += points[i];
 		}
 
@@ -170,25 +171,6 @@ var updateRanks = function(event_id, cb) {
 						}
 					}
 				);
-				// User.findOne({'_id' : recruiter._id}, function(err, result) {
-				// 	if(!err) {
-				// 		var i;
-				// 		for(i=0; i<result.rank.length; i++) {
-				// 			if(result.rank[i].event_id.toString() === event_id.toString()) {
-				// 				result.rank[i].place = recruiter.place;
-				// 				result.save(callback);
-				// 				break;
-				// 			}
-				// 		}
-
-				// 		if(i === result.rank.length) {
-				// 			result.rank.addToSet({event_id : event_id, place : recruiter.place});
-				// 			result.save(callback);
-				// 		}
-				// 	} else {
-				// 		callback(err);
-				// 	}
-				// });
 			}, 10000);
 
 			var errs = false;
@@ -204,7 +186,7 @@ var updateRanks = function(event_id, cb) {
 			});
 
 			aqueue.pause();
-			for(var i=0; i<result.length; i++) {
+			for(var i=0, resultsLength = sortedResults.length; i < resultsLength; i++) {
 				var recruiter = {'_id' : sortedResults[i]._id, 'place' : (i + 1)};
 				aqueue.push(recruiter, task_cb);
 			}
@@ -732,14 +714,16 @@ exports.acceptInvitation = function(req, res) {
 													if(err) {
 														callback(err, false);
 													} else if(!result) {
-														callback(true, false);
+														callback(new Error("Recruiter not found."), false);
 													} else {
-														result.attendeeList.addToSet({event_id : evnt._id, user_id : newAttendee._id});
-														result.inviteeList.pull({event_id : evnt._id, user_id : newAttendee._id});
-														result.save(function(err) {
-															if(err) {
-																return res.status(400).send({message : err});
-															} else {
+														User.update(
+															{_id : result._id},
+															{$pull : {inviteeList : {event_id : evnt._id, user_id : newAttendee._id}}, $push : {attendeeList : {event_id : evnt._id, user_id : newAttendee._id}}},
+															function(err) {
+																if(err) {
+																	return callback(err, false);
+																}
+
 																updateEventLists(newAttendee._id, evnt._id, function(err) {
 																	if(err) {
 																		//There's not much we can/should do at this point.  Returning an error would keep us from notifying the recruiter.  Resending this request from Zapier would cost extra mulah.  Since the error was logged already, we will ignore the error from here.
@@ -775,7 +759,7 @@ exports.acceptInvitation = function(req, res) {
 																	});
 																});
 															}
-														});
+														);
 													}
 												});
 											} else {
@@ -938,12 +922,14 @@ exports.acceptInvitation = function(req, res) {
 													} else if(!result) {
 														callback(true, false);
 													} else {
-														result.attendeeList.addToSet({event_id : evnt._id, user_id : attendee._id});
-														result.inviteeList.pull({event_id : evnt._id, user_id : attendee._id});
-														result.save(function(err, result) {
-															if(err) {
-																return res.status(400).send({message : err});
-															} else {
+														User.update(
+															{_id : result._id},
+															{$pull : {inviteeList : {event_id : evnt._id, user_id : attendee._id}}, $push : {attendeeList : {event_id : evnt._id, user_id : attendee._id}}},
+															function(err) {
+																if(err) {
+																	return callback(err, false);
+																}
+
 																updateEventLists(attendee._id, evnt._id, function(err) {
 																	if(err) {
 																		//There's not much we can/should do at this point.  Returning an error would keep us from notifying the recruiter.  Resending this request from Zapier would cost extra mulah.  Since the error was logged already, we will ignore the error from here.
@@ -979,7 +965,7 @@ exports.acceptInvitation = function(req, res) {
 																	});
 																});
 															}
-														});
+														);
 													}
 												});
 											} else {
