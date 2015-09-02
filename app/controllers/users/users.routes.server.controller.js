@@ -349,17 +349,34 @@ exports.getLeaderboard = function(req, res) {
 		res.status(401).send({'message' : "User is not logged in."});
 	} else if(req.hasAuthorization(req.user, ["recruiter", "admin"])) {
 		User.aggregate([
+			{$project : {
+				status : {
+					$cond : {
+						if : {$or : [{$not : {$ifNull : ["$status", false]}}, {$eq : [{$size : "$status"}, 0]}]},
+						then : [
+							{
+								"event_id" : 0,
+								"recruiter" : false
+							}
+						],
+						else : "$status"
+					}
+				},
+				rank : 1,
+				displayName : 1,
+				inviteeList : 1,
+				attendeeList : 1
+			}},
 			{$unwind : "$status"},
 			{$match : {
-					$or : [
-						{'rank.event_id' : new mongoose.Types.ObjectId(req.body.event_id)},
-						{$and : [
-								{'status.event_id' : new mongoose.Types.ObjectId(req.body.event_id)},
-								{'status.recruiter' : true}
-						]}
-					]
-				}
-			},
+				$or : [
+					{'rank.event_id' : new mongoose.Types.ObjectId(req.body.event_id)},
+					{$and : [
+							{'status.event_id' : new mongoose.Types.ObjectId(req.body.event_id)},
+							{'status.recruiter' : true}
+					]}
+				]
+			}},
 			{$group : {
 				_id : "$_id",
 				displayName : {$first : "$displayName"},
@@ -376,8 +393,10 @@ exports.getLeaderboard = function(req, res) {
 				for(var i=0; i<result.length; i++) {
 					result[i].inviteeList = searchByEvent(req.body.event_id, result[i].inviteeList);
 					result[i].attendeeList = searchByEvent(req.body.event_id, result[i].attendeeList);
+					
 					result[i].invited = result[i].inviteeList.length;
 					result[i].attending = result[i].attendeeList.length;
+					
 					delete result[i].inviteeList;
 					delete result[i].attendeeList;
 
@@ -394,6 +413,8 @@ exports.getLeaderboard = function(req, res) {
 						delete result[i].rank;
 						result[i].place = Number.POSITIVE_INFINITY;
 					}
+
+					delete result[i]._id;
 				}
 
 				res.status(200).send(result);

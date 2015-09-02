@@ -1531,25 +1531,52 @@ describe('Express.js User Route Unit Tests:', function() {
 
 	describe('Leaderboard routes:', function() {
 		it('should be able to get leaderboard when they have the proper roles.', function(done) {
-			useragent
-				.post('http://localhost:3001/leaderboard/maintable')
-				.send({'event_id' : event1._id})
-				.end(function(err, res) {
-	         		should.not.exist(err);
-	          		res.status.should.equal(200);
-	          		res.body.length.should.equal(3);
+			var tempUser = new User({
+				fName : "Name",
+				lName : "Fake",
+				displayName : "Name, Fake",
+				email : "fake_name_cen3031.0.boom0625@spamgourmet.com",
+				roles : ["admin"],
+				rank : [{event_id : event1._id, place : 5}],
+				password : "password",
+				login_enabled : true
+			});
 
-	          		var i;
-	          		for(i=0; i<res.body.length; i++) {
-	          			if(res.body[i]._id.toString() === user._id.toString())
-	          				break;
-	          		}
+			tempUser.save(function(err, result) {
+				if(err) {
+					return done(err);
+				}
 
-	          		res.body[i].attending.should.equal(2);
-	          		res.body[i].invited.should.equal(1);
-	          		res.body[i].place.should.equal(2);
-					done();
-				});
+				useragent
+					.post('http://localhost:3001/leaderboard/maintable')
+					.send({'event_id' : event1._id})
+					.end(function(err, res) {
+						should.not.exist(err);
+						res.status.should.equal(200);
+						res.body.length.should.equal(4);
+
+						var foundUser = false;
+						for(var i=0; i<res.body.length; i++) {
+							if(res.body[i].displayName !== user.displayName && res.body[i].displayName !== user4.displayName && res.body[i].displayName !== user2.displayName && res.body[i].displayName !== tempUser.displayName) {
+								done(new Error("Correct users not returned."));
+							}
+
+							if(res.body[i].displayName === user.displayName && res.body[i].attending === user.attendeeList.length) {
+								res.body[i].invited.should.equal(user.attendeeList.length);
+
+								for(var j = 0; j < user.rank.length; j++) {
+									if(user.rank[j].event_id.toString() === event1._id.toString()) {
+										res.body[i].place.should.equal(user.rank[j]);
+									}
+								}
+							}
+						}
+
+						foundUser.should.be.true;
+
+						done();
+					});
+			});
 		});
 
 		it('should return an error when no event_id is specified.', function(done) {
