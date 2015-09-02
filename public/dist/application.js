@@ -2546,6 +2546,8 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', [
       //Number of people attending that this recruiter invited.
       $scope.statsError = false;
       //Error retreiving stats for this event?
+      $scope.inviteeAttendeeRatio = 0.05;
+      //The points ratio of invitees to attendees.
       $scope.mainTableFilter = { displayName: '' };
       if (!eventSelector.recruiterEvent) {
         eventSelector.selectedEvent = 'Select Event';
@@ -2589,11 +2591,14 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', [
             mainApi.getTable({ event_id: eventSelector.postEventId }, function (data) {
               var filteredData = params.filter() ? $filter('filter')(data, params.filter()) : data;
               var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : data;
-              //get the max invited and attending
-              var maxInvitedFilter = $filter('orderBy')(data, 'invited', 'reverse');
-              $scope.maxInvited = maxInvitedFilter[0].invited;
-              var maxAttendingFilter = $filter('orderBy')(data, 'attending', 'reverse');
-              $scope.maxAttending = maxAttendingFilter[0].attending;
+              //Find the number of people invited by the person in first place.
+              if (params.orderBy() !== 'place' || params.sorting().place !== 'asc') {
+                var maxFilter = $filter('orderBy')(data, 'place');
+                $scope.maxValue = maxFilter[0].attending + maxFilter[0].invited * $scope.inviteeAttendeeRatio;
+              } else {
+                //No need to sort the data again
+                $scope.maxValue = orderedData[0].attending + orderedData[0].invited * $scope.inviteeAttendeeRatio;
+              }
               params.total(orderedData.length);
               //set total recalculation for paganation
               $defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
