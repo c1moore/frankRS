@@ -30,10 +30,10 @@
 		</td>
 		<td data-title="'Attending/Invited Count'">
 			<div class="progress">
-				<div class="progress-bar progress-bar-warning" ng-style="{'width':((user.attending/maxAttending)*100) + '%'}">
+				<div class="progress-bar progress-bar-warning" ng-style="{'width':((user.attending/maxValue)*100) + '%'}">
 					{{user.attending}}
 				</div>
-				<div class="progress-bar progress-bar-success" ng-style="{'width':((user.invited/maxInvited)*100) + '%'}">
+				<div class="progress-bar progress-bar-success" ng-style="{'width':(((user.invited * inviteeAttendeeRatio)/maxValue)*100) + '%'}">
 					{{user.invited}}
 				</div>
 			</div>

@@ -14,6 +14,7 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 			$scope.userInvites = 0;						//Number of people this recruiter invited.
 			$scope.userAttendees = 0;					//Number of people attending that this recruiter invited.
 			$scope.statsError = false;					//Error retreiving stats for this event?
+			$scope.inviteeAttendeeRatio = 0.05;			//The points ratio of invitees to attendees.
 
 			$scope.mainTableFilter = {displayName : ''};
 
@@ -38,81 +39,83 @@ angular.module('leaderboard').controller('LeaderboardTablesCtrl', ['$scope', 'Au
 
 			var getTables = function() {
 				$scope.mainTableParams = new ngTableParams({
-		        	page: 1,            // show first page
-		        	count: 10,           // count per page
-		        	filter: $scope.mainTableFilter,
-		        	/*{
-		        		displayName:''	//set the initial filter to nothing for name
-		        	},*/
-		        	sorting: {
-		        		place:'asc'		// set the initial sorting to be place asc
-		        	}
-		    	}, {
-		        	total: 0, // length of data
-		        	getData: function($defer, params) {
-		        		mainApi.getTable({event_id:eventSelector.postEventId}, function(data) {
-			            	var filteredData = params.filter() ? $filter('filter')(data, params.filter()) : data;
-			            	var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : data;
-			           
-			           		//get the max invited and attending
-			            	var maxInvitedFilter = $filter('orderBy')(data,'invited', 'reverse');
-			            	$scope.maxInvited = maxInvitedFilter[0].invited;
+					page: 1,            // show first page
+					count: 10,           // count per page
+					filter: $scope.mainTableFilter,
+					/*{
+						displayName:''	//set the initial filter to nothing for name
+					},*/
+					sorting: {
+						place:'asc'		// set the initial sorting to be place asc
+					}
+				}, {
+					total: 0, // length of data
+					getData: function($defer, params) {
+						mainApi.getTable({event_id:eventSelector.postEventId}, function(data) {
+							var filteredData = params.filter() ? $filter('filter')(data, params.filter()) : data;
+							var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : data;
 
-			            	var maxAttendingFilter = $filter('orderBy')(data,'attending', 'reverse');
-			            	$scope.maxAttending = maxAttendingFilter[0].attending;
+							//Find the number of people invited by the person in first place.
+							if(params.orderBy() !== 'place' || params.sorting().place !== 'asc') {
+								var maxFilter = $filter('orderBy')(data, 'place');
+								$scope.maxValue = maxFilter[0].attending + (maxFilter[0].invited * $scope.inviteeAttendeeRatio);
+							} else {
+								//No need to sort the data again
+								$scope.maxValue = orderedData[0].attending + (orderedData[0].invited * $scope.inviteeAttendeeRatio);
+							}
 
-			            	params.total(orderedData.length); //set total recalculation for paganation
-			            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
-			            });
-		        	},
-		        	$scope: {$data: {}}
+							params.total(orderedData.length); //set total recalculation for paganation
+							$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+						});
+					},
+					$scope: {$data: {}}
 				});
 
 				$scope.attendingTableParams = new ngTableParams({
-		        	page: 1,            // show first page
-		        	count: 10,           // count per page
-		        	filter: {
-		        		attendeeName:''	//set the initial filter to nothing for name
-		        	},
-		        	sorting: {
-		        		attendeeName:'asc'		// set the initial sorting to be displayName asc
-		        	}
-		    	}, {
-		        	total: 0, // length of data
-		        	getData: function($defer, params) {
-		            	attendingApi.getTable({event_id:eventSelector.postEventId}, function(data){
-			            	var filteredData = params.filter() ? $filter('filter')(data, params.filter()) : data;
-			            	var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : data;
+					page: 1,            // show first page
+					count: 10,           // count per page
+					filter: {
+						attendeeName:''	//set the initial filter to nothing for name
+					},
+					sorting: {
+						attendeeName:'asc'		// set the initial sorting to be displayName asc
+					}
+				}, {
+					total: 0, // length of data
+					getData: function($defer, params) {
+						attendingApi.getTable({event_id:eventSelector.postEventId}, function(data){
+							var filteredData = params.filter() ? $filter('filter')(data, params.filter()) : data;
+							var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : data;
 
-			            	params.total(orderedData.length); //set total recalculation for paganation
-			            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
-			            });
-		        	},
-		        	$scope: {$data: {}}
+							params.total(orderedData.length); //set total recalculation for paganation
+							$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+						});
+					},
+					$scope: {$data: {}}
 				});
 
 				$scope.invitedTableParams = new ngTableParams({
-		        	page: 1,            // show first page
-		        	count: 10,           // count per page
-		        	filter: {
-		        		inviteeName:''	//set the initial filter to nothing for name
-		        	},
-		        	sorting: {
-		        		inviteeName:'asc'		// set the initial sorting to be displayName asc
-		        	}
-		    	}, {
-		        	total: 0, // length of data
-		        	getData: function($defer, params) {
-		            	invitedApi.getTable(params.url,{event_id: eventSelector.postEventId}, function(data){
-			            	var filteredData = params.filter() ? $filter('filter')(data, params.filter()) : data;
-			            	var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : data;
+					page: 1,            // show first page
+					count: 10,           // count per page
+					filter: {
+						inviteeName:''	//set the initial filter to nothing for name
+					},
+					sorting: {
+						inviteeName:'asc'		// set the initial sorting to be displayName asc
+					}
+				}, {
+					total: 0, // length of data
+					getData: function($defer, params) {
+						invitedApi.getTable(params.url,{event_id: eventSelector.postEventId}, function(data){
+							var filteredData = params.filter() ? $filter('filter')(data, params.filter()) : data;
+							var orderedData = params.sorting() ? $filter('orderBy')(filteredData, params.orderBy()) : data;
 
 
-			            	params.total(orderedData.length); //set total recalculation for paganation
-			            	$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
-			            });
-		        	},
-		        	$scope: {$data: {}}
+							params.total(orderedData.length); //set total recalculation for paganation
+							$defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+						});
+					},
+					$scope: {$data: {}}
 				});
 			};
 

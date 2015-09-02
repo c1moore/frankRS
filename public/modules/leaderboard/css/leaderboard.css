@@ -79,6 +79,10 @@ th.header {
 	margin-top: 50px;
 }
 
+.progress-bar {
+	color: #333232;
+}
+
 .progress-keys {
 	display: table;
 	margin: auto;
