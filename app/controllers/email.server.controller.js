@@ -1106,7 +1106,7 @@ exports.emailProgrammer = function(req, res) {
 * event at a time, this function does not consider this, it will be the responsibility of the
 * admin to mention which event the email is referencing, if necessary.
 *
-* @param candidates - array of candidate IDs that will receive this email.
+* @param candidate_ids - array of candidate IDs that will receive this email.
 * @param subject - the subject of the email
 * @param message - the message of the email
 * @param event_id - Event id of the event being referenced
@@ -1146,7 +1146,7 @@ exports.sendCandidateEmail = function(req, res) {
 
 				var aqueue = async.queue(function(email, callback) {
 					var tempmail = new Email({
-						to: 		email.to,
+						to: 		email,
 						from: 		'frank@jou.ufl.edu',
 						subject: 	req.body.subject,
 						event_id: 	new mongoose.Types.ObjectId(req.body.event_id)
@@ -1162,7 +1162,7 @@ exports.sendCandidateEmail = function(req, res) {
 						replyTo: 	tempmail.from,
 						subject: 	tempmail.subject,
 						html: 		tempmail.message
-					}, function(err) {
+					}, function(err, info) {
 						if(err) {
 							return callback({error : err, email : tempmail.to});
 						} else {
@@ -1181,7 +1181,7 @@ exports.sendCandidateEmail = function(req, res) {
 				var failedEmails = [];
 				var task_cb = function(errObj) {
 					if(errObj.error) {
-						errs = err;
+						errs = errObj.error;
 						if(errObj.email) {
 							failedEmails.push(errObj.email);
 						}
@@ -1195,13 +1195,17 @@ exports.sendCandidateEmail = function(req, res) {
 				aqueue.resume();
 
 				aqueue.drain = function() {
-					if(errs) {
-						if(failedEmails.length) {
-							return res.status(400).send({message : "Some emails were not sent.", emails : failedEmails});
+					if(aqueue.length() === 0 && aqueue.running() === 0) {
+						if(errs) {
+							if(failedEmails.length) {
+								return res.status(400).send({message : "Some emails were not sent.", emails : failedEmails});
+							}
+
+							return res.status(400).send({message : "Email(s) sent, but some cannot be tracked."});
 						}
-						return res.status(400).send({message : "Email(s) sent, but some cannot be tracked."});
+
+						return res.status(200).send({message : "Email(s) sent!"});
 					}
-					return res.status(200).send({message : "Email(s) sent!"});
 				};
 			}
 		});
