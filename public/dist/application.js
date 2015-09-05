@@ -287,16 +287,21 @@ angular.module('admin').controller('applicationController', [
       $scope.email = {};
       $scope.email.errmess = [];
       $scope.sending = false;
-      $scope.setSelected = function (_id, email) {
-        for (var i = 0; i < $scope.selected.ids.length; i++) {
-          if ($scope.selected.ids[i] === _id) {
-            $scope.selected.ids.splice(i, 1);
-            $scope.selected.emails.splice(i, 1);
-            return;
+      $scope.selectedCandidates = [];
+      $scope.setSelected = function (_id, email, index) {
+        if ($scope.selectedCandidates[index]) {
+          for (var i = 0; i < $scope.selected.ids.length; i++) {
+            if ($scope.selected.ids[i] === _id) {
+              $scope.selected.ids.splice(i, 1);
+              $scope.selected.emails.splice(i, 1);
+              $scope.selectedCandidates[index] = false;
+              return;
+            }
           }
         }
         $scope.selected.ids.push(_id);
         $scope.selected.emails.push(email);
+        $scope.selectedCandidates[index] = true;
       };
       $scope.sendMessages = function () {
         $scope.email.error = false;
