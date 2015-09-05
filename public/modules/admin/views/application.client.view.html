@@ -39,7 +39,7 @@
 				<table ng-table="tableParams" show-filter="true" class="table table-bordered frank-table">
 					<tr ng-repeat="candidate in $data" ng-init="candidate.$edit = {name : false, email : false, status : false, notes : false}">
 						<td class="text-center" data-title="'Send Message'" width="5%">
-							<input type="checkbox" ng-click="setSelected(candidate._id, candidate.email)" ng-model="selectedCandidates" />
+							<input type="checkbox" ng-click="setSelected(candidate._id, candidate.email, $index)" ng-model="selectedCandidates[$index]" />
 						</td>
 						<td data-title="'Candidate'" sortable="'displayName'" filter="{'displayName':'text'}" width="20%">
 							<div ng-if="!candidate.user_id">
