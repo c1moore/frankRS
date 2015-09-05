@@ -171,7 +171,7 @@ var updateRanks = function(event_id, cb) {
 						}
 					}
 				);
-			}, 10000);
+			}, 20);
 
 			var errs = false;
 			var task_cb = function(err, result) {
@@ -187,14 +187,40 @@ var updateRanks = function(event_id, cb) {
 
 			aqueue.pause();
 			for(var i=0, resultsLength = sortedResults.length; i < resultsLength; i++) {
+				if(sortedResults[i + 1] && sortedResults[i].value < sortedResults[i + 1].value) {
+					//There have been problems with rankings, so I am trying to detect if the problem exists here.
+					console.log("Error detected while updating ranks.");
+				}
+
 				var recruiter = {'_id' : sortedResults[i]._id, 'place' : (i + 1)};
 				aqueue.push(recruiter, task_cb);
 			}
 			aqueue.resume();
 
-			aqueue.drain = function() {
-				cb(errs);
+			var timer;
+			var aQueueDrain = function() {
+				if(aqueue.length() === 0 && aqueue.running() === 0) {
+					//The queue is in deed empty and we can move on.
+					if(timer) {
+						clearTimeout(timer);
+						timer.unref();
+					}
+
+					cb(errs);
+				} else {
+					//The queue is not empty.  Just in case, set a timeout to check again in 20ms.
+					if(timer) {
+						clearTimeout(timer);
+						timer.unref();
+
+						timer = null;
+					}
+
+					timer = setTimeout(aQueueDrain, 500);
+				}
 			};
+
+			aqueue.drain = aQueueDrain;
 		}
 	});
 };
@@ -267,9 +293,30 @@ var updateEventLists = function(user_id, event_id, callback) {
 			}
 			aqueue.resume();
 
-			aqueue.drain = function() {
-				callback(errs);
+			var timer;
+			var aQueueDrain = function() {
+				if(aqueue.length() === 0 && aqueue.running() === 0) {
+					//The queue is in deed empty and we can move on.
+					if(timer) {
+						clearTimeout(timer);
+						timer.unref();
+					}
+
+					callback(errs);
+				} else {
+					//The queue is not empty.  Just in case, set a timeout to check again in 20ms.
+					if(timer) {
+						clearTimeout(timer);
+						timer.unref();
+
+						timer = null;
+					}
+
+					timer = setTimeout(aQueueDrain, 20);
+				}
 			};
+
+			aqueue.drain = aQueueDrain;
 		}
 	});
 };
@@ -1087,7 +1134,7 @@ exports.sendCandidateEmail = function(req, res) {
 		], function(err, result) {
 			if(err) {
 				return res.status(400).send({message : err});
-			} else if(!result.length) {
+			} else if(!result || !result.length) {
 				return res.status(400).send({message : "No emails found."});
 			} else {
 				var emails = [];
@@ -1128,29 +1175,29 @@ exports.sendCandidateEmail = function(req, res) {
 							});
 						}
 					});
-				}, 10000);
+				}, 20);
 
 				var errs = false;
-				var emails = [];
+				var failedEmails = [];
 				var task_cb = function(errObj) {
 					if(errObj.error) {
 						errs = err;
 						if(errObj.email) {
-							emails.push(errObj.email);
+							failedEmails.push(errObj.email);
 						}
 					}
 				};
 
 				aqueue.pause();
-				for(var i = 0; i < req.body.emails.length; i++) {
+				for(var i = 0; i < emails.length; i++) {
 					aqueue.push(emails[i], task_cb);
 				}
 				aqueue.resume();
 
 				aqueue.drain = function() {
 					if(errs) {
-						if(emails.length) {
-							return res.status(400).send({message : "Some emails were not sent.", emails : emails});
+						if(failedEmails.length) {
+							return res.status(400).send({message : "Some emails were not sent.", emails : failedEmails});
 						}
 						return res.status(400).send({message : "Email(s) sent, but some cannot be tracked."});
 					}

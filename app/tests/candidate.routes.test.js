@@ -441,6 +441,102 @@ describe('Candidate Route Integration Tests:', function() {
 					});
 			});
 
+			it("admin should be able to send an email to multiple candidates.", function(done) {
+				this.timeout(10000);
+				userAgent
+					.post('http://localhost:3001/admin/send')
+					.send({candidate_ids : [candidate1._id.toString(), candidate2._id.toString()], subject : "This is a test of the candidate emailing system.", message : "Thank you for cooperating and donating your valuable bandwith to this important process.", event_id : event1._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						
+						res.status.should.equal(200);
+						res.body.should.have.property('message');
+						res.body.message.should.be.equal("Email(s) sent!");
+						
+						done();
+					});
+			});
+
+			it("admin should be able to send an email to a single candidate.", function(done) {
+				this.timeout(10000);
+				userAgent
+					.post('http://localhost:3001/admin/send')
+					.send({candidate_ids : [candidate1._id.toString()], subject : "This is a test of the candidate emailing system.", message : "Thank you for cooperating and donating your valuable bandwith to this important process.", event_id : event1._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						
+						res.status.should.equal(200);
+						res.body.should.have.property('message');
+						res.body.message.should.be.equal("Email(s) sent!");
+						
+						done();
+					});
+			});
+
+			it("admin should receive a proper error when no candidates are specified.", function(done) {
+				this.timeout(10000);
+				userAgent
+					.post('http://localhost:3001/admin/send')
+					.send({candidate_ids : [], subject : "This is a test of the candidate emailing system.", message : "Thank you for cooperating and donating your valuable bandwith to this important process.", event_id : event1._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						
+						res.status.should.equal(400);
+						res.body.should.have.property('message');
+						res.body.message.should.be.equal("At least one email is required.");
+						
+						done();
+					});
+			});
+
+			it("admin should receive a proper error when the candidates field is not specified", function(done) {
+				this.timeout(10000);
+				userAgent
+					.post('http://localhost:3001/admin/send')
+					.send({subject : "This is a test of the candidate emailing system.", message : "Thank you for cooperating and donating your valuable bandwith to this important process.", event_id : event1._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						
+						res.status.should.equal(400);
+						res.body.should.have.property('message');
+						res.body.message.should.be.equal("At least one email is required.");
+						
+						done();
+					});
+			});
+
+			it("admin should receive a proper error when the message field is not specified", function(done) {
+				this.timeout(10000);
+				userAgent
+					.post('http://localhost:3001/admin/send')
+					.send({candidate_ids : [candidate1._id.toString(), candidate2._id.toString()], subject : "This is a test of the candidate emailing system.", event_id : event1._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						
+						res.status.should.equal(400);
+						res.body.should.have.property('message');
+						res.body.message.should.be.equal("Required field not specified.");
+						
+						done();
+					});
+			});
+
+			it("admin should receive a proper error when the event_id field is not specified", function(done) {
+				this.timeout(10000);
+				userAgent
+					.post('http://localhost:3001/admin/send')
+					.send({candidate_ids : [candidate1._id.toString(), candidate2._id.toString()], subject : "This is a test of the candidate emailing system.", message : "Thank you for cooperating and donating your valuable bandwith to this important process."})
+					.end(function(err,res) {
+						if (err) throw err;
+						
+						res.status.should.equal(400);
+						res.body.should.have.property('message');
+						res.body.message.should.be.equal("Required field not specified.");
+						
+						done();
+					});
+			});
+
 			it("admin should be able to send an email to multiple people.", function(done) {
 				this.timeout(10000);
 				userAgent
@@ -760,6 +856,8 @@ describe('Candidate Route Integration Tests:', function() {
 			});
 
 			it('should update the candidate\'s role when both an admin and the candidate have accepted the recruiter position for this event.' ,function(done){
+				this.timeout(10000);
+
 				candidate2.save(function(err) {
 					if(err)
 						return done(err);
@@ -1352,6 +1450,21 @@ describe('Candidate Route Integration Tests:', function() {
 
 		it("should not allow attendees to send an email.", function(done) {
 				attendeeAgent2
+					.post('http://localhost:3001/admin/send')
+					.send({candidate_ids : [candidate1._id.toString(), candidate2._id.toString()], subject : "This is a test of the candidate emailing system.", message : "Thank you for cooperating and donating your valuable bandwith to this important process.", event_id : event1._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						
+						res.status.should.equal(401);
+						res.body.should.have.property('message');
+						res.body.message.should.be.equal("User does not have permission.");
+						
+						done();
+					});
+		});
+
+		it("should not allow attendees to send an email.", function(done) {
+				attendeeAgent2
 					.post('http://localhost:3001/send/nonuser')
 					.send({emails : ["anyString_cen3031.0.boom0625@spamgourmet.com", "test_cen3031.0.boom0625@spamgourmet.com", "cowsandbeans_cen3031.0.boom0625@spamgourmet.com"], subject : "Selling Cows for Beans", message : "Did you know that selling a cow for magic beans is typically a bad idea?", event_id : event1._id})
 					.end(function(err,res) {
@@ -1626,6 +1739,21 @@ describe('Candidate Route Integration Tests:', function() {
 						done();
 					});
 				});
+		});
+
+		it("should not allow recruiters to send an email to a nonuser candidate.", function(done) {
+				attendeeAgent2
+					.post('http://localhost:3001/admin/send')
+					.send({candidate_ids : [candidate1._id.toString(), candidate2._id.toString()], subject : "This is a test of the candidate emailing system.", message : "Thank you for cooperating and donating your valuable bandwith to this important process.", event_id : event1._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						
+						res.status.should.equal(401);
+						res.body.should.have.property('message');
+						res.body.message.should.be.equal("User does not have permission.");
+						
+						done();
+					});
 		});
 
 		it("should not allow recruiters to send an email.", function(done) {
@@ -2118,6 +2246,21 @@ describe('Candidate Route Integration Tests:', function() {
 						done();
 					});
 				});
+		});
+
+		it("should not allow guests to send an email.", function(done) {
+				tempAgent
+					.post('http://localhost:3001/admin/send')
+					.send({candidate_ids : [candidate1._id.toString(), candidate2._id.toString()], subject : "This is a test of the candidate emailing system.", message : "Thank you for cooperating and donating your valuable bandwith to this important process.", event_id : event1._id})
+					.end(function(err,res) {
+						if (err) throw err;
+						
+						res.status.should.equal(401);
+						res.body.should.have.property('message');
+						res.body.message.should.be.equal("User is not logged in.");
+						
+						done();
+					});
 		});
 
 		it("should not allow guests to send an email.", function(done) {
