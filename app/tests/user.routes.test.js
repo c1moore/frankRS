@@ -2850,6 +2850,15 @@ describe('Express.js User Route Unit Tests:', function() {
 													}
 													i.should.not.equal(newUser5.status.length);
 
+													for(i = 0; i < newUser5.rank.length; i++) {
+														if(newUser5.rank[i].event_id.toString() === event1._id.toString()) {
+															//Both user5 and tempUser2 have 0 points so either could be in 5th or 6th place.
+															newUser5.rank[i].place.should.be.within(5, 6);
+															break;
+														}
+													}
+													i.should.not.equal(newUser5.rank.length);
+
 													Evnt.findOne({_id : event1._id}, function(err, newEvnt) {
 														if(err) {
 															return done(err);
@@ -2868,10 +2877,8 @@ describe('Express.js User Route Unit Tests:', function() {
 															User.findOne({_id : tempUser2._id}, function(err, newTempUser2) {
 																should.not.exist(err);
 
-																//tempUser2 is tied with user5 (an admin) so he could be in 5th or 6th place.
-																if(newTempUser2.rank[0].place !== 5 && newTempUser2.rank[0].place !== 6) {
-																	done(new Error("tempUser2's rank was not updated correctly.  Expected 5 or 6, but got " + newTempUser2.rank[0].place + "."));
-																}
+																//Both user5 and tempUser2 have 0 points so either could be in 5th or 6th place.
+																newTempUser2.rank[0].place.should.be.within(5, 6);
 																
 																newTempUser2.inviteeList.length.should.equal(0);
 																newTempUser2.almostList.length.should.equal(2);

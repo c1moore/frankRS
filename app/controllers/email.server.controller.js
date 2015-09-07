@@ -75,6 +75,7 @@ var updateRanks = function(event_id, cb) {
 	mapReduceObj.map = function() {
 		var isAdmin = false;
 		var isRecruiter = false;
+
 		for(var i = 0; i < this.roles.length; i++) {
 			if(this.roles[i] === 'admin') {
 				isAdmin = true;
@@ -84,19 +85,26 @@ var updateRanks = function(event_id, cb) {
 			}
 		}
 
+		var event_idStringified = event_id.valueOf();
+
 		if(isAdmin) {
 			var hasPoints = false;		//Does the user have any points?
 
-			for(var j = 0; j < this.attendeeList.length; j++) {
-				if(this.attendeeList[j].event_id.toString() === event_id.toString()) {
-					emit(this._id, 10);		//People attending are worth 10 points.
-					hasPoints = true;
+			if(this.attendeeList) {
+				for(var j = 0, attendeeLength = this.attendeeList.length; j < attendeeLength; j++) {
+					if(this.attendeeList[j].event_id.valueOf() === event_idStringified) {
+						emit(this._id, 10);		//People attending are worth 10 points.
+						hasPoints = true;
+					}
 				}
 			}
-			for(var j = 0; j < this.inviteeList.length; j++) {
-				if(this.inviteeList[j].event_id.toString() === event_id.toString()) {
-					emit(this._id, 0.5);	//People invited are worth 0.5 points.  The only time invites will make a big enough contribution is when there is a tie between recruiters from number of people attending.
-					hasPoints = true;
+
+			if(this.inviteeList) {
+				for(var j = 0, inviteeLength = this.inviteeList.length; j < inviteeLength; j++) {
+					if(this.inviteeList[j].event_id.valueOf() === event_idStringified) {
+						emit(this._id, 0.5);	//People invited are worth 0.5 points.  The only time invites will make a big enough contribution is when there is a tie between recruiters from number of people attending.
+						hasPoints = true;
+					}
 				}
 			}
 
@@ -104,24 +112,29 @@ var updateRanks = function(event_id, cb) {
 				emit(this._id, 0);
 			}
 		} else if(isRecruiter) {
-			for(var i = 0; i < this.status.length; i++) {
-				if(this.status[i].event_id.toString() === event_id.toString()) {
+			for(var i = 0, statusLength = this.status.length; i < statusLength; i++) {
+				if(this.status[i].event_id.valueOf() === event_idStringified) {
 					if(!this.status[i].recruiter) {
 						break;
 					}
 
 					var hasPoints = false;		//Does the user have any points?
 
-					for(var j = 0; j < this.attendeeList.length; j++) {
-						if(this.attendeeList[j].event_id.toString() === event_id.toString()) {
-							emit(this._id, 10);		//People attending are worth 10 points.
-							hasPoints = true;
+					if(this.attendeeList) {
+						for(var j = 0, attendeeLength = this.attendeeList.length; j < attendeeLength; j++) {
+							if(this.attendeeList[j].event_id.valueOf() === event_idStringified) {
+								emit(this._id, 10);		//People attending are worth 10 points.
+								hasPoints = true;
+							}
 						}
 					}
-					for(var j = 0; j < this.inviteeList.length; j++) {
-						if(this.inviteeList[j].event_id.toString() === event_id.toString()) {
-							emit(this._id, 0.5);	//People invited are worth 0.5 points.  The only time invites will make a big enough contribution is when there is a tie between recruiters from number of people attending.
-							hasPoints = true;
+
+					if(this.inviteeList) {
+						for(var j = 0, inviteeLength = this.inviteeList.length; j < inviteeLength; j++) {
+							if(this.inviteeList[j].event_id.valueOf() === event_idStringified) {
+								emit(this._id, 0.5);	//People invited are worth 0.5 points.  The only time invites will make a big enough contribution is when there is a tie between recruiters from number of people attending.
+								hasPoints = true;
+							}
 						}
 					}
 
@@ -134,9 +147,10 @@ var updateRanks = function(event_id, cb) {
 			}
 		}
 	};
+
 	mapReduceObj.reduce = function(recruiterId, points) {
 		var totalPoints = 0;
-		var pointsLength = points.length
+		var pointsLength = points.length;
 
 		for(var i = 0; i < pointsLength; i++) {
 			totalPoints += points[i];
@@ -144,8 +158,11 @@ var updateRanks = function(event_id, cb) {
 
 		return totalPoints;
 	};
+
 	mapReduceObj.scope = {event_id : event_id};
 	mapReduceObj.sort = {_id : 1};
+	mapReduceObj.query = {roles : {"$in" : ['admin', 'recruiter']}};
+
 	User.mapReduce(mapReduceObj, function(err, result) {
 		if(err) {
 			console.log("Error updating inviteeLists/almostLists (1): " + err);
@@ -187,11 +204,6 @@ var updateRanks = function(event_id, cb) {
 
 			aqueue.pause();
 			for(var i=0, resultsLength = sortedResults.length; i < resultsLength; i++) {
-				if(sortedResults[i + 1] && sortedResults[i].value < sortedResults[i + 1].value) {
-					//There have been problems with rankings, so I am trying to detect if the problem exists here.
-					console.log("Error detected while updating ranks.");
-				}
-
 				var recruiter = {'_id' : sortedResults[i]._id, 'place' : (i + 1)};
 				aqueue.push(recruiter, task_cb);
 			}
