@@ -25,6 +25,11 @@ exports.update = function(req, res) {
 	delete req.body.attendeeList;
 	delete req.body.inviteeList;
 	delete req.body.status;
+	delete req.body.provider;
+	delete req.body.password;
+	delete req.body.salt;
+	delete req.body.providerData;
+	delete req.body.additionalProvidersData;
 
 	if (user) {
 		// Merge existing user
