@@ -467,8 +467,17 @@ exports.sendInvitation = function(req, res) {
 											//The invitee has not been invited to the event yet, increment the event invited count and add this event to the invitee status array.
 											var evnt_id = new mongoose.Types.ObjectId(req.body.event_id);
 
-											result.status.addToSet({'event_id' : evnt_id, 'attending' : false, 'recruiter' : false});
-											result.save(function(err, updatedUser) {
+											User.update({_id : result._id}, {status : {
+												$addToSet : {
+													event_id : evnt_id,
+													attending : false,
+													recruiter : false
+												}
+											}}, function(err, updatedUser) {
+												if(err) {
+													callback(err, null);
+												}
+
 												Event.findByIdAndUpdate(evnt_id, {$inc : {invited : 1}}, function(err) {
 													if(err) {
 														callback(err, null);
