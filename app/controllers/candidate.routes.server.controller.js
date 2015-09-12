@@ -12,7 +12,7 @@ var errorHandler = require('./errors'),
 	Candidate = mongoose.model('Candidate'),
 	Email = mongoose.model('Email'),
 	nodemailer = require("nodemailer"),
-	smtpPool = require('nodemailer-smtp-pool'),
+	sgTransport = require('nodemailer-sendgrid-transport'),
 	config = require('../../config/config'),
 	https = require('https'),
 	querystring = require('querystring'),
@@ -520,7 +520,7 @@ exports.setEventStatus = function(req,res) {
 															event_id: 	event_id
 														});
 
-														var smtpTransport = nodemailer.createTransport(config.mailer.options);
+														var smtpTransport = nodemailer.createTransport(sgTransport(config.mailer.options));
 														var mailOptions = {
 															to: 		candidateEmail.to,
 															from: 		candidateEmail.from,
@@ -591,7 +591,7 @@ exports.setEventStatus = function(req,res) {
 															event_id: 	event_id
 														});
 
-														var smtpTransport = nodemailer.createTransport(config.mailer.options);
+														var smtpTransport = nodemailer.createTransport(sgTransport(config.mailer.options));
 														var mailOptions = {
 															to: 		candidateEmail.to,
 															from: 		candidateEmail.from,
@@ -823,7 +823,7 @@ exports.setEventAccepted = function(req,res){
 															event_id: 	event_id
 														});
 
-														var smtpTransport = nodemailer.createTransport(config.mailer.options);
+														var smtpTransport = nodemailer.createTransport(sgTransport(config.mailer.options));
 														var mailOptions = {
 															to: 		candidateEmail.to,
 															from: 		candidateEmail.from,
@@ -896,7 +896,7 @@ exports.setEventAccepted = function(req,res){
 															event_id: 	event_id
 														});
 
-														var smtpTransport = nodemailer.createTransport(config.mailer.options);
+														var smtpTransport = nodemailer.createTransport(sgTransport(config.mailer.options));
 														var mailOptions = {
 															to: 		candidateEmail.to,
 															from: 		candidateEmail.from,

@@ -50,7 +50,8 @@
     "mongoose-id-validator": "^0.1.5",
     "formidable": "~1.0.15",
     "nodemailer-smtp-pool": "~0.1.8",
-    "buffer-equal-constant-time": "^1.0.1"
+    "buffer-equal-constant-time": "^1.0.1",
+    "nodemailer-sendgrid-transport": "~0.2.0"
   },
   "devDependencies": {
     "supertest": "~0.13.0",

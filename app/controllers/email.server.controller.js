@@ -7,7 +7,7 @@ var errorHandler = require('./errors'),
 	mongoose = require('mongoose'),
 	_ = require('lodash'),
 	nodemailer = require('nodemailer'),
-	smtpPool = require('nodemailer-smtp-pool'),
+	sgTransport = require('nodemailer-sendgrid-transport'),
 	User = mongoose.model('User'),
 	Event = mongoose.model('Event'),
 	Candidate = mongoose.model('Candidate'),
@@ -357,7 +357,7 @@ exports.sendInvitation = function(req, res) {
 			event_id: 	new mongoose.Types.ObjectId(req.body.event_id)
 		});
 
-		var smtpTransport = nodemailer.createTransport(config.mailer.options);
+		var smtpTransport = nodemailer.createTransport(sgTransport(config.mailer.options));
 		var mailOptions = {
 			to: 		invitationEmail.to,
 			from: 		invitationEmail.from,
@@ -445,7 +445,7 @@ exports.sendInvitation = function(req, res) {
 											if(err) {
 												callback(err, null);
 											}
-											
+
 											Event.findByIdAndUpdate(new mongoose.Types.ObjectId(req.body.event_id), {$inc : {invited : 1}}, function(err) {
 												if(err) {
 													callback(err, null);
@@ -726,7 +726,7 @@ exports.acceptInvitation = function(req, res) {
 										event_id: 	evnt._id
 									});
 
-									var smtpTransport = nodemailer.createTransport(config.mailer.options);
+									var smtpTransport = nodemailer.createTransport(sgTransport(config.mailer.options));
 									var attendeeMailOptions = {
 										to: 		attendeeEmail.to,
 										from: 		attendeeEmail.from,
@@ -908,7 +908,7 @@ exports.acceptInvitation = function(req, res) {
 										event_id: 	evnt._id
 									});
 
-									var smtpTransport = nodemailer.createTransport(config.mailer.options);
+									var smtpTransport = nodemailer.createTransport(sgTransport(config.mailer.options));
 									var attendeeMailOptions = {
 										to: 		attendeeEmail.to,
 										from: 		attendeeEmail.from,
@@ -1104,7 +1104,7 @@ exports.emailProgrammer = function(req, res) {
 			message: 	req.body.message,
 			event_id: 	new mongoose.Types.ObjectId(req.body.event_id)
 		});
-		var smtpTransport = nodemailer.createTransport(config.mailer.options);
+		var smtpTransport = nodemailer.createTransport(sgTransport(config.mailer.options));
 		smtpTransport.sendMail({
 			to: 		programmerEmail.to,
 			from: 		programmerEmail.from,
@@ -1168,7 +1168,7 @@ exports.sendCandidateEmail = function(req, res) {
 					emails.push(result[i].email);
 				}
 
-				var smtpTransport = nodemailer.createTransport(smtpPool(config.mailer.options));
+				var smtpTransport = nodemailer.createTransport(sgTransport(config.mailer.options));
 
 				var aqueue = async.queue(function(email, callback) {
 					var tempmail = new Email({
@@ -1207,6 +1207,8 @@ exports.sendCandidateEmail = function(req, res) {
 				var failedEmails = [];
 				var task_cb = function(errObj) {
 					if(errObj.error) {
+						console.error(errObj);
+
 						errs = errObj.error;
 						if(errObj.email) {
 							failedEmails.push(errObj.email);
@@ -1262,7 +1264,7 @@ exports.sendNonuserEmail = function(req, res) {
 	} else if(!req.body.event_id) {
 		return res.status(400).send({message : "Required field not specified."});
 	} else {
-		var smtpTransport = nodemailer.createTransport(smtpPool(config.mailer.options));
+		var smtpTransport = nodemailer.createTransport(sgTransport(config.mailer.options));
 
 		var aqueue = async.queue(function(email, callback) {
 			var tempmail = new Email({

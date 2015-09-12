@@ -10,6 +10,7 @@ var _ = require('lodash'),
 	User = mongoose.model('User'),
 	config = require('../../../config/config'),
 	nodemailer = require('nodemailer'),
+	sgTransport = require('nodemailer-sendgrid-transport'),
 	crypto = require('crypto'),
 	async = require('async'),
 	crypto = require('crypto');
@@ -66,7 +67,7 @@ exports.forgot = function(req, res, next) {
 		},
 		// If valid email, send reset email using service
 		function(emailHTML, user, done) {
-			var smtpTransport = nodemailer.createTransport(config.mailer.options);
+			var smtpTransport = nodemailer.createTransport(sgTransport(config.mailer.options));
 			var mailOptions = {
 				to: user.email,
 				from: config.mailer.from,
@@ -169,7 +170,7 @@ exports.reset = function(req, res, next) {
 		},
 		// If valid email, send reset email using service
 		function(emailHTML, user, done) {
-			var smtpTransport = nodemailer.createTransport(config.mailer.options);
+			var smtpTransport = nodemailer.createTransport(sgTransport(config.mailer.options));
 			var mailOptions = {
 				to: user.email,
 				from: config.mailer.from,

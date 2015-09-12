@@ -42,7 +42,9 @@ module.exports = {
 			service: process.env.MAILER_SERVICE_PROVIDER || 'MAILER_SERVICE_PROVIDER',
 			auth: {
 				user: process.env.MAILER_EMAIL_ID || 'MAILER_EMAIL_ID',
-				pass: process.env.MAILER_PASSWORD || 'MAILER_PASSWORD'
+				pass: process.env.MAILER_PASSWORD || 'MAILER_PASSWORD',
+				api_user: process.env.MAILER_API_USER || 'MAILER_API_USER',
+				api_key: process.env.MAILER_API_KEY || 'MAILER_API_KEY'
 			}
 		}
 	},

@@ -599,11 +599,13 @@ exports.getRecruiterAttendees = function(req, res) {
 					aqueue.pause();
 					var attendeeList = [];
 					for(var i = 0; i < populatedAttendees.length; i++) {
-						populatedAttendees[i].attendeeList.user_id = populatedAttendees[i].attendeeList.user_id.toObject();
-						
-						aqueue.push({attendeeEmail : populatedAttendees[i].attendeeList.user_id.email, index : i}, aqueueCallback);
+						if(populatedAttendees[i].attendeeList.user_id) {
+							populatedAttendees[i].attendeeList.user_id = populatedAttendees[i].attendeeList.user_id.toObject();
+							
+							aqueue.push({attendeeEmail : populatedAttendees[i].attendeeList.user_id.email, index : i}, aqueueCallback);
 
-						attendeeList.push(populatedAttendees[i].attendeeList.user_id);
+							attendeeList.push(populatedAttendees[i].attendeeList.user_id);
+						}
 					}
 					aqueue.resume();
 				});
@@ -693,11 +695,13 @@ exports.getRecruiterInvitees = function(req, res) {
 					aqueue.pause();
 					var inviteeList = [];
 					for(var i = 0; i < populatedInvitees.length; i++) {
-						populatedInvitees[i].inviteeList.user_id = populatedInvitees[i].inviteeList.user_id.toObject();
-						
-						aqueue.push({inviteeEmail : populatedInvitees[i].inviteeList.user_id.email, index : i}, aqueueCallback);
+						if(populatedInvitees[i].inviteeList.user_id) {
+							populatedInvitees[i].inviteeList.user_id = populatedInvitees[i].inviteeList.user_id.toObject();
+							
+							aqueue.push({inviteeEmail : populatedInvitees[i].inviteeList.user_id.email, index : i}, aqueueCallback);
 
-						inviteeList.push(populatedInvitees[i].inviteeList.user_id);
+							inviteeList.push(populatedInvitees[i].inviteeList.user_id);
+						}
 					}
 					aqueue.resume();
 				});
@@ -787,11 +791,13 @@ exports.getRecruiterAlmosts = function(req, res) {
 					aqueue.pause();
 					var almostList = [];
 					for(var i = 0; i < populatedAlmosts.length; i++) {
-						populatedAlmosts[i].almostList.user_id = populatedAlmosts[i].almostList.user_id.toObject();
-						
-						aqueue.push({almostEmail : populatedAlmosts[i].almostList.user_id.email, index : i}, aqueueCallback);
+						if(populatedAlmosts[i].almostList.user_id) {
+							populatedAlmosts[i].almostList.user_id = populatedAlmosts[i].almostList.user_id.toObject();
+							
+							aqueue.push({almostEmail : populatedAlmosts[i].almostList.user_id.email, index : i}, aqueueCallback);
 
-						almostList.push(populatedAlmosts[i].almostList.user_id);
+							almostList.push(populatedAlmosts[i].almostList.user_id);
+						}
 					}
 					aqueue.resume();
 				});
