@@ -422,7 +422,7 @@ exports.sendInvitation = function(req, res) {
 								*/
 								User.findOne({'email' : req.body.email}, function(err, result) {
 									if(err) {
-										callback(true, null);
+										callback(err, null);
 									} else if(!result) {
 										/**
 										* Invitee is not in the db yet.  Add the invitee to the db and send the new User
@@ -489,7 +489,7 @@ exports.sendInvitation = function(req, res) {
 								recruiter.inviteeList.addToSet({'event_id' : new mongoose.Types.ObjectId(req.body.event_id), 'user_id' : invitee._id});
 								recruiter.save(function(err, result) {
 									if(err) {
-										callback(true, null);
+										callback(err, null);
 									} else {
 										callback(null, invitee);
 									}
@@ -529,11 +529,12 @@ exports.sendInvitation = function(req, res) {
 						*/
 						], function(err, invitee) {
 							if(err) {
-								console.log("Line 418", err);
+								console.error("Line 418", err);
 								return res.status(400).send({'message' : "Invitation was not sent.  We could not connect to the server, please try again later."});
 							} else {
 								smtpTransport.sendMail(mailOptions, function(err) {
 									if(err) {
+										console.error("Error sending message: ", err);
 										return res.status(400).send({'message' : 'Invitation was not sent.  Please try again later.', 'error' : err});
 									} else {
 										async.parallel([

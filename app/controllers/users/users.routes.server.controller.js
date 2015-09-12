@@ -673,7 +673,7 @@ exports.getRecruiterInvitees = function(req, res) {
 								cb(false);
 							}
 						});
-					});
+					}, 20);
 
 					var aqueueErrors = false;
 					var aqueueCallback = function(err) {
