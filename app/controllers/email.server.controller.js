@@ -442,6 +442,10 @@ exports.sendInvitation = function(req, res) {
 										});
 
 										newUser.save(function(err, result2) {
+											if(err) {
+												callback(err, null);
+											}
+											
 											Event.findByIdAndUpdate(new mongoose.Types.ObjectId(req.body.event_id), {$inc : {invited : 1}}, function(err) {
 												if(err) {
 													callback(err, null);
