@@ -551,7 +551,11 @@ exports.getRecruiterAttendees = function(req, res) {
 					select : "-_id displayName email"
 				}, function(err, populatedAttendees) {
 					if(err) {
-						res.status(400).send(err);
+						return res.status(400).send(err);
+					}
+
+					if(populatedAttendees.length === 0) {
+						return res.status(200).send([]);
 					}
 
 					/**
@@ -579,7 +583,7 @@ exports.getRecruiterAttendees = function(req, res) {
 								cb(false);
 							}
 						});
-					});
+					}, 20);
 
 					var aqueueErrors = false;
 					var aqueueCallback = function(err) {
@@ -647,7 +651,11 @@ exports.getRecruiterInvitees = function(req, res) {
 					select : "-_id displayName email"
 				}, function(err, populatedInvitees) {
 					if(err) {
-						res.status(400).send(err);
+						return res.status(400).send(err);
+					}
+
+					if(populatedInvitees.length === 0) {
+						return res.status(200).send([]);
 					}
 
 					/**
@@ -743,7 +751,11 @@ exports.getRecruiterAlmosts = function(req, res) {
 					select : "-_id displayName email"
 				}, function(err, populatedAlmosts) {
 					if(err) {
-						res.status(400).send(err);
+						return res.status(400).send(err);
+					}
+
+					if(populatedAlmosts.length === 0) {
+						return res.status(200).send([]);
 					}
 
 					/**
@@ -771,7 +783,7 @@ exports.getRecruiterAlmosts = function(req, res) {
 								cb(false);
 							}
 						});
-					});
+					}, 20);
 
 					var aqueueErrors = false;
 					var aqueueCallback = function(err) {
