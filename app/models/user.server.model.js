@@ -56,7 +56,7 @@ var validateRole = function(property) {
 
 	var valid = true;
 	for(var i=0; i<property.length; i++) {
-		if(!(property[i] === 'admin' || property[i] === 'recruiter' || property[i] === 'attendee')) {
+		if(!(property[i] === 'admin' || property[i] === 'recruiter' || property[i] === 'attendee' || property[i] === 'kaptain' || property[i] === 'kreweAdmin' || property[i] === 'recruiterAdmin' || property[i] === 'userAdmin')) {
 			valid = false;
 			break;
 		}
@@ -89,6 +89,7 @@ var StatusSchema = new Schema({
 	event_id: {type: mongoose.Schema.Types.ObjectId, ref:'Event'},
 	attending: {type: Boolean},
 	recruiter: {type: Boolean},
+	kaptain: {type: Boolean, default: false, required: true},
 	active: {type: Boolean, default: true, required: true}
 }, {_id:false, validate : [validateOptional, 'All fields of status required.']});
 
@@ -155,7 +156,7 @@ var UserSchema = new Schema({
 	roles: {
 		type: [{
 			type: String,
-			enum: ['admin', 'recruiter', 'attendee']
+			enum: ['admin', 'recruiter', 'attendee', 'kaptain', 'kreweAdmin', 'recruiterAdmin', 'userAdmin']
 		}],
 		validate: [validateRole, 'A valid role is required.']
 	},
@@ -201,6 +202,10 @@ var UserSchema = new Schema({
   			name: {type: String},
   			template: {type: String}
   		}]
+  	},
+  	hasKrewe: {
+  		type: Boolean,
+  		default: false
   	}
 });
 
