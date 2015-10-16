@@ -2765,161 +2765,2237 @@ describe('Krewe Routes Integration Tests:', function() {
 
 	/* saveKreweAsKaptain - /save/krewe */
 	it('should allow a Kaptain to save their Krewe.', function(done) {
+		var newName = "My New Krewe Name",
+			newMembers = krewe1.members.slice(0);
 
+		newMembers.push({member_id : member3._id.toString()});
+
+		kaptain1Agent
+			.post('http://localhost:3001/save/krewe')
+			.send({
+				event_id: event1._id.toString(),
+				krewe: {
+					_id: 		krewe1._id.toString(),
+					name: 		newName,
+					members: 	newMembers
+				}
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(200);
+				res.body.message.should.equal("Krewe updated successfully.");
+
+				Krewe.findOne({_id : krewe1._id}, function(findErr, newKrewe1) {
+					if(findErr) {
+						return done(findErr);
+					}
+
+					newKrewe1.name.should.equal(newName);
+
+					newKrewe1.members.length.should.equal(newMembers.length);
+					for(var dbIndex = 0; dbIndex < newKrewe1.members.length; dbIndex++) {
+						var varIndex = 0;
+						for(; varIndex < newMembers.length; varIndex++) {
+							if(newKrewe1.members[dbIndex].member_id.toString() === newMembers[varIndex].member_id.toString()) {
+								break;
+							}
+						}
+
+						if(varIndex === newMembers.length) {
+							return done(new Error("Unknown member added to Krewe."));
+						}
+					}
+
+					newKrewe1.event_id.toString().should.equal(krewe1.event_id.toString());
+
+					done();
+				});
+			});
 	});
 
 	it('should not allow a Kaptain to save another Krewe.', function(done) {
+		var newName = "My New Krewe Name",
+			newMembers = krewe1.members.slice(0);
 
+		newMembers.push({member_id : member3._id.toString()});
+
+		kaptain1Agent
+			.post('http://localhost:3001/save/krewe')
+			.send({
+				event_id: event1._id.toString(),
+				krewe: {
+					_id: 		krewe2._id.toString(),
+					name: 		newName,
+					members: 	newMembers
+				}
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(401);
+				res.body.message.should.equal("User does not have permission to modify Krewe.");
+
+				Krewe.findOne({_id : krewe2._id}, function(findErr, newKrewe2) {
+					if(findErr) {
+						return done(findErr);
+					}
+
+					newKrewe2.name.should.equal(krewe2.name);
+
+					newKrewe2.members.length.should.equal(krewe2.members.length);
+					for(var dbIndex = 0; dbIndex < newKrewe2.members.length; dbIndex++) {
+						var varIndex = 0;
+						for(; varIndex < krewe2.members.length; varIndex++) {
+							if(newKrewe2.members[dbIndex].member_id.toString() === krewe2.members[varIndex].member_id.toString()) {
+								break;
+							}
+						}
+
+						if(varIndex === krewe2.members.length) {
+							return done(new Error("Member added to Krewe."));
+						}
+					}
+
+					newKrewe2.event_id.toString().should.equal(krewe2.event_id.toString());
+
+					done();
+				});
+			});
 	});
 
 	it('should not allow a Kaptain to save a Krewe when the event_id is missing.', function(done) {
+		var newName = "My New Krewe Name",
+			newMembers = krewe1.members.slice(0);
 
+		newMembers.push({member_id : member3._id.toString()});
+
+		kaptain1Agent
+			.post('http://localhost:3001/save/krewe')
+			.send({
+				krewe: {
+					_id: 		krewe1._id.toString(),
+					name: 		newName,
+					members: 	newMembers
+				}
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(400);
+				res.body.message.should.equal("Required fields not specified.");
+
+				Krewe.findOne({_id : krewe1._id}, function(findErr, newKrewe1) {
+					if(findErr) {
+						return done(findErr);
+					}
+
+					newKrewe1.name.should.equal(krewe1.name);
+
+					newKrewe1.members.length.should.equal(krewe1.members.length);
+					for(var dbIndex = 0; dbIndex < newKrewe1.members.length; dbIndex++) {
+						var varIndex = 0;
+						for(; varIndex < krewe1.members.length; varIndex++) {
+							if(newKrewe1.members[dbIndex].member_id.toString() === krewe1.members[varIndex].member_id.toString()) {
+								break;
+							}
+						}
+
+						if(varIndex === krewe1.members.length) {
+							return done(new Error("Member added to Krewe."));
+						}
+					}
+
+					newKrewe1.event_id.toString().should.equal(krewe1.event_id.toString());
+
+					done();
+				});
+			});
 	});
 
 	it('should not allow a Kaptain to save a Krewe when the event_id is invalid.', function(done) {
+		var newName = "My New Krewe Name",
+			newMembers = krewe1.members.slice(0);
 
+		newMembers.push({member_id : member3._id.toString()});
+
+		kaptain1Agent
+			.post('http://localhost:3001/save/krewe')
+			.send({
+				event_id: 	"fake_id12",
+				krewe: {
+					_id: 		krewe1._id.toString(),
+					name: 		newName,
+					members: 	newMembers
+				}
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(400);
+				res.body.message.should.equal("Required fields not specified.");
+
+				Krewe.findOne({_id : krewe1._id}, function(findErr, newKrewe1) {
+					if(findErr) {
+						return done(findErr);
+					}
+
+					newKrewe1.name.should.equal(krewe1.name);
+
+					newKrewe1.members.length.should.equal(krewe1.members.length);
+					for(var dbIndex = 0; dbIndex < newKrewe1.members.length; dbIndex++) {
+						var varIndex = 0;
+						for(; varIndex < krewe1.members.length; varIndex++) {
+							if(newKrewe1.members[dbIndex].member_id.toString() === krewe1.members[varIndex].member_id.toString()) {
+								break;
+							}
+						}
+
+						if(varIndex === krewe1.members.length) {
+							return done(new Error("Member added to Krewe."));
+						}
+					}
+
+					newKrewe1.event_id.toString().should.equal(krewe1.event_id.toString());
+
+					done();
+				});
+			});
 	});
 
 	it('should not allow a Kaptain to save a Krewe when the krewe field is missing.', function(done) {
+		var newName = "My New Krewe Name",
+			newMembers = krewe1.members.slice(0);
 
+		newMembers.push({member_id : member3._id.toString()});
+
+		kaptain1Agent
+			.post('http://localhost:3001/save/krewe')
+			.send({
+				event_id: 	event1._id
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(400);
+				res.body.message.should.equal("Required fields not specified.");
+
+				Krewe.findOne({_id : krewe1._id}, function(findErr, newKrewe1) {
+					if(findErr) {
+						return done(findErr);
+					}
+
+					newKrewe1.name.should.equal(krewe1.name);
+
+					newKrewe1.members.length.should.equal(krewe1.members.length);
+					for(var dbIndex = 0; dbIndex < newKrewe1.members.length; dbIndex++) {
+						var varIndex = 0;
+						for(; varIndex < krewe1.members.length; varIndex++) {
+							if(newKrewe1.members[dbIndex].member_id.toString() === krewe1.members[varIndex].member_id.toString()) {
+								break;
+							}
+						}
+
+						if(varIndex === krewe1.members.length) {
+							return done(new Error("Member added to Krewe."));
+						}
+					}
+
+					newKrewe1.event_id.toString().should.equal(krewe1.event_id.toString());
+
+					done();
+				});
+			});
 	});
 
 	it('should not allow a Kaptain to save a Krewe when the krewe field is not an object.', function(done) {
+		var newName = "My New Krewe Name",
+			newMembers = krewe1.members.slice(0);
 
+		newMembers.push({member_id : member3._id.toString()});
+
+		kaptain1Agent
+			.post('http://localhost:3001/save/krewe')
+			.send({
+				event_id: 	event1._id, 
+				krewe: [{
+					_id: 		krewe1._id.toString(),
+					name: 		newName,
+					members: 	newMembers
+				}]
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(400);
+				res.body.message.should.equal("Required fields not specified.");
+
+				Krewe.findOne({_id : krewe1._id}, function(findErr, newKrewe1) {
+					if(findErr) {
+						return done(findErr);
+					}
+
+					newKrewe1.name.should.equal(krewe1.name);
+
+					newKrewe1.members.length.should.equal(krewe1.members.length);
+					for(var dbIndex = 0; dbIndex < newKrewe1.members.length; dbIndex++) {
+						var varIndex = 0;
+						for(; varIndex < krewe1.members.length; varIndex++) {
+							if(newKrewe1.members[dbIndex].member_id.toString() === krewe1.members[varIndex].member_id.toString()) {
+								break;
+							}
+						}
+
+						if(varIndex === krewe1.members.length) {
+							return done(new Error("Member added to Krewe."));
+						}
+					}
+
+					newKrewe1.event_id.toString().should.equal(krewe1.event_id.toString());
+
+					done();
+				});
+			});
 	});
 
 	it('should not allow a Kaptain to save a Krewe when the krewe\'s _id is missing.', function(done) {
+		var newName = "My New Krewe Name",
+			newMembers = krewe1.members.slice(0);
 
+		newMembers.push({member_id : member3._id.toString()});
+
+		kaptain1Agent
+			.post('http://localhost:3001/save/krewe')
+			.send({
+				event_id: 	event1._id, 
+				krewe: {
+					name: 		newName,
+					members: 	newMembers
+				}
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(400);
+				res.body.message.should.equal("Required fields not specified.");
+
+				Krewe.findOne({_id : krewe1._id}, function(findErr, newKrewe1) {
+					if(findErr) {
+						return done(findErr);
+					}
+
+					newKrewe1.name.should.equal(krewe1.name);
+
+					newKrewe1.members.length.should.equal(krewe1.members.length);
+					for(var dbIndex = 0; dbIndex < newKrewe1.members.length; dbIndex++) {
+						var varIndex = 0;
+						for(; varIndex < krewe1.members.length; varIndex++) {
+							if(newKrewe1.members[dbIndex].member_id.toString() === krewe1.members[varIndex].member_id.toString()) {
+								break;
+							}
+						}
+
+						if(varIndex === krewe1.members.length) {
+							return done(new Error("Member added to Krewe."));
+						}
+					}
+
+					newKrewe1.event_id.toString().should.equal(krewe1.event_id.toString());
+
+					done();
+				});
+			});
 	});
 
 	it('should not allow a Kaptain to save a Krewe when the krewe\'s _id is invalid.', function(done) {
+		var newName = "My New Krewe Name",
+			newMembers = krewe1.members.slice(0);
 
+		newMembers.push({member_id : member3._id.toString()});
+
+		kaptain1Agent
+			.post('http://localhost:3001/save/krewe')
+			.send({
+				event_id: 	event1._id, 
+				krewe: {
+					_id: 		1011101,
+					name: 		newName,
+					members: 	newMembers
+				}
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(400);
+				res.body.message.should.equal("Incorrect data format.");
+
+				Krewe.findOne({_id : krewe1._id}, function(findErr, newKrewe1) {
+					if(findErr) {
+						return done(findErr);
+					}
+
+					newKrewe1.name.should.equal(krewe1.name);
+
+					newKrewe1.members.length.should.equal(krewe1.members.length);
+					for(var dbIndex = 0; dbIndex < newKrewe1.members.length; dbIndex++) {
+						var varIndex = 0;
+						for(; varIndex < krewe1.members.length; varIndex++) {
+							if(newKrewe1.members[dbIndex].member_id.toString() === krewe1.members[varIndex].member_id.toString()) {
+								break;
+							}
+						}
+
+						if(varIndex === krewe1.members.length) {
+							return done(new Error("Member added to Krewe."));
+						}
+					}
+
+					newKrewe1.event_id.toString().should.equal(krewe1.event_id.toString());
+
+					done();
+				});
+			});
 	});
 
 	it('should not allow a Kaptain to save a Krewe when the krewe\'s name is missing.', function(done) {
+		var newName = "My New Krewe Name",
+			newMembers = krewe1.members.slice(0);
 
+		newMembers.push({member_id : member3._id.toString()});
+
+		kaptain1Agent
+			.post('http://localhost:3001/save/krewe')
+			.send({
+				event_id: 	event1._id, 
+				krewe: {
+					_id: 		krewe1._id.toString(),
+					members: 	newMembers
+				}
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(400);
+				res.body.message.should.equal("Required fields not specified.");
+
+				Krewe.findOne({_id : krewe1._id}, function(findErr, newKrewe1) {
+					if(findErr) {
+						return done(findErr);
+					}
+
+					newKrewe1.name.should.equal(krewe1.name);
+
+					newKrewe1.members.length.should.equal(krewe1.members.length);
+					for(var dbIndex = 0; dbIndex < newKrewe1.members.length; dbIndex++) {
+						var varIndex = 0;
+						for(; varIndex < krewe1.members.length; varIndex++) {
+							if(newKrewe1.members[dbIndex].member_id.toString() === krewe1.members[varIndex].member_id.toString()) {
+								break;
+							}
+						}
+
+						if(varIndex === krewe1.members.length) {
+							return done(new Error("Member added to Krewe."));
+						}
+					}
+
+					newKrewe1.event_id.toString().should.equal(krewe1.event_id.toString());
+
+					done();
+				});
+			});
 	});
 
 	it('should not allow a Kaptain to save a Krewe when the krewe\'s name is invalid', function(done) {
+		var newName = "My New Krewe Name",
+			newMembers = krewe1.members.slice(0);
 
+		newMembers.push({member_id : member3._id.toString()});
+
+		kaptain1Agent
+			.post('http://localhost:3001/save/krewe')
+			.send({
+				event_id: 	event1._id, 
+				krewe: {
+					_id: 		krewe1._id.toString(),
+					name: 		{name : newName},
+					members: 	newMembers
+				}
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(400);
+				res.body.message.should.equal("Incorrect data format.");
+
+				Krewe.findOne({_id : krewe1._id}, function(findErr, newKrewe1) {
+					if(findErr) {
+						return done(findErr);
+					}
+
+					newKrewe1.name.should.equal(krewe1.name);
+
+					newKrewe1.members.length.should.equal(krewe1.members.length);
+					for(var dbIndex = 0; dbIndex < newKrewe1.members.length; dbIndex++) {
+						var varIndex = 0;
+						for(; varIndex < krewe1.members.length; varIndex++) {
+							if(newKrewe1.members[dbIndex].member_id.toString() === krewe1.members[varIndex].member_id.toString()) {
+								break;
+							}
+						}
+
+						if(varIndex === krewe1.members.length) {
+							return done(new Error("Member added to Krewe."));
+						}
+					}
+
+					newKrewe1.event_id.toString().should.equal(krewe1.event_id.toString());
+
+					done();
+				});
+			});
 	});
 
 	it('should not allow a Kaptain to save a Krewe when the krewe\'s members field is missing.', function(done) {
+		var newName = "My New Krewe Name",
+			newMembers = krewe1.members.slice(0);
 
+		newMembers.push({member_id : member3._id.toString()});
+
+		kaptain1Agent
+			.post('http://localhost:3001/save/krewe')
+			.send({
+				event_id: 	event1._id, 
+				krewe: {
+					_id: 		krewe1._id.toString(),
+					name: 		newName
+				}
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(400);
+				res.body.message.should.equal("Required fields not specified.");
+
+				Krewe.findOne({_id : krewe1._id}, function(findErr, newKrewe1) {
+					if(findErr) {
+						return done(findErr);
+					}
+
+					newKrewe1.name.should.equal(krewe1.name);
+
+					newKrewe1.members.length.should.equal(krewe1.members.length);
+					for(var dbIndex = 0; dbIndex < newKrewe1.members.length; dbIndex++) {
+						var varIndex = 0;
+						for(; varIndex < krewe1.members.length; varIndex++) {
+							if(newKrewe1.members[dbIndex].member_id.toString() === krewe1.members[varIndex].member_id.toString()) {
+								break;
+							}
+						}
+
+						if(varIndex === krewe1.members.length) {
+							return done(new Error("Member added to Krewe."));
+						}
+					}
+
+					newKrewe1.event_id.toString().should.equal(krewe1.event_id.toString());
+
+					done();
+				});
+			});
 	});
 
-	it('should not allow a Kaptain to save a Krewe when the krewe\'s members field is invalid.', function(done) {
+	it('should not allow a Kaptain to save a Krewe when one of the krewe\'s members field is invalid.', function(done) {
+		var newName = "My New Krewe Name",
+			newMembers = krewe1.members.slice(0);
 
+		newMembers.push(3701);
+
+		kaptain1Agent
+			.post('http://localhost:3001/save/krewe')
+			.send({
+				event_id: 	event1._id, 
+				krewe: {
+					_id: 		krewe1._id.toString(),
+					name: 		newName,
+					members: 	newMembers
+				}
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(400);
+				res.body.message.should.equal("Incorrect data format.");
+
+				Krewe.findOne({_id : krewe1._id}, function(findErr, newKrewe1) {
+					if(findErr) {
+						return done(findErr);
+					}
+
+					newKrewe1.name.should.equal(krewe1.name);
+
+					newKrewe1.members.length.should.equal(krewe1.members.length);
+					for(var dbIndex = 0; dbIndex < newKrewe1.members.length; dbIndex++) {
+						var varIndex = 0;
+						for(; varIndex < krewe1.members.length; varIndex++) {
+							if(newKrewe1.members[dbIndex].member_id.toString() === krewe1.members[varIndex].member_id.toString()) {
+								break;
+							}
+						}
+
+						if(varIndex === krewe1.members.length) {
+							return done(new Error("Member added to Krewe."));
+						}
+					}
+
+					newKrewe1.event_id.toString().should.equal(krewe1.event_id.toString());
+
+					done();
+				});
+			});
 	});
 
 	it('should not allow an admin to save a Krewe from the Kaptain\'s route.', function(done) {
+		var newName = "My New Krewe Name",
+			newMembers = krewe1.members.slice(0);
 
+		newMembers.push({member_id : member3._id.toString()});
+
+		adminAgent
+			.post('http://localhost:3001/save/krewe')
+			.send({
+				event_id: 	event1._id, 
+				krewe: {
+					_id: 		krewe1._id.toString(),
+					name: 		newName,
+					members: 	newMembers
+				}
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(401);
+				res.body.message.should.equal("Use route for admins.");
+
+				Krewe.findOne({_id : krewe1._id}, function(findErr, newKrewe1) {
+					if(findErr) {
+						return done(findErr);
+					}
+
+					newKrewe1.name.should.equal(krewe1.name);
+
+					newKrewe1.members.length.should.equal(krewe1.members.length);
+					for(var dbIndex = 0; dbIndex < newKrewe1.members.length; dbIndex++) {
+						var varIndex = 0;
+						for(; varIndex < krewe1.members.length; varIndex++) {
+							if(newKrewe1.members[dbIndex].member_id.toString() === krewe1.members[varIndex].member_id.toString()) {
+								break;
+							}
+						}
+
+						if(varIndex === krewe1.members.length) {
+							return done(new Error("Member added to Krewe."));
+						}
+					}
+
+					newKrewe1.event_id.toString().should.equal(krewe1.event_id.toString());
+
+					done();
+				});
+			});
 	});
 
 	it('should not allow a recruiter to save a Krewe.', function(done) {
+		this.timeout(10000);
+		var tempUser = new User({
+			fName: 			'Peter',
+			lName: 			'Parker',
+			displayName: 	'Parker, Peter',
+			email: 			'spiders_cen3031.0.boom0625@spamgourmet.com',
+			roles: 			['recruiter'],
+			status: 		[
+				{
+					event_id: 	event2._id,
+					attending: 	true,
+					recruiter: 	true,
+					kaptain: 	false
+				}
+			],
+			password: 		'password',
+			login_enabled: 	true
+		});
 
+		tempUser.save(function(saveErr) {
+			if(saveErr) {
+				return done(saveErr);
+			}
+
+			var tempUserAgent = agent.agent();
+			tempUserAgent
+				.post('http://localhost:3001/auth/signin')
+				.send({email : tempUser.email, password : 'password'})
+				.end(function(loginErr, loginRes) {
+					if(loginErr) {
+						return done(loginErr);
+					}
+
+					if(loginRes.status !== 200) {
+						return done(new Error("Temp Recruiter could not login: " + loginRes.body.message));
+					}
+
+					tempUserAgent.saveCookies(loginRes);
+
+					tempUserAgent
+						.post('http://localhost:3001/save/krewe')
+						.send({event_id : event1._id.toString()})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(401);
+
+							res.body.message.should.equal("User does not have permission.");
+
+							Krewe.findOne({_id : krewe1._id}, function(findErr, newKrewe1) {
+								if(findErr) {
+									return done(findErr);
+								}
+
+								newKrewe1.name.should.equal(krewe1.name);
+
+								newKrewe1.members.length.should.equal(krewe1.members.length);
+								for(var dbIndex = 0; dbIndex < newKrewe1.members.length; dbIndex++) {
+									var varIndex = 0;
+									for(; varIndex < krewe1.members.length; varIndex++) {
+										if(newKrewe1.members[dbIndex].member_id.toString() === krewe1.members[varIndex].member_id.toString()) {
+											break;
+										}
+									}
+
+									if(varIndex === krewe1.members.length) {
+										return done(new Error("Member added to Krewe."));
+									}
+								}
+
+								newKrewe1.event_id.toString().should.equal(krewe1.event_id.toString());
+
+								done();
+							});
+						});
+				});
+		});
 	});
 
 	it('should not allow an attendee to save a Krewe.', function(done) {
+		this.timeout(10000);
+		var tempUser = new User({
+			fName: 			'Peter',
+			lName: 			'Parker',
+			displayName: 	'Parker, Peter',
+			email: 			'spiders_cen3031.0.boom0625@spamgourmet.com',
+			roles: 			['attendee'],
+			status: 		[
+				{
+					event_id: 	event2._id,
+					attending: 	true,
+					recruiter: 	true,
+					kaptain: 	false
+				}
+			],
+			password: 		'password',
+			login_enabled: 	true
+		});
 
+		tempUser.save(function(saveErr) {
+			if(saveErr) {
+				return done(saveErr);
+			}
+
+			var tempUserAgent = agent.agent();
+			tempUserAgent
+				.post('http://localhost:3001/auth/signin')
+				.send({email : tempUser.email, password : 'password'})
+				.end(function(loginErr, loginRes) {
+					if(loginErr) {
+						return done(loginErr);
+					}
+
+					if(loginRes.status !== 200) {
+						return done(new Error("Temp Recruiter could not login: " + loginRes.body.message));
+					}
+
+					tempUserAgent.saveCookies(loginRes);
+
+					tempUserAgent
+						.post('http://localhost:3001/save/krewe')
+						.send({event_id : event1._id.toString()})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(401);
+
+							res.body.message.should.equal("User does not have permission.");
+
+							Krewe.findOne({_id : krewe1._id}, function(findErr, newKrewe1) {
+								if(findErr) {
+									return done(findErr);
+								}
+
+								newKrewe1.name.should.equal(krewe1.name);
+
+								newKrewe1.members.length.should.equal(krewe1.members.length);
+								for(var dbIndex = 0; dbIndex < newKrewe1.members.length; dbIndex++) {
+									var varIndex = 0;
+									for(; varIndex < krewe1.members.length; varIndex++) {
+										if(newKrewe1.members[dbIndex].member_id.toString() === krewe1.members[varIndex].member_id.toString()) {
+											break;
+										}
+									}
+
+									if(varIndex === krewe1.members.length) {
+										return done(new Error("Member added to Krewe."));
+									}
+								}
+
+								newKrewe1.event_id.toString().should.equal(krewe1.event_id.toString());
+
+								done();
+							});
+						});
+				});
+		});
 	});
 
 	it('should not allow a kreweAdmin to save a Krewe.', function(done) {
+		var newName = "My New Krewe Name",
+			newMembers = krewe1.members.slice(0);
 
+		newMembers.push({member_id : member3._id.toString()});
+
+		kreweAdminAgent
+			.post('http://localhost:3001/save/krewe')
+			.send({
+				event_id: 	event1._id, 
+				krewe: {
+					_id: 		krewe1._id.toString(),
+					name: 		newName,
+					members: 	newMembers
+				}
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(401);
+				res.body.message.should.equal("Use route for admins.");
+
+				Krewe.findOne({_id : krewe1._id}, function(findErr, newKrewe1) {
+					if(findErr) {
+						return done(findErr);
+					}
+
+					newKrewe1.name.should.equal(krewe1.name);
+
+					newKrewe1.members.length.should.equal(krewe1.members.length);
+					for(var dbIndex = 0; dbIndex < newKrewe1.members.length; dbIndex++) {
+						var varIndex = 0;
+						for(; varIndex < krewe1.members.length; varIndex++) {
+							if(newKrewe1.members[dbIndex].member_id.toString() === krewe1.members[varIndex].member_id.toString()) {
+								break;
+							}
+						}
+
+						if(varIndex === krewe1.members.length) {
+							return done(new Error("Member added to Krewe."));
+						}
+					}
+
+					newKrewe1.event_id.toString().should.equal(krewe1.event_id.toString());
+
+					done();
+				});
+			});
 	});
 
 	it('should not allow a recruiterAdmin to save a Krewe.', function(done) {
+		this.timeout(10000);
+		var tempUser = new User({
+			fName: 			'Peter',
+			lName: 			'Parker',
+			displayName: 	'Parker, Peter',
+			email: 			'spiders_cen3031.0.boom0625@spamgourmet.com',
+			roles: 			['recruiterAdmin'],
+			status: 		[
+				{
+					event_id: 	event2._id,
+					attending: 	true,
+					recruiter: 	true,
+					kaptain: 	false
+				}
+			],
+			password: 		'password',
+			login_enabled: 	true
+		});
 
+		tempUser.save(function(saveErr) {
+			if(saveErr) {
+				return done(saveErr);
+			}
+
+			var tempUserAgent = agent.agent();
+			tempUserAgent
+				.post('http://localhost:3001/auth/signin')
+				.send({email : tempUser.email, password : 'password'})
+				.end(function(loginErr, loginRes) {
+					if(loginErr) {
+						return done(loginErr);
+					}
+
+					if(loginRes.status !== 200) {
+						return done(new Error("Temp Recruiter could not login: " + loginRes.body.message));
+					}
+
+					tempUserAgent.saveCookies(loginRes);
+
+					tempUserAgent
+						.post('http://localhost:3001/save/krewe')
+						.send({event_id : event1._id.toString()})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(401);
+
+							res.body.message.should.equal("User does not have permission.");
+
+							Krewe.findOne({_id : krewe1._id}, function(findErr, newKrewe1) {
+								if(findErr) {
+									return done(findErr);
+								}
+
+								newKrewe1.name.should.equal(krewe1.name);
+
+								newKrewe1.members.length.should.equal(krewe1.members.length);
+								for(var dbIndex = 0; dbIndex < newKrewe1.members.length; dbIndex++) {
+									var varIndex = 0;
+									for(; varIndex < krewe1.members.length; varIndex++) {
+										if(newKrewe1.members[dbIndex].member_id.toString() === krewe1.members[varIndex].member_id.toString()) {
+											break;
+										}
+									}
+
+									if(varIndex === krewe1.members.length) {
+										return done(new Error("Member added to Krewe."));
+									}
+								}
+
+								newKrewe1.event_id.toString().should.equal(krewe1.event_id.toString());
+
+								done();
+							});
+						});
+				});
+		});
 	});
 
 	it('should not allow a userAdmin to save a Krewe.', function(done) {
+		this.timeout(10000);
+		var tempUser = new User({
+			fName: 			'Peter',
+			lName: 			'Parker',
+			displayName: 	'Parker, Peter',
+			email: 			'spiders_cen3031.0.boom0625@spamgourmet.com',
+			roles: 			['userAdmin'],
+			status: 		[
+				{
+					event_id: 	event2._id,
+					attending: 	true,
+					recruiter: 	true,
+					kaptain: 	false
+				}
+			],
+			password: 		'password',
+			login_enabled: 	true
+		});
 
+		tempUser.save(function(saveErr) {
+			if(saveErr) {
+				return done(saveErr);
+			}
+
+			var tempUserAgent = agent.agent();
+			tempUserAgent
+				.post('http://localhost:3001/auth/signin')
+				.send({email : tempUser.email, password : 'password'})
+				.end(function(loginErr, loginRes) {
+					if(loginErr) {
+						return done(loginErr);
+					}
+
+					if(loginRes.status !== 200) {
+						return done(new Error("Temp Recruiter could not login: " + loginRes.body.message));
+					}
+
+					tempUserAgent.saveCookies(loginRes);
+
+					tempUserAgent
+						.post('http://localhost:3001/save/krewe')
+						.send({event_id : event1._id.toString()})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(401);
+
+							res.body.message.should.equal("User does not have permission.");
+
+							Krewe.findOne({_id : krewe1._id}, function(findErr, newKrewe1) {
+								if(findErr) {
+									return done(findErr);
+								}
+
+								newKrewe1.name.should.equal(krewe1.name);
+
+								newKrewe1.members.length.should.equal(krewe1.members.length);
+								for(var dbIndex = 0; dbIndex < newKrewe1.members.length; dbIndex++) {
+									var varIndex = 0;
+									for(; varIndex < krewe1.members.length; varIndex++) {
+										if(newKrewe1.members[dbIndex].member_id.toString() === krewe1.members[varIndex].member_id.toString()) {
+											break;
+										}
+									}
+
+									if(varIndex === krewe1.members.length) {
+										return done(new Error("Member added to Krewe."));
+									}
+								}
+
+								newKrewe1.event_id.toString().should.equal(krewe1.event_id.toString());
+
+								done();
+							});
+						});
+				});
+		});
 	});
 
 	it('should not allow a guest to save a Krewe.', function(done) {
+		var tempUserAgent = agent.agent();
+		tempUserAgent
+			.post('http://localhost:3001/save/krewe')
+			.send({event_id : event1._id.toString()})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(401);
 
+				res.body.message.should.equal("User is not logged in.");
+
+				Krewe.findOne({_id : krewe1._id}, function(findErr, newKrewe1) {
+					if(findErr) {
+						return done(findErr);
+					}
+
+					newKrewe1.name.should.equal(krewe1.name);
+
+					newKrewe1.members.length.should.equal(krewe1.members.length);
+					for(var dbIndex = 0; dbIndex < newKrewe1.members.length; dbIndex++) {
+						var varIndex = 0;
+						for(; varIndex < krewe1.members.length; varIndex++) {
+							if(newKrewe1.members[dbIndex].member_id.toString() === krewe1.members[varIndex].member_id.toString()) {
+								break;
+							}
+						}
+
+						if(varIndex === krewe1.members.length) {
+							return done(new Error("Member added to Krewe."));
+						}
+					}
+
+					newKrewe1.event_id.toString().should.equal(krewe1.event_id.toString());
+
+					done();
+				});
+			});
 	});
 
 	/* deleteKrewe - /remove/krewes */
 	it('should allow an admin to delete several krewes.', function(done) {
+		adminAgent
+			.post("http://localhost:3001/remove/krewes")
+			.send({
+				krewe_ids : [
+					krewe1._id.toString(),
+					krewe2._id.toString()
+				]
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(200);
 
+				res.body.message.should.equal("All deleted Krewes removed successfully.");
+
+				Krewe.findOne({_id : krewe1._id}, function(search1Err, newKrewe1) {
+					if(search1Err) {
+						return done(search1Err);
+					}
+
+					if(newKrewe1) {
+						return done(new Error("Krewe was not deleted."));
+					}
+
+					Krewe.findOne({_id : krewe2._id}, function(search2Err, newKrewe2) {
+						if(search2Err) {
+							return done(search2Err);
+						}
+
+						if(newKrewe2) {
+							return done(new Error("Krewe was not deleted."));
+						}
+
+						done();
+					});
+				});
+			});
 	});
 
 	it('should allow a kreweAdmin to delete several krewes.', function(done) {
+		kreweAdminAgent
+			.post("http://localhost:3001/remove/krewes")
+			.send({
+				krewe_ids : [
+					krewe1._id.toString(),
+					krewe2._id.toString()
+				]
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(200);
 
+				res.body.message.should.equal("All deleted Krewes removed successfully.");
+
+				Krewe.findOne({_id : krewe1._id}, function(search1Err, newKrewe1) {
+					if(search1Err) {
+						return done(search1Err);
+					}
+
+					if(newKrewe1) {
+						return done(new Error("Krewe was not deleted."));
+					}
+
+					Krewe.findOne({_id : krewe2._id}, function(search2Err, newKrewe2) {
+						if(search2Err) {
+							return done(search2Err);
+						}
+
+						if(newKrewe2) {
+							return done(new Error("Krewe was not deleted."));
+						}
+
+						done();
+					});
+				});
+			});
 	});
 
 	it('should return an error when a Krewe _id is invalid.', function(done) {
+		adminAgent
+			.post("http://localhost:3001/remove/krewes")
+			.send({
+				krewe_ids : [
+					krewe1._id.toString(),
+					{number: 201520}
+				]
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(400);
 
+				res.body.message.should.equal("Required fields not specified.");
+
+				Krewe.findOne({_id : krewe1._id}, function(search1Err, newKrewe1) {
+					if(search1Err) {
+						return done(search1Err);
+					}
+
+					// This method does not modify any fields, so no need to check expected values.
+					if(!newKrewe1) {
+						return done(new Error("Krewe was deleted."));
+					}
+
+					Krewe.findOne({_id : krewe2._id}, function(search2Err, newKrewe2) {
+						if(search2Err) {
+							return done(search2Err);
+						}
+
+						if(!newKrewe2) {
+							return done(new Error("Krewe was deleted."));
+						}
+
+						done();
+					});
+				});
+			});
+	});
+
+	it('should return immediately when no krewe_ids is invalid.', function(done) {
+		adminAgent
+			.post("http://localhost:3001/remove/krewes")
+			.send({
+				krewe_ids : {}
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(400);
+
+				res.body.message.should.equal("Required fields not specified.");
+
+				Krewe.findOne({_id : krewe1._id}, function(search1Err, newKrewe1) {
+					if(search1Err) {
+						return done(search1Err);
+					}
+
+					// This method does not modify any fields, so no need to check expected values.
+					if(!newKrewe1) {
+						return done(new Error("Krewe was deleted."));
+					}
+
+					Krewe.findOne({_id : krewe2._id}, function(search2Err, newKrewe2) {
+						if(search2Err) {
+							return done(search2Err);
+						}
+
+						if(!newKrewe2) {
+							return done(new Error("Krewe was deleted."));
+						}
+
+						done();
+					});
+				});
+			});
 	});
 
 	it('should return immediately when no krewe _ids are specified.', function(done) {
+		adminAgent
+			.post("http://localhost:3001/remove/krewes")
+			.send({
+				krewe_ids : []
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(200);
 
+				res.body.message.should.equal("No updates.");
+
+				done();
+			});
 	});
 
 	it('should not allow a recruiter to delete a Krewe.', function(done) {
+		this.timeout(10000);
+		var tempUser = new User({
+			fName: 			'Peter',
+			lName: 			'Parker',
+			displayName: 	'Parker, Peter',
+			email: 			'spiders_cen3031.0.boom0625@spamgourmet.com',
+			roles: 			['recruiter'],
+			status: 		[
+				{
+					event_id: 	event2._id,
+					attending: 	true,
+					recruiter: 	true,
+					kaptain: 	false
+				}
+			],
+			password: 		'password',
+			login_enabled: 	true
+		});
 
+		tempUser.save(function(saveErr) {
+			if(saveErr) {
+				return done(saveErr);
+			}
+
+			var tempUserAgent = agent.agent();
+			tempUserAgent
+				.post('http://localhost:3001/auth/signin')
+				.send({email : tempUser.email, password : 'password'})
+				.end(function(loginErr, loginRes) {
+					if(loginErr) {
+						return done(loginErr);
+					}
+
+					if(loginRes.status !== 200) {
+						return done(new Error("Temp Recruiter could not login: " + loginRes.body.message));
+					}
+
+					tempUserAgent.saveCookies(loginRes);
+
+					tempUserAgent
+						.post("http://localhost:3001/remove/krewes")
+						.send({
+							krewe_ids : {}
+						})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(401);
+
+							res.body.message.should.equal("User does not have permission.");
+
+							Krewe.findOne({_id : krewe1._id}, function(search1Err, newKrewe1) {
+								if(search1Err) {
+									return done(search1Err);
+								}
+
+								// This method does not modify any fields, so no need to check expected values.
+								if(!newKrewe1) {
+									return done(new Error("Krewe was deleted."));
+								}
+
+								Krewe.findOne({_id : krewe2._id}, function(search2Err, newKrewe2) {
+									if(search2Err) {
+										return done(search2Err);
+									}
+
+									if(!newKrewe2) {
+										return done(new Error("Krewe was deleted."));
+									}
+
+									done();
+								});
+							});
+						});
+				});
+		});
 	});
 
 	it('should not allow an attendee to delete a Krewe.', function(done) {
+		this.timeout(10000);
+		var tempUser = new User({
+			fName: 			'Peter',
+			lName: 			'Parker',
+			displayName: 	'Parker, Peter',
+			email: 			'spiders_cen3031.0.boom0625@spamgourmet.com',
+			roles: 			['attendee'],
+			status: 		[
+				{
+					event_id: 	event2._id,
+					attending: 	true,
+					recruiter: 	true,
+					kaptain: 	false
+				}
+			],
+			password: 		'password',
+			login_enabled: 	true
+		});
 
+		tempUser.save(function(saveErr) {
+			if(saveErr) {
+				return done(saveErr);
+			}
+
+			var tempUserAgent = agent.agent();
+			tempUserAgent
+				.post('http://localhost:3001/auth/signin')
+				.send({email : tempUser.email, password : 'password'})
+				.end(function(loginErr, loginRes) {
+					if(loginErr) {
+						return done(loginErr);
+					}
+
+					if(loginRes.status !== 200) {
+						return done(new Error("Temp Recruiter could not login: " + loginRes.body.message));
+					}
+
+					tempUserAgent.saveCookies(loginRes);
+
+					tempUserAgent
+						.post("http://localhost:3001/remove/krewes")
+						.send({
+							krewe_ids : {}
+						})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(401);
+
+							res.body.message.should.equal("User does not have permission.");
+
+							Krewe.findOne({_id : krewe1._id}, function(search1Err, newKrewe1) {
+								if(search1Err) {
+									return done(search1Err);
+								}
+
+								// This method does not modify any fields, so no need to check expected values.
+								if(!newKrewe1) {
+									return done(new Error("Krewe was deleted."));
+								}
+
+								Krewe.findOne({_id : krewe2._id}, function(search2Err, newKrewe2) {
+									if(search2Err) {
+										return done(search2Err);
+									}
+
+									if(!newKrewe2) {
+										return done(new Error("Krewe was deleted."));
+									}
+
+									done();
+								});
+							});
+						});
+				});
+		});
 	});
 
 	it('should not allow a kaptain to delete a Krewe.', function(done) {
+		this.timeout(10000);
+		var tempUser = new User({
+			fName: 			'Peter',
+			lName: 			'Parker',
+			displayName: 	'Parker, Peter',
+			email: 			'spiders_cen3031.0.boom0625@spamgourmet.com',
+			roles: 			['kaptain'],
+			status: 		[
+				{
+					event_id: 	event2._id,
+					attending: 	true,
+					recruiter: 	true,
+					kaptain: 	false
+				}
+			],
+			password: 		'password',
+			login_enabled: 	true
+		});
 
+		tempUser.save(function(saveErr) {
+			if(saveErr) {
+				return done(saveErr);
+			}
+
+			var tempUserAgent = agent.agent();
+			tempUserAgent
+				.post('http://localhost:3001/auth/signin')
+				.send({email : tempUser.email, password : 'password'})
+				.end(function(loginErr, loginRes) {
+					if(loginErr) {
+						return done(loginErr);
+					}
+
+					if(loginRes.status !== 200) {
+						return done(new Error("Temp Recruiter could not login: " + loginRes.body.message));
+					}
+
+					tempUserAgent.saveCookies(loginRes);
+
+					tempUserAgent
+						.post("http://localhost:3001/remove/krewes")
+						.send({
+							krewe_ids : {}
+						})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(401);
+
+							res.body.message.should.equal("User does not have permission.");
+
+							Krewe.findOne({_id : krewe1._id}, function(search1Err, newKrewe1) {
+								if(search1Err) {
+									return done(search1Err);
+								}
+
+								// This method does not modify any fields, so no need to check expected values.
+								if(!newKrewe1) {
+									return done(new Error("Krewe was deleted."));
+								}
+
+								Krewe.findOne({_id : krewe2._id}, function(search2Err, newKrewe2) {
+									if(search2Err) {
+										return done(search2Err);
+									}
+
+									if(!newKrewe2) {
+										return done(new Error("Krewe was deleted."));
+									}
+
+									done();
+								});
+							});
+						});
+				});
+		});
 	});
 
 	it('should not allow a recruiterAdmin to delete a Krewe.', function(done) {
+		this.timeout(10000);
+		var tempUser = new User({
+			fName: 			'Peter',
+			lName: 			'Parker',
+			displayName: 	'Parker, Peter',
+			email: 			'spiders_cen3031.0.boom0625@spamgourmet.com',
+			roles: 			['recruiterAdmin'],
+			status: 		[
+				{
+					event_id: 	event2._id,
+					attending: 	true,
+					recruiter: 	true,
+					kaptain: 	false
+				}
+			],
+			password: 		'password',
+			login_enabled: 	true
+		});
 
+		tempUser.save(function(saveErr) {
+			if(saveErr) {
+				return done(saveErr);
+			}
+
+			var tempUserAgent = agent.agent();
+			tempUserAgent
+				.post('http://localhost:3001/auth/signin')
+				.send({email : tempUser.email, password : 'password'})
+				.end(function(loginErr, loginRes) {
+					if(loginErr) {
+						return done(loginErr);
+					}
+
+					if(loginRes.status !== 200) {
+						return done(new Error("Temp Recruiter could not login: " + loginRes.body.message));
+					}
+
+					tempUserAgent.saveCookies(loginRes);
+
+					tempUserAgent
+						.post("http://localhost:3001/remove/krewes")
+						.send({
+							krewe_ids : {}
+						})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(401);
+
+							res.body.message.should.equal("User does not have permission.");
+
+							Krewe.findOne({_id : krewe1._id}, function(search1Err, newKrewe1) {
+								if(search1Err) {
+									return done(search1Err);
+								}
+
+								// This method does not modify any fields, so no need to check expected values.
+								if(!newKrewe1) {
+									return done(new Error("Krewe was deleted."));
+								}
+
+								Krewe.findOne({_id : krewe2._id}, function(search2Err, newKrewe2) {
+									if(search2Err) {
+										return done(search2Err);
+									}
+
+									if(!newKrewe2) {
+										return done(new Error("Krewe was deleted."));
+									}
+
+									done();
+								});
+							});
+						});
+				});
+		});
 	});
 
 	it('should not allow a userAdmin to delete a Krewe.', function(done) {
+		this.timeout(10000);
+		var tempUser = new User({
+			fName: 			'Peter',
+			lName: 			'Parker',
+			displayName: 	'Parker, Peter',
+			email: 			'spiders_cen3031.0.boom0625@spamgourmet.com',
+			roles: 			['userAdmin'],
+			status: 		[
+				{
+					event_id: 	event2._id,
+					attending: 	true,
+					recruiter: 	true,
+					kaptain: 	false
+				}
+			],
+			password: 		'password',
+			login_enabled: 	true
+		});
 
+		tempUser.save(function(saveErr) {
+			if(saveErr) {
+				return done(saveErr);
+			}
+
+			var tempUserAgent = agent.agent();
+			tempUserAgent
+				.post('http://localhost:3001/auth/signin')
+				.send({email : tempUser.email, password : 'password'})
+				.end(function(loginErr, loginRes) {
+					if(loginErr) {
+						return done(loginErr);
+					}
+
+					if(loginRes.status !== 200) {
+						return done(new Error("Temp Recruiter could not login: " + loginRes.body.message));
+					}
+
+					tempUserAgent.saveCookies(loginRes);
+
+					tempUserAgent
+						.post("http://localhost:3001/remove/krewes")
+						.send({
+							krewe_ids : {}
+						})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(401);
+
+							res.body.message.should.equal("User does not have permission.");
+
+							Krewe.findOne({_id : krewe1._id}, function(search1Err, newKrewe1) {
+								if(search1Err) {
+									return done(search1Err);
+								}
+
+								// This method does not modify any fields, so no need to check expected values.
+								if(!newKrewe1) {
+									return done(new Error("Krewe was deleted."));
+								}
+
+								Krewe.findOne({_id : krewe2._id}, function(search2Err, newKrewe2) {
+									if(search2Err) {
+										return done(search2Err);
+									}
+
+									if(!newKrewe2) {
+										return done(new Error("Krewe was deleted."));
+									}
+
+									done();
+								});
+							});
+						});
+				});
+		});
 	});
 
 	it('should not allow guests to delete a Krewe.', function(done) {
+		var tempUserAgent = agent.agent();
+		tempUserAgent
+			.post("http://localhost:3001/remove/krewes")
+			.send({
+				krewe_ids : {}
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(401);
 
+				res.body.message.should.equal("User is not logged in.");
+
+				Krewe.findOne({_id : krewe1._id}, function(search1Err, newKrewe1) {
+					if(search1Err) {
+						return done(search1Err);
+					}
+
+					// This method does not modify any fields, so no need to check expected values.
+					if(!newKrewe1) {
+						return done(new Error("Krewe was deleted."));
+					}
+
+					Krewe.findOne({_id : krewe2._id}, function(search2Err, newKrewe2) {
+						if(search2Err) {
+							return done(search2Err);
+						}
+
+						if(!newKrewe2) {
+							return done(new Error("Krewe was deleted."));
+						}
+
+						done();
+					});
+				});
+			});
 	});
 
 	/* removeKaptainPermissions - /remove/kaptain */
 	it('should allow an admin to remove several Kaptains.', function(done) {
+		adminAgent
+			.post("http://localhost:3001/remove/kaptain")
+			.send({
+				event_id: 	event1._id.toString(),
+				user_ids: 	[
+					kaptain1._id.toString(),
+					kaptain2._id.toString()
+				]
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(200);
 
+				res.body.message.should.equal("All ex-Kaptains updated successfully.");
+
+				User.findOne({_id : kaptain1._id}, function(search1Err, newKaptain1) {
+					if(search1Err) {
+						return done(search1Err);
+					}
+
+					_.intersection(newKaptain1.roles, ["kaptain"]).length.should.equal(0);
+
+					User.findOne({_id : kaptain1._id}, function(search2Err, newKaptain2) {
+						if(search2Err) {
+							return done(search2Err);
+						}
+
+						_.intersection(newKaptain2.roles, ["kaptain"]).length.should.equal(0);
+
+						done();
+					});
+				});
+			});
 	});
 
 	it('should allow a kreweAdmin to remove several Kaptains.', function(done) {
+		kreweAdminAgent
+			.post("http://localhost:3001/remove/kaptain")
+			.send({
+				event_id: 	event1._id.toString(),
+				user_ids: 	[
+					kaptain1._id.toString(),
+					kaptain2._id.toString()
+				]
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(200);
 
+				res.body.message.should.equal("All ex-Kaptains updated successfully.");
+
+				User.findOne({_id : kaptain1._id}, function(search1Err, newKaptain1) {
+					if(search1Err) {
+						return done(search1Err);
+					}
+
+					_.intersection(newKaptain1.roles, ["kaptain"]).length.should.equal(0);
+
+					User.findOne({_id : kaptain1._id}, function(search2Err, newKaptain2) {
+						if(search2Err) {
+							return done(search2Err);
+						}
+
+						_.intersection(newKaptain2.roles, ["kaptain"]).length.should.equal(0);
+
+						done();
+					});
+				});
+			});
 	});
 
 	it('should not allow an admin to remove Kaptains when one of the _ids are invalid.', function(done) {
+		adminAgent
+			.post("http://localhost:3001/remove/kaptain")
+			.send({
+				event_id: 	event1._id.toString(),
+				user_ids: 	[
+					kaptain1._id.toString(),
+					"123456789f"
+				]
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(400);
 
+				res.body.message.should.equal("Required fields not specified.");
+
+				User.findOne({_id : kaptain1._id}, function(search1Err, newKaptain1) {
+					if(search1Err) {
+						return done(search1Err);
+					}
+
+					_.intersection(newKaptain1.roles, ["kaptain"]).length.should.equal(1);
+
+					User.findOne({_id : kaptain1._id}, function(search2Err, newKaptain2) {
+						if(search2Err) {
+							return done(search2Err);
+						}
+
+						_.intersection(newKaptain2.roles, ["kaptain"]).length.should.equal(1);
+
+						done();
+					});
+				});
+			});
 	});
 
 	it('should return immediately when no Kaptains are specified.', function(done) {
+		adminAgent
+			.post("http://localhost:3001/remove/kaptain")
+			.send({
+				event_id: 	event1._id.toString(),
+				user_ids: 	[]
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(200);
 
+				res.body.message.should.equal("No updates.");
+
+				User.findOne({_id : kaptain1._id}, function(search1Err, newKaptain1) {
+					if(search1Err) {
+						return done(search1Err);
+					}
+
+					_.intersection(newKaptain1.roles, ["kaptain"]).length.should.equal(1);
+
+					User.findOne({_id : kaptain1._id}, function(search2Err, newKaptain2) {
+						if(search2Err) {
+							return done(search2Err);
+						}
+
+						_.intersection(newKaptain2.roles, ["kaptain"]).length.should.equal(1);
+
+						done();
+					});
+				});
+			});
+	});
+
+	it('should return an error when user_ids field has an invalid format.', function(done) {
+		adminAgent
+			.post("http://localhost:3001/remove/kaptain")
+			.send({
+				event_id: 	event1._id.toString(),
+				user_ids: 	{}
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(400);
+
+				res.body.message.should.equal("Required fields not specified.");
+
+				User.findOne({_id : kaptain1._id}, function(search1Err, newKaptain1) {
+					if(search1Err) {
+						return done(search1Err);
+					}
+
+					_.intersection(newKaptain1.roles, ["kaptain"]).length.should.equal(1);
+
+					User.findOne({_id : kaptain1._id}, function(search2Err, newKaptain2) {
+						if(search2Err) {
+							return done(search2Err);
+						}
+
+						if(!newKaptain2) {
+							return done(new Error("An innocent Kaptain was deleted!"));
+						}
+
+						_.intersection(newKaptain2.roles, ["kaptain"]).length.should.equal(1);
+
+						done();
+					});
+				});
+			});
 	});
 
 	it('should not allow a recruiter to remove Kaptains.', function(done) {
+		this.timeout(10000);
+		var tempUser = new User({
+			fName: 			'Peter',
+			lName: 			'Parker',
+			displayName: 	'Parker, Peter',
+			email: 			'spiders_cen3031.0.boom0625@spamgourmet.com',
+			roles: 			['recruiter'],
+			status: 		[
+				{
+					event_id: 	event2._id,
+					attending: 	true,
+					recruiter: 	true,
+					kaptain: 	false
+				}
+			],
+			password: 		'password',
+			login_enabled: 	true
+		});
 
+		tempUser.save(function(saveErr) {
+			if(saveErr) {
+				return done(saveErr);
+			}
+
+			var tempUserAgent = agent.agent();
+			tempUserAgent
+				.post('http://localhost:3001/auth/signin')
+				.send({email : tempUser.email, password : 'password'})
+				.end(function(loginErr, loginRes) {
+					if(loginErr) {
+						return done(loginErr);
+					}
+
+					if(loginRes.status !== 200) {
+						return done(new Error("Temp Recruiter could not login: " + loginRes.body.message));
+					}
+
+					tempUserAgent.saveCookies(loginRes);
+
+					tempUserAgent
+						.post("http://localhost:3001/remove/kaptain")
+						.send({
+							event_id: 	event1._id.toString(),
+							user_ids: 	[
+								kaptain1._id.toString()
+							]
+						})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(401);
+
+							res.body.message.should.equal("User does not have permission.");
+
+							User.findOne({_id : kaptain1._id}, function(search1Err, newKaptain1) {
+								if(search1Err) {
+									return done(search1Err);
+								}
+
+								if(!newKaptain1) {
+									return done(new Error("An innocent Kaptain was deleted!"));
+								}
+								
+								_.intersection(newKaptain1.roles, ["kaptain"]).length.should.equal(1);
+
+								User.findOne({_id : kaptain1._id}, function(search2Err, newKaptain2) {
+									if(search2Err) {
+										return done(search2Err);
+									}
+
+									if(!newKaptain2) {
+										return done(new Error("An innocent Kaptain was deleted!"));
+									}
+									
+									_.intersection(newKaptain2.roles, ["kaptain"]).length.should.equal(1);
+
+									done();
+								});
+							});
+						});
+				});
+		});
 	});
 
 	it('should not allow an attendee to remove Kaptains.', function(done) {
+		this.timeout(10000);
+		var tempUser = new User({
+			fName: 			'Peter',
+			lName: 			'Parker',
+			displayName: 	'Parker, Peter',
+			email: 			'spiders_cen3031.0.boom0625@spamgourmet.com',
+			roles: 			['attendee'],
+			status: 		[
+				{
+					event_id: 	event2._id,
+					attending: 	true,
+					recruiter: 	true,
+					kaptain: 	false
+				}
+			],
+			password: 		'password',
+			login_enabled: 	true
+		});
 
+		tempUser.save(function(saveErr) {
+			if(saveErr) {
+				return done(saveErr);
+			}
+
+			var tempUserAgent = agent.agent();
+			tempUserAgent
+				.post('http://localhost:3001/auth/signin')
+				.send({email : tempUser.email, password : 'password'})
+				.end(function(loginErr, loginRes) {
+					if(loginErr) {
+						return done(loginErr);
+					}
+
+					if(loginRes.status !== 200) {
+						return done(new Error("Temp Recruiter could not login: " + loginRes.body.message));
+					}
+
+					tempUserAgent.saveCookies(loginRes);
+
+					tempUserAgent
+						.post("http://localhost:3001/remove/kaptain")
+						.send({
+							event_id: 	event1._id.toString(),
+							user_ids: 	[
+								kaptain1._id.toString()
+							]
+						})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(401);
+
+							res.body.message.should.equal("User does not have permission.");
+
+							User.findOne({_id : kaptain1._id}, function(search1Err, newKaptain1) {
+								if(search1Err) {
+									return done(search1Err);
+								}
+
+								if(!newKaptain1) {
+									return done(new Error("An innocent Kaptain was deleted!"));
+								}
+								
+								_.intersection(newKaptain1.roles, ["kaptain"]).length.should.equal(1);
+
+								User.findOne({_id : kaptain1._id}, function(search2Err, newKaptain2) {
+									if(search2Err) {
+										return done(search2Err);
+									}
+
+									if(!newKaptain2) {
+										return done(new Error("An innocent Kaptain was deleted!"));
+									}
+									
+									_.intersection(newKaptain2.roles, ["kaptain"]).length.should.equal(1);
+
+									done();
+								});
+							});
+						});
+				});
+		});
 	});
 
 	it('should not allow a Kaptain to remove other Kaptains.', function(done) {
+		kaptain1Agent
+			.post("http://localhost:3001/remove/kaptain")
+			.send({
+				event_id: 	event1._id.toString(),
+				user_ids: 	[
+					kaptain2._id.toString()
+				]
+			})
+			.end(function(err, res) {
+				should.not.exist(err);
+				res.status.should.equal(401);
 
+				res.body.message.should.equal("User does not have permission.");
+
+				User.findOne({_id : kaptain1._id}, function(search1Err, newKaptain1) {
+					if(search1Err) {
+						return done(search1Err);
+					}
+
+					if(!newKaptain1) {
+						return done(new Error("An innocent Kaptain was deleted!"));
+					}
+					
+					_.intersection(newKaptain1.roles, ["kaptain"]).length.should.equal(1);
+
+					User.findOne({_id : kaptain1._id}, function(search2Err, newKaptain2) {
+						if(search2Err) {
+							return done(search2Err);
+						}
+
+						if(!newKaptain2) {
+							return done(new Error("An innocent Kaptain was deleted!"));
+						}
+						
+						_.intersection(newKaptain2.roles, ["kaptain"]).length.should.equal(1);
+
+						done();
+					});
+				});
+			});
 	});
 
 	it('should not allow a recruiterAdmin to remove Kaptains.', function(done) {
+		this.timeout(10000);
+		var tempUser = new User({
+			fName: 			'Peter',
+			lName: 			'Parker',
+			displayName: 	'Parker, Peter',
+			email: 			'spiders_cen3031.0.boom0625@spamgourmet.com',
+			roles: 			['recruiterAdmin'],
+			status: 		[
+				{
+					event_id: 	event2._id,
+					attending: 	true,
+					recruiter: 	true,
+					kaptain: 	false
+				}
+			],
+			password: 		'password',
+			login_enabled: 	true
+		});
 
+		tempUser.save(function(saveErr) {
+			if(saveErr) {
+				return done(saveErr);
+			}
+
+			var tempUserAgent = agent.agent();
+			tempUserAgent
+				.post('http://localhost:3001/auth/signin')
+				.send({email : tempUser.email, password : 'password'})
+				.end(function(loginErr, loginRes) {
+					if(loginErr) {
+						return done(loginErr);
+					}
+
+					if(loginRes.status !== 200) {
+						return done(new Error("Temp Recruiter could not login: " + loginRes.body.message));
+					}
+
+					tempUserAgent.saveCookies(loginRes);
+
+					tempUserAgent
+						.post("http://localhost:3001/remove/kaptain")
+						.send({
+							event_id: 	event1._id.toString(),
+							user_ids: 	[
+								kaptain2._id.toString()
+							]
+						})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(401);
+
+							res.body.message.should.equal("User does not have permission.");
+
+							User.findOne({_id : kaptain1._id}, function(search1Err, newKaptain1) {
+								if(search1Err) {
+									return done(search1Err);
+								}
+
+								if(!newKaptain1) {
+									return done(new Error("An innocent Kaptain was deleted!"));
+								}
+								
+								_.intersection(newKaptain1.roles, ["kaptain"]).length.should.equal(1);
+
+								User.findOne({_id : kaptain1._id}, function(search2Err, newKaptain2) {
+									if(search2Err) {
+										return done(search2Err);
+									}
+
+									if(!newKaptain2) {
+										return done(new Error("An innocent Kaptain was deleted!"));
+									}
+									
+									_.intersection(newKaptain2.roles, ["kaptain"]).length.should.equal(1);
+
+									done();
+								});
+							});
+						});
+				});
+		});
 	});
 
 	it('should not allow a userAdmin to remove Kaptains.', function(done) {
+		this.timeout(10000);
+		var tempUser = new User({
+			fName: 			'Peter',
+			lName: 			'Parker',
+			displayName: 	'Parker, Peter',
+			email: 			'spiders_cen3031.0.boom0625@spamgourmet.com',
+			roles: 			['userAdmin'],
+			status: 		[
+				{
+					event_id: 	event2._id,
+					attending: 	true,
+					recruiter: 	true,
+					kaptain: 	false
+				}
+			],
+			password: 		'password',
+			login_enabled: 	true
+		});
 
+		tempUser.save(function(saveErr) {
+			if(saveErr) {
+				return done(saveErr);
+			}
+
+			var tempUserAgent = agent.agent();
+			tempUserAgent
+				.post('http://localhost:3001/auth/signin')
+				.send({email : tempUser.email, password : 'password'})
+				.end(function(loginErr, loginRes) {
+					if(loginErr) {
+						return done(loginErr);
+					}
+
+					if(loginRes.status !== 200) {
+						return done(new Error("Temp Recruiter could not login: " + loginRes.body.message));
+					}
+
+					tempUserAgent.saveCookies(loginRes);
+
+					tempUserAgent
+						.post("http://localhost:3001/remove/kaptain")
+						.send({
+							event_id: 	event1._id.toString(),
+							user_ids: 	[
+								kaptain2._id.toString()
+							]
+						})
+						.end(function(err, res) {
+							should.not.exist(err);
+							res.status.should.equal(401);
+
+							res.body.message.should.equal("User does not have permission.");
+
+							User.findOne({_id : kaptain1._id}, function(search1Err, newKaptain1) {
+								if(search1Err) {
+									return done(search1Err);
+								}
+
+								if(!newKaptain1) {
+									return done(new Error("An innocent Kaptain was deleted!"));
+								}
+								
+								_.intersection(newKaptain1.roles, ["kaptain"]).length.should.equal(1);
+
+								User.findOne({_id : kaptain1._id}, function(search2Err, newKaptain2) {
+									if(search2Err) {
+										return done(search2Err);
+									}
+
+									if(!newKaptain2) {
+										return done(new Error("An innocent Kaptain was deleted!"));
+									}
+									
+									_.intersection(newKaptain2.roles, ["kaptain"]).length.should.equal(1);
+
+									done();
+								});
+							});
+						});
+				});
+		});
 	});
 
 	it('should not allow a guest to remove Kaptains.', function(done) {
+		var tempUserAgent = agent.agent();
+			tempUserAgent
+				.post("http://localhost:3001/remove/kaptain")
+				.send({
+					event_id: 	event1._id.toString(),
+					user_ids: 	[
+						kaptain2._id.toString()
+					]
+				})
+				.end(function(err, res) {
+					should.not.exist(err);
+					res.status.should.equal(401);
 
+					res.body.message.should.equal("User is not logged in.");
+
+					User.findOne({_id : kaptain1._id}, function(search1Err, newKaptain1) {
+						if(search1Err) {
+							return done(search1Err);
+						}
+
+						if(!newKaptain1) {
+							return done(new Error("An innocent Kaptain was deleted!"));
+						}
+						
+						_.intersection(newKaptain1.roles, ["kaptain"]).length.should.equal(1);
+
+						User.findOne({_id : kaptain1._id}, function(search2Err, newKaptain2) {
+							if(search2Err) {
+								return done(search2Err);
+							}
+
+							if(!newKaptain2) {
+								return done(new Error("An innocent Kaptain was deleted!"));
+							}
+							
+							_.intersection(newKaptain2.roles, ["kaptain"]).length.should.equal(1);
+
+							done();
+						});
+					});
+				});
 	});
 	
 	afterEach(function(done) {

@@ -236,6 +236,11 @@ exports.saveKrewesAsAdmin = function(req, res) {
 
 	var eid = new mongoose.Types.ObjectId(req.body.event_id);
 	var modifiedKrewes = req.body.krewes;
+
+	if(Object.prototype.toString.call(modifiedKrewes) !== "[object Array]") {
+		return res.status(400).send({message : "Required fields not specified."});
+	}
+
 	var krewesCount = modifiedKrewes.length;
 
 	if(krewesCount === 0) {
@@ -395,7 +400,7 @@ exports.saveKrewesAsAdmin = function(req, res) {
 * will be notified of any changes.
 *
 * @param event_id <ObjectId> the event for which the Krewes should be saved
-* @param krewe <[Object]> an array of Krewe object with ALL of the following fields
+* @param krewe <Object> this user's Krewe as an object with ALL of the following fields
 *		- _id <ObjectId> the Krewe _id for which this Kaptain is responsible
 *		- name <String> the Krewe's name
 *		- members <[ObjectId]> an array of all the Krewe's members' _ids
@@ -405,48 +410,52 @@ exports.saveKreweAsKaptain = function(req, res) {
 		return res.status(401).send({message : "User is not logged in."});
 	}
 
+	if(req.hasAuthorization(req.user, ["admin", "kreweAdmin"])) {
+		return res.status(401).send({message : "Use route for admins."});
+	}
+
 	if(!req.hasAuthorization(req.user, ["kaptain"])) {
 		return res.status(401).send({message: "User does not have permission."});
 	}
 
-	if(!req.body.event_id || !mongoose.Types.ObjectId.isValid(req.body.event_id.toString()) || !req.body.krewes || !(req.body.krewes instanceof Object)) {
+	if(!req.body.event_id || !mongoose.Types.ObjectId.isValid(req.body.event_id.toString()) || !req.body.krewe || !(req.body.krewe instanceof Object)) {
 		return res.status(400).send({message : "Required fields not specified."});
 	}
 
 	var eid = new mongoose.Types.ObjectId(req.body.event_id);
-
+	var newKrewe = req.body.krewe;
 	var requiredKreweKeys = ["_id", "name", "members"];
 
 	/**
 	* First, check to make sure all data is valid.  If any data is not valid, return immediately
 	* without saving.
 	*/
-	if(_.union(Object.keys(req.body.krewe), requiredKreweKeys).length !== requiredKreweKeys.length) {
+	if(_.union(Object.keys(newKrewe), requiredKreweKeys).length !== requiredKreweKeys.length) {
 		return res.status(400).send({message : "Required fields not specified."});
 	}
 
-	if(_.intersection(Object.keys(req.body.krewe), requiredKreweKeys).length !== requiredKreweKeys.length) {
+	if(_.intersection(Object.keys(newKrewe), requiredKreweKeys).length !== requiredKreweKeys.length) {
 		return res.status(400).send({message : "Required fields not specified."});
 	}
 
-	if(!mongoose.Types.ObjectId.isValid(req.body.krewe._id.toString())) {
+	if(!mongoose.Types.ObjectId.isValid(newKrewe._id.toString())) {
 		return res.status(400).send({message : "Incorrect data format."});
 	}
 
-	if(!(typeof req.body.krewe.name === "string")) {
+	if(!(typeof newKrewe.name === "string")) {
 		return res.status(400).send({message : "Incorrect data format."});
 	}
 
-	for(var memberIndex = 0, membersCount = req.body.krewe.members.length; memberIndex < membersCount; memberIndex) {
-		if(!mongoose.Types.ObjectId.isValid(req.body.krewe.members[memberIndex].member_id.toString())) {
+	for(var memberIndex = 0, membersCount = newKrewe.members.length; memberIndex < membersCount; memberIndex++) {
+		if(!newKrewe.members[memberIndex].member_id || !mongoose.Types.ObjectId.isValid(newKrewe.members[memberIndex].member_id.toString())) {
 			return res.status(400).send({message : "Incorrect data format."});
 		}
 
-		req.body.krewe.members[memberIndex] = {member_id : new mongoose.Types.ObjectId(req.body.krewe.members[memberIndex].member_id.toString())};
+		newKrewe.members[memberIndex] = {member_id : new mongoose.Types.ObjectId(newKrewe.members[memberIndex].member_id.toString())};
 	}
 
 	// Everything checked out, save the Krewe to the database.
-	Krewe.findOne({_id : req.body.krewe._id}, function(searchErr, krewe) {
+	Krewe.findOne({_id : newKrewe._id}, function(searchErr, krewe) {
 		if(searchErr) {
 			console.error(searchErr);
 			return res.status(400).send({message : "Error updating Krewe, Krewe could not be updated."});
@@ -454,14 +463,16 @@ exports.saveKreweAsKaptain = function(req, res) {
 
 		if(krewe) {
 			if(krewe.kaptain.equals(req.user._id)) {
-				krewe.name = req.body.name;
-				krewe.members = req.body.members;
+				krewe.name = newKrewe.name;
+				krewe.members = newKrewe.members;
 
 				krewe.save(function(saveErr) {
 					if(saveErr) {
 						console.error(saveErr);
 						return res.status(400).send({message : "Error updating Krewe, Krewe could not be updated."});
 					}
+
+					return res.status(200).send({message: "Krewe updated successfully."});
 				});
 			} else {
 				return res.status(401).send({message : "User does not have permission to modify Krewe."});
@@ -485,9 +496,13 @@ exports.deleteKrewe = function(req, res) {
 	}
 
 	var kreweIds = req.body.krewe_ids;
+	if(Object.prototype.toString.call(kreweIds) !== "[object Array]") {
+		return res.status(400).send({message : "Required fields not specified."});
+	}
+
 	var kreweCount = kreweIds.length;
 	for(var index = 0; index < kreweCount; index++) {
-		if(!mongoose.Types.ObjectId.isValid(kreweIds)) {
+		if(!mongoose.Types.ObjectId.isValid(kreweIds[index])) {
 			return res.status(400).send({message : "Required fields not specified."});
 		}
 
@@ -542,16 +557,20 @@ exports.removeKaptainPermissions = function(req, res) {
 		return res.status(401).send({message: "User does not have permission."});
 	}
 
-	if(!req.body.event_id || !mongoose.Types.ObjectId.isValid(req.body.event_id) || !req.body.krewes || !(req.body.krewes instanceof Object)) {
+	if(!req.body.event_id || !mongoose.Types.ObjectId.isValid(req.body.event_id)) {
 		return res.status(400).send({message : "Required fields not specified."});
 	}
 
 	var eid = new mongoose.Types.ObjectId(req.body.event_id);
 
 	var userIds = req.body.user_ids;
+	if(Object.prototype.toString.call(userIds) !== "[object Array]") {
+		return res.status(400).send({message : "Required fields not specified."});
+	}
+
 	var userCount = userIds.length;
 	for(var index = 0; index < userCount; index++) {
-		if(!mongoose.Types.ObjectId.isValid(userIds)) {
+		if(!mongoose.Types.ObjectId.isValid(userIds[index])) {
 			return res.status(400).send({message : "Required fields not specified."});
 		}
 
