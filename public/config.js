@@ -4,7 +4,7 @@
 var ApplicationConfiguration = (function() {
 	// Init module configuration options
 	var applicationModuleName = 'frank-recruiter-system';
-	var applicationModuleVendorDependencies = ['ngResource', 'ngCookies',  'ngAnimate',  'ngTouch',  'ngSanitize',  'ui.router', 'ui.bootstrap', 'ui.utils', 'ngTable', 'angularjs-dropdown-multiselect', 'textAngular', 'flow', 'ngInputDate', 'multi-select', 'dialogs.main', 'angularSpinner', 'vcRecaptcha'];
+	var applicationModuleVendorDependencies = ['ngResource', 'ngCookies',  'ngAnimate',  'ngTouch',  'ngSanitize',  'ui.router', 'ui.bootstrap', 'ui.utils', 'ngTable', 'angularjs-dropdown-multiselect', 'textAngular', 'flow', 'ngInputDate', 'multi-select', 'dialogs.main', 'angularSpinner', 'vcRecaptcha', 'dndLists', 'LocalStorageModule'];
 
 	// Add a new vertical module
 	var registerModule = function(moduleName, dependencies) {
