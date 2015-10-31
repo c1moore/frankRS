@@ -1,0 +1,61 @@
+/* Required CSS styles for angular-drag-and-drop-lists */
+ul[dnd-list], ul[dnd-list] > li {
+	position: relative;
+}
+
+.box {
+	background-color: #fff;
+	border: 1px solid transparent;
+	border-radius: 4px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+	-webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.box h3 {
+	color: #333;
+	border-color: #ddd;
+	border-bottom: 1px solid transparent;
+	border-top-right-radius: 3px;
+	border-top-left-radius: 3px;
+	background-repeat: : repeat-x;
+	display: block;
+	font-size: 16px;
+	padding: 10px 15px;
+	margin-top: 0;
+	margin-bottom: 0;
+	text-align: center;
+}
+
+.box-blue {
+	border-color: #bce8f1;
+}
+
+.box-blue h3 {
+	color: #31708f;
+	background-color: #d9edf7;
+	background-image: linear-gradient(to bottom, #d9edf7 0, #c4e3f3 100%);
+	background-image: -webkit-linear-gradient(top, #d9edf7 0, #c4e3f3 100%);
+}
+
+.krewe-members {
+	overflow-y: auto;
+	background-color: #333232;
+	margin-top: -30px;
+}
+
+.krewe-members .refresh-button {
+	margin-left: 85%;
+	margin-top: 15px;
+}
+
+li.krewe-member-item {
+	color: white;
+	font-weight: bold;
+	font-size: 12px;
+	list-style: none;
+	margin-top: 7px;
+}
+
+ul.krewe-members-unassigned {
+	padding-left: 10px;
+}
