@@ -28,7 +28,8 @@
     "angular-recaptcha": "~2.2.2",
     "octicons": "*",
     "angular-drag-and-drop-lists": "1.x",
-    "angular-local-storage": "0.x.x"
+    "angular-local-storage": "0.x.x",
+    "async": "1.x.x"
   },
   "resolutions": {
     "angular": "1.2.28"

@@ -7,17 +7,18 @@
 from Util import getPymongoDB
 
 import pickle
+import base64
 
 def main():
-  db = getPymongoDB()
-  user = list(db.users.find())[0]
-  salt = user['salt']
-  password = user['password'] #Hashed
-  with open('hashfile.dat','w') as fd:
-    fd.write(salt)
-    fd.write(password)
+	db = getPymongoDB()
+	user = list(db.users.find())[0]
+	with open('hashfile.dat','wb') as fd:
+		pickle.dump(user['salt'], fd)
+		pickle.dump(user['password'], fd)
 
+# If this program should need to run again, simply comment out the print statement and uncomment main()
 if __name__=='__main__':
-  print("Cowardly refusing to run because I'm not confident that you know what you're doing.")
+# 	main()
+	print("Cowardly refusing to run because I'm not confident that you know what you're doing.")
 
 

@@ -13,6 +13,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				/*** scope Variables ***/
 				$scope.krewes = [];
 				$scope.potentialMembers = [];
+				$scope.newPotentialMembers = [];
 
 				// Dictionary of potential interests as the key and the path to their image as the value.
 				$scope.interestsSource = {
@@ -53,45 +54,288 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				/*** Variables ***/
 				var originalDataPrefix = "original_";		// Prefix to add to original krewe data.
 				var currentDataPrefix = "dirty_";			// Prefix to add to current version of krewe data.
+				var deltaPrefix = "delta_";					// Prefix to add to delta information.
 
 				/**
 				* Load all saved krewes in database and transform them to a format expected by 
-				* the drag and drop plugin.  Saves data in $scope.krewes.
+				* the drag and drop plugin.
+				*
+				* @param convertKaptain <Boolean> (optional) - true if the Kaptain field should be converted to an
+				* 	array.  The default value is true.
+				* @param done(err, data) <function> (optional) - callback function with the following parameters
+				*		err - null if no error occurred, status code otherwise
+				*		data - data obtained from server
 				*/
-				var loadKrewes = function() {
-					$http.post('/krewes', {event_id: eventSelector.postEventId}).success(function(kreweData) {
-						// Transform the kaptain field for each krewe to the format dnd expects.
-						for (var i = kreweData.length - 1; i >= 0; i--) {
-							kreweData[i].kaptain = [kreweData[i].kaptain];
-						};
+				var loadKrewes = function(convertKaptain, done) {
+					if(typeof convertKaptain !== 'boolean') {
+						if(!done) {
+							done = convertKaptain;
+						}
 
-						$scope.krewes = kreweData;
+						convertKaptain = true;
+					}
+
+					$http.post('/krewes', {event_id: eventSelector.postEventId}).success(function(kreweData, status) {
+						// Transform the kaptain field for each krewe to the format dnd expects.
+						if(convertKaptain) {
+							for (var i = kreweData.length - 1; i >= 0; i--) {
+								kreweData[i].kaptain = [kreweData[i].kaptain];
+							};
+						}
+
+						if(done && {}.toString.call(done) === '[object Function]') {
+							done(null, kreweData);
+						}
 					}).error(function(errMessage, status) {
-						if(status === 400 && errMessage === "Required fields not specified.") {
-							// Data was not passed to backend.  Most likely the user does not have an event selected.
-						} else if(status === 4000 && errMessage === "An error occurred retreiving krewes.") {
-							// Some error occurred.  Warn the user and give them the option to report the problem.
-						} else {
-							// Unknown error (probably 500).  Warn user.
+						if(done && {}.toString.call(done) === '[object Function]') {
+							done(status, errMessage);
 						}
 					});
 				};
 
 				/**
-				* Load all the potential members and save the result in $scope.potentialMembers.
+				* Load all the potential members from the database.
+				*
+				* @param done(err, data) <function> (optional) - callback function with the following parameters
+				*		err - null if no error occurred, status code otherwise
+				*		data - data obtained from server
 				*/
-				var loadPotentialMemebers = function() {
-					$http.post('/krewes/users', {event_id: eventSelector.postEventId}).success(function(unassignedUsers) {
-						$scope.potentialMembers = unassignedUsers;
+				var loadPotentialMemebers = function(done) {
+					$http.post('/krewes/users', {event_id: eventSelector.postEventId}).success(function(unassignedUsers, status) {
+						if(done && {}.toString.call(done) === '[object Function]') {
+							done(null, unassignedUsers);
+						}
 					}).error(function(errMessage, status) {
-						if(status === 400 && errMessage === "Required fields not specified.") {
-							// Data was not passed to backend.  Most likely the user does not have an event selected.
-						} else if(status === 4000 && errMessage === "An error occurred retreiving krewes.") {
-							// Some error occurred.  Warn the user and give them the option to report the problem.
-						} else {
-							// Unknown error (probably 500).  Warn user.
+						if(done && {}.toString.call(done) === '[object Function]') {
+							done(status);
 						}
 					});
+				};
+
+				/**
+				* Performs a binary search on kreweArray to find needle.  If kreweArray is not sorted, this search will
+				* fail.  If needle could not be found, null is returned.
+				*
+				* @param needle <String> - the _id of the Krewe that needs to be found
+				* @param kreweArray <[Object]> - the array of Krewes through which to search
+				*
+				* @return <Int> - index of needle or null if needle was not found
+				*/
+				var binarySearchKrewes = function(needle, kreweArray) {
+					var index;
+					var lowerBounds = 0;
+					var upperBounds = kreweArray.length - 1;
+
+					while(true) {
+						if(lowerBounds >= upperBounds) {
+							return null;
+						}
+
+						index = lowerBounds + Math.floor((upperBounds - lowerBounds) / 2);
+
+						if(kreweArray[index]._id === needle) {
+							return index;
+						} else if(kreweArray[index]._id > needle) {
+							upperBounds = index - 1;
+						} else {
+							lowerBounds = index + 1;
+						}
+					}
+				};
+
+				/**
+				* Closely examine conflicts and attempt to resolve.  If a conflict cannot be resolved, notify
+				* the user and let them determine which copy to maintain.  Conflicts that can be resolved
+				* automatically include:
+				*		- Changes to different Krewes
+				*		- Changes to different data for the same Krewe
+				*		- Changes to elements in arrays such as:
+				*			- The same member being added to a Krewe
+				*			- Different members being added and removed from the Krewe without adding them 
+				*				to another Krewe
+				*
+				* @param deltas <[Object]> - all deltas stored for this event
+				* @param localChanges <[Object]> - data for all modified Krewes
+				* @param originalVersion <[Object]> - sorted original version of Krewes before changes were made
+				* @param serverVersion <[Object]> - sorted version of Krewes on the server
+				* @param potentialUsers <[Object]> - list of all users that have not been assigned a Krewe locally
+				*/
+				var resolveConflicts = function(deltas, localChanges, originalVersion, serverVersion) {
+					var deltaKeys = _.keys(deltas);
+
+					// Sort the server version to find the required Krewe faster.
+					quickSortKrewes(serverVersion);
+
+					// Check each delta and determine if a conflict can be resolved programatically.
+					for(var deltaIndex = deltaKeys.length - 1; deltaIndex >= 0; deltaIndex--) {
+						var serverIndex = binarySearchKrewes(deltaKeys[deltaIndex]);
+
+						if(serverIndex === null) {
+							// Server version was not found.  This item has been deleted.  Ask the user what to do.  If the user wants to keep the krewe, the krewe's _id needs to be set to null to be assigned a new krewe.
+						}
+
+						var currentDelta = deltas[deltaKeys[deltaIndex]];
+						var serverKrewe = serverVersion[serverIndex];
+
+						if(currentDelta.name && currentDelta.name.original !== serverKrewe.name && currentDelta.name.current !== serverKrewe.name) {
+							// Cannot resolve automatically.  Ask the user which version to keep (original, current, server).
+						}
+
+						if(currentDelta.kaptain && currentDelta.kaptain.original !== serverKrewe.kaptain._id && currentDelta.kaptain.current !== serverKrewe.kaptain._id) {
+							// Cannot resolve automatically.  Ask the user which version to keep (original, current, server).
+						}
+
+						// If no changes have been made, we can safely ignore this Krewe.  If changes have been made, the following
+						// considerations need to be made based on how the members changed:
+						//	- Deletion - 	If the member does not appear anywhere else on the server, the user needs to be added back
+						//					back to the potentialMembers.  If the member exists somewhere else, no further actions
+						//					are necessary.
+						// 	- Addition -	If the member was not previously part of a different krewe, the user needs to be removed
+						//					from the potentialMembers, which occurs automaticaly.  If the member was previously part
+						//					of a different krewe, no further actions are required anyways.
+						// Conflicts are considered differently.  A conflict only exists if the same member was added to different
+						// Krewes on the server and locally.  To detect this type of conflict, we will have to search the server
+						// version for all members that were added to a Krewe.  If the member exists in a different Krewe than the
+						// server and original versions, a conflict exists.  To speed up searching through the server and original
+						// array of members, an object will be created for both.
+						serverMembers = {};
+						for(var serverKreweIndex = serverVersion.length - 1; serverKreweIndex >= 0; serverKreweIndex--) {
+							serverMembers[serverVersion[serverKreweIndex]._id] = {};
+
+							for(var serverMemberIndex = serverVersion[serverKreweIndex].members.length; serverMemberIndex >= 0; serverMemberIndex--) {
+								serverMembers[serverVersion[serverKreweIndex]._id][members[serverMemberIndex]] = true;
+							}
+						}
+
+						originalMembers = {};
+						for(var originalKreweIndex = originalVersion.length - 1; originalKreweIndex >= 0; originalKreweIndex--) {
+							originalMembers[originalVersion[originalKreweIndex]._id] = {};
+
+							for(var originalMemberIndex = originalVersion[originalKreweIndex].members.length; originalMemberIndex >= 0; originalMemberIndex--) {
+								originalMembers[originalVersion[originalKreweIndex]._id][members[originalMemberIndex]] = true;
+							}
+						}
+
+						if(currentDelta.members) {
+							var memberKeys = _.keys(currentDelta.members);
+
+							for(var index = memberKeys - 1; index >= 0; index--) {
+								var currentMember = currentDelta.members[memberKeys[index]];
+
+								if(currentMember.action === '+') {
+									// Check for conflicts.
+									if(serverMembers[currentDelta._id][memberKeys[index]]) {
+										// The member was added to the same group.  No conflict.
+										continue;
+									}
+
+									// Find where the member is on the server.
+									for (var innerKreweIndex = serverVersion.length - 1; innerKreweIndex >= 0; innerKreweIndex--) {
+										var currentServerKrewe = serverVersion[innerKreweIndex];
+
+										if(serverMembers[currentServerKrewe._id][memberKeys[index]]) {
+											// The member is in this krewe on the server.  Check if the original version agrees.
+											if(originalMembers[currentServerKrewe._id][memberKeys[index]]) {
+												// The original and server version match for this member.  Keep changes, no conflict.
+												 break;
+											}
+
+											// A conflict exists that cannot be resolved automatically.  Ask the user which version to keep (original, current, server).
+
+											break;
+										}
+									}
+								} else {
+									// User was deleted.  Check if they were added to a different group on the server.  If so, merge the changes.  If not, keep these changes and add the user to the array of members that should be added to potentialMembers.
+									var kreweIndex = serverVersion.length - 1;
+									for (; kreweIndex >= 0; kreweIndex--) {
+										var currentServerKrewe = serverVersion[kreweIndex];
+
+										if(serverMembers[currentServerKrewe._id][memberKeys[index]] && currentServerKrewe._id !== currentDelta._id && (!currentDelta[currentServerKrewe._id] || !currentDelta[currentServerKrewe._id][memberKeys[index]])) {
+											// The member is part of this Krewe (which is not the same as the Krewe from which it was removed).  Merge the changes.
+											for (var localIndex = $scope.krewes.length - 1; localIndex >= 0; localIndex--) {
+												if($scope.krewes[localIndex]._id === currentServerKrewe._id) {
+													$scope.krewes[localIndex].members.push({_id: memberKeys[index]});
+												}
+											};
+
+											break;
+										}
+									}
+
+									if(kreweIndex >= 0) {
+										// The member was not found, add them to newPotentialMembers.
+										$scope.newPotentialMembers.push(memberKeys[index]);
+									}
+								}
+							}
+						}
+					}
+
+					// // Retreive the list of potential users from the server.
+					// loadPotentialMemebers(function(status, serverPotentialUsers) {
+					// 	if(!status) {
+					// 		// Potential users were retreived from server.  Now iterate over data and fix conflicts if possible.
+					// 		for(var localKreweIndex = 0, localChangesLength = localChanges.length; localKreweIndex < localChangesLength; localKreweIndex++) {
+					// 			// Check to see if this is a new Krewe, do not compare it to server krewes.
+					// 			if(!localChanges[localKreweIndex]._id) {
+					// 				// Make sure this new Krewe's members are actually available.  If not, there is a conflict.
+
+					// 				continue;
+					// 			}
+
+					// 			for(var serverKreweIndex = 0, serverVersionLength = serverVersion.length; serverKreweIndex < serverVersionLength; serverKreweIndex++) {
+					// 				// If we aren't comparing the same object go to the next
+					// 				if(localChanges[localKreweIndex]._id !== serverVersion[serverKreweIndex]) {
+					// 					continue;
+					// 				}
+
+					// 				// If the new krewe and server krewe match, move on to the next Krewe
+					// 				if(_.matches(localChanges[localKreweIndex])(serverVersion[serverKreweIndex])) {
+					// 					break;
+					// 				}
+
+					// 				var tempLocalKrewe = localChanges[localKreweIndex];
+					// 				var tempServerKrewe = serverVersion[serverKreweIndex];
+					// 				var tempOriginalKrewe;
+
+					// 				// An Krewe in originalVersion must match these two since localTempKrewe has an _id.
+					// 				for(var originalKreweIndex = 0, originalVersionLength = originalVersion.length; originalKreweIndex < originalVersionLength; originalKreweIndex++) {
+					// 					if(originalVersion[originalKreweIndex]._id === tempLocalKrewe._id) {
+					// 						tempOriginalKrewe = originalVersion[originalKreweIndex];
+
+					// 						break;
+					// 					}
+					// 				}
+
+					// 				// If the original krewe matches the server krewe, just use the local krewe.
+					// 				if(_.matches(tempServerKrewe)(tempOriginalKrewe)) {
+					// 					break;
+					// 				}
+
+					// 				// Something doesn't match.  Find it and fix it one way or another.
+					// 				if(tempOriginalKrewe.name !== tempServerKrewe.name && tempLocalKrewe.name !== tempServerKrewe.name) {
+					// 					// Cannot resolve programmatically, ask the user whether to keep tempLocalKrewe or tempServerKrewe.
+					// 				}
+
+					// 				if(tempOriginalKrewe.kaptain._id !== tempServerKrewe.kaptain._id && tempLocalKrewe.kaptain._id !== tempServerKrewe.kaptain._id) {
+					// 					// Cannot resolve programmatically, ask the user whether to teep tempLocalKrewe or tempServerKrewe.
+					// 				}
+
+					// 				var matchesTempServerMembers = _.matches(tempServerKrewe.members);
+					// 				if(!matchesTempServerMembers(tempOriginalKrewe.members) && !matchesTempServerMembers(tempLocalKrewe.members) {
+					// 					// If the local version with changes matches the original version AND the potential members are the same, use the server version.
+					// 					if(_.matches())
+					// 				}
+
+					// 				break;
+					// 			}
+					// 		}
+					// 	} else {
+					// 		// Potential users could not be retreived.  Attempt to resolve conflicts without this information, but alert user if necessary.
+
+					// 	}
+					// });
 				};
 
 				/**
@@ -124,6 +368,17 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				}
 
 				/**
+				* Remove the original data as retreived from the backend before changes were made.
+				*
+				* @param event_id <String> - the event for which original Krewe data should be removed.
+				*/
+				var removeOriginalVersionLocally = function(event_id) {
+					var storageKey = currentDataPrefix + event_id;
+
+					localStorageService.remove(storageKey);
+				}
+
+				/**
 				* Returns true iff the a local version of the state of krewe data when changes
 				* began is stored in localstorage.  Returns false otherwise.
 				*
@@ -131,7 +386,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				*
 				* @return <Bool> - true iff local version of the state of krewe data when changes began is in localstorage
 				*/
-				var originalStateExistsLocally = function(event_id) {
+				var originalVersionExistsLocally = function(event_id) {
 					var storageKey = originalDataPrefix + event_id;
 
 					return (_.intersection(localStorageService.keys(), [storageKey]).length === 1);
@@ -150,6 +405,28 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				};
 
 				/**
+				* Same as storeChangesLocally except the current values are used for event_id and kreweData.
+				* Note: this method may not be as safe as storeChangesLocally if the user changes the selected
+				* event before this method is called.
+				*/
+				var storeCurrentStateLocallyUnsafe = function() {
+					var storageKey = currentDataPrefix + eventSelector.postEventId;
+
+					localStorageService.set(storageKey, $scope.krewes);
+				};
+
+				/**
+				* Remove locally saved changes from localstorage.
+				*
+				* @param event_id <String> - the event for which local changes should be removed.
+				*/
+				var removeLocalChanges = function(event_id) {
+					var storageKey = currentDataPrefix + event_id;
+
+					localStorageService.remove(storageKey);
+				};
+
+				/**
 				* Returns the local krewe data for the event specified by event_id.
 				*
 				* @param event_id <String> - the _id of the event for which local krewe data should be retreived
@@ -164,7 +441,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 					}
 
 					return null;
-				}
+				};
 
 				/**
 				* Return true iff local changes to krewe data for event_id is stored.  Returns
@@ -178,7 +455,388 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 					var storageKey = currentDataPrefix + event_id;
 
 					return (_.intersection(localStorageService.keys(), [storageKey]).length === 1);
-				}
+				};
+
+				/**
+				* Stores a delta in local storage.  If the delta already exists, the values in the delta
+				* will be replaced by these values.
+				*
+				* @param event_id <String> - 
+				* @param krewe_id <String> - 
+				* @param modifiedField <String> - 
+				* @param newValue <String> - 
+				* @param action <String> - "+" when the member was added, "-" when the member was removed
+				*/
+				var storeDelta = function(event_id, krewe_id, modifiedField, newValue, action) {
+					var storageKey = deltaPrefix + event_id;
+					var eventDeltas = retreiveDeltas(event_id);
+					var originalKrewes = retreiveOriginalVersionLocally(event_id);
+					var originalData = null;
+					var delta = {};
+
+					// Find the original value only if the field is name or kaptain and the original data for this Krewe isn't already saved in a delta record.
+					if((modifiedField === "name" || modifiedField === "kaptain") && (!eventDeltas || !eventDeltas[krewe_id] || !eventDeltas[krewe_id][modifiedField])) {
+						for(var originalKreweIndex = originalKrewes.length - 1; originalKreweIndex >= 0; originalKreweIndex--) {
+							if(originalKrewes[originalKreweIndex]._id === krewe_id) {
+								if(modifiedField === "name") {
+									originalData = originalKrewes[originalKreweIndex][modifiedField];
+								} else {
+									originalData = originalKrewes[originalKreweIndex][modifiedField]._id;
+								}
+
+								break;
+							}
+						}
+					}
+
+					// If the new value matches the original value, simply delete the delta and return.
+					if(originalData === newValue && (modifiedField === "name" || modifiedField === "kaptain")) {
+						removeDelta(event_id, krewe_id, modifiedField);
+						return;
+					}
+
+					if(modifiedField === "name" || modifiedField === "kaptain") {
+						delta = {
+							original: 	originalData,
+							current: 	newValue
+						};
+					} else if(modifiedField === "members") {
+						delta = {
+							action: 	action
+						};
+					} else {
+						return;
+					}
+
+					if(eventDeltas) {
+						// Some deltas already exist for this event.
+						if(eventDeltas[krewe_id]) {
+							// Some deltas exist for this Krewe.
+							var krewe = eventDeltas[krewe_id];
+
+							if(modifiedField === "name" || modifiedField === "kaptain") {
+								// Simply replace the old value, if applicable.
+								krewe[modifiedField] = delta;
+							} else {
+								// Determine if information for members exist.  If so and this action is the opposite of the previous action, remove entry for the member's delta record; otherwise do nothing.
+								if(krewe[modifiedField]) {
+									if(krewe[modifiedField][newValue].action !== action) {
+										delete krewe[modifiedField][newValue];
+
+										// If this field no longer has any deltas, delete it.
+										if(!krewe[modifiedField]) {
+											delete krewe[modifiedField];
+
+											// If this Krewe no longer has any deltas, delete it.
+											if(!krewe) {
+												delete eventDeltas[krewe_id];
+
+												// If this event no longer has deltas, delete it and return it.
+												if(!eventDeltas) {
+													localStorageService.remove(storageKey);
+													return;
+												}
+											}
+										}
+									}
+								} else {
+									krewe[modifiedField] = {};
+									krewe[modifiedField][newValue] = delta;
+								}
+							}
+						} else {
+							// No deltas exist for this Krewe, add this one.
+							eventDeltas[krewe_id] = {};
+							eventDeltas[krewe_id][modifiedField] = delta;
+						}
+					} else {
+						// No deltas exist for this event.  Simply create one for this Krewe and save the information.
+						eventDeltas = {};
+						eventDeltas[krewe_id] = {};
+						eventDeltas[krewe_id][modifiedField] = delta;
+					}
+
+					localStorageService.set(storageKey, eventDeltas);
+				};
+
+				/**
+				* Retreive all delta information for a particular event.  If no deltas are stored for the specifed
+				* event, null will be returned instead.
+				*
+				* @param event_id <String> - the _id of the event for which information should be returned
+				*
+				* @return <[Object]> - an array of deltas for this event
+				*/
+				var retreiveDeltas = function(event_id) {
+					var storageKey = deltaPrefix + event_id;
+
+					if(_.intersection(localStorageService.keys(), [storageKey]).length === 1) {
+						return localStorageService.get(storageKey);
+					}
+
+					return null;
+				};
+
+				/**
+				* Remove a delta for a specific field in a specific krewe.  Returns true if the krewe was found
+				* and deleted, false otherwise.
+				*
+				* @param event_id <String> - the event to which this krewe belongs
+				* @param krewe_id <String> - the krewe that should be modified
+				* @param modifiedField <String> - the field that should be removed
+				*
+				* @return <Boolean> - true iff the Krewe was found and the field was deleted
+				*/
+				var removeDelta = function(event_id, krewe_id, modifiedField) {
+					var storageKey = deltaPrefix + event_id;
+					var eventDeltas = retreiveDeltas(event_id);
+
+					if(eventDeltas) {
+						if(eventDeltas[krewe_id]) {
+							// An entry for this Krewe exists, remove the necessary data.
+							delete eventDeltas[krewe_id][modifiedField];
+
+							// Check if any other deltas exist for this Krewe, if not delete it.
+							if(!_.keys(eventDeltas[deltaIndex]).length) {
+								delete eventDeltas[krewe_id];
+							}
+
+							localStorageService.set(storageKey, eventDeltas);
+
+							return true;
+						}
+					}
+
+					return false;
+				};
+
+				/**
+				* Remove all deltas for a specific event.
+				*
+				* @param event_id <String> - 
+				*/
+				var removeDeltas = function(event_id) {
+					var storageKey = deltaPrefix + event_id;
+
+					localStorageService.remove(storageKey);
+				};
+
+				/**
+				* Return true iff deltas exist for the specified event.  This method is much more accurate
+				* than use localChangesExist as deltas are a smarter way of keeping track of changes.
+				*
+				* @param event_id <String> - the _id of the event
+				*
+				* @return <Bool> - true iff local changes are stored, false otherwise
+				*/
+				var deltasExist = function(event_id) {
+					var storageKey = deltaPrefix + event_id;
+
+					return (_.intersection(localStorageService.keys(), [storageKey]).length === 1);
+				};
+
+				/**
+				* Deteremines if two arrays of Krewes contain the same exact information.  Order of the arrays
+				* does not matter.  When comparing members only the _id field is used to determine equality as
+				* other fields can be modified by the user, but still point to the same person.
+				*
+				* Since conflicts are not expected to be common, this method simply returns false if the difference
+				* is found between any two krewes.  If conflicts become more common, performance can be enhanced
+				* returning a complete report of differences between the two arrays.  For example, once a difference
+				* is found, the difference can be recorded and this method could continue to search for other
+				* differences and record all found.
+				*
+				* @param kreweArray1 <[Object]> - 
+				* @param kreweArray2 <[Object]> - 
+				*
+				* @return <Boolean> - true if the data in the arrays match.
+				*/
+				var kreweArraysMatch = function(kreweArray1, kreweArray2) {
+					if(kreweArray1.length !== kreweArray2.length) {
+						return false;
+					}
+
+					quickSortKrewes(kreweArray1);
+					quickSortKrewes(kreweArray2);
+
+					for(var kreweIndex = kreweArray1.length - 1; kreweIndex >= 0; kreweIndex--) {
+						if(!krewesMatch(kreweArray1[kreweIndex], kreweArray2[kreweIndex])) {
+							return false;
+						}
+					}
+
+					return true;
+				};
+
+				/**
+				* Determines if two Krewe objects are equal.  When comparing members, only the _id field is used
+				* to determine equality as other fields can be modified by the user, but still point to the same
+				* person.
+				*
+				* Since conflicts are not expected to be common, this method simply returns false if the difference
+				* is found between any two krewes.  If conflicts become more common, performance can be enhanced
+				* returning a complete report of differences between the two arrays.  For example, once a difference
+				* is found, the difference can be recorded and this method could continue to search for other
+				* differences and record all found.
+				*
+				* @param krewe1 <Object> - 
+				* @param krewe2 <Object> - 
+				*
+				* @return <Boolean> - true if krewe1 matches krewe2
+				*/
+				var krewesMatch = function(krewe1, krewe2) {
+					if(krewe1.name !== krewe2.name) {
+						return false;
+					}
+
+					if(krewe1.kaptain._id !== krewe2.kaptain._id) {
+						return false;
+					}
+
+					if(!membersMatch(krewe1.members, krewe2.members)) {
+						return false;
+					}
+
+					return true;
+				};
+
+				/**
+				* Detemines if an array of members are equal.  Equality is defined as having the same
+				* members in both arrays of members.  Only the _id field is used to determine equality
+				* as other fields (such as name) can be modified by the user, but still point to the same
+				* person.
+				*
+				* Since conflicts are not expected to be common, this method simply returns false if the difference
+				* is found between any two krewes.  If conflicts become more common, performance can be enhanced
+				* returning a complete report of differences between the two arrays.  For example, once a difference
+				* is found, the difference can be recorded and this method could continue to search for other
+				* differences and record all found.
+				*
+				* @param memberArray1 <[Object]> - 
+				* @param memberArray2 <[Object]> - 
+				*
+				* @return <Boolean> - true if all members are in both arrays.
+				*/
+				var membersMatch = function(memberArray1, memberArray2) {
+					if(memberArray1.length !== memberArray2.length) {
+						return false;
+					}
+
+					quickSortMembers(memberArray1);
+					quickSortMembers(memberArray2);
+
+					for(var memberIndex = memberArray1.length - 1; memberIndex >= 0; memberIndex--) {
+						if(memberArray1[memberIndex].member_id._id !== memberArray2[memberIndex].member_id._id) {
+							return false;
+						}
+					}
+
+					return true;
+				};
+
+				/**
+				* Sorts an array of member objects according to the member_id.  This function mutates unsortedArray.
+				*
+				* @param unsortedArray <[Object]> - an array of member objects to be sorted
+				* @param lowerBounds <Int> (optional) - optional lower index to begin sort.  If not specifed, 0 is used.
+				* @param upperBounds <Int> (optional) - optional upper index to stop sorting.  If not specified, the
+				* 	length of the array is used.
+				*/
+				var quickSortMembers = function(unsortedArray, lowerBounds, upperBounds) {
+					lowerBounds = lowerBounds ? lowerBounds : 0;
+					upperBounds = upperBounds ? upperBounds : unsortedArray.length;
+
+					if(lowerBounds < upperBounds) {
+						var partition = partitionMembers(unsortedArray, lowerBounds, upperBounds);
+						quickSortMembers(unsortedArray, lowerBounds, partition - 1);
+						quickSortMembers(unsortedArray, partition, upperBounds);
+					}
+				};
+
+				/**
+				* Helper method for quickSortMembers.  It selects a pivot randomly and sorts the items in the array
+				* within the bounds relative to the selected pivot.
+				*
+				* @param unsortedArray <[Object]> - an array of member objects to be sorted
+				* @param lowerBounds <Int> - lower bounds for this partition
+				* @param upperBounds <Int> - upper bounds for this partition
+				*
+				* @return <Int> - the index of the pivot chosen
+				*/
+				var partitionMembers = function(unsortedArray, lowerBounds, upperBounds) {
+					var random = Math.random() * (upperBounds - lowerBounds) + lowerBounds;
+					var pivot = unsortedArray[random].member_id._id;
+
+					var leftCursor = lowerBounds,
+						rightCursor = upperBounds;
+
+					while(true) {
+						while(unsortedArray[++leftCursor].member_id._id < pivot && leftCursor <= upperBounds);
+						while(unsortedArray[--rightCursor].member_id._id > pivot && rightCursor >= lowerBounds);
+
+						if(leftCursor >= rightCursor) {
+							break;
+						}
+
+						var temp = unsortedArray[leftCursor];
+						unsortedArray[leftCursor] = unsortedArray[rightCursor];
+						unsortedArray[rightCursor] = temp;
+					}
+
+					return random;
+				};
+
+				/**
+				* Sorts an array of krewe objects according to the krewe _id.  This function mutates unsortedArray.
+				*
+				* @param unsortedArray <[Object]> - an array of krewe objects to be sorted
+				* @param lowerBounds <Int> (optional) - optional lower index to begin sort.  If not specified, 0 is used
+				* @param upperBounds <Int> (optional) - optional upper index to stop sort.  If not specified, the length
+				* 	of unsortedArray is used.
+				*/
+				var quickSortKrewes = function(unsortedArray, lowerBounds, upperBounds) {
+					lowerBounds = lowerBounds ? lowerBounds : 0;
+					upperBounds = upperBounds ? upperBounds : unsortedArray.length;
+
+					if(lowerBounds < upperBounds) {
+						var partition = partitionKrewes(unsortedArray, lowerBounds, upperBounds);
+						quickSortKrewes(unsortedArray, lowerBounds, partition - 1);
+						quickSortKrewes(unsortedArray, partition, upperBounds);
+					}
+				};
+
+				/**
+				* Helper method for quickSortKrewes.  It selects a pivot randomly and sorts the items in the array
+				* within the bounds relative to the selected pivot.
+				*
+				* @param unsortedArray <[Object]> - an array of krewe objects to be sorted
+				* @param lowerBounds <Int> - lower bounds for this partition
+				* @param upperBounds <Int> - upper bounds for this partition
+				*
+				* @return <Int> - the index of the pivot chosen
+				*/
+				var partitionKrewes = function(unsortedArray, lowerBounds, upperBounds) {
+					var random = Math.random() * (upperBounds - lowerBounds) + lowerBounds;
+					var pivot = unsortedArray[random]._id;
+
+					var leftCursor = lowerBounds,
+						rightCursor = upperBounds;
+
+					while(true) {
+						while(unsortedArray[++leftCursor]._id < pivot && leftCursor <= upperBounds);
+						while(unsortedArray[--rightCursor]._id > pivot && rightCursor >= lowerBounds);
+
+						if(leftCursor >= rightCursor) {
+							break;
+						}
+
+						var temp = unsortedArray[leftCursor];
+						unsortedArray[leftCursor] = unsortedArray[rightCursor];
+						unsortedArray[rightCursor] = temp;
+					}
+
+					return random;
+				};
 
 				/*** Event Listeners ***/
 				// Load data from backend when the selected event changes.
@@ -190,10 +848,25 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 						if(eventSelector.postEventId !== null) {
 							if(!localChangesExist(eventSelector.postEventId)) {
 								// No local changes exist.  Update the local information.
-								loadKrewes();
-								loadPotentialMemebers();
+								async.parallel([
+									loadKrewes,
+									loadPotentialMemebers
+								], function(status, data) {
+									if(!status) {
+										$scope.krewes = data[0];
+										$scope.potentialMembers = data[1];
 
-								storeOriginalVersionLocally(eventSelector.postEventId, $scope.krewes);
+										storeOriginalVersionLocally(eventSelector.postEventId, $scope.krewes);
+									} else {
+										if(status === 400 && data.message === "Required fields not specified.") {
+											// Data was not passed to backend.  Most likely the user does not have an event selected.
+										} else if(status === 4000 && (data.message === "An error occurred retreiving krewes." || data.message === "An error occurred retreiving users.")) {
+											// Some error occurred.  Warn the user and give them the option to report the problem.
+										} else {
+											// Unknown error (probably 500).  Warn user.
+										}
+									}
+								});
 							} else {
 								// Local changes have been made.  Make sure the backend still has the same version as the local original version.
 							}
@@ -203,7 +876,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 
 				/*** scope Functions ***/
 				$scope.editKreweName = function(kreweIndex) {
-
+					
 				};
 
 				/**
@@ -219,11 +892,30 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				$scope.removeKaptain = function(kreweIndex, newKaptain) {
 					$scope.krewes[kreweIndex].kaptain.splice(0, 1);
 
-					storeChangesLocally(eventSelector.postEventId, $scope.krewes);
+					var event_id = eventSelector.postEventId.toString()
+
+					if(newKaptain) {
+						storeDelta(event_id, $scope.krewes[kreweIndex]._id.toString(), "kaptain", newKaptain._id.toString());
+					} else {
+						storeDelta(event_id, $scope.krewes[kreweIndex]._id.toString(), "kaptain", null);
+					}
+
+					storeChangesLocally(event_id, _.extend({}, $scope.krewes));
 
 					if(newKaptain) {
 						return newKaptain;
 					}
+				};
+
+				/**
+				* Add a delta for a new member.
+				*/
+				$scope.addMember = function(kreweIndex, newMember) {
+					var event_id = eventSelector.postEventId.toString();
+
+					storeDelta(event_id, $scope.krewes[kreweIndex]._id.toString(), "members", newMember._id.toString(), "+");
+
+					return newMember;
 				};
 
 				/**
@@ -235,7 +927,10 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				$scope.removeMember = function(kreweIndex, memberIndex) {
 					$scope.krewes[kreweIndex].members.splice(0, 1);
 
-					storeChangesLocally(eventSelector.postEventId, $scope.krewes);
+					var event_id = eventSelector.postEventId.toString();
+
+					storeDelta(event_id, $scope.krewes[kreweIndex]._id.toString(), "members", $scope.krewes[kreweIndex].members[memberIndex]._id.toString(), "-");
+					storeChangesLocally(event_id, _.extend({}, $scope.krewes));
 				};
 
 				/**
@@ -253,7 +948,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 						members: 	[]
 					};
 
-					$scope.krewes.append(newKrewe);
+					$scope.krewes.push(newKrewe);
 				};
 
 				/**
@@ -263,7 +958,142 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				* matches the backend.
 				*/
 				$scope.saveChanges = function() {
+					var event_id = eventSelector.postEventId.toString();
+					
+					var currentKreweData = [];
 
+					if(deltasExist(event_id)) {
+						// Check to see if the data can be saved and save to the database if so.
+						var localVersion = retreiveChangesLocally(event_id);
+						var originalVersion = retreiveOriginalVersionLocally(event_id);
+						var deltas = retreiveDeltas(event_id);
+
+						// Check the original version against the one in the db.  If they match, local changes will overwrite the backend's version.
+						loadKrewes(false, function(status, data) {
+							if(!status) {
+								var serverVersion = data;
+
+								if(kreweArraysMatch(originalVersion, serverVersion)) {
+									_.assign(currentKreweData, $scope.krewes);
+
+									// Convert the kaptain and members fields back to the proper format.
+									for(var kreweIndex = currentKreweData.length - 1; kreweIndex >= 0; kreweIndex--) {
+										var memberUserObjects = [];
+										_.assign(memberUserObjects, currentKreweData[kreweIndex].members);
+										currentKreweData[kreweIndex].members = [];
+
+										currentKreweData[kreweIndex].kaptain = currentKreweData[kreweIndex].kaptain[0];
+
+										for (var memberIndex = memberUserObjects.length - 1; memberIndex >= 0; memberIndex--) {
+											currentKreweData[kreweIndex].members.push(memberUserObjects[memberIndex]._id);
+										};
+									};
+
+									// Find all deltas that remove a member and add the member to add that member to the potentialMembers.  If somebody is found that was added to another group, this will be taken care of automatically with /save/krewes.
+									for (var deltaIndex = deltas.length - 1; deltaIndex >= 0; deltaIndex--) {
+										var delta = deltas[deltaIndex];
+										var memberKeys = _.keys(delta.members);
+
+										for (var memberIndex = memberKeys.length - 1; memberIndex >= 0; memberIndex--) {
+											if(delta.members[memberKeys[memberIndex]].action === '-') {
+												$scope.newPotentialMembers.push(memberKeys[memberIndex]);
+											}
+										};
+									};
+
+									// Update potential members.
+
+									// Save changes.
+									$http.post('/save/krewes', {event_id: event_id, krewes: currentKreweData}).success(function(resMess) {
+										// Remove localstorage and load current version from the backend.
+										removeLocalChanges(event_id);
+										removeOriginalVersionLocally(event_id);
+										removeDeltas(event_id);
+										
+										async.parallel([
+											loadKrewes,
+											loadPotentialMemebers
+										], function(status, data) {
+											if(!status) {
+												$scope.krewes = data[0];
+												$scope.potentialMembers = data[1];
+
+												storeOriginalVersionLocally(event_id, $scope.krewes);
+
+												// Stop loading icon and give the user positive feedback.
+											} else {
+												// An error occurred refreshing data.  Alert the user and refresh the page.
+											}
+										});
+									}).error(function(errData, status) {
+										if(status === 400 && errData.message !== "Some Krewes could not be updated.") {
+											// Data is missing or formatted inproperly.  Search the data for missing information.  Alert the user to results.
+										} else if(status === 400) {
+											// Some Krewes could not be saved.  Alert the user.
+										} else {
+											// Unkown error.  Most likely 500.  Alert the user.
+										}
+									});
+								} else {
+									// Conflicts exist that need to be resolved.  Display a message alerting the user.
+									resolveConflicts(deltas, localVersion, originalVersion, serverVersion);
+
+									_.assign(currentKreweData, $scope.krewes);
+
+									// Convert the kaptain and members fields back to the proper format.
+									for(var kreweIndex = currentKreweData.length - 1; kreweIndex >= 0; kreweIndex--) {
+										var memberUserObjects = [];
+										_.assign(memberUserObjects, currentKreweData[kreweIndex].members);
+										currentKreweData[kreweIndex].members = [];
+
+										currentKreweData[kreweIndex].kaptain = currentKreweData[kreweIndex].kaptain[0];
+
+										for (var memberIndex = memberUserObjects.length - 1; memberIndex >= 0; memberIndex--) {
+											currentKreweData[kreweIndex].members.push(memberUserObjects[memberIndex]._id);
+										};
+									};
+
+									// newPotentialMembers was set by resolveConflicts.  Store them.
+
+									// Save changes.
+									$http.post('/save/krewes', {event_id: event_id, krewes: currentKreweData}).success(function(resMess) {
+										// Remove localstorage and load current version from the backend.
+										removeLocalChanges(event_id);
+										removeOriginalVersionLocally(event_id);
+										removeDeltas(event_id);
+										
+										async.parallel([
+											loadKrewes,
+											loadPotentialMemebers
+										], function(status, data) {
+											if(!status) {
+												$scope.krewes = data[0];
+												$scope.potentialMembers = data[1];
+
+												storeOriginalVersionLocally(event_id, $scope.krewes);
+
+												// Stop loading icon and give the user positive feedback.
+											} else {
+												// An error occurred refreshing data.  Alert the user and refresh the page.
+											}
+										});
+									}).error(function(errData, status) {
+										if(status === 400 && errData.message !== "Some Krewes could not be updated.") {
+											// Data is missing or formatted inproperly.  Search the data for missing information.  Alert the user to results.
+										} else if(status === 400) {
+											// Some Krewes could not be saved.  Alert the user.
+										} else {
+											// Unkown error.  Most likely 500.  Alert the user.
+										}
+									});
+								}
+							} else {
+								// An error occurred.  Stop loading icon and warn the user and let them know they can save it later.
+							}
+						});
+					} else {
+						// No need to save changes.  Stop loading icon and give user positive feedback.
+					}
 				};
 
 				/**
@@ -279,7 +1109,9 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				* @param potentialMemberIndex <int> the index of the member to remove within the potentialMembers array
 				*/
 				$scope.removePotentialMember = function(potentialMemberIndex) {
+					$scope.potentialMembers.splice(potentialMemberIndex, 1);
 
+					storeChangesLocally(eventSelector.postEventId, $scope.krewes);
 				};
 			}
 		}

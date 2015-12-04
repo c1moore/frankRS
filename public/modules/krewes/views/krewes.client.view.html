@@ -9,11 +9,11 @@
 			<div class="col-md-9 col-sm-7 col-xs-7 krewe-creator">
 				<div ng-repeat="krewe in krewes" class="krewe-container">
 					<h3 class="krewe-name" ng-model="krewe.name" ng-click="editKreweName($index)"></h3>
-					<ul dnd-list="krewe.kaptain" dnd-drop="removeKaptain($index, item)">
+					<ul dnd-list="krewe.kaptain" dnd-drop="removeKaptain($index, item)" dnd-inserted="storeCurrentStateLocallyUnsafe()">
 						<li class="krewe-kaptain" ng-model="krewe.kaptain" dnd-draggable="krewe.kaptain" dnd-effect-allowed="move" dnd-moved="removeKaptain($parent.$index)">
 						</li>
 					</ul>
-					<ul dnd-list="krewe.members" class="krewe-members-assigned">
+					<ul dnd-list="krewe.members" class="krewe-members-assigned" dnd-drop="addMember($index, item)" dnd-inserted="storeCurrentStateLocallyUnsafe()">
 						<li class="krewe-member-item" ng-repeat="member in krewe.members" dnd-draggable="member" dnd-effect-allowed="moved" dnd-moved="removeMember($parent.$index, $index)">
 							<div ng-include="'modules/krewes/views/krewe-member.client.view.html'"></div>
 						</li>
@@ -25,7 +25,7 @@
 			</div>
 			<div class="col-md-3 col-sm-5 col-xs-5 krewe-members">
 				<button class="btn btn-default refresh-button" type="button"><i class="fa fa-refresh"></i></button>
-				<ul dnd-list="potentialMembers" class="krewe-members-unassigned">
+				<ul dnd-list="potentialMembers" class="krewe-members-unassigned" dnd-inserted="storeCurrentStateLocallyUnsafe()">
 					<li class="krewe-member-item box box-blue" ng-repeat="member in potentialMembers" dnd-draggable="member" dnd-effect-allowed="moved" dnd-moved="removePotentialMember($index)">
 						<div ng-include="'modules/krewes/views/krewe-member.client.view.html'"></div>
 					</li>
