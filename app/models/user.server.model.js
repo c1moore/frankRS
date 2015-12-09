@@ -139,7 +139,8 @@ var UserSchema = new Schema({
 	},
 	provider: {
 		type: String,
-		validate: [validateRequired, 'Provider required']
+		validate: [validateRequired, 'Provider required'],
+		default: "local"
 	},
 	organization: {
 		type: String,
