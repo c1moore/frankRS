@@ -3,6 +3,24 @@ ul[dnd-list], ul[dnd-list] > li {
 	position: relative;
 }
 
+.btn-save {
+	background-color: #005c97;
+	background-image: -linear-gradient(to bottom, #005c97 0, #363795 100%);
+	background-image: -webkit-linear-gradient(top, #005c97 0, #363795 100%);
+	border-radius: 25px;
+	padding: 6px 7px;
+	position: absolute;
+	right: 10px;
+	top: 0;
+}
+
+.btn-save > .fa-save {
+	color: #e8e9eb;
+	font-size: 25px;
+	margin: 0;
+	padding: 0;
+}
+
 .box {
 	background-color: #fff;
 	border: 1px solid transparent;
@@ -17,7 +35,7 @@ ul[dnd-list], ul[dnd-list] > li {
 	border-bottom: 1px solid transparent;
 	border-top-right-radius: 3px;
 	border-top-left-radius: 3px;
-	background-repeat: : repeat-x;
+	background-repeat: repeat-x;
 	display: block;
 	font-size: 16px;
 	padding: 10px 15px;
@@ -27,20 +45,141 @@ ul[dnd-list], ul[dnd-list] > li {
 }
 
 .box-blue {
-	border-color: #bce8f1;
+	border-color: rgb(51, 50, 50);
+	border-color: rgba(51, 50, 50, 0.7);
 }
 
 .box-blue h3 {
-	color: #31708f;
-	background-color: #d9edf7;
-	background-image: linear-gradient(to bottom, #d9edf7 0, #c4e3f3 100%);
-	background-image: -webkit-linear-gradient(top, #d9edf7 0, #c4e3f3 100%);
+	color: white;
+	text-shadow: -0.2px -0.2px 0 #333232, 0.2px -0.2px 0 #333232, -0.2px 0.2px 0 #333232, 0.5px 0.5px 0 #333232;
+	background-color: #E6DADA;
+	background-image: linear-gradient(to bottom, #274046 0, #E6DADA 100%);
+	background-image: -webkit-linear-gradient(top, #274046 0, #E6DADA 100%);
+}
+
+.box-green {
+	border-color: rgb(51, 50, 50);
+	border-color: rgba(51, 50, 50, 0.7);
+}
+
+.box-green h3 {
+	color: white;
+	text-shadow: -0.2px -0.2px 0 #333232, 0.2px -0.2px 0 #333232, -0.2px 0.2px 0 #333232, 0.5px 0.5px 0 #333232;
+	background-color: #7B920A;
+	background-image: linear-gradient(to bottom, #ADD100 0, #7B920A 100%);
+	background-image: -webkit-linear-gradient(top, #ADD100 0, #7B920A 100%);
+}
+
+.box-orange {
+	border-color: rgb(51, 50, 50);
+	border-color: rgba(51, 50, 50, 0.7);
+}
+
+.box-orange h3 {
+	color: white;
+	text-shadow: -0.2px -0.2px 0 #333232, 0.2px -0.2px 0 #333232, -0.2px 0.2px 0 #333232, 0.5px 0.5px 0 #333232;
+	background-color: #ED8F03;
+	background-image: linear-gradient(to bottom, #FFB75E 0, #ED8F03 100%);
+	background-image: -webkit-linear-gradient(top, #FFB75E 0, #ED8F03 100%);
+}
+
+.box-pink {
+	border-color: rgb(51, 50, 50);
+	border-color: rgba(51, 50, 50, 0.7);
+}
+
+.box-pink h3 {
+	color: white;
+	text-shadow: -0.2px -0.2px 0 #333232, 0.2px -0.2px 0 #333232, -0.2px 0.2px 0 #333232, 0.5px 0.5px 0 #333232;
+	background-color: #B24592;
+	background-image: linear-gradient(to bottom, #B24592 0, #F15F79 100%);
+	background-image: -webkit-linear-gradient(top, #B24592 0, #F15F79 100%);
+}
+
+.btn-new-krewe {
+	border: 5px dashed rgba(51, 50, 50, 0.85);
+	color: rgb(51, 50, 50);
+	color: rgba(51, 50, 50, 0.8);
+	font-size: 85px;
+}
+
+.btn-new-krewe .btn-description {
+	font-size: 40px;
+}
+
+.krewe-container {
+	background-color: rgb(232, 233, 235);
+	border-radius: 4px;
+	display: inline-block;
+	height: 350px;
+	margin: 5px;
+	max-width: 300px;
+	min-width: 235px;
+	vertical-align: middle;
+	width: 30%;
+}
+
+.krewe-container > ul {
+	list-style: none;
+}
+
+.krewe-container > .krewe-kaptain {
+	border-bottom: 2px solid rgba(51, 50, 50, 0.85);
+	list-style-type: none;
+	margin: 0;
+	min-height: 50px;
+	padding: 0;
+}
+
+.krewe-container .krewe-members-assigned {
+	padding: 0;
+	list-style-type: none;
+	margin: 0;
+	overflow-y: auto;
+}
+
+.krewe-container .krewe-members-assigned li.krewe-member-item {
+	margin-top: 3px;
+}
+
+.krewe-container .krewe-members-assigned .krewe-member-placeholder {
+	border: 2px dashed;
+	color: rgb(51, 50, 50);
+	color: rgba(51, 50, 50, 0.4);
+	font-style: italic;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.krewe-container > .krewe-name {
+	background-color: #333232;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	color: white;
+	font-size: 22px;
+	font-weight: bold;
+	margin: 0;
+	padding: 5px;
+	text-align: center;
+}
+
+.krewe-container > .krewe-kaptain > .krewe-kaptain-placeholder {
+	border: 2px dashed;
+	color: rgb(51, 50, 50);
+	color: rgba(51, 50, 50, 0.4);
+	font-size: 20px;
+	font-style: italic;
+	height: 48px;
+	line-height: 48px;
+	text-align: center;
+	vertical-align: middle;
 }
 
 .krewe-members {
 	overflow-y: auto;
 	background-color: #333232;
-	margin-top: -30px;
+	background-image: linear-gradient(to left, #232526 0, #414345 100%);
+	background-image: -webkit-linear-gradient(right, #232526 0, #414345 100%);
 }
 
 .krewe-members .refresh-button {
@@ -48,8 +187,18 @@ ul[dnd-list], ul[dnd-list] > li {
 	margin-top: 15px;
 }
 
+li.krewe-kaptain {
+	color: white;
+	cursor: pointer;
+	font-weight: bold;
+	font-size: 12px;
+	list-style: none;
+	margin: 1px 0;
+}
+
 li.krewe-member-item {
 	color: white;
+	cursor: pointer;
 	font-weight: bold;
 	font-size: 12px;
 	list-style: none;
@@ -57,5 +206,20 @@ li.krewe-member-item {
 }
 
 ul.krewe-members-unassigned {
-	padding-left: 10px;
+	padding-left: 0;
+}
+
+.unassigned-attendees-header {
+	background: #333232;
+	box-shadow: inset 0 -1px 0;
+	color: #e8e9eb;
+	margin-left: -15px;
+	margin-right: -15px;
+	padding: 10px 0;
+	text-align: center;
+}
+
+.unassigned-attendees-header > h3 {
+	padding: 0;
+	margin: 0;
 }

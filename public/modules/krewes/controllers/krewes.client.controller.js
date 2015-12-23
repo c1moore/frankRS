@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('krewes').controller('KreweController', ['$scope', 'Authentication', '$http', '$location', 'eventSelector', '$timeout', 'localStorageService',
-	function($scope, Authentication, $http, $location, eventSelector, $timeout, localStorageService) {
+angular.module('krewes').controller('KreweController', ['$scope', 'Authentication', '$http', '$location', 'eventSelector', '$timeout', 'localStorageService', 'frankInterests',
+	function($scope, Authentication, $http, $location, eventSelector, $timeout, localStorageService, frankInterests) {
 		if(!Authentication.user || _.intersection(Authentication.user.roles, ['admin', 'kreweAdmin', 'kaptain']).length === 0) {
 			if(!Authentication.user) {
 				$location.path('/signin');
@@ -16,45 +16,13 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				$scope.newPotentialMembers = [];
 
 				// Dictionary of potential interests as the key and the path to their image as the value.
-				$scope.interestsSource = {
-					"Arts" : "img/interests/arts.png",
-					"Child Development" : "img/interests/child_development.png",
-					"Conservation" : "img/interests/conservation.png",
-					"Corporate Social Responsibility" : "img/interests/corporate_social_responsibility.png",
-					"Corrections" : "img/interests/corrections.png",
-					"Culture" : "img/interests/culture.png",
-					"Education" : "img/interests/education.png",
-					"Entertainment" : "img/interests/entertainment.png",
-					"Environment" : "img/interests/environment.png",
-					"Food & Health" : "img/interests/food_&_health.png",
-					"frank" : "img/interests/frank.png",
-					"Gender Equality" : "img/interests/gender_equality.png",
-					"Health" : "img/interests/health.png",
-					"Human Rights" : "img/interests/human_rights.png",
-					"Income Disparity" : "img/interests/income_disparity.png",
-					"Inspiration" : "img/interests/inspiration.png",
-					"International Development" : "img/interests/international_development.png",
-					"Media" : "img/interests/media.png",
-					"Mental Health" : "img/interests/mental_health.png",
-					"Music" : "img/interests/music.png",
-					"Politics" : "img/interests/politics.png",
-					"Poverty" : "img/interests/poverty.png",
-					"Religion" : "img/interests/religion.png",
-					"Science" : "img/interests/science.png",
-					"Social Media" : "img/interests/social_media.png",
-					"Solutions Journalism" : "img/interests/solutions_journalism.png",
-					"Special Needs" : "img/interests/special_needs.png",
-					"Technology" : "img/interests/technology.png",
-					"Tobacco" : "img/interests/tobacco.png",
-					"Travel" : "img/interests/travel.png",
-					"Violence Prevention" : "img/interests/violence_prevention.png",
-					"Water" : "img/interests/water.png"
-				};
+				$scope.interestsSource = frankInterests.interests;
 
 				/*** Variables ***/
 				var originalDataPrefix = "original_";		// Prefix to add to original krewe data.
 				var currentDataPrefix = "dirty_";			// Prefix to add to current version of krewe data.
 				var deltaPrefix = "delta_";					// Prefix to add to delta information.
+				var potentialMembersPrefix = "potential_";	// Prefix to add to current potential members.
 
 				/**
 				* Load all saved krewes in database and transform them to a format expected by 
@@ -80,7 +48,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 						if(convertKaptain) {
 							for (var i = kreweData.length - 1; i >= 0; i--) {
 								kreweData[i].kaptain = [kreweData[i].kaptain];
-							};
+							}
 						}
 
 						if(done && {}.toString.call(done) === '[object Function]') {
@@ -100,7 +68,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				*		err - null if no error occurred, status code otherwise
 				*		data - data obtained from server
 				*/
-				var loadPotentialMemebers = function(done) {
+				var loadPotentialMembers = function(done) {
 					$http.post('/krewes/users', {event_id: eventSelector.postEventId}).success(function(unassignedUsers, status) {
 						if(done && {}.toString.call(done) === '[object Function]') {
 							done(null, unassignedUsers);
@@ -198,21 +166,21 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 						// version for all members that were added to a Krewe.  If the member exists in a different Krewe than the
 						// server and original versions, a conflict exists.  To speed up searching through the server and original
 						// array of members, an object will be created for both.
-						serverMembers = {};
+						var serverMembers = {};
 						for(var serverKreweIndex = serverVersion.length - 1; serverKreweIndex >= 0; serverKreweIndex--) {
 							serverMembers[serverVersion[serverKreweIndex]._id] = {};
 
 							for(var serverMemberIndex = serverVersion[serverKreweIndex].members.length; serverMemberIndex >= 0; serverMemberIndex--) {
-								serverMembers[serverVersion[serverKreweIndex]._id][members[serverMemberIndex]] = true;
+								serverMembers[serverVersion[serverKreweIndex]._id][serverVersion[serverKreweIndex].members[serverMemberIndex]] = true;
 							}
 						}
 
-						originalMembers = {};
+						var originalMembers = {};
 						for(var originalKreweIndex = originalVersion.length - 1; originalKreweIndex >= 0; originalKreweIndex--) {
 							originalMembers[originalVersion[originalKreweIndex]._id] = {};
 
 							for(var originalMemberIndex = originalVersion[originalKreweIndex].members.length; originalMemberIndex >= 0; originalMemberIndex--) {
-								originalMembers[originalVersion[originalKreweIndex]._id][members[originalMemberIndex]] = true;
+								originalMembers[originalVersion[originalKreweIndex]._id][originalVersion[originalKreweIndex].members[originalMemberIndex]] = true;
 							}
 						}
 
@@ -257,7 +225,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 												if($scope.krewes[localIndex]._id === currentServerKrewe._id) {
 													$scope.krewes[localIndex].members.push({_id: memberKeys[index]});
 												}
-											};
+											}
 
 											break;
 										}
@@ -273,7 +241,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 					}
 
 					// // Retreive the list of potential users from the server.
-					// loadPotentialMemebers(function(status, serverPotentialUsers) {
+					// loadPotentialMembers(function(status, serverPotentialUsers) {
 					// 	if(!status) {
 					// 		// Potential users were retreived from server.  Now iterate over data and fix conflicts if possible.
 					// 		for(var localKreweIndex = 0, localChangesLength = localChanges.length; localKreweIndex < localChangesLength; localKreweIndex++) {
@@ -365,7 +333,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 					}
 
 					return null;
-				}
+				};
 
 				/**
 				* Remove the original data as retreived from the backend before changes were made.
@@ -376,7 +344,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 					var storageKey = currentDataPrefix + event_id;
 
 					localStorageService.remove(storageKey);
-				}
+				};
 
 				/**
 				* Returns true iff the a local version of the state of krewe data when changes
@@ -390,7 +358,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 					var storageKey = originalDataPrefix + event_id;
 
 					return (_.intersection(localStorageService.keys(), [storageKey]).length === 1);
-				}
+				};
 
 				/**
 				* Store the current version of data being edited by the user to localstorage.
@@ -400,8 +368,10 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				*/
 				var storeChangesLocally = function(event_id, kreweData) {
 					var storageKey = currentDataPrefix + event_id;
+					var potentialStorageKey = potentialMembersPrefix + event_id;
 
 					localStorageService.set(storageKey, kreweData);
+					localStorageService.set(potentialStorageKey, $scope.potentialMembers);
 				};
 
 				/**
@@ -411,8 +381,10 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				*/
 				var storeCurrentStateLocallyUnsafe = function() {
 					var storageKey = currentDataPrefix + eventSelector.postEventId;
+					var potentialStorageKey = potentialMembersPrefix + eventSelector.postEventId;
 
 					localStorageService.set(storageKey, $scope.krewes);
+					localStorageService.set(potentialStorageKey, $scope.potentialMembers);
 				};
 
 				/**
@@ -431,10 +403,27 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				*
 				* @param event_id <String> - the _id of the event for which local krewe data should be retreived
 				*
-				* @return <Object if requested data for this event is in localstorage, null otherwise
+				* @return <Object> if requested data for this event is in localstorage, null otherwise
 				*/
 				var retreiveChangesLocally = function(event_id) {
 					var storageKey = currentDataPrefix + event_id;
+
+					if(_.intersection(localStorageService.keys(), [storageKey]).length !== 0) {
+						return localStorageService.get(storageKey);
+					}
+
+					return null;
+				};
+
+				/**
+				* Returns the locally stored potential members.
+				*
+				* @param event_id <String> - the _id of the event for which potential members should be retreived.
+				*
+				* @return <Object> if requested data for this event is in local storage, <null> otherwise.
+				*/
+				var retreiveLocalPotentialMembers = function(event_id) {
+					var storageKey = potentialMembersPrefix + event_id;
 
 					if(_.intersection(localStorageService.keys(), [storageKey]).length !== 0) {
 						return localStorageService.get(storageKey);
@@ -519,7 +508,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 								krewe[modifiedField] = delta;
 							} else {
 								// Determine if information for members exist.  If so and this action is the opposite of the previous action, remove entry for the member's delta record; otherwise do nothing.
-								if(krewe[modifiedField]) {
+								if(krewe[modifiedField] && krewe[modifiedField][newValue]) {
 									if(krewe[modifiedField][newValue].action !== action) {
 										delete krewe[modifiedField][newValue];
 
@@ -597,11 +586,11 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 							delete eventDeltas[krewe_id][modifiedField];
 
 							// Check if any other deltas exist for this Krewe, if not delete it.
-							if(!_.keys(eventDeltas[deltaIndex]).length) {
-								delete eventDeltas[krewe_id];
+							if(!_.keys(eventDeltas[krewe_id]).length) {
+								localStorageService.remove(storageKey);
+							} else {
+								localStorageService.set(storageKey, eventDeltas);
 							}
-
-							localStorageService.set(storageKey, eventDeltas);
 
 							return true;
 						}
@@ -633,6 +622,27 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 					var storageKey = deltaPrefix + event_id;
 
 					return (_.intersection(localStorageService.keys(), [storageKey]).length === 1);
+				};
+
+				/**
+				* Returns the next _id that can be used for a new Krewe and increments the ID value stored
+				* in local storage.
+				*
+				* @param event_id <String> - the _id of the event to which the Krewe will be added
+				*
+				* @return <Int> - the _id that should be used by the new Krewe
+				*/
+				var getNextId = function(event_id) {
+					var storageKey = "nextId_" + event_id;
+
+					var nextId = 0;
+					if(_.intersection(localStorageService.keys(), [storageKey]).length === 1) {
+						nextId = parseInt(localStorageService.get(storageKey), 10);
+					}
+
+					localStorageService.set(storageKey, nextId + 1);
+
+					return nextId;
 				};
 
 				/**
@@ -850,7 +860,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 								// No local changes exist.  Update the local information.
 								async.parallel([
 									loadKrewes,
-									loadPotentialMemebers
+									loadPotentialMembers
 								], function(status, data) {
 									if(!status) {
 										$scope.krewes = data[0];
@@ -868,7 +878,9 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 									}
 								});
 							} else {
-								// Local changes have been made.  Make sure the backend still has the same version as the local original version.
+								// Local changes have been made.
+								$scope.krewes = retreiveChangesLocally(eventSelector.postEventId.toString());
+								$scope.potentialMembers = retreiveLocalPotentialMembers(eventSelector.postEventId.toString());
 							}
 						}
 					}
@@ -890,14 +902,27 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				* @return newKaptain <Object> - iff newKaptain was specified, otherwise nothing is returned
 				*/
 				$scope.removeKaptain = function(kreweIndex, newKaptain) {
-					$scope.krewes[kreweIndex].kaptain.splice(0, 1);
+					var oldKaptain = $scope.krewes[kreweIndex].kaptain.splice(0, 1);
 
-					var event_id = eventSelector.postEventId.toString()
+					var event_id = eventSelector.postEventId.toString();
 
 					if(newKaptain) {
-						storeDelta(event_id, $scope.krewes[kreweIndex]._id.toString(), "kaptain", newKaptain._id.toString());
+						// Check if there is already a Kaptain for this krewe or not.
+						if($scope.krewes[kreweIndex]._id) {
+							storeDelta(event_id, $scope.krewes[kreweIndex]._id.toString(), "kaptain", newKaptain._id.toString());
+						} else {
+							storeDelta(event_id, null, "kaptain", newKaptain._id.toString());
+						}
+
+						if(oldKaptain.length) {
+							$scope.potentialMembers.push(oldKaptain[0]);
+						}
 					} else {
-						storeDelta(event_id, $scope.krewes[kreweIndex]._id.toString(), "kaptain", null);
+						if($scope.krewes[kreweIndex]._id) {
+							storeDelta(event_id, $scope.krewes[kreweIndex]._id.toString(), "kaptain", null);
+						} else {
+							storeDelta(event_id, null, "kaptain", null);
+						}
 					}
 
 					storeChangesLocally(event_id, _.extend({}, $scope.krewes));
@@ -913,6 +938,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				$scope.addMember = function(kreweIndex, newMember) {
 					var event_id = eventSelector.postEventId.toString();
 
+					console.log(kreweIndex, $scope.krewes[kreweIndex], newMember);
 					storeDelta(event_id, $scope.krewes[kreweIndex]._id.toString(), "members", newMember._id.toString(), "+");
 
 					return newMember;
@@ -938,13 +964,9 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				*/
 				$scope.addNewKrewe = function() {
 					var newKrewe = {
-						_id: 		null,
+						_id: 		getNextId(eventSelector.postEventId.toString()),
 						name: 		"",
-						kaptain: 	{
-							_id: 	null,
-							fName: 	"",
-							lName: 	""
-						},
+						kaptain: 	[],
 						members: 	[]
 					};
 
@@ -986,8 +1008,8 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 
 										for (var memberIndex = memberUserObjects.length - 1; memberIndex >= 0; memberIndex--) {
 											currentKreweData[kreweIndex].members.push(memberUserObjects[memberIndex]._id);
-										};
-									};
+										}
+									}
 
 									// Find all deltas that remove a member and add the member to add that member to the potentialMembers.  If somebody is found that was added to another group, this will be taken care of automatically with /save/krewes.
 									for (var deltaIndex = deltas.length - 1; deltaIndex >= 0; deltaIndex--) {
@@ -998,8 +1020,8 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 											if(delta.members[memberKeys[memberIndex]].action === '-') {
 												$scope.newPotentialMembers.push(memberKeys[memberIndex]);
 											}
-										};
-									};
+										}
+									}
 
 									// Update potential members.
 
@@ -1012,7 +1034,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 										
 										async.parallel([
 											loadKrewes,
-											loadPotentialMemebers
+											loadPotentialMembers
 										], function(status, data) {
 											if(!status) {
 												$scope.krewes = data[0];
@@ -1050,8 +1072,8 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 
 										for (var memberIndex = memberUserObjects.length - 1; memberIndex >= 0; memberIndex--) {
 											currentKreweData[kreweIndex].members.push(memberUserObjects[memberIndex]._id);
-										};
-									};
+										}
+									}
 
 									// newPotentialMembers was set by resolveConflicts.  Store them.
 
@@ -1064,7 +1086,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 										
 										async.parallel([
 											loadKrewes,
-											loadPotentialMemebers
+											loadPotentialMembers
 										], function(status, data) {
 											if(!status) {
 												$scope.krewes = data[0];

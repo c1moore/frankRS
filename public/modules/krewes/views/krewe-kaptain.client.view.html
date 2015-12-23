@@ -1,0 +1,8 @@
+<div class="krewe-kaptain">
+	<h3 class="krewe-kaptain-name">{{krewe.kaptain[0].fName + " " + krewe.kaptain[0].lName}}</h3>
+	<div class="krewe-kaptain-interests">
+		<div class="interest-container" ng-repeat="interest in krewe.kaptain[0].interests">
+			<img ng-src="{{interestsSource[interest]}}" class="interest-img" />
+		</div>
+	</div>
+</div>
