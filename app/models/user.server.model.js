@@ -115,7 +115,7 @@ var StatusSchema = new Schema({
 	},
 	krewe: 		{
 		/**
-		* If the use is part of a Krewe for this event, this should be the ObjectId for the Krewe to which
+		* If the user is part of a Krewe for this event, this should be the ObjectId for the Krewe to which
 		* they belong.  Otherwise, it should be blank.
 		*/
 		type: 		String,

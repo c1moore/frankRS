@@ -16,4 +16,5 @@ module.exports = function(app){
 	app.route('/save/krewe').post(krewe_routes.saveKreweAsKaptain);
 	app.route('/remove/krewes').post(krewe_routes.deleteKrewe);
 	app.route('/remove/kaptain').post(krewe_routes.removeKaptainPermissions);
+	app.route('/remove/krewe_members').post(krewe_routes.revokeUserKreweMembership);
 };

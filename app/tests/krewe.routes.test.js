@@ -774,9 +774,9 @@ describe('Krewe Routes Integration Tests:', function() {
 						krewe.kaptain.fName.should.equal(kaptain1.fName);
 						krewe.kaptain.lName.should.equal(kaptain1.lName);
 
-						krewe.members[0].member_id._id.toString().should.equal(member1._id.toString());
-						krewe.members[0].member_id.fName.should.equal(member1.fName);
-						krewe.members[0].member_id.lName.should.equal(member1.lName);
+						krewe.members[0]._id.toString().should.equal(member1._id.toString());
+						krewe.members[0].fName.should.equal(member1.fName);
+						krewe.members[0].lName.should.equal(member1.lName);
 					} else if(res.body[kreweCounter]._id.toString() === krewe2._id.toString()) {
 						// Make sure all expected fields were returned and the subdocuments were populated.
 						krewe.name.should.equal(krewe2.name);
@@ -786,7 +786,7 @@ describe('Krewe Routes Integration Tests:', function() {
 						krewe.kaptain.lName.should.equal(kaptain2.lName);
 
 						for(var memberCounter = 0; memberCounter < krewe.members.length; memberCounter++) {
-							var member = krewe.members[memberCounter].member_id,
+							var member = krewe.members[memberCounter],
 								originalMember;
 
 							if(member._id.toString() === member1._id.toString()) {
@@ -830,9 +830,9 @@ describe('Krewe Routes Integration Tests:', function() {
 						krewe.kaptain.fName.should.equal(kaptain1.fName);
 						krewe.kaptain.lName.should.equal(kaptain1.lName);
 
-						krewe.members[0].member_id._id.toString().should.equal(member1._id.toString());
-						krewe.members[0].member_id.fName.should.equal(member1.fName);
-						krewe.members[0].member_id.lName.should.equal(member1.lName);
+						krewe.members[0]._id.toString().should.equal(member1._id.toString());
+						krewe.members[0].fName.should.equal(member1.fName);
+						krewe.members[0].lName.should.equal(member1.lName);
 					} else if(res.body[kreweCounter]._id.toString() === krewe2._id.toString()) {
 						// Make sure all expected fields were returned and the subdocuments were populated.
 						krewe.name.should.equal(krewe2.name);
@@ -842,7 +842,7 @@ describe('Krewe Routes Integration Tests:', function() {
 						krewe.kaptain.lName.should.equal(kaptain2.lName);
 
 						for(var memberCounter = 0; memberCounter < krewe.members.length; memberCounter++) {
-							var member = krewe.members[memberCounter].member_id,
+							var member = krewe.members[memberCounter],
 								originalMember;
 
 							if(member._id.toString() === member1._id.toString()) {
@@ -1164,7 +1164,7 @@ describe('Krewe Routes Integration Tests:', function() {
 
 				res.body.members.length.should.equal(1);
 
-				var member = res.body.members[0].member_id;
+				var member = res.body.members[0];
 				member.should.have.property('_id');
 				member.should.have.property('fName');
 				member.should.have.property('lName');
@@ -1200,7 +1200,7 @@ describe('Krewe Routes Integration Tests:', function() {
 
 				res.body.members.length.should.equal(1);
 
-				var member = res.body.members[0].member_id;
+				var member = res.body.members[0];
 				member.should.have.property('_id');
 				member.should.have.property('fName');
 				member.should.have.property('lName');
@@ -1236,7 +1236,7 @@ describe('Krewe Routes Integration Tests:', function() {
 
 				res.body.members.length.should.equal(1);
 
-				var member = res.body.members[0].member_id;
+				var member = res.body.members[0];
 				member.should.have.property('_id');
 				member.should.have.property('fName');
 				member.should.have.property('lName');
@@ -1310,7 +1310,7 @@ describe('Krewe Routes Integration Tests:', function() {
 
 							res.body.members.length.should.equal(1);
 
-							var member = res.body.members[0].member_id;
+							var member = res.body.members[0];
 							member.should.have.property('_id');
 							member.should.have.property('fName');
 							member.should.have.property('lName');

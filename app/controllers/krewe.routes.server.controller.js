@@ -128,6 +128,10 @@ exports.getKrewes = function(req, res) {
 			var krewesObjs = [];
 			for(var i = 0; i < krewes.length; i++) {
 				krewesObjs[i] = krewes[i].toObject();
+
+				for(var j = krewesObjs[i].members.length - 1; j >= 0; j--) {
+					krewesObjs[i].members[j] = krewesObjs[i].members[j].member_id;
+				}
 			}
 
 			return res.status(200).send(krewesObjs);
@@ -204,6 +208,10 @@ exports.getKaptainsKrewe = function(req, res) {
 				interests : req.user.interests
 			};
 
+			for(var index = kreweObj.members.length - 1; index >= 0; index--) {
+				kreweObj.members[index] = kreweObj.members[index].member_id;
+			}
+
 			return res.status(200).send(kreweObj);
 		});
 };
@@ -253,6 +261,7 @@ exports.saveKrewesAsAdmin = function(req, res) {
 	* First, check to make sure all data is valid.  If any data is not valid, return immediately
 	* without saving.
 	*/
+	var memberIds = [];
 	for(var index = 0; index < krewesCount; index++) {
 		var krewe = modifiedKrewes[index];
 
@@ -277,11 +286,13 @@ exports.saveKrewesAsAdmin = function(req, res) {
 		}
 
 		for(var memberIndex = 0, membersCount = krewe.members.length; memberIndex < membersCount; memberIndex++) {
-			if(krewe.members[memberIndex].member_id === null || !mongoose.Types.ObjectId.isValid(krewe.members[memberIndex].member_id.toString())) {
+			if(!krewe.members[memberIndex].member_id || !mongoose.Types.ObjectId.isValid(krewe.members[memberIndex].member_id.toString())) {
 				return res.status(400).send({message : "Incorrect data format."});
 			}
 
-			krewe.members[memberIndex] = {member_id : new mongoose.Types.ObjectId(krewe.members[memberIndex].member_id.toString())};
+			var member_id = new mongoose.Types.ObjectId(krewe.members[memberIndex].member_id.toString());
+			krewe.members[memberIndex] = {member_id: member_id};
+			memberIds.push(member_id);
 		}
 	}
 
@@ -298,17 +309,35 @@ exports.saveKrewesAsAdmin = function(req, res) {
 					return done(saveErr);
 				}
 
-				User.update(
-					{
-						_id : data.kreweData.kaptain,
-						'status.event_id' : eid
-					},
-					{
-						$set : {'status.$.kaptain' : true},
-						$addToSet : {roles : 'kaptain'}
-					},
-					done
-				);
+				async.parallel([
+					function(next) {
+						User.update(
+							{
+								_id : data.kreweData.kaptain,
+								'status.event_id' : eid
+							},
+							{
+								$set : {'status.$.kaptain': true, 'status.$.krewe': newKrewe._id},
+								$addToSet : {roles : 'kaptain'}
+							},
+							next
+						);
+					}, function(next) {
+						User.update(
+							{
+								_id: {$in: memberIds},
+								'status.event_id': eid
+							},
+							{
+								$set: {'status.$.krewe': newKrewe._id}
+							},
+							{
+								multi: true
+							},
+							next
+						);
+					}
+				], done);
 			});
 		} else {
 			Krewe.findOne({_id : data.krewe_id}, function(searchErr, krewe) {
@@ -328,17 +357,35 @@ exports.saveKrewesAsAdmin = function(req, res) {
 							return done(saveErr);
 						}
 
-						User.update(
-							{
-								_id : data.kreweData.kaptain,
-								'status.event_id' : eid
-							},
-							{
-								$set : {'status.$.kaptain' : true},
-								$addToSet : {roles : 'kaptain'}
-							},
-							done
-						);
+						async.parallel([
+							function(next) {
+								User.update(
+									{
+										_id : data.kreweData.kaptain,
+										'status.event_id' : eid
+									},
+									{
+										$set : {'status.$.kaptain': true, 'status.$.krewe': krewe._id},
+										$addToSet : {roles : 'kaptain'}
+									},
+									next
+								);
+							}, function(next) {
+								User.update(
+									{
+										_id: {$in: memberIds},
+										'status.event_id': eid
+									},
+									{
+										$set: {'status.$.krewe': krewe._id}
+									},
+									{
+										multi: true
+									},
+									next
+								);
+							}
+						], done);
 					});
 				} else {
 					// Data may have changed on the server, return an error message.
@@ -647,4 +694,65 @@ exports.removeKaptainPermissions = function(req, res) {
 		aqueue.push(userIds[index], aqueueCallback);
 	}
 	aqueue.resume();
+};
+
+/**
+* Removes Krewe information for all specified users for the specified event.  The users will
+* no longer belong to a Krewe and will be returned as potential users.
+*
+* @param event_id <ObjectId> - the _id of the event from which the user's krewe memborship should be revoked
+* @param users [<ObjectId>] - an array of _ids for all users that no longer belong to a krewe
+*/
+exports.revokeUserKreweMembership = function(req, res) {
+	if(!req.isAuthenticated()) {
+		return res.status(401).send({message : "User is not logged in."});
+	}
+
+	if(!req.hasAuthorization(req.user, ["admin", "kreweAdmin"])) {
+		return res.status(401).send({message: "User does not have permission."});
+	}
+
+	if(!mongoose.Types.ObjectId.isValid(req.body.event_id)) {
+		return res.status(400).send({message: "Required fields not specified."});
+	}
+	var event_id = mongoose.Types.ObjectId(req.body.event_id);
+
+	var userIds = req.body.users;
+	if(Object.prototype.toString.call(userIds) !== "[object Array]") {
+		return res.status(400).send({message : "Required fields not specified."});
+	}
+
+	var userCount = userIds.length;
+	for(var index = 0; index < userCount; index++) {
+		if(!mongoose.Types.ObjectId.isValid(userIds[index])) {
+			return res.status(400).send({message : "Required fields not specified."});
+		}
+
+		userIds[index] = new mongoose.Types.ObjectId(userIds[index]);
+	}
+
+	var query = User.update(
+		{
+			_id: 	{
+				$in: 				userIds
+			},
+			"status.event_id": 		event_id
+		},
+		{
+			$set: 	{
+				"status.$.krewe": 	"",
+				"status.$.kaptain": false
+			}
+		},
+		{
+			multi: 	true
+		},
+		function(err, numAffected) {
+			if(err) {
+				return res.status(400).send({message: "Error revoking Krewe membership.", error: err});
+			}
+
+			return res.status(200).send({message: "Members updated successfully."});
+		}
+	);
 };

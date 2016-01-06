@@ -236,15 +236,10 @@ describe("Krewe Schema MongoDB Integration Tests:", function() {
 		});
 	});
 
-	it('should not save when members is empty.', function(done) {
+	it('should save when members is empty.', function(done) {
 		krewe.members = [];
 
-		krewe.save(function(err) {
-			should.exist(err);
-			err.message.should.equal("Validation failed");
-
-			done();
-		});
+		krewe.save(done);
 	});
 
 	it('should not save when members contains and _id that does not reference an existing user\'s _id.', function(done) {
@@ -260,19 +255,14 @@ describe("Krewe Schema MongoDB Integration Tests:", function() {
 		});
 	});
 
-	it('should not save when members is not specified.', function(done) {
+	it('should save when members is not specified.', function(done) {
 		krewe = new Krewe({
 			name: "Best Krewe Ever",
 			event_id: evnt._id,
 			kaptain: kreweKaptain._id
 		});		
 
-		krewe.save(function(err) {
-			should.exist(err);
-			err.message.should.equal("Validation failed");
-
-			done();
-		});
+		krewe.save(done);
 	});
 
 	afterEach(function(done) {

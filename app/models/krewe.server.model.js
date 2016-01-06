@@ -40,7 +40,7 @@ var KreweSchema = new Schema({
 	},
 	members: {
 		type: 		[MemberSchema],
-		validate: 	[validateRequired, 'At least one member required.']
+		default: 	[]
 	},
 	name: {
 		type: 		String,
