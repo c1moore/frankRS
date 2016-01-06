@@ -24,6 +24,7 @@ angular.module('krewes').directive('kreweList', ["$window", "$timeout", "frankIn
 					resizeSelf(elm);
 				}, true);
 
+				var resized = false;
 				var resizeSelf = function(elm) {
 					$timeout(function(elm) {
 						var kreweContainerSelector = ".krewe-container:nth-of-type(" + (parseInt($scope.parentIndex, 10) + 1) + ")";
@@ -37,6 +38,17 @@ angular.module('krewes').directive('kreweList', ["$window", "$timeout", "frankIn
 						angular.element(kreweContainerSelector + " ul.krewe-list").css("height", height);
 						angular.element(kreweContainerSelector + " ul.krewe-list > .krewe-member-placeholder").css("height", height);
 						angular.element(kreweContainerSelector + " ul.krewe-list > .krewe-member-placeholder").css("line-height", height);
+
+						// Make sure the element was resized.
+						if(!resized) {
+							$timeout(function(elm) {
+								resizeSelf(elm);
+							}, 50);
+
+							resized = true;
+						} else {
+							resized = false;
+						}
 					}, 10);
 				};
 

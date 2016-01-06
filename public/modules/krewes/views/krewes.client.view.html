@@ -8,10 +8,13 @@
 		<div class="row">
 			<filler-div class="col-md-9 col-sm-7 col-xs-7 krewe-creator">
 				<div ng-repeat="krewe in krewes" class="krewe-container">
-					<h3 class="krewe-name" ng-model="krewe.name" ng-click="editKreweName($index)" ng-if="krewe.name"></h3>
-					<h3 class="krewe-name" ng-click="editKreweName($index)" ng-if="!krewe.name">New Krewe</h3>
+					<h3 class="krewe-name" ng-bind="krewe.name" ng-click="editKreweName($index)" ng-if="krewe.name && nameLock != $index"></h3>
+					<form class="krewe-name krewe-name-form" ng-submit="saveKreweName($index)" ng-blur="saveKreweName($index)" ng-if="nameLock == $index">
+						<input class="krewe-name krewe-name-element" ng-blur="saveKreweName($index)" ng-model="krewe.name" />
+					</form>
+					<h3 class="krewe-name" ng-click="editKreweName($index)" ng-if="!krewe.name && nameLock != $index" ng-click="editKreweName($index)">New Krewe</h3>
 					<ul class="krewe-kaptain" dnd-list="krewe.kaptain" dnd-drop="removeKaptain($index, item)" dnd-inserted="storeCurrentStateLocallyUnsafe()">
-						<li class="krewe-kaptain box box-orange" dnd-draggable="krewe.kaptain[0]" dnd-effect-allowed="move" dnd-moved="removeKaptain($parent.$index)" ng-if="krewe.kaptain && krewe.kaptain.length">
+						<li class="krewe-kaptain box box-orange" dnd-draggable="krewe.kaptain[0]" dnd-effect-allowed="move" dnd-moved="removeKaptain($index)" ng-if="krewe.kaptain && krewe.kaptain.length">
 							<div ng-include="'modules/krewes/views/krewe-kaptain.client.view.html'"></div>
 						</li>
 						<div class="krewe-kaptain-placeholder" ng-if="!krewe.kaptain || !krewe.kaptain.length">Krewe Kaptain</div>

@@ -17,10 +17,10 @@ angular.module('users').config(['$stateProvider',
 			url: '/settings/accounts',
 			templateUrl: 'modules/users/views/settings/social-accounts.client.view.html'
 		}).
-		// state('addAdmin', {
-		// 	url: '/create/admin',
-		// 	templateUrl: 'modules/users/views/authentication/signup.client.view.html'
-		// }).
+		state('addAdmin', {
+			url: '/create/admin',
+			templateUrl: 'modules/users/views/authentication/signup.client.view.html'
+		}).
 		state('signin', {
 			url: '/signin',
 			templateUrl: 'modules/users/views/authentication/signin.client.view.html'

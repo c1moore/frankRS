@@ -14,11 +14,25 @@ ul[dnd-list], ul[dnd-list] > li {
 	top: 0;
 }
 
+.btn-save:hover {
+	background-color: #1A2980;
+}
+
 .btn-save > .fa-save {
 	color: #e8e9eb;
 	font-size: 25px;
 	margin: 0;
 	padding: 0;
+}
+
+button.btn.btn-default.conflict-modal-btn {
+	margin-bottom: -5px;
+	margin-top: -5px;
+	width: 100px;
+}
+
+button.btn.btn-default.conflict-modal-btn:nth-of-type(1) {
+	margin-right: 160px;
 }
 
 .box {
@@ -107,6 +121,70 @@ ul[dnd-list], ul[dnd-list] > li {
 	font-size: 40px;
 }
 
+.conflict-modal-btn {
+	font-weight: bolder;
+	height: 50px;
+}
+
+.conflict-modal-btn-group button.btn.conflict-modal-btn:nth-of-type(1) {
+	margin-right: 50px;
+}
+
+.conflict-modal-focus {
+	opacity: 1;
+}
+
+.conflict-modal-krewe-container {
+	cursor: pointer;
+}
+
+.conflict-modal-krewe-container:hover {
+	border: 2px solid limegreen;
+}
+
+.conflict-modal-krewe-container.conflict-modal-no-effects {
+	pointer-events: none;
+}
+
+.conflict-modal-krewe-container:nth-of-type(1) {
+	margin-right: 20px;
+}
+
+.conflict-modal-krewe-container .conflict-modal-krewe-element {
+	opacity: 0.5;
+}
+
+.conflict-modal-krewe-container .conflict-modal-krewe-element.conflict-modal-no-fade {
+	opacity: 1;
+}
+
+.conflict-modal-krewe-container .conflict-modal-krewe-element.conflict-modal-focus {
+	border: 3px solid red;
+	opacity: 1;
+}
+
+.conflict-modal-message {
+	font-size: 12pt;
+	font-weight: bold;
+}
+
+.frank-conflict-resolve-modal {
+	z-index: 2147483647;
+}
+
+.frank-save-modal-text {
+	color: rgb(51, 50, 50);
+	color: rgba(51, 50, 50, 0.9);
+	font-size: 16pt;
+	margin-top: 85px;
+	text-align: center;
+}
+
+.interest-container {
+	display: inline-block;
+	padding: 2px;
+}
+
 .krewe-container {
 	background-color: rgb(232, 233, 235);
 	border-radius: 4px;
@@ -185,6 +263,39 @@ ul[dnd-list], ul[dnd-list] > li {
 .krewe-members .refresh-button {
 	margin-left: 85%;
 	margin-top: 15px;
+}
+
+.krewe-name-form .krewe-name-element {
+	background-color: #333232;
+	border: 1px solid #E8E9EB;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	color: white;
+	font-size: 22px;
+	font-weight: bold;
+	margin: 0;
+	padding: 5px;
+	text-align: center;
+	width: 100%;
+}
+
+div.krewe-save-feedback-icon {
+	font-size: 65pt;
+	margin: -30px auto -100px auto;
+	text-align: center;
+}
+
+.krewe-save-feedback-icon.krewe-save-feedback-negative {
+	color: red;
+}
+
+.krewe-save-feedback-icon.krewe-save-feedback-positive {
+	color: green;
+}
+
+.krewe-save-spinner div {
+	top: 0 !important;
+	margin-top: 17px;
 }
 
 li.krewe-kaptain {
