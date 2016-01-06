@@ -1,0 +1,76 @@
+<div>
+	<div class="modal-header">
+		<h3 class="modal-title conflict-modal-title"><i class="fa fa-exclamation-triangle"></i> Conflict</h3>
+	</div>
+	<div class="modal-body">
+		<p class="conflict-modal-message">{{message}}</p>
+		<center class="conflict-modal-options">
+			<div class="conflict-modal-krewe-container krewe-container" ng-if="!kreweDeleted" ng-click="closeModal(serverKrewe.key)">
+				<h3 class="krewe-name conflict-modal-krewe-element" ng-bind="serverKrewe.value.name" ng-class="{'conflict-modal-focus': nameConflict}"></h3>
+				<ul class="conflict-modal-krewe-kaptain krewe-kaptain">
+					<li class="modal-conflict-krewe-kaptain krewe-kaptain box box-orange conflict-modal-krewe-element" ng-class="{'conflict-modal-focus': kaptainConflict}">
+						<div class="conflict-modal-krewe-kaptain krewe-kaptain">
+							<h3 class="conflict-modal-krewe-kaptain-name">{{serverKrewe.value.kaptain.fName + " " + serverKrewe.value.kaptain.lName}}</h3>
+							<div class="conflict-modal-krewe-kaptain-interests">
+								<div class="conflict-modal-interest-container interest-container" ng-repeat="interest in serverKrewe.value.kaptain.interests">
+									<img ng-src="{{interestsSource[interest]}}" class="conflict-modal-interest-img interest-img" />
+								</div>
+							</div>
+						</div>
+					</li>
+				</ul>
+				<ul class="conflict-modal-krewe-list krewe-list krewe-members-assigned">
+					<li class="conflict-modal-krewe-member-item krewe-member-item box box-green conflict-modal-krewe-element" ng-repeat="member in serverKrewe.value.members" ng-class="{'conflict-modal-focus': (memberConflict && $index == serverMemberIndex)}">
+						<div class="conflict-modal-krewe-member krewe-member">
+							<h3 class="conflict-modal-krewe-member-name">{{member.fName + " " + member.lName}}</h3>
+							<div class="conflict-modal-krewe-member-interest krewe-member-interests">
+								<div class="conflict-modal-interest-container interest-container" ng-repeat="interest in member.interests">
+									<img ng-src="{{interestsSource[interest]}}" class="interest-img" />
+								</div>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div class="conflict-modal-krewe-container krewe-container" ng-click="closeModal(localKrewe.key)" ng-class="{'conflict-modal-focus': kreweDeleted, 'conflict-modal-no-effects': kreweDeleted}">
+				<h3 class="krewe-name conflict-modal-krewe-element" ng-bind="localKrewe.value.name" ng-class="{'conflict-modal-focus': nameConflict, 'conflict-modal-no-fade': kreweDeleted}"></h3>
+				<ul class="conflict-modal-krewe-kaptain krewe-kaptain">
+					<li class="modal-conflict-krewe-kaptain krewe-kaptain box box-orange conflict-modal-krewe-element" ng-class="{'conflict-modal-focus': kaptainConflict, 'conflict-modal-no-fade': kreweDeleted}">
+						<div class="conflict-modal-krewe-kaptain krewe-kaptain">
+							<h3 class="conflict-modal-krewe-kaptain-name">{{localKrewe.value.kaptain.fName + " " + localKrewe.value.kaptain.lName}}</h3>
+							<div class="conflict-modal-krewe-kaptain-interests">
+								<div class="conflict-modal-interest-container interest-container" ng-repeat="interest in localKrewe.value.kaptain.interests">
+									<img ng-src="{{interestsSource[interest]}}" class="conflict-modal-interest-img interest-img" />
+								</div>
+							</div>
+						</div>
+					</li>
+				</ul>
+				<ul class="conflict-modal-krewe-list krewe-list krewe-members-assigned">
+					<li class="conflict-modal-krewe-member-item krewe-member-item box box-green conflict-modal-krewe-element" ng-repeat="member in localKrewe.value.members" ng-class="{'conflict-modal-focus': (memberConflict && $index == localMemberIndex), 'conflict-modal-no-fade': kreweDeleted}">
+						<div class="conflict-modal-krewe-member krewe-member">
+							<h3 class="conflict-modal-krewe-member-name">{{member.fName + " " + member.lName}}</h3>
+							<div class="conflict-modal-krewe-member-interest krewe-member-interests">
+								<div class="conflict-modal-interest-container interest-container" ng-repeat="interest in member.interests">
+									<img ng-src="{{interestsSource[interest]}}" class="interest-img" />
+								</div>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</center>
+	</div>
+	<div class="modal-footer">
+		<center>
+			<div class="conflict-modal-btn-group" ng-if="kreweDeleted">
+				<button class="btn btn-danger conflict-modal-btn" ng-click="closeModal(0)">Delete Krewe</button>
+				<button class="btn btn-success conflict-modal-btn" ng-click="closeModal(1)">Keep Krewe</button>
+			</div>
+			<div ng-if="!kreweDeleted">
+				<button class="btn btn-default conflict-modal-btn" ng-click="closeModal(serverKrewe.key)">Server</button>
+				<button class="btn btn-default conflict-modal-btn" ng-click="closeModal(localKrewe.key)" ng-if="!kreweDeleted">Local</button>
+			</div>
+		</center>
+	</div>
+</div>
