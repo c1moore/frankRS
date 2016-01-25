@@ -196,7 +196,7 @@ describe("Krewe Schema MongoDB Integration Tests:", function() {
 		});
 	});
 
-	it('should not save when the kaptain is blank.', function(done) {
+	it('should not save when the kaptain is not an ObjectId.', function(done) {
 		krewe.kaptain = {};
 
 		krewe.save(function(err) {
@@ -207,18 +207,18 @@ describe("Krewe Schema MongoDB Integration Tests:", function() {
 		});
 	});
 
-	it('should not save when kaptain does not reference an existing user\'s _id.', function(done) {
+	it('should save when kaptain does not reference an existing user\'s _id, but kaptain should be set to undefined.', function(done) {
 		krewe.kaptain = mongoose.Schema.Types.ObjectId();
 
-		krewe.save(function(err) {
-			should.exist(err);
-			err.message.should.equal("Validation failed");
+		krewe.save(function(err, result) {
+			should.not.exist(err);
+			should.not.exist(result.kaptain);
 
 			done();
 		});
 	});
 
-	it('should not save when kaptain is not specified.', function(done) {
+	it('should save when kaptain is not specified.', function(done) {
 		krewe = new Krewe({
 			name: "Best Krewe Ever",
 			event_id: evnt._id,
@@ -228,12 +228,7 @@ describe("Krewe Schema MongoDB Integration Tests:", function() {
 			]
 		});
 
-		krewe.save(function(err) {
-			should.exist(err);
-			err.message.should.equal("Validation failed");
-
-			done();
-		});
+		krewe.save(done);
 	});
 
 	it('should save when members is empty.', function(done) {

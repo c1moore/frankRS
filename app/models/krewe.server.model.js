@@ -34,9 +34,7 @@ var MemberSchema = new Schema({
 var KreweSchema = new Schema({
 	kaptain: {
 		type: 		Schema.Types.ObjectId,
-		ref: 		'User',
-		validate: 	[validateRequired, 'Kaptain required.'],
-		required: 	true
+		ref: 		'User'
 	},
 	members: {
 		type: 		[MemberSchema],
