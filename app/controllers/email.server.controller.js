@@ -30,7 +30,15 @@ var tempPass = function() {
 		temp = temp.slice(tempran, tempran + 1);
 	}
 
-	return temp.toString();
+	var tempString = temp.toString();
+
+	// Make sure the password meets length requirements.
+	if(tempString.length < 12) {
+		var bytes = 12 - tempString.length;
+		tempString += new Buffer(crypto.randomBytes(bytes).toString('base64'), 'base64');
+	}
+
+	return tempString;
 };
 
 /**
