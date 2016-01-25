@@ -277,7 +277,7 @@ exports.saveKrewesAsAdmin = function(req, res) {
 			return res.status(400).send({message : "Incorrect data format."});
 		}
 
-		if(krewe.kaptain_id === null || !mongoose.Types.ObjectId.isValid(krewe.kaptain_id.toString())) {
+		if(krewe.kaptain_id !== null && !mongoose.Types.ObjectId.isValid(krewe.kaptain_id.toString())) {
 			return res.status(400).send({message : "Incorrect data format."});
 		}
 
@@ -429,11 +429,16 @@ exports.saveKrewesAsAdmin = function(req, res) {
 			krewe_id : krewe_id,
 			kreweData : {
 				name : modifiedKrewes[index].name,
-				kaptain : new mongoose.Types.ObjectId(modifiedKrewes[index].kaptain_id.toString()),
 				members : modifiedKrewes[index].members,
 				event_id : eid
 			}
 		};
+
+		if(modifiedKrewes[index].kaptain_id) {
+			aqueueData.kreweData.kaptain = new mongoose.Types.ObjectId(modifiedKrewes[index].kaptain_id.toString());
+		} else {
+			aqueueData.kreweData.kaptain = null;
+		}
 
 		aqueue.push(aqueueData, aqueueCallback);
 	}
@@ -632,10 +637,11 @@ exports.removeKaptainPermissions = function(req, res) {
 		User.update(
 			{
 				_id : userId,
-				'status.event_id' : eid
+				'status.event_id': 		eid
 			},
 			{
-				'status.$.kaptain' : false
+				'status.$.kaptain': 	false,
+				'status.$.krewe': 		''
 			},
 			function(updateErr) {
 				if(updateErr) {
@@ -718,6 +724,7 @@ exports.revokeUserKreweMembership = function(req, res) {
 	var event_id = mongoose.Types.ObjectId(req.body.event_id);
 
 	var userIds = req.body.users;
+	console.log(userIds);
 	if(Object.prototype.toString.call(userIds) !== "[object Array]") {
 		return res.status(400).send({message : "Required fields not specified."});
 	}

@@ -2260,7 +2260,7 @@ describe('Krewe Routes Integration Tests:', function() {
 			});
 	});
 
-	it('should return an error and not make any changes when an admin tries to save a krewe without the kaptain_id for the krewe.', function(done) {
+	it('should allow an admin to save a krewe without the kaptain_id for the krewe.', function(done) {
 		this.timeout(10000);
 		var newKreweName = "New Krewe Name",
 			newMembers = krewe1.members.slice(0);		// Give newMembers a shallow copy instead of a pointer to the same array.
@@ -2273,16 +2273,17 @@ describe('Krewe Routes Integration Tests:', function() {
 				event_id: 	event1._id,
 				krewes: 	[
 					{
-						_id: 			krewe1._id,
-						name: 			newKreweName,
-						members: 		newMembers
+						_id:		krewe1._id,
+						name:		newKreweName,
+						kaptain_id:	null,
+						members:	newMembers
 					}
 				]
 			})
 			.end(function(err, res) {
 				should.not.exist(err);
-				res.status.should.equal(400);
-				res.body.message.should.equal("Required fields not specified.");
+				console.log(res.body);
+				res.status.should.equal(200);
 
 				// Make sure the krewe was not updated.
 				Krewe.findOne({_id : krewe1._id}, function(kreweErr, newKrewe) {
@@ -2290,10 +2291,10 @@ describe('Krewe Routes Integration Tests:', function() {
 						return done(kreweErr);
 					}
 
-					newKrewe.name.should.equal(krewe1.name);
-					newKrewe.kaptain.toString().should.equal(krewe1.kaptain.toString());
+					newKrewe.name.should.equal(newKreweName);
+					should.not.exist(newKrewe.kaptain);
 
-					newKrewe.members.length.should.equal(krewe1.members.length);
+					newKrewe.members.length.should.equal(krewe1.members.length + 1);
 					for(var newMemberCounter = 0; newMemberCounter < newKrewe.members.length; newMemberCounter++) {
 						var oldMemberCounter;
 						for(oldMemberCounter = 0; oldMemberCounter < krewe1.members.length; oldMemberCounter++) {
@@ -2302,12 +2303,12 @@ describe('Krewe Routes Integration Tests:', function() {
 							}
 						}
 
-						if(oldMemberCounter === newKrewe.members.length) {
+						if(oldMemberCounter === newKrewe.members.length && !newKrewe.members[newMemberCounter].member_id.equals(kaptain1._id)) {
 							return done(new Error("Krewe's members changed."));
 						}
-
-						done()
 					}
+
+					done();
 				});
 			});
 	});
