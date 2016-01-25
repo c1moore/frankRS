@@ -885,6 +885,8 @@ describe('Candidate Route Integration Tests:', function() {
 
 
 			it("Should automatically create a new user when a candidate accepts and is accepted to become a recruiter if they are not already a user", function(done) {
+				this.timeout(10000);
+				
 				userAgent
 					.post('http://localhost:3001/candidate/setStatus')
 					.send({'candidate_id' : acceptedCandidate._id, 'event_id': event2._id, 'status': 'accepted'})
