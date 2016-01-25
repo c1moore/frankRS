@@ -7,6 +7,9 @@ ul[dnd-list], ul[dnd-list] > li {
 	background-color: #005c97;
 	background-image: -linear-gradient(to bottom, #005c97 0, #363795 100%);
 	background-image: -webkit-linear-gradient(top, #005c97 0, #363795 100%);
+	background-image: -moz-linear-gradient(top, #005c97, #363795);
+	background-image: -o-linear-gradient(top, #005c97, #363795);
+	border: none;
 	border-radius: 25px;
 	padding: 6px 7px;
 	position: absolute;
@@ -136,6 +139,7 @@ button.btn.btn-default.conflict-modal-btn:nth-of-type(1) {
 
 .conflict-modal-krewe-container {
 	cursor: pointer;
+	overflow-y: auto;
 }
 
 .conflict-modal-krewe-container:hover {

@@ -48,6 +48,12 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 						// Transform the kaptain field for each krewe to the format dnd expects.
 						if(convertKaptain) {
 							for (var i = kreweData.length - 1; i >= 0; i--) {
+								if(!kreweData[i].kaptain) {
+									kreweData[i].kaptain = [];
+
+									continue;
+								}
+
 								kreweData[i].kaptain = [kreweData[i].kaptain];
 							}
 						}
@@ -95,13 +101,17 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 					var index;
 					var lowerBounds = 0;
 					var upperBounds = haystack.length - 1;
+					console.log(haystack);
+					console.log(haystack.length);
+					console.log(upperBounds);
 
 					while(true) {
-						if(lowerBounds >= upperBounds) {
+						if(lowerBounds > upperBounds) {
 							return null;
 						}
 
 						index = lowerBounds + Math.floor((upperBounds - lowerBounds) / 2);
+						console.log(lowerBounds, index, upperBounds);
 
 						if(haystack[index]._id === needle) {
 							return index;
@@ -111,6 +121,151 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 							lowerBounds = index + 1;
 						}
 					}
+				};
+
+				/**
+				* Returns the difference between setA and setB (setA \ setB).  An item in a set is determined using the
+				* keys of the sets.
+				*
+				* @param setA <Object> - the object to inspect.  Each key should be an item in the set.
+				* @param setB <Object> - the object with items to exclude.  Each key should be an item in the set.
+				*
+				* @return <[Object]> A set containing those items in setA, but not in setB
+				*/
+				var setDifference = function(setA, setB) {
+					var setAKeys = _.keys(setA);
+					var difference = {};
+
+					for(var setAIndex = setAKeys.length - 1; setAIndex >= 0; setAIndex--) {
+						if(!setB[setAKeys[setAIndex]]) {
+							difference[setAKeys[setAIndex]] = setA[setAKeys[setAIndex]];
+						}
+					}
+
+					return difference;
+				};
+
+				/**
+				* Iterates over each of the deltas (recursively) and detects and resovles conflicts if any are found.
+				*
+				* @param localKrewes <[Object]> - data for all modified Krewes
+				* @param serverKrewes <[Object]> - sorted version of Krewes on the server
+				* @param deltas <Object> - all deltas stored for this event
+				* @param deltaKeys <[String]> - the keys used in deltas
+				* @param deltaIndex <Int> - the index of the delta to use.  This value should always be 0 when calling from outside this function.
+				* @param callback <Function> - the function that should be called after all conflicts have been resolved.
+				*/
+				var scanNonMemberFields = function(localKrewes, serverKrewes, deltas, deltaKeys, deltaIndex, callback) {
+					if(deltas.length === deltaIndex) {
+						callback();
+					}
+
+					var localKrewe;			// Populated only if a conflict is found.
+					var serverIndex = binarySearch(deltaKeys[deltaIndex], serverKrewes);
+
+					async.series([
+						function(asyncSeriesCallback) {
+							console.log(deltaKeys[deltaIndex]);
+							console.log(deltaKeys[deltaIndex] != +deltaKeys[deltaIndex]);
+							console.log(deltaKeys[deltaIndex] != +deltaKeys[deltaIndex] && deltaKeys[deltaIndex] != 0);
+							if(deltaKeys[deltaIndex] != +deltaKeys[deltaIndex] && serverIndex === null) {
+								// Server version was not found.  This item has been deleted.  Ask the user what to do.  If the user wants to keep the krewe, the krewe's _id needs to be set to null to be assigned a new krewe.localKrewe = localChanges[binarySearch(deltaKeys[deltaIndex], localChanges)];
+								queryUser(UserQueryTypes.kreweMissing, localKrewe, function(selection) {
+									if(selection === 0) {
+										// Delete this Krewe.
+										deltaKeys.splice(deltaIndex, 1);
+										deltaIndex--;
+									}
+
+									asyncSeriesCallback();
+								});
+							} else {
+								asyncSeriesCallback();
+							}
+						},
+						function(asyncSeriesCallback) {
+							var currentDelta = deltas[deltaKeys[deltaIndex]];
+							var serverKrewe = serverKrewes[serverIndex];
+
+							console.log("*********************");
+							console.log(currentDelta);
+							console.log(serverKrewe);
+							console.log("*********************");
+
+							async.parallel([
+								function(asyncParallelCallback) {
+									if(deltaKeys[deltaIndex] != +deltaKeys[deltaIndex] && currentDelta.name && currentDelta.name.original !== serverKrewe.name && currentDelta.name.current !== serverKrewe.name) {
+										// Cannot resolve automatically.  Ask the user which version to keep (original, current, server).
+										if(!localKrewe) {
+											localKrewe = localKrewes[binarySearch(deltaKeys[deltaIndex], localKrewes)];
+										}
+
+										queryUser(UserQueryTypes.kreweName, localKrewe, serverKrewes[serverIndex], function(selection) {
+											if(selection === 0) {
+												// Sever version was chosen.  Update the local version.
+												localKrewe.name = serverKrewe.name;
+											} else if(selection === 1) {
+												// Local version was chosen.  Update the server version.
+												serverKrewe.name = localKrewe.name;
+											}
+
+											asyncParallelCallback();
+										});
+									}  else if(deltaKeys[deltaIndex] != +deltaKeys[deltaIndex]) {
+										if(!localKrewe) {
+											localKrewe = localKrewes[binarySearch(deltaKeys[deltaIndex], localKrewes)];
+										}
+
+										// Either the localKrewe already has the name on the server, or the server was updated last.  Either way, the version saved to the server should have the name for serverKrewe.
+										localKrewe.name = serverKrewe.name;
+
+										asyncParallelCallback();
+									} else {
+										asyncParallelCallback();
+									}
+								},
+								function(asyncParallelCallback) {
+									if(deltaKeys[deltaIndex] != +deltaKeys[deltaIndex] && currentDelta.kaptain && currentDelta.kaptain.original !== serverKrewe.kaptain[0]._id && currentDelta.kaptain.current !== serverKrewe.kaptain[0]._id) {
+										// Cannot resolve automatically.  Ask the user which version to keep (original, current, server).
+										if(!localKrewe) {
+											localKrewe = localKrewes[binarySearch(deltaKeys[deltaIndex], localKrewes)];
+										}
+
+										queryUser(UserQueryTypes.kreweKaptain, localKrewe, serverKrewes[serverIndex], function(selection) {
+											if(selection === 0) {
+												// Sever version was chosen.  Update the local version.
+												localKrewe.kaptain = serverKrewe.kaptain;
+											} else if(selection === 1) {
+												// Local version was chosen.  Update the server version.
+												serverKrewe.kaptain = localKrewe.kaptain;
+											}
+
+											asyncParallelCallback();
+										});
+									} else if(deltaKeys[deltaIndex] != +deltaKeys[deltaIndex]) {
+										if(!localKrewe) {
+											localKrewe = localKrewes[binarySearch(deltaKeys[deltaIndex], localKrewes)];
+										}
+
+										// Either the localKrewe already has the same kaptain as on the server, or the server was updated last.  Either way, the version saved to the server should have the same kaptain as already on the server.
+										localKrewe.kaptain = serverKrewe.kaptain;
+
+										asyncParallelCallback();
+									} else {
+										asyncParallelCallback();
+									}
+								}
+							], function(error, results) {
+								asyncSeriesCallback();
+							});
+						}
+					], function(error, results) {
+						if(++deltaIndex < deltaKeys.length) {
+							scanNonMemberFields(localKrewes, serverKrewes, deltas, deltaKeys, deltaIndex, callback);
+						} else {
+							callback();
+						}
+					});
 				};
 
 				/**
@@ -127,90 +282,22 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				* but the local version was not, the server version will be kept since it was last modified.  If both
 				* versions have been modified, the user will have to determine which version to keep.
 				*
-				* @param deltas <[Object]> - all deltas stored for this event
+				* @param deltas <Object> - all deltas stored for this event
 				* @param localChanges <[Object]> - data for all modified Krewes
 				* @param originalVersion <[Object]> - sorted original version of Krewes before changes were made
 				* @param serverVersion <[Object]> - sorted version of Krewes on the server
 				* @param potentialUsers <[Object]> - list of all users that have not been assigned a Krewe locally
 				*/
-				var resolveConflicts = function(deltas, localChanges, originalVersion, serverVersion) {
+				var resolveConflicts = function(deltas, localChanges, originalVersion, serverVersion, callback) {
 					var deltaKeys = _.keys(deltas);
 					var tempIdMax = getNextId(eventSelector.postEventId.toString());
 
-					// Sort the server version to find the required Krewe faster.
+					// Sort the krewe arrays for quicker lookup.
 					quickSortKrewes(serverVersion);
+					quickSortKrewes(localChanges);
 
 					// Check each delta and determine if a conflict can be resolved programatically.
-					for(var deltaIndex = deltaKeys.length - 1; deltaIndex >= 0; deltaIndex--) {
-						var localKrewe;			// Populated only if a conflict is found.
-						var serverIndex = binarySearch(deltaKeys[deltaIndex], serverVersion);
-
-						if((deltaKeys[deltaIndex] !== +deltaKeys[deltaIndex] && deltaKeys[deltaIndex] >= tempIdMax) && serverIndex === null) {
-							// Server version was not found.  This item has been deleted.  Ask the user what to do.  If the user wants to keep the krewe, the krewe's _id needs to be set to null to be assigned a new krewe.
-							var callbackReturned = false;
-
-							localKrewe = localChanges[binarySearch(deltaKeys[deltaIndex], localChanges)];
-
-							queryUser(UserQueryTypes.kreweMissing, localKrewe, function(selection) {
-								if(selection === 0) {
-									// Delete this Krewe.
-									deltaKeys.splice(deltaIndex, 1);
-									deltaIndex--;
-
-									callbackReturned = true;
-								}
-							});
-
-							while(!callbackReturned);
-						}
-
-						var currentDelta = deltas[deltaKeys[deltaIndex]];
-						var serverKrewe = serverVersion[serverIndex];
-
-						if((deltaKeys[deltaIndex] !== +deltaKeys[deltaIndex] && deltaKeys[deltaIndex] >= tempIdMax) && currentDelta.name && currentDelta.name.original !== serverKrewe.name && currentDelta.name.current !== serverKrewe.name) {
-							// Cannot resolve automatically.  Ask the user which version to keep (original, current, server).
-							if(!localKrewe) {
-								localKrewe = localChanges[binarySearch(deltaKeys[deltaIndex], localChanges)];
-							}
-
-							queryUser(UserQueryTypes.kreweName, localKrewe, serverVersion[serverIndex], function(selection) {
-								if(selection === 0) {
-									// Sever version was chosen.  Update the local version.
-									localKrewe.name = serverKrewe.name;
-								} else {
-									// Local version was chosen.  Update the server version.
-									serverKrewe.name = localKrewe.name;
-								}
-							});
-
-							// If ES6 was widely supported, I could convert this function to a generator and use something like the
-							// following (given queryUser returns a promise):
-							//
-							//	yield queryUser(UserQueryTypes.kreweName, localKrewe, serverVersion[serverIndex]);
-							//
-							// The last yield would return false.  The calling function could then check the return value.  If false,
-							// continue execution.  Else use the returned value as a promise and when it finishes, continue executing
-							// this generator.  Unfortunately, this method requires writing compatible code for the majority of
-							// browsers that do not have support for generators.
-						}
-
-						if((deltaKeys[deltaIndex] !== +deltaKeys[deltaIndex] && deltaKeys[deltaIndex] >= tempIdMax) && currentDelta.kaptain && currentDelta.kaptain.original !== serverKrewe.kaptain._id && currentDelta.kaptain.current !== serverKrewe.kaptain._id) {
-							// Cannot resolve automatically.  Ask the user which version to keep (original, current, server).
-							if(!localKrewe) {
-								localKrewe = localChanges[binarySearch(deltaKeys[deltaIndex], localChanges)];
-							}
-
-							queryUser(UserQueryTypes.kreweKaptain, localKrewe, serverVersion[serverIndex], function(selection) {
-								if(selection === 0) {
-									// Sever version was chosen.  Update the local version.
-									localKrewe.kaptain = serverKrewe.kaptain;
-								} else {
-									// Local version was chosen.  Update the server version.
-									serverKrewe.kaptain = localKrewe.kaptain;
-								}
-							});
-						}
-
+					scanNonMemberFields(localChanges, serverVersion, deltas, deltaKeys, 0, function() {
 						// If no changes have been made to this Krewe locally, the server version will be used.  If changes have been
 						// made, the following considerations need to be made based on how the members changed:
 						//	- Deletion - 	If the member does not appear anywhere else on the server, the user needs to be added back
@@ -222,207 +309,273 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 						// Conflicts are considered differently.  A conflict only exists if the same member was added to different
 						// Krewes on the server and locally.  To detect this type of conflict, we will have to search the server
 						// version for all members that were added to a Krewe.  If the member exists in a different Krewe than the
-						// server and original versions, a conflict exists.  To speed up searching through the server and original
+						// server and original versions, a conflict exists.  To speed up searching through the server and local
 						// array of members, an object will be created for both.
+						var localMembers = {};
+						var localMemberKeys = [];
+						var kaptains = {};
+						var kaptainConflicts = {};
+						var conflictingKaptainKeys = [];
+						for(var localIndex = localChanges.length - 1; localIndex >= 0; localIndex--) {
+							var currentKreweId = localChanges[localIndex]._id.toString();
+							var currentKaptain = null;
+
+							if(localChanges[localIndex].kaptain && localChanges[localIndex].kaptain.length) {
+								currentKaptain = localChanges[localIndex].kaptain[0]._id;
+							}
+
+							if(currentKaptain) {
+								kaptains[currentKaptain] = {
+									krewe: 		currentKreweId,
+									kreweIndex:	localIndex
+								};
+							}
+
+							for(var localMemberIndex = localChanges[localIndex].members.length - 1; localMemberIndex >= 0; localMemberIndex--) {
+								var currentMemberId = localChanges[localIndex].members[localMemberIndex]._id;
+
+								localMembers[currentMemberId] = {
+									krewe: 			currentKreweId,
+									kreweIndex: 	localIndex,
+									memberIndex: 	localMemberIndex,
+									original: 		currentKreweId
+								};
+								localMemberKeys.push(currentMemberId);
+
+								if(deltas[currentKreweId] && deltas[currentKreweId].members[currentMemberId]) {
+									// This member was added to this Krewe locally.
+									localMembers[currentMemberId].action = deltas[currentKreweId].members[currentMemberId].action;
+
+									// Find the original Krewe from which they were removed.
+									for(var deltaIndex = deltaKeys.length - 1; deltaIndex >= 0; deltaIndex--) {
+										if(deltaKeys[deltaIndex] === currentKreweId) {
+											continue;
+										}
+
+										if(deltas[deltaKeys[deltaIndex]].members && deltas[deltaKeys[deltaIndex]].members[currentMemberId]) {
+											localMembers[currentMemberId].original = deltaKeys[deltaIndex];
+										}
+									}
+								}
+							}
+						}
+
+						// Make sure the members that no longer part of a Krewe are included.
+						for(var deltaIndex = deltaKeys.length - 1; deltaIndex >= 0; deltaIndex--) {
+							var deltaMembers = _.keys(deltas[deltaKeys[deltaIndex]].members);
+
+							for(var memberIndex = deltaMembers.length - 1; memberIndex >= 0; memberIndex--) {
+								if(!localMembers[deltaMembers[memberIndex]] && !kaptains[deltaMembers[memberIndex]]) {
+									// This member does not exist in localMembers, add him/her.
+									localMembers[deltaMembers[memberIndex]] = {
+										krewe: 		null,
+										original: 	deltaKeys[deltaIndex],
+										action: 	'-'
+									};
+								}
+							}
+						}
+
 						var serverMembers = {};
-						for(var serverKreweIndex = serverVersion.length - 1; serverKreweIndex >= 0; serverKreweIndex--) {
-							serverMembers[serverVersion[serverKreweIndex]._id] = {};
+						var serverMemberConflicts = {};
+						var serverMemberKeys = [];
+						for(var serverIndex = serverVersion.length - 1; serverIndex >= 0; serverIndex--) {
+							var currentKreweId = serverVersion[serverIndex]._id;
+							var currentKaptain = null;
 
-							for(var serverMemberIndex = serverVersion[serverKreweIndex].members.length; serverMemberIndex >= 0; serverMemberIndex--) {
-								serverMembers[serverVersion[serverKreweIndex]._id][serverVersion[serverKreweIndex].members[serverMemberIndex]] = true;
+							if(serverVersion[serverIndex].kaptain && serverVersion[serverIndex].kaptain.length) {
+								currentKaptain = serverVersion[serverIndex].kaptain[0]._id;
+							}
+
+							if(currentKaptain && kaptains[currentKaptain] && kaptains[currentKaptain].krewe !== currentKreweId) {
+								// Conflict!  This Kaptain is a Kaptain for more than one group.
+								kaptainConflicts[currentKaptain] = kaptains[currentKaptain];
+								kaptainConflicts[currentKaptain].conflictingKrewe = currentKreweId;
+								kaptainConflicts[currentKaptain].conflictingKreweIndex = serverIndex;
+
+								conflictingKaptainKeys.push(currentKaptain);
+							}
+
+							for(var serverMemberIndex = serverVersion[serverIndex].members.length - 1; serverMemberIndex >= 0; serverMemberIndex--) {
+								var currentMemberId = serverVersion[serverIndex].members[serverMemberIndex]._id;
+
+								serverMembers[currentMemberId] = {
+									krewe: 			currentKreweId,
+									kreweIndex: 	serverIndex,
+									memberIndex: 	serverMemberIndex
+								};
+
+								if(!localMembers[currentMemberId]) {
+									// This member was added by another.  Merge the changes only if the Krewe is already in the local version and won't be overwritten later.
+									if(deltas[currentKreweId]) {
+										localChanges[binarySearch(currentKreweId, localChanges)].members.push(serverVersion[serverIndex].members[serverMemberIndex]);
+									}
+
+									continue;
+								} else if(localMembers[currentMemberId].krewe === currentKreweId || localMembers[currentMemberId].original === currentKreweId) {
+									// No conflict.  Use the local version.
+									continue;
+								}
+
+								serverMemberConflicts[currentMemberId] = serverMembers[currentMemberId];
+								serverMemberKeys.push(currentMemberId);
 							}
 						}
 
-						var currentOriginalKrewe;
-						var originalMembers = {};
-						for(var originalKreweIndex = originalVersion.length - 1; originalKreweIndex >= 0; originalKreweIndex--) {
-							originalMembers[originalVersion[originalKreweIndex]._id] = {};
+						if(conflictingKaptainKeys.length) {
+							scanKaptains(localChanges, serverVersion, kaptainConflicts, conflictingKaptainKeys, 0, function() {
+								if(serverMemberKeys.length) {
+									scanMembers(serverVersion, localChanges, serverMemberConflicts, localMembers, serverMemberKeys, 0, function() {
+										mergeKrewes(localChanges, serverVersion, localMembers, serverMembers, deltas);
 
-							for(var originalMemberIndex = originalVersion[originalKreweIndex].members.length; originalMemberIndex >= 0; originalMemberIndex--) {
-								originalMembers[originalVersion[originalKreweIndex]._id][originalVersion[originalKreweIndex].members[originalMemberIndex]] = true;
-							}
-
-							if(originalVersion[originalKreweIndex]._id === deltaKeys[deltaIndex]) {
-								currentOriginalKrewe = originalVersion[originalKreweIndex];
-							}
-						}
-
-						if(currentDelta.members) {
-							var memberKeys = _.keys(currentDelta.members);
-
-							for(var index = memberKeys - 1; index >= 0; index--) {
-								var currentMember = currentDelta.members[memberKeys[index]];
-
-								if(currentMember.action === '+') {
-									// Check for conflicts.
-									if(serverMembers[currentDelta._id][memberKeys[index]]) {
-										// The member was added to the same group.  No conflict.
-										continue;
-									}
-
-									// Find where the member is on the server.
-									for (var innerKreweIndex = serverVersion.length - 1; innerKreweIndex >= 0; innerKreweIndex--) {
-										var currentServerKrewe = serverVersion[innerKreweIndex];
-
-										if(serverMembers[currentServerKrewe._id][memberKeys[index]]) {
-											// The member is in this krewe on the server.  Check if the original version agrees.
-											if(originalMembers[currentServerKrewe._id][memberKeys[index]]) {
-												// The original and server version match for this member.  Keep changes, no conflict.
-												 break;
-											}
-
-											// A conflict exists that cannot be resolved automatically.  Ask the user which version to keep (original, current, server).
-											if(!localKrewe) {
-												localKrewe = localChanges[binarySearch(deltaKeys[deltaIndex], localChanges)];
-											}
-
-											var serverMemberIndex = binarySearch(memberKeys[index], currentServerKrewe.members);
-											var localMemberIndex = binarySearch(memberKeys[index], localKrewe.members);
-
-											queryUser(UserQueryTypes.kreweMember, localKrewe, serverVersion[serverIndex], serverMemberIndex, localMemberIndex, function(selection) {
-												if(selection === 0) {
-													// Sever version was chosen.  Update the local version.
-													localKrewe.members[localMemberIndex] = currentServerKrewe.members[serverMemberIndex];
-												} else {
-													// Local version was chosen.  Update the server version.
-													currentServerKrewe.members[serverMemberIndex] = localKrewe.members[localMemberIndex];
-												}
-											});
-
-											break;
-										}
-									}
+										callback();
+									});
 								} else {
-									// User was deleted.  Check if they were added to a different group on the server.  If so, merge the changes.  If not, keep these changes and add the user to the array of members that should be added to potentialMembers.
-									var kreweIndex = serverVersion.length - 1;
-									for (; kreweIndex >= 0; kreweIndex--) {
-										var currentServerKrewe = serverVersion[kreweIndex];
+									mergeKrewes(localChanges, serverVersion, localMembers, serverMembers, deltas);
 
-										if(serverMembers[currentServerKrewe._id][memberKeys[index]] && currentServerKrewe._id !== currentDelta._id && (!currentDelta[currentServerKrewe._id] || !currentDelta[currentServerKrewe._id][memberKeys[index]])) {
-											// The member is part of this Krewe (which is not the same as the Krewe from which it was removed).  Merge the changes.
-											for (var localIndex = $scope.krewes.length - 1; localIndex >= 0; localIndex--) {
-												if($scope.krewes[localIndex]._id === currentServerKrewe._id) {
-													$scope.krewes[localIndex].members.push({_id: memberKeys[index]});
-												}
-											}
-
-											break;
-										}
-									}
-
-									if(kreweIndex >= 0) {
-										// The member was not found, add them to newPotentialMembers.
-										$scope.newPotentialMembers.push(memberKeys[index]);
-									}
+									callback();
 								}
-							}
-						} else if((deltaKeys[deltaIndex] !== +deltaKeys[deltaIndex] && deltaKeys[deltaIndex] >= tempIdMax) && !membersMatch(currentOriginalKrewe.members, serverVersion[serverKreweIndex].members)) {
-							// The Krewe was not modified, but the server version's members do not match the original members.  In this case, keep the server version.
-							if(!localKrewe) {
-								localKrewe = localChanges[binarySearch(deltaKeys[deltaIndex], localChanges)];
-							}
+							});
+						} else {
+							if(serverMemberKeys.length) {
+								scanMembers(serverVersion, localChanges, serverMemberConflicts, localMembers, serverMemberKeys, 0, function() {
+									mergeKrewes(localChanges, serverVersion, localMembers, serverMembers, deltas);
 
-							localKrewe.members = serverKrewe.members; 
+									callback();
+								});
+							} else {
+								mergeKrewes(localChanges, serverVersion, localMembers, serverMembers, deltas);
+
+								callback();
+							}
 						}
-					}
+					});
+				};
 
-					var localMembers = {};
-					for(var localIndex = localChanges.length - 1; localIndex >= 0; localIndex--) {
-						var currentKreweId = localChanges[localIndex]._id;
+				/**
+				* Merges any changes from the server that are not already local and strips any duplicate Kaptains.
+				*/
+				var mergeKrewes = function(localKrewes, serverKrewes, localMembers, serverMembers, deltas) {
+					// Find Krewes that were not modified and replace them with the server version.
+					for(var serverIndex = serverKrewes.length - 1; serverIndex >= 0; serverIndex--) {
+						if(!deltas[serverKrewes[serverIndex]._id]) {
+							// No deltas exist for this Krewe.
+							var localIndex = binarySearch(serverKrewes[serverIndex]._id, localKrewes);
 
-						for(var localMemberIndex = localChanges[localIndex].members.length; localMemberIndex >= 0; localMemberIndex--) {
-							var currentMemberId = localChanges[localIndex].members[localMemberIndex]._id;
-
-							localMembers[currentMemberId] = {};
-							localMembers[currentMemberId].krewe = currentKreweId;
-
-							var foundDelta = false;
-							for(var deltaIndex = deltaKeys.length - 1; deltaIndex >= 0; deltaIndex--) {
-								var deltaMembers = _.keys(deltas[deltaKeys[deltaIndex]].members);
-
-								for(var memberIndex = deltaMembers.length - 1; memberIndex >= 0; memberIndex--) {
-									if(deltaMembers[memberIndex] === currentMemberId && deltas[deltaKeys[deltaIndex]][deltaMembers[memberIndex]].action === "+") {
-										foundDelta = true;
-
-										localMembers[currentMemberId].action = deltas[deltaKeys[deltaIndex]][deltaMembers[memberIndex]].action;
-
-										break;
-									} else if(deltaMembers[memberIndex] === currentMemberId && deltas[deltaKeys[deltaIndex]][deltaMembers[memberIndex]].action === "-") {
-										localMembers[currentMemberId].original = deltaKeys[deltaIndex];
-									}
-								}
-
-								if(foundDelta) {
-									break;
-								}
+							if(localIndex || localIndex === 0) {
+								localKrewes[localIndex] = serverKrewes[serverIndex];
+							} else {
+								localKrewes.push(serverKrewes[serverIndex]);
 							}
 						}
 					}
 
-					// // Retreive the list of potential users from the server.
-					// loadPotentialMembers(function(status, serverPotentialUsers) {
-					// 	if(!status) {
-					// 		// Potential users were retreived from server.  Now iterate over data and fix conflicts if possible.
-					// 		for(var localKreweIndex = 0, localChangesLength = localChanges.length; localKreweIndex < localChangesLength; localKreweIndex++) {
-					// 			// Check to see if this is a new Krewe, do not compare it to server krewes.
-					// 			if(!localChanges[localKreweIndex]._id) {
-					// 				// Make sure this new Krewe's members are actually available.  If not, there is a conflict.
+					// Make sure there is no overlap of Kaptains and Krewe members.  Since Kaptain conflicts have been resolved, Kaptains supercede member status.
+					for(var localIndex = localKrewes.length - 1; localIndex >= 0; localIndex--) {
+						if(!localKrewes[localIndex].kaptain.length) {
+							continue;
+						}
 
-					// 				continue;
-					// 			}
+						var kaptainId = localKrewes[localIndex].kaptain[0]._id;
 
-					// 			for(var serverKreweIndex = 0, serverVersionLength = serverVersion.length; serverKreweIndex < serverVersionLength; serverKreweIndex++) {
-					// 				// If we aren't comparing the same object go to the next
-					// 				if(localChanges[localKreweIndex]._id !== serverVersion[serverKreweIndex]) {
-					// 					continue;
-					// 				}
+						if(localMembers[kaptainId]) {
+							if(localMembers[kaptainId].krewe) {
+								localKrewes[localMembers[kaptainId].kreweIndex].members.splice(localMembers[kaptainId].memberIndex, 1);
 
-					// 				// If the new krewe and server krewe match, move on to the next Krewe
-					// 				if(_.matches(localChanges[localKreweIndex])(serverVersion[serverKreweIndex])) {
-					// 					break;
-					// 				}
+								// for(var memberIndex = localMemberKeys.length - 1; memberIndex >= 0; memberIndex--) {
+								// 	if(localMembers[localMemberKeys[memberIndex]].memberIndex > localMembers[kaptainId].memberIndex && localMembers[localMemberKeys[memberIndex]].krewe === localMembers[kaptainId].krewe) {
+								// 		localMembers[localMemberKeys[memberIndex]].memberIndex--;
+								// 	}
+								// }
+							}
 
-					// 				var tempLocalKrewe = localChanges[localKreweIndex];
-					// 				var tempServerKrewe = serverVersion[serverKreweIndex];
-					// 				var tempOriginalKrewe;
+							delete localMembers[kaptainId];
+						} else if(serverMembers[kaptainId]) {
+							if(serverMembers[kaptainId].krewe) {
+								// At this point, the server and local Krewes have been merged.
+								var index = binarySearch(serverMembers[kaptainId].krewe, localKrewes);
+								localKrewes[index].members.splice(serverMembers[kaptainId].memberIndex, 1);
+							}
 
-					// 				// An Krewe in originalVersion must match these two since localTempKrewe has an _id.
-					// 				for(var originalKreweIndex = 0, originalVersionLength = originalVersion.length; originalKreweIndex < originalVersionLength; originalKreweIndex++) {
-					// 					if(originalVersion[originalKreweIndex]._id === tempLocalKrewe._id) {
-					// 						tempOriginalKrewe = originalVersion[originalKreweIndex];
+							delete serverMembers[kaptainId];
+						}
+					}
+				}
 
-					// 						break;
-					// 					}
-					// 				}
+				/**
+				* Scans the missing members recursively so the system can "pause" while waiting for user input (i.e., the
+				* system will not continue resolving conflicts until callback is called).
+				*
+				* @param missingMembers <[Object]> - an array of the missing members
+				* @param index <Int> - this value should always be 0 when being called by an outside function.
+				* @param callback <Function> - callback function to be called after all missing members have received user feedback
+				*/
+				// var scanMissingMembers = function(serverKrewes, localKrewes, missingMembers, index, callback) {
+				// 	queryUser(UserQueryTypes.missingMembers, serverKrewes[missingMembers[index].kreweIndex], missingMembers[index].memberIndex, function(selection) {
+				// 		// Handle selection.
+				// 		if(selection === 1) {
+				// 			localKrewes[binarySearch(missingMembers[index].krewe, localKrewes)].members.push(serverKrewes[missingMembers[index].kreweIndex].members[missingMembers[index].memberIndex]);
+				// 		}
 
-					// 				// If the original krewe matches the server krewe, just use the local krewe.
-					// 				if(_.matches(tempServerKrewe)(tempOriginalKrewe)) {
-					// 					break;
-					// 				}
+				// 		if(missingMembers.length > index) {
+				// 			scanMissingMembers(missingMembers, ++index, callback);
+				// 		} else {
+				// 			callback();
+				// 		}
+				// 	});
+				// };
 
-					// 				// Something doesn't match.  Find it and fix it one way or another.
-					// 				if(tempOriginalKrewe.name !== tempServerKrewe.name && tempLocalKrewe.name !== tempServerKrewe.name) {
-					// 					// Cannot resolve programmatically, ask the user whether to keep tempLocalKrewe or tempServerKrewe.
-					// 				}
+				/**
+				* Iterates over the members in conflictingKaptainKeys and detects and resolves any conflicts recursively.
+				*/
+				var scanKaptains = function(localKrewes, serverKrewes, kaptainConflicts, conflictingKaptainKeys, index, callback) {
+					var conflictingKaptain = kaptainConflicts[conflictingKaptainKeys[index]];
 
-					// 				if(tempOriginalKrewe.kaptain._id !== tempServerKrewe.kaptain._id && tempLocalKrewe.kaptain._id !== tempServerKrewe.kaptain._id) {
-					// 					// Cannot resolve programmatically, ask the user whether to teep tempLocalKrewe or tempServerKrewe.
-					// 				}
+					queryUser(UserQueryTypes.kreweKaptain, localKrewes[conflictingKaptain.kreweIndex], serverKrewes[conflictingKaptain.conflictingKreweIndex], function(selection) {
+						if(selection === 0) {
+							localKrewes[conflictingKaptain.kreweIndex].kaptain = [];
+						} else {
+							serverKrewes[conflictingKaptain.conflictingKreweIndex].kaptain = [];
+						}
 
-					// 				var matchesTempServerMembers = _.matches(tempServerKrewe.members);
-					// 				if(!matchesTempServerMembers(tempOriginalKrewe.members) && !matchesTempServerMembers(tempLocalKrewe.members) {
-					// 					// If the local version with changes matches the original version AND the potential members are the same, use the server version.
-					// 					if(_.matches())
-					// 				}
+						if(conflictingKaptainKeys.length > ++index) {
+							scanKaptains(localKrewes, kaptainConflicts, conflictingKaptainKeys, index, callback);
+						} else {
+							callback();
+						}
+					});
+				};
 
-					// 				break;
-					// 			}
-					// 		}
-					// 	} else {
-					// 		// Potential users could not be retreived.  Attempt to resolve conflicts without this information, but alert user if necessary.
+				/**
+				* Iterates over the members in serverMemberKeys and detects and resolves any conflicts recursively.
+				*/
+				var scanMembers = function(serverKrewes, localKrewes, serverMembers, localMembers, serverMemberKeys, serverIndex, callback) {
+					var serverMember = serverMembers[serverMemberKeys[serverIndex]];
+					var localMember = localMembers[serverMemberKeys[serverIndex]];
 
-					// 	}
-					// });
+					queryUser(UserQueryTypes.kreweMember, localKrewes[localMember.kreweIndex], serverKrewes[serverMember.kreweIndex], serverMember.memberIndex, localMember.memberIndex, function(selection) {
+						if(selection === 0) {
+							var displacedMember = localKrewes[localMember.kreweIndex].members.splice(localMember.memberIndex, 1)[0];
+							var localIndex = binarySearch(serverMember.krewe, localKrewes);
+
+							// If this Krewe exists on the local version, add the member.  Otherwise, the entire Krewe will be added later.
+							if(localIndex) {
+								localKrewes[localIndex].members.push(displacedMember);
+							}
+
+							delete localMembers[serverMemberKeys[serverIndex]];
+						} else {
+							serverKrewes[serverMember.kreweIndex].members.splice(serverMember.memberIndex, 1)[0];
+
+							delete serverMembers[serverMemberKeys[serverIndex]];
+						}
+
+						if(serverMemberKeys.length > ++serverIndex) {
+							scanMembers(serverKrewes, localKrewes, serverMembers, localMembers, serverMemberKeys, serverIndex, callback);
+						} else {
+							callback();
+						}
+					});
 				};
 
 				/**
@@ -432,7 +585,8 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 					kreweName: 		1,
 					kreweKaptain: 	2,
 					kreweMember: 	3,
-					kreweMissing: 	4
+					kreweMissing: 	4,
+					memberMissing: 	5
 				});
 
 				/**
@@ -445,12 +599,16 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				* @param serverMemberIndex <Int> - required only if queryType is kreweMember.  The index of the member causing the conflict in the local version of the Krewe
 				* @param callback <Function(selection)> - calback function that will return the user's choice.  See table below for possible values of selection and their meanings.
 				*
-				*	|---------------------------------------------------------------------------------------------------------------------------|
-				*	| Value | Meaning  																											|
-				*	|  -1 	| Error occurred																									|
-				*	|	0	| If queryType is kreweMissing, the user chose to delete the Krewe.  Otherwise, the server version was selected. 	|
-				*	|	1 	| If queryType is kreweMissing, the user chose to keep the Krewe.  Otherwise, the local version was selected. 		|
-				*	|---------------------------------------------------------------------------------------------------------------------------|
+				*	|---------------------------------------------------------------|
+				*	|_Value_|_______________________Meaning_________________________|
+				*	|  -1 	| Error occurred										|
+				*	|		| If queryType is kreweMissing or memberMissing,		|
+				*	|	0	|		the user chose to delete the Krewe.  Otherwise,	|
+				*	|		|		the server version was selected. 				|
+				*	|	 	| If queryType is kreweMissing or memberMissing,		|
+				*	|	1	|		the user chose to keep the Krewe.  Otherwise,	|
+				*	|		|		the local version was selected.					|
+				*	|---------------------------------------------------------------|
 				*/
 				var queryUser = function(queryType, localKrewe, serverKrewe, serverMemberIndex, localMemberIndex, callback) {
 					console.log(!queryType);
@@ -458,7 +616,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 					console.log(!localKrewe);
 					console.log(queryType === UserQueryTypes.kreweMember && (!serverMemberIndex || !localMemberIndex || serverMemberIndex !== +serverMemberIndex || localMemberIndex !== +localMemberIndex));
 					if(!queryType || !localKrewe || (queryType !== UserQueryTypes.kreweMissing && (!serverKrewe || typeof serverKrewe !== "object")) || (queryType === UserQueryTypes.kreweMember && ((!serverMemberIndex && serverMemberIndex !== 0) || (!localMemberIndex && localMemberIndex !== 0) || serverMemberIndex !== +serverMemberIndex || localMemberIndex !== +localMemberIndex))) {
-						callback(-1);
+						return -1;
 					}
 
 					if(!callback) {
@@ -469,7 +627,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 							callback = serverMemberIndex;
 							serverMemberIndex = null;
 						} else {
-							callback(-1);
+							return -1;
 						}
 					}
 
@@ -489,11 +647,15 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 
 						conflictIndicators.kaptain = true;
 					} else if(queryType === UserQueryTypes.kreweMember) {
-						modalMessage = "A Krewe member's Krewe has been modified on the server and locally.  Which version should be kept?";
+						modalMessage = "An attendee's assigned Krewe was changed on the server and locally.  Which version should be kept?";
 
 						conflictIndicators.member = true;
 					} else if(queryType === UserQueryTypes.kreweMissing) {
 						modalMessage = "This Krewe was deleted on the server.  Should it be kept or deleted?"
+					} else if(queryType === UserQueryTypes.memberMissing) {
+						modalMessage = "This member has vanished.  Should we remove them from all Krewes or keep them in their original Krewe?";
+
+						conflictIndicators.member = true;
 					} else {
 						return -1;
 					}
@@ -523,12 +685,16 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 										server: serverMemberIndex,
 										local: 	localMemberIndex
 									};
+								} else if(queryType === UserQueryTypes.missingMembers) {
+									return {
+										local: 	serverKrewe
+									}
 								}
 
 								return false;
 							},
 							kreweDeleted: 		function() {
-								if(queryType === UserQueryTypes.kreweMissing) {
+								if(queryType === UserQueryTypes.kreweMissing || queryType === UserQueryTypes.memberMissing) {
 									return true;
 								}
 
@@ -692,10 +858,10 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				* Stores a delta in local storage.  If the delta already exists, the values in the delta
 				* will be replaced by these values.
 				*
-				* @param event_id <String> - 
-				* @param krewe_id <String> - 
-				* @param modifiedField <String> - 
-				* @param newValue <String> - 
+				* @param event_id <String> - the _id of the event that was modified
+				* @param krewe_id <String> - the _id of the krewe that was modified
+				* @param modifiedField <String> -  the field that was modified.  Can be either "name", "kaptain", or "members"
+				* @param newValue <String> - the new value for the modified field or the member's _id if modifiedField is "members"
 				* @param action <String> - "+" when the member was added, "-" when the member was removed
 				*/
 				var storeDelta = function(event_id, krewe_id, modifiedField, newValue, action) {
@@ -706,18 +872,24 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 					var delta = {};
 
 					// Find the original value only if the field is name or kaptain and the original data for this Krewe isn't already saved in a delta record.
-					if((modifiedField === "name" || modifiedField === "kaptain") && (!eventDeltas || !eventDeltas[krewe_id] || !eventDeltas[krewe_id][modifiedField])) {
+					if(modifiedField !== "members" && (!eventDeltas || !eventDeltas[krewe_id] || !eventDeltas[krewe_id][modifiedField])) {
 						for(var originalKreweIndex = originalKrewes.length - 1; originalKreweIndex >= 0; originalKreweIndex--) {
 							if(originalKrewes[originalKreweIndex]._id === krewe_id) {
 								if(modifiedField === "name") {
-									originalData = originalKrewes[originalKreweIndex][modifiedField];
+									originalData = originalKrewes[originalKreweIndex].name;
 								} else {
-									originalData = originalKrewes[originalKreweIndex][modifiedField]._id;
+									if(originalKrewes[originalKreweIndex].kaptain.length) {
+										originalData = originalKrewes[originalKreweIndex].kaptain[0]._id;
+									} else {
+										originalData = null;
+									}
 								}
 
 								break;
 							}
 						}
+					} else if(modifiedField !== "members") {
+						originalData = eventDeltas[krewe_id][modifiedField].original;
 					}
 
 					// If the new value matches the original value, simply delete the delta and return.
@@ -755,15 +927,16 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 										delete krewe[modifiedField][newValue];
 
 										// If this field no longer has any deltas, delete it.
-										if(!krewe[modifiedField]) {
-											delete krewe[modifiedField];
+										console.log(krewe[modifiedField]);
+										if(!krewe[modifiedField] || !Object.keys(krewe[modifiedField]).length) {
+											delete eventDeltas[krewe_id][modifiedField];
 
 											// If this Krewe no longer has any deltas, delete it.
-											if(!krewe) {
+											if(!krewe || !Object.keys(krewe).length) {
 												delete eventDeltas[krewe_id];
 
 												// If this event no longer has deltas, delete it and return it.
-												if(!eventDeltas) {
+												if(!eventDeltas || !Object.keys(eventDeltas).length) {
 													localStorageService.remove(storageKey);
 													return;
 												}
@@ -781,13 +954,25 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 						} else {
 							// No deltas exist for this Krewe, add this one.
 							eventDeltas[krewe_id] = {};
-							eventDeltas[krewe_id][modifiedField] = delta;
+
+							if(modifiedField !== "members") {
+								eventDeltas[krewe_id][modifiedField] = delta;
+							} else {
+								eventDeltas[krewe_id][modifiedField] = {};
+								eventDeltas[krewe_id][modifiedField][newValue] = delta;
+							}
 						}
 					} else {
 						// No deltas exist for this event.  Simply create one for this Krewe and save the information.
 						eventDeltas = {};
 						eventDeltas[krewe_id] = {};
-						eventDeltas[krewe_id][modifiedField] = delta;
+
+						if(modifiedField !== "members") {
+							eventDeltas[krewe_id][modifiedField] = delta;
+						} else {
+							eventDeltas[krewe_id][modifiedField] = {};
+							eventDeltas[krewe_id][modifiedField][newValue] = delta;
+						}
 					}
 
 					localStorageService.set(storageKey, eventDeltas);
@@ -1162,6 +1347,10 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 					storeChangesLocally(event_id, _.extend({}, $scope.krewes));
 				};
 
+				var addToPotentialMembers = function(member) {
+					$scope.potentialMembers.push(member);
+				};
+
 				/**
 				* Remove the current Kaptain from this krewe.  If another Kaptain is being replacing
 				* the current Kaptain, newKaptain should contain the new Kaptain.  Otherwise, this
@@ -1179,16 +1368,13 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 
 					if(oldKaptain.length) {
 						storeDelta(event_id, $scope.krewes[kreweIndex]._id.toString(), "members", oldKaptain[0]._id.toString(), "-");
+						$scope.addNewPotentialMember(oldKaptain[0]);
 					}
 
 					if(newKaptain) {
 						// Check if there is already a Kaptain for this krewe or not.
 						storeDelta(event_id, $scope.krewes[kreweIndex]._id.toString(), "kaptain", newKaptain._id.toString());
 						storeDelta(event_id, $scope.krewes[kreweIndex]._id.toString(), "members", newKaptain._id.toString(), "+");
-
-						if(oldKaptain.length) {
-							$scope.potentialMembers.push(oldKaptain[0]);
-						}
 					} else {
 						storeDelta(event_id, $scope.krewes[kreweIndex]._id.toString(), "kaptain", null);
 					}
@@ -1221,7 +1407,8 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 					var event_id = eventSelector.postEventId.toString();
 					storeDelta(event_id, $scope.krewes[kreweIndex]._id.toString(), "members", $scope.krewes[kreweIndex].members[memberIndex]._id.toString(), "-");
 
-					$scope.krewes[kreweIndex].members.splice(0, 1);
+					var newPotentialMember = $scope.krewes[kreweIndex].members.splice(memberIndex, 1)[0];
+					$scope.addNewPotentialMember(newPotentialMember);
 
 					storeChangesLocally(event_id, _.extend({}, $scope.krewes));
 				};
@@ -1238,6 +1425,24 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 					};
 
 					$scope.krewes.push(newKrewe);
+				};
+
+				/**
+				* Add a member to the potential members.
+				*/
+				$scope.addNewPotentialMember = function(newPotentialMember) {
+					$scope.potentialMembers.push(newPotentialMember);
+
+					var index = $scope.newPotentialMembers.length - 1;
+					for(; index >= 0; index--) {
+						if($scope.newPotentialMembers[index] === newPotentialMember._id) {
+							break;
+						}
+					}
+
+					if(index < 0) {
+						$scope.newPotentialMembers.push(newPotentialMember._id);
+					}
 				};
 
 				/**
@@ -1260,7 +1465,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 						_.assign(memberUserObjects, krewes[kreweIndex].members);
 						krewes[kreweIndex].members = [];
 
-						krewes[kreweIndex].kaptain_id = krewes[kreweIndex].kaptain[0]._id;
+						krewes[kreweIndex].kaptain_id = krewes[kreweIndex].kaptain.length ? krewes[kreweIndex].kaptain[0]._id : null;
 						delete krewes[kreweIndex].kaptain;
 
 						for (var memberIndex = memberUserObjects.length - 1; memberIndex >= 0; memberIndex--) {
@@ -1295,7 +1500,6 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				*/
 				$scope.saveChanges = function() {
 					var event_id = eventSelector.postEventId.toString();
-					var currentKreweData = [];
 					var refresh = false;				// Whether the page should be refreshed after the modal has exited.
 
 					$scope.modalData = {};
@@ -1323,22 +1527,26 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 
 					if(deltasExist(event_id)) {
 						// Check to see if the data can be saved and save to the database if so.
-						var localVersion = retreiveChangesLocally(event_id);
-						var originalVersion = retreiveOriginalVersionLocally(event_id);
+						var localVersion = [];
+						_.assign(localVersion, $scope.krewes);
+
+						var cacheObj = retreiveOriginalVersionLocally(event_id);
+						var originalVersion = Object.keys(cacheObj).map(function(value) {
+							return cacheObj[value];
+						});
+
 						var deltas = retreiveDeltas(event_id);
 
 						// Check the original version against the one in the db.  If they match, local changes will overwrite the backend's version.
-						loadKrewes(false, function(status, data) {
+						loadKrewes(true, function(status, data) {
 							if(!status) {
 								var serverVersion = data;
 
 								if(kreweArraysMatch(originalVersion, serverVersion)) {
-									_.assign(currentKreweData, $scope.krewes);
-
 									$scope.modalData.statusMessage = "No conflicts exist.  Saving to server...";
 
 									// Convert the kaptain and members fields back to the proper format.
-									unmangleKrewes(currentKreweData, event_id);
+									unmangleKrewes(localVersion, event_id);
 
 									// Find all deltas that remove a member and add the member to add that member to the potentialMembers.  If somebody is found that was added to another group, this will be taken care of automatically with /save/krewes.
 									for (var deltaIndex = deltas.length - 1; deltaIndex >= 0; deltaIndex--) {
@@ -1355,7 +1563,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 									// Update potential members.
 									$http.post('/remove/krewe_members', {event_id: event_id, users: $scope.newPotentialMembers}).success(function(resMess) {
 										// Save local changes to the server.
-										$http.post('/save/krewes', {event_id: event_id, krewes: currentKreweData}).success(function(resMess) {
+										$http.post('/save/krewes', {event_id: event_id, krewes: localVersion}).success(function(resMess) {
 											// Remove localstorage and load current version from the backend.
 											resetLocalStorage(event_id);
 											
@@ -1419,77 +1627,75 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 									$scope.modalData.statusMessage = "Conflicts found.  Attempting to resolve them, this may take some time.  Please do not close out of the browser.";
 
 									// Conflicts exist that need to be resolved.  Display a message alerting the user.
-									resolveConflicts(deltas, localVersion, originalVersion, serverVersion);
+									resolveConflicts(deltas, localVersion, originalVersion, serverVersion, function() {
+										$scope.modalData.statusMessage = "Conflicts resolved.  Saving to server...";
 
-									$scope.modalData.statusMessage = "Conflicts resolved.  Saving to server...";
+										// Convert the kaptain and members fields back to the proper format.
+										unmangleKrewes(localVersion, event_id);
 
-									_.assign(currentKreweData, $scope.krewes);
+										// newPotentialMembers was set by resolveConflicts.  Save them.
+										$http.post('/remove/krewe_members', {event_id: event_id, users: $scope.newPotentialMembers}).success(function(resMess) {
+											// Save local changes to the server.
+											$http.post('/save/krewes', {event_id: event_id, krewes: localVersion}).success(function(resMess) {
+												// Remove localstorage and load current version from the backend.
+												resetLocalStorage(event_id);
+												
+												async.parallel([
+													loadKrewes,
+													loadPotentialMembers
+												], function(status, data) {
+													if(!status) {
+														$scope.krewes = data[0];
+														$scope.potentialMembers = data[1];
 
-									// Convert the kaptain and members fields back to the proper format.
-									unmangleKrewes(currentKreweData, event_id);
+														storeOriginalVersionLocally(event_id, $scope.krewes);
 
-									// newPotentialMembers was set by resolveConflicts.  Save them.
-									$http.post('/remove/krewe_members', {event_id: event_id, users: $scope.newPotentialMembers}).success(function(resMess) {
-										// Save local changes to the server.
-										$http.post('/save/krewes', {event_id: event_id, krewes: currentKreweData}).success(function(resMess) {
-											// Remove localstorage and load current version from the backend.
-											resetLocalStorage(event_id);
-											
-											async.parallel([
-												loadKrewes,
-												loadPotentialMembers
-											], function(status, data) {
-												if(!status) {
-													$scope.krewes = data[0];
-													$scope.potentialMembers = data[1];
-
-													storeOriginalVersionLocally(event_id, $scope.krewes);
-
-													// Stop loading icon and give the user positive feedback.
-													$scope.modalData.statusMessage = "Local changes saved!";
+														// Stop loading icon and give the user positive feedback.
+														$scope.modalData.statusMessage = "Local changes saved!";
+														$scope.modalData.loading = false;
+													} else {
+														// An error occurred refreshing data.  Alert the user and refresh the page.
+														$scope.modalData.statusMessage = "Local changes saved!  This page will self-refresh in 5 seconds.";
+														$scope.modalData.loading = false;
+														refresh = true;
+													}
+												});
+											}).error(function(errData, status) {
+												if(status === 400 && errData.message !== "Some Krewes could not be updated.") {
+													// Data is missing or formatted improperly.  Alert the user to results.
+													$scope.modalData.statusMessage = "Could not save local changes as some data may be corrupt.  Please contact frank to resolve the problem (you can do so by clicking the \"Report a Problem\" link on the drop-down under your name).";
 													$scope.modalData.loading = false;
+													$scope.modalData.errorSaving = true;
+												} else if(status === 400) {
+													// Some Krewes could not be saved.  Alert the user.
+													$scope.modalData.statusMessage = "Some local changes could not be saved.  Please contact frank to resolve the problem (you can do so by clicking the \"Report a Problem\" link on the drop-down under your name).";
+													$scope.modalData.loading = false;
+													$scope.modalData.errorSaving = true;
 												} else {
-													// An error occurred refreshing data.  Alert the user and refresh the page.
-													$scope.modalData.statusMessage = "Local changes saved!  This page will self-refresh in 5 seconds.";
+													// Unkown error.  Most likely 500.  Alert the user.
+													$scope.modalData.statusMessage = "Could not connect to server.  Please try again later.";
 													$scope.modalData.loading = false;
-													refresh = true;
+													$scope.modalData.errorSaving = true;
 												}
 											});
 										}).error(function(errData, status) {
-											if(status === 400 && errData.message !== "Some Krewes could not be updated.") {
+											if(status === 400 && errData.message === "Required fields not specified.") {
 												// Data is missing or formatted improperly.  Alert the user to results.
 												$scope.modalData.statusMessage = "Could not save local changes as some data may be corrupt.  Please contact frank to resolve the problem (you can do so by clicking the \"Report a Problem\" link on the drop-down under your name).";
 												$scope.modalData.loading = false;
 												$scope.modalData.errorSaving = true;
 											} else if(status === 400) {
-												// Some Krewes could not be saved.  Alert the user.
-												$scope.modalData.statusMessage = "Some local changes could not be saved.  Please contact frank to resolve the problem (you can do so by clicking the \"Report a Problem\" link on the drop-down under your name).";
+												// Some memberships could not be revoked.  Alert the user.
+												$scope.modalData.statusMessage = "Some members were not updated.  Please contact frank to resolve the problem (you can do so by clicking the \"Report a Problem\" link on the drop-down under your name).";
 												$scope.modalData.loading = false;
 												$scope.modalData.errorSaving = true;
 											} else {
 												// Unkown error.  Most likely 500.  Alert the user.
-												$scope.modalData.statusMessage = "Could not connect to server.  Please try again later.";
+												$scope.modalData.statusMessage = "Could not connect to the server.  Please try again later.";
 												$scope.modalData.loading = false;
 												$scope.modalData.errorSaving = true;
 											}
 										});
-									}).error(function(errData, status) {
-										if(status === 400 && errData.message === "Required fields not specified.") {
-											// Data is missing or formatted improperly.  Alert the user to results.
-											$scope.modalData.statusMessage = "Could not save local changes as some data may be corrupt.  Please contact frank to resolve the problem (you can do so by clicking the \"Report a Problem\" link on the drop-down under your name).";
-											$scope.modalData.loading = false;
-											$scope.modalData.errorSaving = true;
-										} else if(status === 400) {
-											// Some memberships could not be revoked.  Alert the user.
-											$scope.modalData.statusMessage = "Some members were not updated.  Please contact frank to resolve the problem (you can do so by clicking the \"Report a Problem\" link on the drop-down under your name).";
-											$scope.modalData.loading = false;
-											$scope.modalData.errorSaving = true;
-										} else {
-											// Unkown error.  Most likely 500.  Alert the user.
-											$scope.modalData.statusMessage = "Could not connect to the server.  Please try again later.";
-											$scope.modalData.loading = false;
-											$scope.modalData.errorSaving = true;
-										}
 									});
 								}
 							} else {

@@ -10,9 +10,9 @@
 				<ul class="conflict-modal-krewe-kaptain krewe-kaptain">
 					<li class="modal-conflict-krewe-kaptain krewe-kaptain box box-orange conflict-modal-krewe-element" ng-class="{'conflict-modal-focus': kaptainConflict}">
 						<div class="conflict-modal-krewe-kaptain krewe-kaptain">
-							<h3 class="conflict-modal-krewe-kaptain-name">{{serverKrewe.value.kaptain.fName + " " + serverKrewe.value.kaptain.lName}}</h3>
+							<h3 class="conflict-modal-krewe-kaptain-name">{{serverKrewe.value.kaptain[0].fName + " " + serverKrewe.value.kaptain[0].lName}}</h3>
 							<div class="conflict-modal-krewe-kaptain-interests">
-								<div class="conflict-modal-interest-container interest-container" ng-repeat="interest in serverKrewe.value.kaptain.interests">
+								<div class="conflict-modal-interest-container interest-container" ng-repeat="interest in serverKrewe.value.kaptain[0].interests">
 									<img ng-src="{{interestsSource[interest]}}" class="conflict-modal-interest-img interest-img" />
 								</div>
 							</div>
@@ -32,14 +32,14 @@
 					</li>
 				</ul>
 			</div>
-			<div class="conflict-modal-krewe-container krewe-container" ng-click="closeModal(localKrewe.key)" ng-class="{'conflict-modal-focus': kreweDeleted, 'conflict-modal-no-effects': kreweDeleted}">
+			<div class="conflict-modal-krewe-container krewe-container" ng-click="closeModal(localKrewe.key)" ng-class="{'conflict-modal-focus': (kreweDeleted && !memberConflict), 'conflict-modal-no-effects': kreweDeleted}">
 				<h3 class="krewe-name conflict-modal-krewe-element" ng-bind="localKrewe.value.name" ng-class="{'conflict-modal-focus': nameConflict, 'conflict-modal-no-fade': kreweDeleted}"></h3>
 				<ul class="conflict-modal-krewe-kaptain krewe-kaptain">
 					<li class="modal-conflict-krewe-kaptain krewe-kaptain box box-orange conflict-modal-krewe-element" ng-class="{'conflict-modal-focus': kaptainConflict, 'conflict-modal-no-fade': kreweDeleted}">
 						<div class="conflict-modal-krewe-kaptain krewe-kaptain">
-							<h3 class="conflict-modal-krewe-kaptain-name">{{localKrewe.value.kaptain.fName + " " + localKrewe.value.kaptain.lName}}</h3>
+							<h3 class="conflict-modal-krewe-kaptain-name">{{localKrewe.value.kaptain[0].fName + " " + localKrewe.value.kaptain[0].lName}}</h3>
 							<div class="conflict-modal-krewe-kaptain-interests">
-								<div class="conflict-modal-interest-container interest-container" ng-repeat="interest in localKrewe.value.kaptain.interests">
+								<div class="conflict-modal-interest-container interest-container" ng-repeat="interest in localKrewe.value.kaptain[0].interests">
 									<img ng-src="{{interestsSource[interest]}}" class="conflict-modal-interest-img interest-img" />
 								</div>
 							</div>
