@@ -1,0 +1,6 @@
+<ul dnd-list="krewe.members" class="krewe-list krewe-members-assigned" dnd-drop="dndDropFunc({kreweIndex: parentIndex, newMember: item})" dnd-inserted="dndInsertedFunc()">
+	<li class="krewe-member-item box box-green" ng-repeat="member in krewe.members" dnd-draggable="member" dnd-effect-allowed="move" dnd-moved="dndMovedFunc({kreweIndex: parentIndex, memberIndex: $index})">
+		<div ng-include="'modules/krewes/views/krewe-member.client.view.html'"></div>
+	</li>
+	<div class="krewe-member-placeholder" ng-if="!krewe.members || !krewe.members.length">Krewe Members</div>
+</ul>

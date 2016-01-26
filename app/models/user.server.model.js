@@ -56,7 +56,7 @@ var validateRole = function(property) {
 
 	var valid = true;
 	for(var i=0; i<property.length; i++) {
-		if(!(property[i] === 'admin' || property[i] === 'recruiter' || property[i] === 'attendee')) {
+		if(!(property[i] === 'admin' || property[i] === 'recruiter' || property[i] === 'attendee' || property[i] === 'kaptain' || property[i] === 'kreweAdmin' || property[i] === 'recruiterAdmin' || property[i] === 'userAdmin')) {
 			valid = false;
 			break;
 		}
@@ -72,8 +72,14 @@ var validateRole = function(property) {
 * of whether the invitee has read the invitation the recruiter has sent.
 */
 var ListSchema = new Schema({
-	user_id: 	{type: mongoose.Schema.Types.ObjectId, ref:'User'},
-	event_id: 	{type: mongoose.Schema.Types.ObjectId, ref:'Event'}
+	user_id: 	{
+		type: Schema.Types.ObjectId,
+		ref:'User'
+	},
+	event_id: 	{
+		type: Schema.Types.ObjectId,
+		ref:'Event'
+	}
 }, {_id:false});
 
 //mongoose.model('List', ListSchema);
@@ -86,10 +92,35 @@ var ListSchema = new Schema({
 * the user is attending, and whether or not the user is a recruiter for this event (as opposed to just an attendee).
 */
 var StatusSchema = new Schema({
-	event_id: {type: mongoose.Schema.Types.ObjectId, ref:'Event'},
-	attending: {type: Boolean},
-	recruiter: {type: Boolean},
-	active: {type: Boolean, default: true, required: true}
+	event_id: 	{
+		type: 		Schema.Types.ObjectId,
+		ref: 		'Event'
+	},
+	attending: 	{
+		type: 		Boolean
+	},
+	recruiter: 	{
+		type: 		Boolean,
+		default: 	false
+	},
+	kaptain: 	{
+		type: 		Boolean,
+		default: 	false,
+		required: 	true
+	},
+	active: 	{
+		type: 		Boolean,
+		default: 	true,
+		required: 	true
+	},
+	krewe: 		{
+		/**
+		* If the user is part of a Krewe for this event, this should be the ObjectId for the Krewe to which
+		* they belong.  Otherwise, it should be blank.
+		*/
+		type: 		String,
+		default: 	''
+	}
 }, {_id:false, validate : [validateOptional, 'All fields of status required.']});
 
 /*
@@ -97,8 +128,14 @@ var StatusSchema = new Schema({
 * event that is determined by the number of people they invited and the ones out of those invited who are actually attending.
 */
 var RankSchema = new Schema({
-	event_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Event'},
-	place: {type: Number, min: 1}
+	event_id: 	{
+		type: Schema.Types.ObjectId,
+		ref: 'Event'
+	},
+	place: 	{
+		type: Number,
+		min: 1
+	}
 }, {_id : false});
 
 /**
@@ -156,7 +193,7 @@ var UserSchema = new Schema({
 	roles: {
 		type: [{
 			type: String,
-			enum: ['admin', 'recruiter', 'attendee']
+			enum: ['admin', 'recruiter', 'attendee', 'kaptain', 'kreweAdmin', 'recruiterAdmin', 'userAdmin']
 		}],
 		validate: [validateRole, 'A valid role is required.']
 	},
@@ -171,38 +208,38 @@ var UserSchema = new Schema({
 	resetPasswordToken: {
 		type: String
 	},
-  	resetPasswordExpires: {
-  		type: Date
-  	},
-  	status: {
-  		type: [StatusSchema]
-  	},
-  	/*List of people invited, but not registered to attend.*/
-  	inviteeList: {
-  		type: [ListSchema]
-  	},
-  	/*List of people attending the event.*/
-  	attendeeList: {
-  		type: [ListSchema]
-  	},
-  	/*List of people attending the event, but who accepted the invitation from another recruiter.*/
-  	almostList: {
-  		type: [ListSchema]
-  	},
-  	rank: {
-  		type: [RankSchema]
-  	},
-  	/*If the user is invited, but not yet registered to attend they cannot login.*/
-  	login_enabled: {
-  		type: Boolean,
-  		validate: [validateLogin, 'login_enabled is required.']
-  	},
-  	templates: {
-  		type: [{
-  			name: {type: String},
-  			template: {type: String}
-  		}]
-  	}
+	resetPasswordExpires: {
+		type: Date
+	},
+	status: {
+		type: [StatusSchema]
+	},
+	/*List of people invited, but not registered to attend.*/
+	inviteeList: {
+		type: [ListSchema]
+	},
+	/*List of people attending the event.*/
+	attendeeList: {
+		type: [ListSchema]
+	},
+	/*List of people attending the event, but who accepted the invitation from another recruiter.*/
+	almostList: {
+		type: [ListSchema]
+	},
+	rank: {
+		type: [RankSchema]
+	},
+	/*If the user is invited, but not yet registered to attend they cannot login.*/
+	login_enabled: {
+		type: Boolean,
+		validate: [validateLogin, 'login_enabled is required.']
+	},
+	templates: {
+		type: [{
+			name: {type: String},
+			template: {type: String}
+		}]
+	}
 });
 
 //Validate that ObjectIds reference actual IDs from other schemas.

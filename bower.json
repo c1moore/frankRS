@@ -24,9 +24,12 @@
     "angular-input-date": "~1.0.4",
     "angular-multi-select": "~2.0.2",
     "angular-dialog-service": "~5.2.5",
-    "angular-spinner": "~0.5.1",
+    "angular-spinner": "~0.8.0",
     "angular-recaptcha": "~2.2.2",
-    "octicons": "*"
+    "octicons": "*",
+    "angular-drag-and-drop-lists": "1.x",
+    "angular-local-storage": "0.x.x",
+    "async": "1.x.x"
   },
   "resolutions": {
     "angular": "1.2.28"

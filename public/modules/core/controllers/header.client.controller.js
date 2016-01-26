@@ -9,6 +9,7 @@ angular.module('core').controller('HeaderController', ['$scope', 'Authentication
 		$scope.memoRoles = ['recruiter','admin','attendee'];
 		$scope.eventsRoles = ['attendee','recruiter'];
 		$scope.adminRoles = ['admin'];
+		$scope.kreweRoles = ['admin', 'kreweAdmin'];
 		$scope.isCollapsed = false;
 		$scope.menu = Menus.getMenu('topbar');
 		$scope.eventSelector = eventSelector;
