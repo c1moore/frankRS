@@ -25,6 +25,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 			$scope.data = {
 				buttons: [
 					{name:"Admin Page", description:"A place where admins can fulfill their fantasies of being all-powerful.", link:'/#!/admin', roles:['admin'], image: "/modules/core/img/icons/admin.png"},
+					{name:"Krewes Portal", description:"Create and adjust Krewes.", link:'/#!/krewes_portal', roles:['admin', 'kreweAdmin'], image: "/modules/core/img/icons/krewes.png"},
 					{name:"Control Room", description:"Send out your invitations and see your invitation stats.", link:'/#!/invite', roles:['recruiter','admin'], image: "/modules/core/img/icons/invites.png"},
 					{name:"Leaderboard", description:"See how your friends and competitors rank against you.", link:'/#!/leaderboard', roles:['recruiter','admin'], image: "/modules/core/img/icons/leaderboard.png"},
 					{name:"frank Lounge", description:"Take a look at what people are saying about the events you are attending and weigh in on the chatter.", link:'/#!/franklounge', roles:['admin', 'recruiter', 'attendee'], image: "/modules/core/img/icons/frank_lounge.png"},

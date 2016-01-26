@@ -20,7 +20,7 @@
 					<div ng-repeat="button in data.buttons | roles:userRoles" class="homeButtonContainer">
 						<div class="homeButton text-center">
 							<a href="{{button.link}}" target="{{button.newTab ? '_blank' : ''}}">
-								<img src="{{button.image}}" class="homepage-nav-buttons" alt="Place holder">
+								<img src="{{button.image}}" class="homepage-nav-buttons" alt="{{button.name + ': ' + button.description}}">
 							</a>
 						</div>
 					</div>
