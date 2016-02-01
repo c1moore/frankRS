@@ -42,8 +42,7 @@ var KreweSchema = new Schema({
 	},
 	name: {
 		type: 		String,
-		required: 	true,
-		validate: 	[validateRequired, 'Krewe name is required.']
+		required: 	true
 	},
 	event_id: {
 		type: 		Schema.Types.ObjectId,
