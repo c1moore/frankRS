@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('krewes').controller('KreweController', ['$scope', 'Authentication', '$http', '$location', 'eventSelector', '$timeout', 'localStorageService', 'frankInterests', '$modal', '$window',
-	function($scope, Authentication, $http, $location, eventSelector, $timeout, localStorageService, frankInterests, $modal, $window) {
+angular.module('krewes').controller('KreweController', ['$scope', 'Authentication', '$http', '$location', 'eventSelector', '$timeout', 'localStorageService', 'frankInterests', '$modal', '$window', '$filter',
+	function($scope, Authentication, $http, $location, eventSelector, $timeout, localStorageService, frankInterests, $modal, $window, $filter) {
 		if(!Authentication.user || _.intersection(Authentication.user.roles, ['admin', 'kreweAdmin', 'kaptain']).length === 0) {
 			if(!Authentication.user) {
 				$location.path('/signin');
@@ -1307,7 +1307,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 								], function(status, data) {
 									if(!status) {
 										$scope.krewes = data[0];
-										$scope.potentialMembers = data[1];
+										$scope.potentialMembers = $filter('orderBy')(data[1], 'lName');
 
 										storeOriginalVersionLocally(eventSelector.postEventId, $scope.krewes);
 									} else {
@@ -1573,7 +1573,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 											], function(status, data) {
 												if(!status) {
 													$scope.krewes = data[0];
-													$scope.potentialMembers = data[1];
+													$scope.potentialMembers = $filter('orderBy')(data[1], 'lName');
 
 													storeOriginalVersionLocally(event_id, $scope.krewes);
 
@@ -1646,7 +1646,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 												], function(status, data) {
 													if(!status) {
 														$scope.krewes = data[0];
-														$scope.potentialMembers = data[1];
+														$scope.potentialMembers = $filter('orderBy')(data[1], 'lName');
 
 														storeOriginalVersionLocally(event_id, $scope.krewes);
 
