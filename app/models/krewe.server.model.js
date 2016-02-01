@@ -41,8 +41,7 @@ var KreweSchema = new Schema({
 		default: 	[]
 	},
 	name: {
-		type: 		String,
-		required: 	true
+		type: 		String
 	},
 	event_id: {
 		type: 		Schema.Types.ObjectId,
