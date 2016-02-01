@@ -44,7 +44,10 @@ module.exports = {
 				'public/lib/angular-dialog-service/example/js/dialogs.min.js',
 				'public/lib/spin.js/spin.js',
 				'public/lib/spin.js/jquery.spin.js',
-				'public/lib/angular-spinner/angular-spinner.min.js'
+				'public/lib/angular-spinner/angular-spinner.min.js',
+				'public/lib/angular-drag-and-drop-lists/angular-drag-and-drop-lists.min.js',
+				'public/lib/angular-local-storage/dist/angular-local-storage.min.js',
+				'public/lib/async/dist/async.min.js'
 			]
 		},
 		css: 'public/dist/application.min.css',
