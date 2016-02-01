@@ -2592,7 +2592,8 @@ angular.module('krewes').controller('KreweController', [
   'frankInterests',
   '$modal',
   '$window',
-  function ($scope, Authentication, $http, $location, eventSelector, $timeout, localStorageService, frankInterests, $modal, $window) {
+  '$filter',
+  function ($scope, Authentication, $http, $location, eventSelector, $timeout, localStorageService, frankInterests, $modal, $window, $filter) {
     if (!Authentication.user || _.intersection(Authentication.user.roles, [
         'admin',
         'kreweAdmin',
@@ -3729,7 +3730,7 @@ angular.module('krewes').controller('KreweController', [
               ], function (status, data) {
                 if (!status) {
                   $scope.krewes = data[0];
-                  $scope.potentialMembers = data[1];
+                  $scope.potentialMembers = $filter('orderBy')(data[1], 'lName');
                   storeOriginalVersionLocally(eventSelector.postEventId, $scope.krewes);
                 } else {
                   if (status === 400 && data.message === 'Required fields not specified.') {
@@ -3956,7 +3957,7 @@ angular.module('krewes').controller('KreweController', [
                       ], function (status, data) {
                         if (!status) {
                           $scope.krewes = data[0];
-                          $scope.potentialMembers = data[1];
+                          $scope.potentialMembers = $filter('orderBy')(data[1], 'lName');
                           storeOriginalVersionLocally(event_id, $scope.krewes);
                           // Stop loading icon and give the user positive feedback.
                           $scope.modalData.statusMessage = 'Local changes saved!';
@@ -4029,7 +4030,7 @@ angular.module('krewes').controller('KreweController', [
                         ], function (status, data) {
                           if (!status) {
                             $scope.krewes = data[0];
-                            $scope.potentialMembers = data[1];
+                            $scope.potentialMembers = $filter('orderBy')(data[1], 'lName');
                             storeOriginalVersionLocally(event_id, $scope.krewes);
                             // Stop loading icon and give the user positive feedback.
                             $scope.modalData.statusMessage = 'Local changes saved!';
@@ -4819,9 +4820,6 @@ angular.module('users').config([
     }).state('accounts', {
       url: '/settings/accounts',
       templateUrl: 'modules/users/views/settings/social-accounts.client.view.html'
-    }).state('addAdmin', {
-      url: '/create/admin',
-      templateUrl: 'modules/users/views/authentication/signup.client.view.html'
     }).state('signin', {
       url: '/signin',
       templateUrl: 'modules/users/views/authentication/signin.client.view.html'
