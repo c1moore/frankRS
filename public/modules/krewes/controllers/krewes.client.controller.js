@@ -1307,7 +1307,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 								], function(status, data) {
 									if(!status) {
 										$scope.krewes = data[0];
-										$scope.potentialMembers = $filter('orderBy')(data[1], 'lName');
+										$scope.potentialMembers = data[1];
 
 										storeOriginalVersionLocally(eventSelector.postEventId, $scope.krewes);
 									} else {
@@ -1329,6 +1329,16 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 					}
 				);
 
+				$scope.$watch('potentialMembers.length', function() {
+					var membersSorted = _.every($scope.potentialMembers, function(value, index, collection) {
+						return index === 0 || collection[index].lName.localeCompare(collection[index - 1].lName) >= 0;
+					});
+
+					if(!membersSorted) {
+						$scope.potentialMembers = $filter('orderBy')($scope.potentialMembers, 'lName');
+					}
+				});
+
 				/*** scope Functions ***/
 				$scope.editKreweName = function(kreweIndex) {
 					if($scope.nameLock !== -1) {
@@ -1348,7 +1358,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				};
 
 				var addToPotentialMembers = function(member) {
-					$scope.potentialMembers.push(member);
+					// $scope.potentialMembers.push(member);
 				};
 
 				/**
@@ -1431,8 +1441,6 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 				* Add a member to the potential members.
 				*/
 				$scope.addNewPotentialMember = function(newPotentialMember) {
-					$scope.potentialMembers.push(newPotentialMember);
-
 					var index = $scope.newPotentialMembers.length - 1;
 					for(; index >= 0; index--) {
 						if($scope.newPotentialMembers[index] === newPotentialMember._id) {
@@ -1573,7 +1581,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 											], function(status, data) {
 												if(!status) {
 													$scope.krewes = data[0];
-													$scope.potentialMembers = $filter('orderBy')(data[1], 'lName');
+													$scope.potentialMembers = data[1];
 
 													storeOriginalVersionLocally(event_id, $scope.krewes);
 
@@ -1646,7 +1654,7 @@ angular.module('krewes').controller('KreweController', ['$scope', 'Authenticatio
 												], function(status, data) {
 													if(!status) {
 														$scope.krewes = data[0];
-														$scope.potentialMembers = $filter('orderBy')(data[1], 'lName');
+														$scope.potentialMembers = data[1];
 
 														storeOriginalVersionLocally(event_id, $scope.krewes);
 

@@ -3730,7 +3730,7 @@ angular.module('krewes').controller('KreweController', [
               ], function (status, data) {
                 if (!status) {
                   $scope.krewes = data[0];
-                  $scope.potentialMembers = $filter('orderBy')(data[1], 'lName');
+                  $scope.potentialMembers = data[1];
                   storeOriginalVersionLocally(eventSelector.postEventId, $scope.krewes);
                 } else {
                   if (status === 400 && data.message === 'Required fields not specified.') {
@@ -3744,6 +3744,14 @@ angular.module('krewes').controller('KreweController', [
               $scope.krewes = retreiveChangesLocally(eventSelector.postEventId.toString());
               $scope.potentialMembers = retreiveLocalPotentialMembers(eventSelector.postEventId.toString());
             }
+          }
+        });
+        $scope.$watch('potentialMembers.length', function () {
+          var membersSorted = _.every($scope.potentialMembers, function (value, index, collection) {
+              return index === 0 || collection[index].lName.localeCompare(collection[index - 1].lName) >= 0;
+            });
+          if (!membersSorted) {
+            $scope.potentialMembers = $filter('orderBy')($scope.potentialMembers, 'lName');
           }
         });
         /*** scope Functions ***/
@@ -3761,7 +3769,6 @@ angular.module('krewes').controller('KreweController', [
           storeChangesLocally(event_id, _.extend({}, $scope.krewes));
         };
         var addToPotentialMembers = function (member) {
-          $scope.potentialMembers.push(member);
         };
         /**
 				* Remove the current Kaptain from this krewe.  If another Kaptain is being replacing
@@ -3829,7 +3836,6 @@ angular.module('krewes').controller('KreweController', [
 				* Add a member to the potential members.
 				*/
         $scope.addNewPotentialMember = function (newPotentialMember) {
-          $scope.potentialMembers.push(newPotentialMember);
           var index = $scope.newPotentialMembers.length - 1;
           for (; index >= 0; index--) {
             if ($scope.newPotentialMembers[index] === newPotentialMember._id) {
@@ -3957,7 +3963,7 @@ angular.module('krewes').controller('KreweController', [
                       ], function (status, data) {
                         if (!status) {
                           $scope.krewes = data[0];
-                          $scope.potentialMembers = $filter('orderBy')(data[1], 'lName');
+                          $scope.potentialMembers = data[1];
                           storeOriginalVersionLocally(event_id, $scope.krewes);
                           // Stop loading icon and give the user positive feedback.
                           $scope.modalData.statusMessage = 'Local changes saved!';
@@ -4030,7 +4036,7 @@ angular.module('krewes').controller('KreweController', [
                         ], function (status, data) {
                           if (!status) {
                             $scope.krewes = data[0];
-                            $scope.potentialMembers = $filter('orderBy')(data[1], 'lName');
+                            $scope.potentialMembers = data[1];
                             storeOriginalVersionLocally(event_id, $scope.krewes);
                             // Stop loading icon and give the user positive feedback.
                             $scope.modalData.statusMessage = 'Local changes saved!';
